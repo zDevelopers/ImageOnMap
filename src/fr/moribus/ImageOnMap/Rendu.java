@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -25,12 +26,15 @@ public class Rendu extends MapRenderer implements Runnable
 	MapView carte;
 	String URLImage, nomJoueur;
 	Player joueur;
+	boolean hasFail;
+	ImageOnMap plugin;
 
-	public Rendu(String url, boolean svg)
+	public Rendu(String url, boolean svg, ImageOnMap plug)
 	{
 		estRendu = true;
 		estSVGee = svg;
 		URLImage = url;
+		plugin = plug;
 	}
 	
 	public Rendu(String url, String pseudo)
@@ -59,6 +63,7 @@ public class Rendu extends MapRenderer implements Runnable
 	}
 
 	// Le chargement et le rendu de l'image se font dans un thread afin d'éviter le lag..
+	@SuppressWarnings("deprecation")
 	@Override
 	public void run() 
 	{
@@ -72,6 +77,7 @@ public class Rendu extends MapRenderer implements Runnable
 			} 
 			catch (IOException e) {
 				e.printStackTrace();
+				hasFail = true;
 			}
 		}
 		if (touhou == null  && local == true)
@@ -83,6 +89,7 @@ public class Rendu extends MapRenderer implements Runnable
 			} 
 			catch (IOException e) {
 				e.printStackTrace();
+				hasFail = true;
 			}
 		}
 		
@@ -91,13 +98,18 @@ public class Rendu extends MapRenderer implements Runnable
 		{
 			try 
 			{
-				@SuppressWarnings("deprecation")
-				File outputfile = new File("./plugins/ImageOnMap/map" + carte.getId() + ".png");
+				File outputfile = new File("./plugins/ImageOnMap/Image/map" + carte.getId() + ".png");
 				ImageIO.write(MapPalette.resizeImage(touhou), "png", outputfile);
+				hasFail = false;
 			} catch (IOException e) 
 			{
 				e.printStackTrace();
+				hasFail = true;
 			}
+		}
+		if(!hasFail && local == false)
+		{
+			SvgMap(carte.getId(), "map" + carte.getId(), joueur.getName());
 		}
 
 		//System.out.println("Rendu de l'image..");
@@ -113,6 +125,17 @@ public class Rendu extends MapRenderer implements Runnable
 		
 		//System.out.println("Rendu de l'image fini");
 
+	}
+	
+	void SvgMap(int IdMap, String nomImage, String nomJoueur)
+	{
+		System.out.println("Sauvegarde de la map..");
+		ArrayList<String> liste = new ArrayList<String>();
+		liste.add(String.valueOf(IdMap));
+		liste.add(nomImage);
+		liste.add(nomJoueur);
+		plugin.getConfig().set("map" + IdMap, liste);
+		plugin.saveConfig();
 	}
 	
 	static void SupprRendu(MapView map)

@@ -1,8 +1,11 @@
 name: ImageOnMap
 main: fr.moribus.ImageOnMap.ImageOnMap
-version: 1.0
+version: 1.2
 
 commands:
    tomap:
       description: render an image in a map
-      usage: /<command> [URL] [true or false]
+      usage: /<command> [URL]
+   rmmap:
+      description: remove an image
+      usage: /<command>
