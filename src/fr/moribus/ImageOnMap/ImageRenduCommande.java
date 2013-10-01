@@ -33,7 +33,11 @@ public class ImageRenduCommande implements CommandExecutor
 		
 		joueur = (Player) sender;
 		
-		if(!joueur.hasPermission("imageonmap.userender") || !joueur.isOp())
+		if(joueur.hasPermission("imageonmap.userender"))
+		{
+			
+		}
+		else
 		{
 			joueur.sendMessage("You are not allowed to use this command ( " + arg1.getName() + " )!");
 			return false;

@@ -10,19 +10,28 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class ImageOnMap extends JavaPlugin
 {
 	File dossier;
+	boolean dossierCree;
 	@Override
 	public void onEnable()
 	{
 		dossier = new File(getDataFolder().getPath() + "/Image");
 		if (!dossier.exists())
 		{
-			dossier.mkdir();
+			 dossierCree = dossier.mkdirs();
 		}
+		else
+			dossierCree = true;
+		
+		if(dossierCree)
+		{
 		System.out.println("Loading ImageOnMap");
 		getCommand("tomap").setExecutor(new ImageRenduCommande(this));
 		getCommand("rmmap").setExecutor(new ImageSupprCommande(this));
 		this.saveDefaultConfig();
 		ChargerMap();
+		}
+		else
+			System.out.println("[ImageOnMap] An error occured ! Unable to create Image folder. Plugin will NOT work !");
 	}
 	
 	@Override
