@@ -18,32 +18,33 @@ import org.bukkit.map.MinecraftFont;
 public class Rendu extends MapRenderer implements Runnable 
 {
 	
-	boolean estRendu, estSVGee, local = false;
-	BufferedImage touhou;
-	BufferedImage resizedImage;
+	boolean estRendu, estSVGee, hasFail, renderName, local = false;
+	BufferedImage touhou, resizedImage;
 	private Thread TRendu;
 	public MapCanvas canvas;
 	MapView carte;
 	String URLImage, nomJoueur;
 	Player joueur;
-	boolean hasFail;
 	ImageOnMap plugin;
 
-	public Rendu(String url, boolean svg, ImageOnMap plug)
+	public Rendu(String url, boolean svg, ImageOnMap plug, boolean rn)
 	{
 		estRendu = true;
 		estSVGee = svg;
 		URLImage = url;
 		plugin = plug;
+		renderName = rn;
 	}
 	
-	public Rendu(String url, String pseudo)
+	public Rendu(String url, String pseudo, String boolRN)
 	{
 		estRendu = true;
 		estSVGee = false;
 		URLImage = url;
 		local = true; // Sert à indiquer que le rendu a été lancé par le plugin au démarrage, et non par un joueur en jeu.
 		nomJoueur = pseudo;
+		renderName = Boolean.parseBoolean(boolRN);
+		System.out.println(boolRN + " " + renderName);
 	}
 	@Override
 	public void render(MapView v, final MapCanvas mc, Player p) 
@@ -73,6 +74,7 @@ public class Rendu extends MapRenderer implements Runnable
 			try 
 			{
 				touhou = ImageIO.read(URI.create(URLImage).toURL().openStream());
+				System.out.println(touhou.getWidth() + " " + touhou.getHeight());
 				//System.out.println("chargement de l'image");
 			} 
 			catch (IOException e) {
@@ -118,10 +120,13 @@ public class Rendu extends MapRenderer implements Runnable
 		canvas.drawImage(0, 0, MapPalette.resizeImage(touhou));
 		
 		// On écrit le pseudo du joueur qui a téléchargé l'image
-		if(!local)
-			canvas.drawText(2, 120, MinecraftFont.Font, new String("(" + joueur.getName() + ")"));
-		else
-			canvas.drawText(2, 120, MinecraftFont.Font, new String("(" + nomJoueur + ")"));
+		if (renderName)
+		{
+			if(!local)
+				canvas.drawText(2, 120, MinecraftFont.Font, new String("(" + joueur.getName() + ")"));
+			else
+				canvas.drawText(2, 120, MinecraftFont.Font, new String("(" + nomJoueur + ")"));
+		}
 		
 		//System.out.println("Rendu de l'image fini");
 
@@ -134,6 +139,7 @@ public class Rendu extends MapRenderer implements Runnable
 		liste.add(String.valueOf(IdMap));
 		liste.add(nomImage);
 		liste.add(nomJoueur);
+		liste.add(String.valueOf(renderName));
 		plugin.getConfig().set("map" + IdMap, liste);
 		plugin.saveConfig();
 	}

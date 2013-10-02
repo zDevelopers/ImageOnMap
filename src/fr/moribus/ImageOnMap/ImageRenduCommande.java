@@ -14,6 +14,7 @@ public class ImageRenduCommande implements CommandExecutor
 {
 
 	Player joueur;
+	boolean renderName;
 	ImageOnMap ca;
 	boolean imgSvg;
 	
@@ -56,9 +57,19 @@ public class ImageRenduCommande implements CommandExecutor
 		    return false;
 		}
 		
+		if (arg3.length == 2)
+		{
+			if (arg3[1].contains("true"))
+				renderName = true;
+			else
+				renderName = false;
+		}
+		else
+			renderName = false;
+		
 		imgSvg = true;
 		// On crée une map
-		Rendu ren = new Rendu(arg3[0], imgSvg, ca);
+		Rendu ren = new Rendu(arg3[0], imgSvg, ca, renderName);
 		MapView carte = Bukkit.getMap(joueur.getItemInHand().getDurability());
 		Rendu.SupprRendu(carte);
 		carte.addRenderer(ren);

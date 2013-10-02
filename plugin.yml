@@ -1,6 +1,6 @@
 name: ImageOnMap
 main: fr.moribus.ImageOnMap.ImageOnMap
-version: 1.2
+version: 1.2.2
 
 commands:
    tomap:
@@ -9,3 +9,8 @@ commands:
    rmmap:
       description: remove an image
       usage: /<command>
+      
+permissions:
+    imageonmap.userender:
+        description: Allows you to use /tomap
+        default: op
