@@ -50,14 +50,17 @@ public class ImageSupprCommande implements CommandExecutor
 		Set<String> cle = plugin.getConfig().getKeys(false);
 		for (String s: cle)
 		{
-			if(carte.getId() == Short.parseShort(plugin.getConfig().getStringList(s).get(0)))
+			if(plugin.getConfig().getStringList(s).size() >= 3)
 			{
-				Rendu.SupprRendu(carte);
-				plugin.getConfig().set(s, null);
-				plugin.saveConfig();
-				new File("./plugins/ImageOnMap/" + s + ".png").delete();
-				joueur.sendMessage("L'image a bien été supprimée");
-				return true;
+				if(carte.getId() == Short.parseShort(plugin.getConfig().getStringList(s).get(0)))
+				{
+					Rendu.SupprRendu(carte);
+					plugin.getConfig().set(s, null);
+					plugin.saveConfig();
+					new File("./plugins/ImageOnMap/" + s + ".png").delete();
+					joueur.sendMessage("L'image a bien été supprimée");
+					return true;
+				}
 			}
 		}
 		

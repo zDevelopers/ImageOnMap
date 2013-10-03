@@ -1,6 +1,7 @@
 package fr.moribus.ImageOnMap;
 
 import java.io.File;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.BlockCommandSender;
@@ -47,5 +48,59 @@ public class ImgUtility
 			plugin.getConfig().set("Limit-map-by-player", 0);
 		plugin.saveConfig();
 		
+	}
+	
+	static int getNombreDeMaps(ImageOnMap plugin)
+	{
+		int nombre = 0;
+		Set<String> cle = plugin.getConfig().getKeys(false);
+		for (String s: cle)
+		{
+			if(plugin.getConfig().getStringList(s).size() >= 3)
+			{
+				nombre++;
+			}
+		}
+		return nombre;
+	}
+	
+	static int getNombreDeMapsParJoueur(ImageOnMap plugin, String pseudo)
+	{
+		int nombre = 0;
+		Set<String> cle = plugin.getConfig().getKeys(false);
+		for (String s: cle)
+		{
+			if(plugin.getConfig().getStringList(s).size() >= 3 && plugin.getConfig().getStringList(s).get(2).contentEquals(pseudo))
+			{
+				nombre++;
+			}
+		}
+		return nombre;
+	}
+	
+	static boolean EstDansFichier(ImageOnMap plugin, short id)
+	{
+		Set<String> cle = plugin.getConfig().getKeys(false);
+		for (String s: cle)
+		{
+			if(plugin.getConfig().getStringList(s).size() >= 3 && Short.parseShort(plugin.getConfig().getStringList(s).get(0)) == id)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean EstDansFichier(ImageOnMap plugin, short id, String pseudo) 
+	{
+		Set<String> cle = plugin.getConfig().getKeys(false);
+		for (String s: cle)
+		{
+			if(plugin.getConfig().getStringList(s).size() >= 3 && Short.parseShort(plugin.getConfig().getStringList(s).get(0)) == id && plugin.getConfig().getStringList(s).get(2).contentEquals(pseudo))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

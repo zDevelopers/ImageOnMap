@@ -21,6 +21,9 @@ public final class ImageOnMap extends JavaPlugin
 		// On ajoute si besoin les params par défaut du plugin
 		ImgUtility.CreeSectionConfig(this);
 		
+		System.out.println(ImgUtility.getNombreDeMaps(this));
+		System.out.println(ImgUtility.getNombreDeMapsParJoueur(this, "moribus"));
+		
 		if(dossierCree)
 		{
 			getCommand("tomap").setExecutor(new ImageRenduCommande(this));
