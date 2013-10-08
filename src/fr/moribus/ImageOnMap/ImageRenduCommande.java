@@ -83,7 +83,7 @@ public class ImageRenduCommande implements CommandExecutor
 		}
 		
 		// Même chose, mais par joueur cette fois
-		if(!ImgUtility.EstDansFichier(ca, carte.getId()) && nbMapJoueur != 0 && ImgUtility.getNombreDeMapsParJoueur(ca, joueur.getName()) >= nbMapJoueur)
+		if(!ImgUtility.EstDansFichier(ca, carte.getId(), joueur.getName()) && nbMapJoueur != 0 && ImgUtility.getNombreDeMapsParJoueur(ca, joueur.getName()) >= nbMapJoueur)
 		{
 			joueur.sendMessage(ChatColor.RED + "You've reached the limit of maps per player (" + nbMapJoueur + ") ! Please delete or reuse one of your custom map.");
 			return true;

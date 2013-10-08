@@ -44,7 +44,6 @@ public class Rendu extends MapRenderer implements Runnable
 		local = true; // Sert à indiquer que le rendu a été lancé par le plugin au démarrage, et non par un joueur en jeu.
 		nomJoueur = pseudo;
 		renderName = Boolean.parseBoolean(boolRN);
-		System.out.println(boolRN + " " + renderName);
 	}
 	@Override
 	public void render(MapView v, final MapCanvas mc, Player p) 
@@ -132,9 +131,10 @@ public class Rendu extends MapRenderer implements Runnable
 
 	}
 	
+	@SuppressWarnings("deprecation")
 	void SvgMap(int IdMap, String nomImage, String nomJoueur)
 	{
-		System.out.println("Sauvegarde de la map..");
+		System.out.println("Saving map " + carte.getId());
 		ArrayList<String> liste = new ArrayList<String>();
 		liste.add(String.valueOf(IdMap));
 		liste.add(nomImage);

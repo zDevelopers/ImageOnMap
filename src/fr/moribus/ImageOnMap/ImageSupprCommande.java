@@ -58,7 +58,7 @@ public class ImageSupprCommande implements CommandExecutor
 					plugin.getConfig().set(s, null);
 					plugin.saveConfig();
 					new File("./plugins/ImageOnMap/" + s + ".png").delete();
-					joueur.sendMessage("L'image a bien été supprimée");
+					joueur.sendMessage("The picture have been deleted");
 					return true;
 				}
 			}
