@@ -54,7 +54,7 @@ public class ImageSupprCommande implements CommandExecutor
 			{
 				if(carte.getId() == Short.parseShort(plugin.getConfig().getStringList(s).get(0)))
 				{
-					Rendu.SupprRendu(carte);
+					ImageRenderer.SupprRendu(carte);
 					plugin.getConfig().set(s, null);
 					plugin.saveConfig();
 					new File("./plugins/ImageOnMap/" + s + ".png").delete();

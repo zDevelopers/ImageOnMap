@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 
 public class ImageRenduCommande implements CommandExecutor
@@ -49,7 +48,7 @@ public class ImageRenduCommande implements CommandExecutor
 			
 		if(joueur.getItemInHand().getType() != Material.MAP)
 		{
-			joueur.sendMessage(ChatColor.RED + "Vous devez tenir une map en main !!");
+			joueur.sendMessage(ChatColor.RED + "You must hold a map !!");
 			return false;
 		}
 		
@@ -91,10 +90,11 @@ public class ImageRenduCommande implements CommandExecutor
 		
 		imgSvg = true;
 		// On ajoute un rendu
-		Rendu ren = new Rendu(arg3[0], imgSvg, ca, renderName);
-		Rendu.SupprRendu(carte);
-		carte.addRenderer(ren);
-		joueur.setItemInHand(new ItemStack(Material.MAP, 1, carte.getId()));
+		//Rendu ren = new Rendu(arg3[0], imgSvg, ca, renderName);
+		ImageRenderer.SupprRendu(carte);
+		//carte.addRenderer(ren);
+		TacheTraitementImg tache = new TacheTraitementImg(joueur, arg3[0]);
+		tache.runTaskTimer(ca, 0, 10);
 		
 		return true;
 	}

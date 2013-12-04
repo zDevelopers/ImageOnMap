@@ -26,7 +26,7 @@ public final class ImageOnMap extends JavaPlugin
 			getCommand("tomap").setExecutor(new ImageRenduCommande(this));
 			getCommand("rmmap").setExecutor(new ImageSupprCommande(this));
 			this.saveDefaultConfig();
-			ChargerMap();
+			//ChargerMap();
 		}
 		else
 		{
@@ -41,7 +41,7 @@ public final class ImageOnMap extends JavaPlugin
 		System.out.println("Stopping ImageOnMap");
 	}
 
-	public void ChargerMap()
+	/*public void ChargerMap()
 	{
 		Set<String> cle = getConfig().getKeys(false);
 		for (String s: cle)
@@ -51,13 +51,13 @@ public final class ImageOnMap extends JavaPlugin
 				System.out.println("Loading " + s);
 				@SuppressWarnings("deprecation")
 				MapView carte = Bukkit.getMap(Short.parseShort(getConfig().getStringList(s).get(0)));
-				Rendu.SupprRendu(carte);
+				ImageRenderer.SupprRendu(carte);
 				if (getConfig().getStringList(s).size() == 4)
 					carte.addRenderer(new Rendu("./plugins/ImageOnMap/Image/" + getConfig().getStringList(s).get(1) + ".png", getConfig().getStringList(s).get(2), getConfig().getStringList(s).get(3)));
 				else if (getConfig().getStringList(s).size() == 3)
 					carte.addRenderer(new Rendu("./plugins/ImageOnMap/Image/" + getConfig().getStringList(s).get(1) + ".png", getConfig().getStringList(s).get(2), "True"));
 			}
 		}
-	}
+	}*/
 
 }
