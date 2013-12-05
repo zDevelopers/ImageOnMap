@@ -1,23 +1,32 @@
 package fr.moribus.ImageOnMap;
 
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 
 /* Class which represents a picture cut into several parts */
 public class Poster 
 {
 	BufferedImage src;
 	BufferedImage ImgDecoupe[];
+	HashMap<Integer, String> NumeroMap;
 	int nbPartie;
+	int nbColonne;
 	
 	Poster(BufferedImage img)
 	{
 		src = img;
+		NumeroMap = new HashMap<Integer, String>();
 		DecoupeImg();
 	}
 	
 	public BufferedImage[] getPoster()
 	{
 		return ImgDecoupe;
+	}
+	
+	public int getNbColonne()
+	{
+		return nbColonne;
 	}
 	
 	private void DecoupeImg()
@@ -41,6 +50,7 @@ public class Poster
 			else
 				colonne = src.getHeight() / 128;
 			
+			nbColonne = colonne;
 			nbPartie = ligne * colonne;
 			ImgDecoupe = new BufferedImage[nbPartie];
 			
@@ -54,14 +64,15 @@ public class Poster
 						if(col == colonne - 1  && resteY != 0)
 						{
 							ImgDecoupe[index] = src.getSubimage(x, y, resteX, resteY);
-							index++;
+							
 						}
 						else
 						{
 							ImgDecoupe[index] = src.getSubimage(x, y, resteX, 128);
-							index++;
 							y += 128;
 						}
+						NumeroMap.put(index, "column "+ (lig + 1) +", row "+ (col + 1));
+						index++;
 						
 					}
 				}
@@ -72,14 +83,14 @@ public class Poster
 						if(col == colonne - 1 && resteY != 0)
 						{
 							ImgDecoupe[index] = src.getSubimage(x, y, 128, resteY);
-							index++;
 						}
 						else
 						{
 							ImgDecoupe[index] = src.getSubimage(x, y, 128, 128);
-							index++;
 							y += 128;
 						}
+						NumeroMap.put(index, "column "+ (lig +1) +", row "+ (col + 1));
+						index++;
 						
 					}
 					x += 128;

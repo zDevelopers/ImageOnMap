@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -14,6 +15,7 @@ public class TacheTraitementImg extends BukkitRunnable
 	Player joueur;
  	ImageRenderer renduImg;
  	PlayerInventory inv;
+ 	ItemStack map;
 	
  	TacheTraitementImg(Player j, String u)
  	{
@@ -35,17 +37,20 @@ public class TacheTraitementImg extends BukkitRunnable
 		}
 		else
 		{
-			System.out.println("ohlala ?");
 			cancel();
-			int nbImage = renduImg.getImg().length;
+			int nbImage = renduImg.getImg().getPoster().length;
 			MapView carte;
 			
 			for (int i = 0; i < nbImage; i++)
 			{
 				carte = Bukkit.createMap(joueur.getWorld());
 				ImageRenderer.SupprRendu(carte);
-				carte.addRenderer(new Rendu(renduImg.getImg()[i]));
-				inv.addItem(new ItemStack(Material.MAP, 1, carte.getId()));
+				carte.addRenderer(new Rendu(renduImg.getImg().getPoster()[i]));
+				map = new ItemStack(Material.MAP, 1, carte.getId());
+				ItemMeta meta = map.getItemMeta();
+				meta.setDisplayName("Map (" +renduImg.getImg().NumeroMap.get(i) +")");
+				map.setItemMeta(meta);
+				inv.addItem(map);
 			}
 			joueur.sendMessage("Rendu de l'image fini");
 		}

@@ -1,10 +1,7 @@
 package fr.moribus.ImageOnMap;
 
 import java.io.File;
-import java.util.Set;
 
-import org.bukkit.Bukkit;
-import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ImageOnMap extends JavaPlugin

@@ -22,13 +22,15 @@ public class ImageRenderer extends Thread
 		URL = u;
 	}
 	
-	public BufferedImage[] getImg() 
+	public Poster getImg() 
 	{
 		if (estPrete)
-			return img.getPoster();
+			return img;
 		else
 			return null;
 	}
+	
+	
 
 	public Boolean getStatut()
 	{
