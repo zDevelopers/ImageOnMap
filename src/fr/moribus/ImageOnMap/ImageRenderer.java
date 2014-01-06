@@ -55,10 +55,10 @@ public class ImageRenderer extends Thread
 	
 	static void SupprRendu(MapView map)
 	{
-		if (map.getRenderers().size() != 0)
+		if (map.getRenderers().size() > 0)
 		{
 			int i = 0, t = map.getRenderers().size();
-			while (i < t )
+			while (i < t)
 			{
 				map.removeRenderer(map.getRenderers().get(i));
 				i++;

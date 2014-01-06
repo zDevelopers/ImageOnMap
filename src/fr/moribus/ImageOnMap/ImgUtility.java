@@ -46,6 +46,8 @@ public class ImgUtility
 			plugin.getConfig().set("Limit-map-by-server", 0);
 		if(plugin.getConfig().get("Limit-map-by-player") == null)
 			plugin.getConfig().set("Limit-map-by-player", 0);
+		if(plugin.getConfig().get("collect-data") == null)
+			plugin.getConfig().set("collect-data", true);
 		plugin.saveConfig();
 		
 	}

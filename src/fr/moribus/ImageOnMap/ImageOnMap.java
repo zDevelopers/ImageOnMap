@@ -1,6 +1,8 @@
 package fr.moribus.ImageOnMap;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Set;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,12 +20,24 @@ public final class ImageOnMap extends JavaPlugin
 		// On ajoute si besoin les params par défaut du plugin
 		ImgUtility.CreeSectionConfig(this);
 		
+		if(this.getConfig().getBoolean("collect-data"))
+		{
+			try 
+			{
+				MetricsLite metrics = new MetricsLite(this);
+				metrics.start();
+				System.out.println("Metrics launched for ImageOnMap");
+			} catch (IOException e) {
+				// Failed to submit the stats :-(
+			}
+		}
+		
 		if(dossierCree)
 		{
 			getCommand("tomap").setExecutor(new ImageRenduCommande(this));
-			getCommand("rmmap").setExecutor(new ImageSupprCommande(this));
+			//getCommand("rmmap").setExecutor(new ImageSupprCommande(this));
 			this.saveDefaultConfig();
-			//ChargerMap();
+			ChargerMap();
 		}
 		else
 		{
@@ -38,23 +52,26 @@ public final class ImageOnMap extends JavaPlugin
 		System.out.println("Stopping ImageOnMap");
 	}
 
-	/*public void ChargerMap()
+	public void ChargerMap()
 	{
 		Set<String> cle = getConfig().getKeys(false);
+		int nbMap = 0, nbErr = 0;
 		for (String s: cle)
 		{
 			if(getConfig().getStringList(s).size() >= 3)
 			{
-				System.out.println("Loading " + s);
-				@SuppressWarnings("deprecation")
-				MapView carte = Bukkit.getMap(Short.parseShort(getConfig().getStringList(s).get(0)));
-				ImageRenderer.SupprRendu(carte);
-				if (getConfig().getStringList(s).size() == 4)
-					carte.addRenderer(new Rendu("./plugins/ImageOnMap/Image/" + getConfig().getStringList(s).get(1) + ".png", getConfig().getStringList(s).get(2), getConfig().getStringList(s).get(3)));
-				else if (getConfig().getStringList(s).size() == 3)
-					carte.addRenderer(new Rendu("./plugins/ImageOnMap/Image/" + getConfig().getStringList(s).get(1) + ".png", getConfig().getStringList(s).get(2), "True"));
+				SavedMap map = new SavedMap(this, Short.valueOf(getConfig().getStringList(s).get(0)));
+				
+				if(map.LoadMap())
+					nbMap++;
+				else
+					nbErr++;
 			}
+			
 		}
-	}*/
+		System.out.println(nbMap +" maps was loaded");
+		if(nbErr != 0)
+			System.out.println(nbErr +" maps can't be loaded");
+	}
 
 }
