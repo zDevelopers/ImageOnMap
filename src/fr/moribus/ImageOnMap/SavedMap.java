@@ -32,17 +32,17 @@ public class SavedMap
 	{
 		idMap = id;
 		plugin = plug;
-		Set<String> cle = plugin.getConfig().getKeys(false);
+		Set<String> cle = plugin.getCustomConfig().getKeys(false);
 		int tmp = 0;
 		for (String s: cle)
 		{
-			if(plugin.getConfig().getStringList(s).size() >= 3 && Short.valueOf(plugin.getConfig().getStringList(s).get(0)) == id)
+			if(plugin.getCustomConfig().getStringList(s).size() >= 3 && Short.valueOf(plugin.getCustomConfig().getStringList(s).get(0)) == id)
 			{
 				tmp++;
 				//System.out.println(tmp);
 				//MapView carte = Bukkit.getMap(Short.parseShort(plugin.getConfig().getStringList(s).get(0)));
-				nomImg = plugin.getConfig().getStringList(s).get(1);
-				nomJoueur = plugin.getConfig().getStringList(s).get(2);
+				nomImg = plugin.getCustomConfig().getStringList(s).get(1);
+				nomJoueur = plugin.getCustomConfig().getStringList(s).get(2);
 				try {
 					image = ImageIO.read(new File("./plugins/ImageOnMap/Image/"+ nomImg + ".png"));
 					//System.out.println("Chargement de l'image fini");
@@ -76,8 +76,8 @@ public class SavedMap
 		liste.add(String.valueOf(idMap));
 		liste.add(nomImg);
 		liste.add(nomJoueur);
-		plugin.getConfig().set(nomImg, liste);
-		plugin.saveConfig();
+		plugin.getCustomConfig().set(nomImg, liste);
+		plugin.saveCustomConfig();
 		return true;
 	}
 	

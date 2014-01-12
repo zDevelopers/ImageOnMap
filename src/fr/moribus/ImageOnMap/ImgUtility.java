@@ -1,6 +1,7 @@
 package fr.moribus.ImageOnMap;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
@@ -48,6 +49,8 @@ public class ImgUtility
 			plugin.getConfig().set("Limit-map-by-player", 0);
 		if(plugin.getConfig().get("collect-data") == null)
 			plugin.getConfig().set("collect-data", true);
+		if(plugin.getConfig().get("import-maps") == null)
+			plugin.getConfig().set("import-maps", true);
 		plugin.saveConfig();
 		
 	}
@@ -55,10 +58,10 @@ public class ImgUtility
 	static int getNombreDeMaps(ImageOnMap plugin)
 	{
 		int nombre = 0;
-		Set<String> cle = plugin.getConfig().getKeys(false);
+		Set<String> cle = plugin.getCustomConfig().getKeys(false);
 		for (String s: cle)
 		{
-			if(plugin.getConfig().getStringList(s).size() >= 3)
+			if(plugin.getCustomConfig().getStringList(s).size() >= 3)
 			{
 				nombre++;
 			}
@@ -69,10 +72,10 @@ public class ImgUtility
 	static int getNombreDeMapsParJoueur(ImageOnMap plugin, String pseudo)
 	{
 		int nombre = 0;
-		Set<String> cle = plugin.getConfig().getKeys(false);
+		Set<String> cle = plugin.getCustomConfig().getKeys(false);
 		for (String s: cle)
 		{
-			if(plugin.getConfig().getStringList(s).size() >= 3 && plugin.getConfig().getStringList(s).get(2).contentEquals(pseudo))
+			if(plugin.getCustomConfig().getStringList(s).size() >= 3 && plugin.getCustomConfig().getStringList(s).get(2).contentEquals(pseudo))
 			{
 				nombre++;
 			}
@@ -82,10 +85,10 @@ public class ImgUtility
 	
 	static boolean EstDansFichier(ImageOnMap plugin, short id)
 	{
-		Set<String> cle = plugin.getConfig().getKeys(false);
+		Set<String> cle = plugin.getCustomConfig().getKeys(false);
 		for (String s: cle)
 		{
-			if(plugin.getConfig().getStringList(s).size() >= 3 && Short.parseShort(plugin.getConfig().getStringList(s).get(0)) == id)
+			if(plugin.getCustomConfig().getStringList(s).size() >= 3 && Short.parseShort(plugin.getCustomConfig().getStringList(s).get(0)) == id)
 			{
 				return true;
 			}
@@ -95,14 +98,42 @@ public class ImgUtility
 
 	public static boolean EstDansFichier(ImageOnMap plugin, short id, String pseudo) 
 	{
-		Set<String> cle = plugin.getConfig().getKeys(false);
+		Set<String> cle = plugin.getCustomConfig().getKeys(false);
 		for (String s: cle)
 		{
-			if(plugin.getConfig().getStringList(s).size() >= 3 && Short.parseShort(plugin.getConfig().getStringList(s).get(0)) == id && plugin.getConfig().getStringList(s).get(2).contentEquals(pseudo))
+			if(plugin.getCustomConfig().getStringList(s).size() >= 3 && Short.parseShort(plugin.getCustomConfig().getStringList(s).get(0)) == id && plugin.getCustomConfig().getStringList(s).get(2).contentEquals(pseudo))
 			{
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	static boolean ImporterConfig(ImageOnMap plugin)
+	{
+		Set<String> cle = plugin.getConfig().getKeys(false);
+		
+		plugin.getLogger().info("Start importing maps config to maps.yml...");
+		int i = 0;
+		for (String s: cle)
+		{
+			if(plugin.getConfig().getStringList(s).size() >= 3)
+			{
+				//plugin.getLogger().info("Importing "+ plugin.getConfig().getStringList(s).get(1));
+				ArrayList<String> liste = new ArrayList<String>();
+				liste.add(String.valueOf(plugin.getConfig().getStringList(s).get(0)));
+				liste.add(plugin.getConfig().getStringList(s).get(1));
+				liste.add(plugin.getConfig().getStringList(s).get(2));
+				plugin.getCustomConfig().set(plugin.getConfig().getStringList(s).get(1), liste);
+				plugin.getConfig().set(s, null);
+				i++;
+			}
+			
+		}
+		plugin.getLogger().info("Importing finished. "+ i+ "maps were imported");
+		plugin.getConfig().set("import-maps", false);
+		plugin.saveConfig();
+		plugin.saveCustomConfig();
+		return true;
 	}
 }
