@@ -130,6 +130,31 @@ public class MapToolCommand implements CommandExecutor
 					"\nYou have rendered "+ ChatColor.DARK_PURPLE+ (compteur + 1)+ ChatColor.RESET+ " pictures");
 		}
 		
+		else if(arg3[0].equalsIgnoreCase("getrest"))
+		{
+			if(plugin.getRemainingMaps(joueur.getName()) == null)
+			{
+				joueur.sendMessage("All maps have already be placed in your inventory");
+				return true;
+			}
+			ArrayList<ItemStack> reste = plugin.getRemainingMaps(joueur.getName());
+			ArrayList<ItemStack> restant = new ArrayList<ItemStack>();
+			for(int i = 0; i < reste.size(); i++)
+			{
+				ImgUtility.AddMap(reste.get(i), inv, restant);
+			}
+			if(restant.isEmpty())
+			{
+				plugin.removeRemaingMaps(joueur.getName());
+				joueur.sendMessage("All maps have been placed in your inventory");
+			}
+			else
+			{
+				plugin.setRemainingMaps(joueur.getName(), restant);
+				joueur.sendMessage(restant.size()+ " maps can't be placed in your inventory. Please run "+ ChatColor.GOLD+ "/maptool getrest again");
+			}
+		}
+		
 		return true;
 	}
 

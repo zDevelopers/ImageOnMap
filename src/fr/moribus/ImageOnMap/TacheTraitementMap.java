@@ -1,5 +1,7 @@
 package fr.moribus.ImageOnMap;
 
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -59,6 +61,7 @@ public class TacheTraitementMap extends BukkitRunnable
 			}
 			MapView carte;
 			
+			ArrayList<ItemStack> restant = new ArrayList<ItemStack>();
 			for (int i = 0; i < nbImage; i++)
 			{
 				carte = Bukkit.createMap(joueur.getWorld());
@@ -68,14 +71,18 @@ public class TacheTraitementMap extends BukkitRunnable
 				ItemMeta meta = map.getItemMeta();
 				meta.setDisplayName("Map (" +renduImg.getImg().NumeroMap.get(i) +")");
 				map.setItemMeta(meta);
-				inv.addItem(map);
+				
+				ImgUtility.AddMap(map, inv, restant);
 				
 				//Svg de la map
 				SavedMap svg = new SavedMap(plugin, joueur.getName(), carte.getId(), renduImg.getImg().getPoster()[i]);
 				svg.SaveMap();
 				joueur.sendMap(carte);
 			}
-			joueur.sendMessage("Rendu de l'image fini");
+			if(!restant.isEmpty())
+				joueur.sendMessage(restant.size()+ " maps can't be place in your inventory. Please make free space in your inventory and run "+ ChatColor.GOLD+  "/maptool rest");
+			plugin.setRemainingMaps(joueur.getName(), restant);
+			joueur.sendMessage("Render finished");
 		}
 	}
 

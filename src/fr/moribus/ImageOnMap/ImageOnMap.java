@@ -3,11 +3,14 @@ package fr.moribus.ImageOnMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ImageOnMap extends JavaPlugin
@@ -17,6 +20,9 @@ public final class ImageOnMap extends JavaPlugin
 	boolean dossierCree;
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
+    // liste contenant les maps ne pouvant être placé dans l'inventaire du joueur. Je le fous ici afin que ce soit
+    // accessible de partout dans le plugin..
+    private HashMap<String, ArrayList<ItemStack>> cache = new HashMap<String, ArrayList<ItemStack>>();
     
 	@Override
 	public void onEnable()
@@ -125,6 +131,21 @@ public final class ImageOnMap extends JavaPlugin
         } catch (IOException ex) {
             getLogger().log(Level.SEVERE, "Could not save config to " + customConfigFile, ex);
         }
+    }
+    
+    public ArrayList<ItemStack> getRemainingMaps(String j)
+    {
+    	return cache.get(j);
+    }
+    
+    public void setRemainingMaps(String j, ArrayList<ItemStack> remaining)
+    {
+    	cache.put(j, remaining);
+    }
+    
+    public void removeRemaingMaps(String j)
+    {
+    	cache.remove(j);
     }
 
 }

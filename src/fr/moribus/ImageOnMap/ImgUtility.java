@@ -2,6 +2,7 @@ package fr.moribus.ImageOnMap;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -10,6 +11,8 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 
 public class ImgUtility 
@@ -227,5 +230,15 @@ public class ImgUtility
 			}
 		}
 		return listeMap;
+	}
+	
+	static void AddMap(ItemStack map, Inventory inv, ArrayList<ItemStack> restant)
+	{
+		HashMap<Integer,ItemStack> reste = inv.addItem(map);
+		
+		if(!reste.isEmpty())
+		{
+			restant.add(reste.get(0));
+		}
 	}
 }
