@@ -4,11 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.map.MapView;
 
 public class ImgUtility 
 {
@@ -135,5 +137,95 @@ public class ImgUtility
 		plugin.saveConfig();
 		plugin.saveCustomConfig();
 		return true;
+	}
+	
+	// Fait la même chose que EstDansFichier() mais en retournant un objet MapView
+	@SuppressWarnings("deprecation")
+	static MapView getMap(ImageOnMap plugin, short id)
+	{
+		MapView map;
+		if(!ImgUtility.EstDansFichier(plugin, id))
+		{
+			return null;
+		}
+		
+		
+		map = Bukkit.getMap(id);
+		if(map == null)
+		{
+			plugin.getLogger().warning("Map#"+ id+ " exists in maps.yml but not in the world folder !");
+			return null;
+		}
+		
+		return map;
+	}
+	
+	static boolean RemoveMap(ImageOnMap plugin, short id)
+	{
+		@SuppressWarnings("deprecation")
+		MapView carte = Bukkit.getMap(id);
+		
+		Set<String> cle = plugin.getCustomConfig().getKeys(false);
+		plugin.getLogger().info("POINT 2");
+		for (String s: cle)
+		{
+			if(plugin.getCustomConfig().getStringList(s).size() >= 3)
+			{
+				if(carte == null && id == Short.parseShort(plugin.getCustomConfig().getStringList(s).get(0)))
+				{
+					//joueur.sendMessage("Suppression de la map dans fichier conf");
+					plugin.getCustomConfig().set(s, null);
+					plugin.saveCustomConfig();
+					File map = new File("./plugins/ImageOnMap/Image/" + s + ".png");
+					boolean isDeleted = map.delete();
+					//joueur.sendMessage("The picture have been deleted");
+					
+					if(isDeleted)
+						return true;
+					else
+					{
+						plugin.getLogger().warning("Picture "+ s+ ".png cannot be deleted !");
+						return false;
+					}
+				}
+				
+				else if(id == Short.parseShort(plugin.getCustomConfig().getStringList(s).get(0)))
+				{
+					//joueur.sendMessage("Suppression de la map dans fichier conf + fichier dat");
+					ImageRenderer.SupprRendu(carte);
+					plugin.getCustomConfig().set(s, null);
+					plugin.saveCustomConfig();
+					File map = new File("./plugins/ImageOnMap/Image/" + s + ".png");
+					boolean isDeleted = map.delete();
+					//joueur.sendMessage("DEBUG: booléen isDeleted :"+ isDeleted+ "; Nom de la map : "+ plugin.getServer().getWorlds().get(0).getName());
+					//joueur.sendMessage("The map has been deleted");
+					if(isDeleted)
+						return true;
+					else
+					{
+						plugin.getLogger().warning("Picture "+ s+ ".png cannot be deleted !");
+						return false;
+					}
+						
+				}
+			}
+		}
+		
+		plugin.getLogger().info("No map with id"+ id+ " was found");
+		return false;
+	}
+	
+	static ArrayList<String> getListMapByPlayer(ImageOnMap plugin, String pseudo)
+	{
+		ArrayList<String> listeMap = new ArrayList<String>();
+		Set<String> cle = plugin.getCustomConfig().getKeys(false);
+		for (String s: cle)
+		{
+			if(plugin.getCustomConfig().getStringList(s).size() >= 3 && pseudo.equalsIgnoreCase(plugin.getCustomConfig().getStringList(s).get(2)))
+			{
+				listeMap.add(plugin.getCustomConfig().getStringList(s).get(0));
+			}
+		}
+		return listeMap;
 	}
 }

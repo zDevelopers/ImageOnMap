@@ -45,8 +45,7 @@ public final class ImageOnMap extends JavaPlugin
 		if(dossierCree)
 		{
 			getCommand("tomap").setExecutor(new ImageRenduCommande(this));
-			getCommand("getmap").setExecutor(new GetMapCommand(this));
-			//getCommand("rmmap").setExecutor(new ImageSupprCommande(this));
+			getCommand("maptool").setExecutor(new MapToolCommand(this));
 			this.saveDefaultConfig();
 			ChargerMap();
 		}
@@ -86,6 +85,10 @@ public final class ImageOnMap extends JavaPlugin
 			System.out.println(nbErr +" maps can't be loaded");
 	}
 	
+	/* Méthodes pour charger / recharger / sauvegarder
+	 * le fichier conf des maps (map.yml).
+	 * Je les ai juste copié depuis un tuto du wiki Bukkit...
+	 */
     public void reloadCustomConfig() 
     {
         if (customConfigFile == null) 

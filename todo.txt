@@ -1,0 +1,6 @@
+- Créer un fichier config dédié à l'enregistrement des maps = FAIT !
+- Stocker les maps dans un coffre s'il n'y a plus de place dans l'inventaire du joueur
+- Pouvoir charger une image locale
+- Ajouter une option permettant de redimensioner une image
+- IMPORTANT: sauvegarder les images selon la map
+- IMPORTANT (mais difficilement faisable pour le moment): enregistrer les maps dans leurs fichiers "natifs" (dans le dossier de la map)

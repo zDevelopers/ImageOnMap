@@ -73,6 +73,7 @@ public class TacheTraitementMap extends BukkitRunnable
 				//Svg de la map
 				SavedMap svg = new SavedMap(plugin, joueur.getName(), carte.getId(), renduImg.getImg().getPoster()[i]);
 				svg.SaveMap();
+				joueur.sendMap(carte);
 			}
 			joueur.sendMessage("Rendu de l'image fini");
 		}
