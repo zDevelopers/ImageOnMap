@@ -12,13 +12,14 @@ public class ImageRenduCommande implements CommandExecutor
 
 	Player joueur;
 	boolean renderName, imgSvg;
-	ImageOnMap ca;
+	ImageOnMap plugin;
+	boolean resize;
 	
-	public ImageRenduCommande(ImageOnMap plugin)
+	public ImageRenduCommande(ImageOnMap p)
 	{
-		ca = plugin;
+		plugin = p;
 	}
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command arg1, String arg2,
 			String[] arg3) 
@@ -28,6 +29,7 @@ public class ImageRenduCommande implements CommandExecutor
 			return false;
 		
 		joueur = (Player) sender;
+		resize = false;
 		
 		if(joueur.hasPermission("imageonmap.userender"))
 		{
@@ -45,8 +47,22 @@ public class ImageRenduCommande implements CommandExecutor
 		    return false;
 		}
 		
-		TacheTraitementMap tache = new TacheTraitementMap(joueur, arg3[0], ca);
-		tache.runTaskTimer(ca, 0, 10);
+		/*if(arg3.length == 1 && arg3[0].equalsIgnoreCase("test"))
+		{
+			MapView map = Bukkit.createMap(joueur.getWorld());
+			TacheHorloge tache = new TacheHorloge(joueur, map);
+			tache.runTaskTimer(plugin, 0, 150);
+			return true;
+		}*/
+		
+		if(arg3.length >= 2 && arg3[1].equalsIgnoreCase("resize"))
+		{
+			resize = true;
+		}
+		
+		
+		TacheTraitementMap tache = new TacheTraitementMap(joueur, arg3[0], plugin, resize);
+		tache.runTaskTimer(plugin, 0, 10);
 		
 		return true;
 	}

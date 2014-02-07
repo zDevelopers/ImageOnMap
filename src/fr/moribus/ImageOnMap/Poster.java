@@ -24,6 +24,7 @@ public class Poster
 		return ImgDecoupe;
 	}
 	
+	
 	public int getNbColonne()
 	{
 		return nbColonne;

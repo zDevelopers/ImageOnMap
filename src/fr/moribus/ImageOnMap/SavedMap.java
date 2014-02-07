@@ -15,17 +15,18 @@ import org.bukkit.map.MapView;
 public class SavedMap 
 {
 	ImageOnMap plugin;
-	String nomImg, nomJoueur;
+	String nomImg, nomJoueur, nomMonde;
 	short idMap;
 	BufferedImage image;
 	
-	SavedMap(ImageOnMap plug, String nomJ, short id, BufferedImage img)
+	SavedMap(ImageOnMap plug, String nomJ, short id, BufferedImage img, String nomM)
 	{
 		plugin = plug;
 		nomJoueur = nomJ;
 		idMap = id;
 		image = img;
 		nomImg = "map" + id;
+		nomMonde = nomM;
 	}
 	
 	SavedMap(ImageOnMap plug, short id)
@@ -59,7 +60,7 @@ public class SavedMap
 	
 	Boolean SaveMap()
 	{
-		System.out.println("Saving map " + idMap);
+		plugin.getLogger().info("Saving map " + idMap);
 		
 		// Enregistrement de l'image sur le disque dur
 		try
@@ -76,6 +77,7 @@ public class SavedMap
 		liste.add(String.valueOf(idMap));
 		liste.add(nomImg);
 		liste.add(nomJoueur);
+		liste.add(nomMonde);
 		plugin.getCustomConfig().set(nomImg, liste);
 		plugin.saveCustomConfig();
 		return true;
@@ -87,7 +89,7 @@ public class SavedMap
 		MapView carte = Bukkit.getMap(idMap);
 		if(carte != null)
 		{
-			ImageRenderer.SupprRendu(carte);
+			ImageRendererThread.SupprRendu(carte);
 			carte.addRenderer(new Rendu(image));
 			return true;
 		}

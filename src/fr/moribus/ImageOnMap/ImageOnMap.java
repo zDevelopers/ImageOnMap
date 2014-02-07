@@ -24,9 +24,18 @@ public final class ImageOnMap extends JavaPlugin
     // accessible de partout dans le plugin..
     private HashMap<String, ArrayList<ItemStack>> cache = new HashMap<String, ArrayList<ItemStack>>();
     
+    @Override
+    public void onLoad()
+    {
+    	
+    	//File map = new File("/home/moribus/Projet/Serveur de dev/world/data/map_1125.dat");
+    	//map.delete();
+    }
+    
 	@Override
 	public void onEnable()
 	{
+		getLogger().info("World name: "+ getServer().getWorlds().get(0).getName());
 		// On crée si besoin le dossier où les images seront stockées
 		dossierCree = ImgUtility.CreeRepImg(this);
 		
@@ -42,7 +51,7 @@ public final class ImageOnMap extends JavaPlugin
 			{
 				MetricsLite metrics = new MetricsLite(this);
 				metrics.start();
-				System.out.println("Metrics launched for ImageOnMap");
+				getLogger().info("Metrics launched for ImageOnMap");
 			} catch (IOException e) {
 				// Failed to submit the stats :-(
 			}
@@ -57,7 +66,7 @@ public final class ImageOnMap extends JavaPlugin
 		}
 		else
 		{
-			System.out.println("[ImageOnMap] An error occured ! Unable to create Image folder. Plugin will NOT work !");
+			getLogger().info("[ImageOnMap] An error occured ! Unable to create Image folder. Plugin will NOT work !");
 			this.setEnabled(false);
 		}
 		
@@ -66,7 +75,7 @@ public final class ImageOnMap extends JavaPlugin
 	@Override
 	public void onDisable()
 	{
-		System.out.println("Stopping ImageOnMap");
+		getLogger().info("Stopping ImageOnMap");
 	}
 
 	public void ChargerMap()
@@ -86,9 +95,9 @@ public final class ImageOnMap extends JavaPlugin
 			}
 			
 		}
-		System.out.println(nbMap +" maps was loaded");
+		getLogger().info(nbMap +" maps was loaded");
 		if(nbErr != 0)
-			System.out.println(nbErr +" maps can't be loaded");
+			getLogger().info(nbErr +" maps can't be loaded");
 	}
 	
 	/* Méthodes pour charger / recharger / sauvegarder

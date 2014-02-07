@@ -195,7 +195,7 @@ public class ImgUtility
 				else if(id == Short.parseShort(plugin.getCustomConfig().getStringList(s).get(0)))
 				{
 					//joueur.sendMessage("Suppression de la map dans fichier conf + fichier dat");
-					ImageRenderer.SupprRendu(carte);
+					ImageRendererThread.SupprRendu(carte);
 					plugin.getCustomConfig().set(s, null);
 					plugin.saveCustomConfig();
 					File map = new File("./plugins/ImageOnMap/Image/" + s + ".png");

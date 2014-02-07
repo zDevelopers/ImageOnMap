@@ -16,19 +16,21 @@ public class TacheTraitementMap extends BukkitRunnable
 {
 	int i;
 	Player joueur;
- 	ImageRenderer renduImg;
+ 	ImageRendererThread renduImg;
  	PlayerInventory inv;
  	ItemStack map;
  	ImageOnMap plugin;
+ 	boolean resized;
 	
- 	TacheTraitementMap(Player j, String u, ImageOnMap plug)
+ 	TacheTraitementMap(Player j, String u, ImageOnMap plug, boolean r)
  	{
  		i = 0;
  		joueur = j;
- 		renduImg = new ImageRenderer(u);
+ 		renduImg = new ImageRendererThread(u, r);
  		renduImg.start();
  		inv = joueur.getInventory();
  		plugin = plug;
+ 		resized = r;
  	}
  	
 	@SuppressWarnings("deprecation")
@@ -39,7 +41,7 @@ public class TacheTraitementMap extends BukkitRunnable
 		{
 			//joueur.sendMessage("Nombre d'exécution depuis le lancement du timer : " + i);
 			i++;
-			if(i > 42)
+			if(renduImg.isErreur() || i > 42)
 			{
 				joueur.sendMessage("TIMEOUT: the render took too many time");
 				cancel();
@@ -48,7 +50,7 @@ public class TacheTraitementMap extends BukkitRunnable
 		else
 		{
 			cancel();
-			int nbImage = renduImg.getImg().getPoster().length;
+			int nbImage = renduImg.getImg().length;
 			if (plugin.getConfig().getInt("Limit-map-by-server") != 0 && nbImage + ImgUtility.getNombreDeMaps(plugin) > plugin.getConfig().getInt("Limit-map-by-server"))
 			{
 				joueur.sendMessage("ERROR: cannot render "+ nbImage +" picture(s): the limit of maps per server would be exceeded.");
@@ -65,17 +67,21 @@ public class TacheTraitementMap extends BukkitRunnable
 			for (int i = 0; i < nbImage; i++)
 			{
 				carte = Bukkit.createMap(joueur.getWorld());
-				ImageRenderer.SupprRendu(carte);
-				carte.addRenderer(new Rendu(renduImg.getImg().getPoster()[i]));
+				ImageRendererThread.SupprRendu(carte);
+				carte.addRenderer(new Rendu(renduImg.getImg()[i]));
 				map = new ItemStack(Material.MAP, 1, carte.getId());
-				ItemMeta meta = map.getItemMeta();
-				meta.setDisplayName("Map (" +renduImg.getImg().NumeroMap.get(i) +")");
-				map.setItemMeta(meta);
+				if(!resized)
+				{
+					ItemMeta meta = map.getItemMeta();
+					meta.setDisplayName("Map (" +renduImg.getNumeroMap().get(i) +")");
+					map.setItemMeta(meta);
+				}
+				
 				
 				ImgUtility.AddMap(map, inv, restant);
 				
 				//Svg de la map
-				SavedMap svg = new SavedMap(plugin, joueur.getName(), carte.getId(), renduImg.getImg().getPoster()[i]);
+				SavedMap svg = new SavedMap(plugin, joueur.getName(), carte.getId(), renduImg.getImg()[i], joueur.getWorld().getName());
 				svg.SaveMap();
 				joueur.sendMap(carte);
 			}
