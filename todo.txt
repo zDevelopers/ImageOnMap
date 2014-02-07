@@ -1,6 +1,7 @@
 - Créer un fichier config dédié à l'enregistrement des maps = FAIT !
-- Stocker les maps dans un coffre s'il n'y a plus de place dans l'inventaire du joueur
+- Stocker les maps dans un coffre s'il n'y a plus de place dans l'inventaire du joueur = Fait d'une autre manière (voir ci-dessous)
+- Récupérer le ou les maps qui n'ont pas pu être placées dans l'inventaire du joueur = FAIT ! (/maptool getrest)
 - Pouvoir charger une image locale
-- Ajouter une option permettant de redimensioner une image
-- IMPORTANT: sauvegarder les images selon la map
+- Ajouter une option permettant de redimensioner une image = FAIT ! (tomap [URL] resize)
+- IMPORTANT: sauvegarder les images selon la map = FAIT !
 - IMPORTANT (mais difficilement faisable pour le moment): enregistrer les maps dans leurs fichiers "natifs" (dans le dossier de la map)
