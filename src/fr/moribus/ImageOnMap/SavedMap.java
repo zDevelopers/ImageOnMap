@@ -18,6 +18,7 @@ public class SavedMap
 	String nomImg, nomJoueur, nomMonde;
 	short idMap;
 	BufferedImage image;
+	boolean loaded = false;
 	
 	SavedMap(ImageOnMap plug, String nomJ, short id, BufferedImage img, String nomM)
 	{
@@ -27,6 +28,7 @@ public class SavedMap
 		image = img;
 		nomImg = "map" + id;
 		nomMonde = nomM;
+		loaded = true;
 	}
 	
 	SavedMap(ImageOnMap plug, short id)
@@ -34,27 +36,27 @@ public class SavedMap
 		idMap = id;
 		plugin = plug;
 		Set<String> cle = plugin.getCustomConfig().getKeys(false);
-		int tmp = 0;
 		for (String s: cle)
 		{
 			if(plugin.getCustomConfig().getStringList(s).size() >= 3 && Short.valueOf(plugin.getCustomConfig().getStringList(s).get(0)) == id)
 			{
-				tmp++;
 				//System.out.println(tmp);
 				//MapView carte = Bukkit.getMap(Short.parseShort(plugin.getConfig().getStringList(s).get(0)));
 				nomImg = plugin.getCustomConfig().getStringList(s).get(1);
 				nomJoueur = plugin.getCustomConfig().getStringList(s).get(2);
 				try {
 					image = ImageIO.read(new File("./plugins/ImageOnMap/Image/"+ nomImg + ".png"));
+					loaded = true;
 					//System.out.println("Chargement de l'image fini");
 				} catch (IOException e) {
 					System.out.println("Image "+ nomImg +".png doesn't exists in Image directory.");
 				}
+				break;
 			}
 		}
-		if(tmp == 0)
+		if(!loaded)
 		{
-			System.out.println("No map was loaded");
+			plugin.getLogger().info("No map was loaded");
 		}
 	}
 	
@@ -87,10 +89,12 @@ public class SavedMap
 	Boolean LoadMap()
 	{
 		MapView carte = Bukkit.getMap(idMap);
-		if(carte != null)
+		if(carte != null && loaded)
 		{
 			ImageRendererThread.SupprRendu(carte);
 			carte.addRenderer(new Rendu(image));
+			if(!plugin.mapChargee.contains(idMap))
+				plugin.mapChargee.add(idMap);
 			return true;
 		}
 		else

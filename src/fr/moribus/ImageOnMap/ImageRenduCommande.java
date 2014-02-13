@@ -13,7 +13,7 @@ public class ImageRenduCommande implements CommandExecutor
 	Player joueur;
 	boolean renderName, imgSvg;
 	ImageOnMap plugin;
-	boolean resize;
+	boolean resize, rename;
 	
 	public ImageRenduCommande(ImageOnMap p)
 	{
@@ -30,6 +30,7 @@ public class ImageRenduCommande implements CommandExecutor
 		
 		joueur = (Player) sender;
 		resize = false;
+		rename = true;
 		
 		if(joueur.hasPermission("imageonmap.userender"))
 		{
@@ -55,13 +56,19 @@ public class ImageRenduCommande implements CommandExecutor
 			return true;
 		}*/
 		
-		if(arg3.length >= 2 && arg3[1].equalsIgnoreCase("resize"))
+		if(arg3.length >= 2)
 		{
-			resize = true;
+			for(int i = 1; i < arg3.length; i++)
+			{
+				if(arg3[i].equalsIgnoreCase("resize:true"))
+					resize = true;
+				if(arg3[i].equalsIgnoreCase("rename:false"))
+					rename = false;
+			}
 		}
 		
 		
-		TacheTraitementMap tache = new TacheTraitementMap(joueur, arg3[0], plugin, resize);
+		TacheTraitementMap tache = new TacheTraitementMap(joueur, arg3[0], plugin, resize, rename);
 		tache.runTaskTimer(plugin, 0, 10);
 		
 		return true;

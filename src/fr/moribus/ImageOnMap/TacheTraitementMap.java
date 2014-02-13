@@ -20,17 +20,18 @@ public class TacheTraitementMap extends BukkitRunnable
  	PlayerInventory inv;
  	ItemStack map;
  	ImageOnMap plugin;
- 	boolean resized;
+ 	boolean resized, renamed;
 	
- 	TacheTraitementMap(Player j, String u, ImageOnMap plug, boolean r)
+ 	TacheTraitementMap(Player j, String u, ImageOnMap plug, boolean rs, boolean rn)
  	{
  		i = 0;
  		joueur = j;
- 		renduImg = new ImageRendererThread(u, r);
+ 		renduImg = new ImageRendererThread(u, rs);
  		renduImg.start();
  		inv = joueur.getInventory();
  		plugin = plug;
- 		resized = r;
+ 		resized = rs;
+ 		renamed = rn;
  	}
  	
 	@SuppressWarnings("deprecation")
@@ -66,19 +67,24 @@ public class TacheTraitementMap extends BukkitRunnable
 			ArrayList<ItemStack> restant = new ArrayList<ItemStack>();
 			for (int i = 0; i < nbImage; i++)
 			{
-				carte = Bukkit.createMap(joueur.getWorld());
+				if(nbImage == 1 && joueur.getItemInHand().getType() == Material.MAP)
+					carte = Bukkit.getMap(joueur.getItemInHand().getDurability());
+				else
+					carte = Bukkit.createMap(joueur.getWorld());
 				ImageRendererThread.SupprRendu(carte);
 				carte.addRenderer(new Rendu(renduImg.getImg()[i]));
 				map = new ItemStack(Material.MAP, 1, carte.getId());
-				if(!resized)
+				if(nbImage > 1 && renamed == true)
 				{
 					ItemMeta meta = map.getItemMeta();
 					meta.setDisplayName("Map (" +renduImg.getNumeroMap().get(i) +")");
 					map.setItemMeta(meta);
 				}
 				
-				
-				ImgUtility.AddMap(map, inv, restant);
+				if(nbImage == 1 && joueur.getItemInHand().getType() == Material.MAP)
+					joueur.setItemInHand(map);
+				else
+					ImgUtility.AddMap(map, inv, restant);
 				
 				//Svg de la map
 				SavedMap svg = new SavedMap(plugin, joueur.getName(), carte.getId(), renduImg.getImg()[i], joueur.getWorld().getName());
@@ -86,7 +92,7 @@ public class TacheTraitementMap extends BukkitRunnable
 				joueur.sendMap(carte);
 			}
 			if(!restant.isEmpty())
-				joueur.sendMessage(restant.size()+ " maps can't be place in your inventory. Please make free space in your inventory and run "+ ChatColor.GOLD+  "/maptool rest");
+				joueur.sendMessage(restant.size()+ " maps can't be place in your inventory. Please make free space in your inventory and run "+ ChatColor.GOLD+  "/maptool getrest");
 			plugin.setRemainingMaps(joueur.getName(), restant);
 			joueur.sendMessage("Render finished");
 		}

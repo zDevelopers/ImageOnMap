@@ -69,6 +69,7 @@ public class MapToolCommand implements CommandExecutor
 				return true;
 			}
 			
+			
 			if(inv.firstEmpty() == -1)
 			{
 				joueur.sendMessage("Your inventory is full, you can't take the map !");
@@ -90,14 +91,28 @@ public class MapToolCommand implements CommandExecutor
 				return true;
 			}
 			
-			try
+			if(arg3.length <= 1)
 			{
-				id = Short.parseShort(arg3[1]);
+				if(joueur.getItemInHand().getType() == Material.MAP)
+				{
+					id = joueur.getItemInHand().getDurability();
+				}
+				else
+				{
+					joueur.sendMessage(ChatColor.RED+ "You must hold a map or enter an id");
+				}
 			}
-			catch(NumberFormatException err)
+			else
 			{
-				joueur.sendMessage("you must enter a number !");
-				return true;
+				try
+				{
+					id = Short.parseShort(arg3[1]);
+				}
+				catch(NumberFormatException err)
+				{
+					joueur.sendMessage("you must enter a number !");
+					return true;
+				}
 			}
 			
 			boolean success = ImgUtility.RemoveMap(plugin, id);

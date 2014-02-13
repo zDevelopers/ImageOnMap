@@ -20,27 +20,44 @@ public final class ImageOnMap extends JavaPlugin
 	boolean dossierCree;
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
-    // liste contenant les maps ne pouvant être placé dans l'inventaire du joueur. Je le fous ici afin que ce soit
-    // accessible de partout dans le plugin..
+    /* liste contenant les maps ne pouvant être placé dans l'inventaire du joueur. Je le fous ici afin que ce soit
+     accessible de partout dans le plugin.. */
     private HashMap<String, ArrayList<ItemStack>> cache = new HashMap<String, ArrayList<ItemStack>>();
+    
+    // Index des maps chargées sur le serveur
+    public ArrayList<Short> mapChargee = new ArrayList<Short>();
     
     @Override
     public void onLoad()
     {
+    	/*MapASuppr = (ArrayList<String>) getConfig().getStringList("delete");
+    	if(getConfig().get("map_path") != null && !MapASuppr.isEmpty())
+    	{
+    		for(int i = 0; i < MapASuppr.size(); i++)
+        	{
+        		File map = new File(getDataFolder()+ "/../../"+ getConfig().getString("map_path")+ "/data/map_"+ MapASuppr.get(i)+ ".dat");
+            	boolean deleted = map.delete();
+            	if(!deleted)
+            		getLogger().info("Could not delete map_"+ MapASuppr.get(i)+ ".dat on world folder " +getConfig().getString("map_path"));
+        	}
+        	getConfig().set("delete", null);
+        	saveConfig();
+    	}*/
     	
-    	//File map = new File("/home/moribus/Projet/Serveur de dev/world/data/map_1125.dat");
-    	//map.delete();
     }
     
 	@Override
 	public void onEnable()
 	{
-		getLogger().info("World name: "+ getServer().getWorlds().get(0).getName());
 		// On crée si besoin le dossier où les images seront stockées
 		dossierCree = ImgUtility.CreeRepImg(this);
 		
 		// On ajoute si besoin les params par défaut du plugin
 		ImgUtility.CreeSectionConfig(this);
+		if(getConfig().get("map_path") == null)
+			getConfig().set("map_path", getServer().getWorlds().get(0).getName());
+		else if(getConfig().get("map_path") != getServer().getWorlds().get(0).getName())
+			getConfig().set("map_path", getServer().getWorlds().get(0).getName());
 		
 		if(getConfig().getBoolean("import-maps"))
 			ImgUtility.ImporterConfig(this);
@@ -61,8 +78,10 @@ public final class ImageOnMap extends JavaPlugin
 		{
 			getCommand("tomap").setExecutor(new ImageRenduCommande(this));
 			getCommand("maptool").setExecutor(new MapToolCommand(this));
+			getServer().getPluginManager().registerEvents(new SendMapOnFrameEvent(this), this);
+			getServer().getPluginManager().registerEvents(new SendMapOnInvEvent(this), this);
 			this.saveDefaultConfig();
-			ChargerMap();
+			//ChargerMap();
 		}
 		else
 		{

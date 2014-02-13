@@ -169,7 +169,6 @@ public class ImgUtility
 		MapView carte = Bukkit.getMap(id);
 		
 		Set<String> cle = plugin.getCustomConfig().getKeys(false);
-		plugin.getLogger().info("POINT 2");
 		for (String s: cle)
 		{
 			if(plugin.getCustomConfig().getStringList(s).size() >= 3)
@@ -196,8 +195,15 @@ public class ImgUtility
 				{
 					//joueur.sendMessage("Suppression de la map dans fichier conf + fichier dat");
 					ImageRendererThread.SupprRendu(carte);
+					/*if(plugin.getConfig().get("delete") != null);
+					{
+						ArrayList<String> ListeSuppr = (ArrayList<String>) plugin.getConfig().getStringList("delete");
+						ListeSuppr.add(plugin.getCustomConfig().getStringList(s).get(0));
+						plugin.getConfig().set("delete", ListeSuppr);
+					}*/
 					plugin.getCustomConfig().set(s, null);
 					plugin.saveCustomConfig();
+					plugin.saveConfig();
 					File map = new File("./plugins/ImageOnMap/Image/" + s + ".png");
 					boolean isDeleted = map.delete();
 					//joueur.sendMessage("DEBUG: booléen isDeleted :"+ isDeleted+ "; Nom de la map : "+ plugin.getServer().getWorlds().get(0).getName());
