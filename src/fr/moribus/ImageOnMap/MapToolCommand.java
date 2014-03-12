@@ -2,6 +2,7 @@ package fr.moribus.ImageOnMap;
 
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -58,9 +59,10 @@ public class MapToolCommand implements CommandExecutor
 				return true;
 			}
 			
-			map = ImgUtility.getMap(plugin, id);
+			SavedMap smap = new SavedMap(plugin, id);
+			//map = ImgUtility.getMap(plugin, id);
 			
-			if(map == null)
+			if(!smap.LoadMap())
 			{
 				if(joueur.isOp())
 					joueur.sendMessage(ChatColor.RED+ "Can't retrieve the map ! Check if map"+ id+ " exists in your maps.yml or if the dat file in the world folder exists");
@@ -76,6 +78,7 @@ public class MapToolCommand implements CommandExecutor
 				return true;
 			}
 			
+			map = Bukkit.getMap(id);
 			inv.addItem(new ItemStack(Material.MAP, 1, map.getId()));
 			joueur.sendMap(map);
 			joueur.sendMessage("Map "+ ChatColor.ITALIC+ id+ ChatColor.RESET+ " was added in your inventory.");
@@ -88,6 +91,15 @@ public class MapToolCommand implements CommandExecutor
 			if(!joueur.hasPermission("imageonmap.usermmap"))
 			{
 				joueur.sendMessage("You are not allowed to delete map !");
+				return true;
+			}
+			
+			if(arg3.length == 2 && arg3[1].startsWith("poster"))
+			{
+				SavedPoster poster = new SavedPoster(plugin, arg3[1]);
+				boolean suppr = poster.Remove();
+				if(!suppr)
+					joueur.sendMessage("Unable to remove the entire poster, check the server log for more information");
 				return true;
 			}
 			
@@ -131,7 +143,7 @@ public class MapToolCommand implements CommandExecutor
 		
 		else if(arg3[0].equalsIgnoreCase("list"))
 		{
-			String msg = "";
+			String msg = "", msg2 = "";
 			int compteur = 0;
 			ArrayList<String> liste = new ArrayList<String>();
 			
@@ -141,8 +153,17 @@ public class MapToolCommand implements CommandExecutor
 			{
 				msg += liste.get(compteur)+ " ";
 			}
+			
+			SavedPoster tmp = new SavedPoster(plugin);
+			ArrayList<String> listePoster = tmp.getListMapByPlayer(plugin, joueur.getName());
+			for (int i= 0; i< listePoster.size(); i++)
+			{
+				msg2 += listePoster.get(i)+ " ";
+			}
 			joueur.sendMessage(msg+ 
 					"\nYou have rendered "+ ChatColor.DARK_PURPLE+ (compteur + 1)+ ChatColor.RESET+ " pictures");
+			joueur.sendMessage("Your posters: \n"+ msg2);
+			
 		}
 		
 		else if(arg3[0].equalsIgnoreCase("getrest"))

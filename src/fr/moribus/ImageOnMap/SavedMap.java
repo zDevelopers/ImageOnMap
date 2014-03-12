@@ -56,12 +56,17 @@ public class SavedMap
 		}
 		if(!loaded)
 		{
-			plugin.getLogger().info("No map was loaded");
+			//plugin.getLogger().info("No map was loaded");
 		}
 	}
 	
 	Boolean SaveMap()
 	{
+		if(!loaded)
+		{
+			plugin.getLogger().info("Cannot save the map !");
+			return false;
+		}
 		plugin.getLogger().info("Saving map " + idMap);
 		
 		// Enregistrement de l'image sur le disque dur
@@ -82,6 +87,8 @@ public class SavedMap
 		liste.add(nomMonde);
 		plugin.getCustomConfig().set(nomImg, liste);
 		plugin.saveCustomConfig();
+		if(!plugin.mapChargee.contains(idMap))
+			plugin.mapChargee.add(idMap);
 		return true;
 	}
 	

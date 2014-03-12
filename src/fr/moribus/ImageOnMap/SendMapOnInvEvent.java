@@ -40,7 +40,6 @@ public class SendMapOnInvEvent implements Listener
 					
 					if(!listeId.contains(stack.getDurability()))
 					{
-						//plugin.getLogger().info("map"+ stack.getDurability()+ " dans la main du joueur en cours de recherche...");
 						if(plugin.getCustomConfig().getStringList(s).get(0).equals(String.valueOf(stack.getDurability())))
 						{
 							SavedMap map = new SavedMap(plugin, Short.valueOf(plugin.getCustomConfig().getStringList(s).get(0)));
@@ -49,7 +48,6 @@ public class SendMapOnInvEvent implements Listener
 								plugin.getLogger().log(Level.WARNING, "Unable to load map " +stack.getDurability());
 							else
 							{
-								//plugin.getLogger().info("map"+ stack.getDurability()+ " chargée");
 								break;
 							}
 								

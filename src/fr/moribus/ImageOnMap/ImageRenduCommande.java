@@ -44,8 +44,19 @@ public class ImageRenduCommande implements CommandExecutor
 		
 		if (arg3.length < 1)
 		{
-			joueur.sendMessage(ChatColor.RED + "You must enter image url");
+			joueur.sendMessage(ChatColor.RED + "You must enter image url.");
 		    return false;
+		}
+		if(!arg3[0].startsWith("http"))
+		{
+			joueur.sendMessage("You must enter a valid URL.");
+			return true;
+		}
+		else if(arg3[0].startsWith("https"))
+		{
+			joueur.sendMessage("WARNING: you have entered a secure HTTP link, ImageOnMap can't guarantee " +
+					"that the image is downloadable");
+			return true;
 		}
 		
 		/*if(arg3.length == 1 && arg3[0].equalsIgnoreCase("test"))

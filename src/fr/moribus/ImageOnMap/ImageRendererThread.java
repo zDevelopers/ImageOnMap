@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.HashMap;
 
@@ -19,7 +20,7 @@ public class ImageRendererThread extends Thread
 	private BufferedImage[] img;
 	private Poster poster;
 	private boolean estPrete = false, resized;
-	boolean erreur = false;
+	public boolean erreur = false;
 	
 	public boolean isErreur() 
 	{
@@ -54,12 +55,34 @@ public class ImageRendererThread extends Thread
 	}
 
 	@Override
-	public void run() 
+	public void run()
 	{
+		URI uri = null;
+		java.net.URL url = null;
 		try 
 		{
-			imgSrc = ImageIO.read(URI.create(URL).toURL().openStream());
+			uri = URI.create(URL);
+			url = uri.toURL();
 			
+			
+		}
+		catch (IllegalArgumentException | MalformedURLException e) {
+			e.printStackTrace();
+			
+			erreur = true;
+			return;
+		}
+		if(erreur != true)
+		{
+			try {
+				imgSrc = ImageIO.read(url.openStream());
+				
+			
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				erreur = true;
+				e.printStackTrace();
+			}
 			if(resized)
 			{
 				img = new BufferedImage[1];
@@ -113,14 +136,8 @@ public class ImageRendererThread extends Thread
 				img = poster.getPoster();
 			}
 			
-			
+			estPrete = true;
 		}
-		catch (IOException e) {
-			e.printStackTrace();
-			erreur = true;
-		}
-		
-		estPrete = true;
 		
 	}
 	

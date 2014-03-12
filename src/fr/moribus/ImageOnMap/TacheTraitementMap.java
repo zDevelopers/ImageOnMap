@@ -42,7 +42,12 @@ public class TacheTraitementMap extends BukkitRunnable
 		{
 			//joueur.sendMessage("Nombre d'exécution depuis le lancement du timer : " + i);
 			i++;
-			if(renduImg.isErreur() || i > 42)
+			if(renduImg.erreur)
+			{
+				joueur.sendMessage("There was a problem while fetching image. Check your URL.");
+				cancel();
+			}
+			if(i > 42)
 			{
 				joueur.sendMessage("TIMEOUT: the render took too many time");
 				cancel();
@@ -57,14 +62,22 @@ public class TacheTraitementMap extends BukkitRunnable
 				joueur.sendMessage("ERROR: cannot render "+ nbImage +" picture(s): the limit of maps per server would be exceeded.");
 				return;
 			}
-			if (plugin.getConfig().getInt("Limit-map-by-player") != 0 && nbImage + ImgUtility.getNombreDeMapsParJoueur(plugin, joueur.getName()) > plugin.getConfig().getInt("Limit-map-by-player"))
+			if(joueur.hasPermission("imageonmap.nolimit"))
 			{
-				joueur.sendMessage(ChatColor.RED +"ERROR: cannot render "+ nbImage +" picture(s): the limit of maps allowed for you (per player) would be exceeded.");
-				return;
+				
+			}
+			else
+			{
+				if (plugin.getConfig().getInt("Limit-map-by-player") != 0 && nbImage + ImgUtility.getNombreDeMapsParJoueur(plugin, joueur.getName()) > plugin.getConfig().getInt("Limit-map-by-player"))
+				{
+					joueur.sendMessage(ChatColor.RED +"ERROR: cannot render "+ nbImage +" picture(s): the limit of maps allowed for you (per player) would be exceeded.");
+					return;
+				}
 			}
 			MapView carte;
 			
 			ArrayList<ItemStack> restant = new ArrayList<ItemStack>();
+			short[] ids = new short[nbImage];
 			for (int i = 0; i < nbImage; i++)
 			{
 				if(nbImage == 1 && joueur.getItemInHand().getType() == Material.MAP)
@@ -74,11 +87,16 @@ public class TacheTraitementMap extends BukkitRunnable
 				ImageRendererThread.SupprRendu(carte);
 				carte.addRenderer(new Rendu(renduImg.getImg()[i]));
 				map = new ItemStack(Material.MAP, 1, carte.getId());
-				if(nbImage > 1 && renamed == true)
+				if(nbImage > 1)
 				{
-					ItemMeta meta = map.getItemMeta();
-					meta.setDisplayName("Map (" +renduImg.getNumeroMap().get(i) +")");
-					map.setItemMeta(meta);
+					ids[i] = carte.getId();
+					if(renamed == true)
+					{
+						ItemMeta meta = map.getItemMeta();
+						meta.setDisplayName("Map (" +renduImg.getNumeroMap().get(i) +")");
+						map.setItemMeta(meta);
+					}
+					
 				}
 				
 				if(nbImage == 1 && joueur.getItemInHand().getType() == Material.MAP)
@@ -91,10 +109,18 @@ public class TacheTraitementMap extends BukkitRunnable
 				svg.SaveMap();
 				joueur.sendMap(carte);
 			}
+			SavedPoster poster;
+			if(nbImage > 1)
+			{
+				poster = new SavedPoster(plugin, ids, joueur.getName());
+				poster.Save();
+				joueur.sendMessage("Poster ( Id: "+ poster.getId()+ " ) finished");
+			}
+			else
+				joueur.sendMessage("Render finished");
 			if(!restant.isEmpty())
 				joueur.sendMessage(restant.size()+ " maps can't be place in your inventory. Please make free space in your inventory and run "+ ChatColor.GOLD+  "/maptool getrest");
 			plugin.setRemainingMaps(joueur.getName(), restant);
-			joueur.sendMessage("Render finished");
 		}
 	}
 

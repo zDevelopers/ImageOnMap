@@ -17,7 +17,7 @@ public final class ImageOnMap extends JavaPlugin
 {
 	int test = 0;
 	File dossier;
-	boolean dossierCree;
+	private boolean dossierCree;
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
     /* liste contenant les maps ne pouvant être placé dans l'inventaire du joueur. Je le fous ici afin que ce soit
@@ -62,6 +62,7 @@ public final class ImageOnMap extends JavaPlugin
 		if(getConfig().getBoolean("import-maps"))
 			ImgUtility.ImporterConfig(this);
 		
+		ChargerMap();
 		if(this.getConfig().getBoolean("collect-data"))
 		{
 			try 
@@ -69,7 +70,8 @@ public final class ImageOnMap extends JavaPlugin
 				MetricsLite metrics = new MetricsLite(this);
 				metrics.start();
 				getLogger().info("Metrics launched for ImageOnMap");
-			} catch (IOException e) {
+			} catch (IOException e) 
+			{
 				// Failed to submit the stats :-(
 			}
 		}
@@ -80,6 +82,7 @@ public final class ImageOnMap extends JavaPlugin
 			getCommand("maptool").setExecutor(new MapToolCommand(this));
 			getServer().getPluginManager().registerEvents(new SendMapOnFrameEvent(this), this);
 			getServer().getPluginManager().registerEvents(new SendMapOnInvEvent(this), this);
+			getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 			this.saveDefaultConfig();
 			//ChargerMap();
 		}
@@ -175,5 +178,4 @@ public final class ImageOnMap extends JavaPlugin
     {
     	cache.remove(j);
     }
-
 }

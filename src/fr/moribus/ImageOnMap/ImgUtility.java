@@ -56,6 +56,8 @@ public class ImgUtility
 			plugin.getConfig().set("collect-data", true);
 		if(plugin.getConfig().get("import-maps") == null)
 			plugin.getConfig().set("import-maps", true);
+		if(plugin.getConfig().get("send-entire-maps") == null)
+			plugin.getConfig().set("send-entire-maps", 0);
 		plugin.saveConfig();
 		
 	}
@@ -220,7 +222,7 @@ public class ImgUtility
 			}
 		}
 		
-		plugin.getLogger().info("No map with id"+ id+ " was found");
+		//plugin.getLogger().info("No map with id"+ id+ " was found");
 		return false;
 	}
 	
