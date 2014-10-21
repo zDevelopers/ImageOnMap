@@ -82,7 +82,7 @@ public final class ImageOnMap extends JavaPlugin
 			getCommand("maptool").setExecutor(new MapToolCommand(this));
 			getServer().getPluginManager().registerEvents(new SendMapOnFrameEvent(this), this);
 			getServer().getPluginManager().registerEvents(new SendMapOnInvEvent(this), this);
-			getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+			//getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 			this.saveDefaultConfig();
 			//ChargerMap();
 		}

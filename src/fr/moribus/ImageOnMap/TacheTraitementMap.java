@@ -15,7 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class TacheTraitementMap extends BukkitRunnable
 {
 	int i;
-	Player joueur;
+	ImgPlayer joueur;
  	ImageRendererThread renduImg;
  	PlayerInventory inv;
  	ItemStack map;
@@ -25,7 +25,7 @@ public class TacheTraitementMap extends BukkitRunnable
  	TacheTraitementMap(Player j, String u, ImageOnMap plug, boolean rs, boolean rn)
  	{
  		i = 0;
- 		joueur = j;
+ 		joueur = new ImgPlayer(j);
  		renduImg = new ImageRendererThread(u, rs);
  		renduImg.start();
  		inv = joueur.getInventory();
