@@ -2,7 +2,6 @@ package fr.moribus.ImageOnMap;
 
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -10,6 +9,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
+
+import fr.moribus.ImageOnMap.Map.SingleMap;
 
 
 public class SendMapOnInvEvent implements Listener
@@ -42,13 +43,14 @@ public class SendMapOnInvEvent implements Listener
 					{
 						if(plugin.getCustomConfig().getStringList(s).get(0).equals(String.valueOf(stack.getDurability())))
 						{
-							SavedMap map = new SavedMap(plugin, Short.valueOf(plugin.getCustomConfig().getStringList(s).get(0)));
-							
-							if(!map.LoadMap())
-								plugin.getLogger().log(Level.WARNING, "Unable to load map " +stack.getDurability());
-							else
+							try
 							{
-								break;
+								new SingleMap(stack.getDurability()).load();
+							}
+							catch (Exception e)
+							{
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
 								
 						}

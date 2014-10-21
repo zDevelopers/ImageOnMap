@@ -15,6 +15,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 
+import fr.moribus.ImageOnMap.Map.SingleMap;
+
 public class ImgUtility 
 {
 
@@ -196,7 +198,7 @@ public class ImgUtility
 				else if(id == Short.parseShort(plugin.getCustomConfig().getStringList(s).get(0)))
 				{
 					//joueur.sendMessage("Suppression de la map dans fichier conf + fichier dat");
-					ImageRendererThread.SupprRendu(carte);
+					SingleMap.SupprRendu(carte);
 					/*if(plugin.getConfig().get("delete") != null);
 					{
 						ArrayList<String> ListeSuppr = (ArrayList<String>) plugin.getConfig().getStringList("delete");

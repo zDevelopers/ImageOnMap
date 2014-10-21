@@ -2,7 +2,6 @@ package fr.moribus.ImageOnMap;
 
 import java.util.ArrayList;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -12,6 +11,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
+
+import fr.moribus.ImageOnMap.Map.ImageMap;
+import fr.moribus.ImageOnMap.Map.PosterMap;
+import fr.moribus.ImageOnMap.Map.SingleMap;
 
 public class MapToolCommand implements CommandExecutor
 {
@@ -26,7 +29,6 @@ public class MapToolCommand implements CommandExecutor
 		plugin = p;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String arg2, String[] arg3) 
 	{
@@ -36,7 +38,7 @@ public class MapToolCommand implements CommandExecutor
 		
 		String nomCmd = arg2;
 		joueur = (Player) sender;
-		inv = (Inventory) joueur.getInventory();
+		inv = joueur.getInventory();
 		
 		if(arg3.length < 1)
 		{
@@ -59,29 +61,87 @@ public class MapToolCommand implements CommandExecutor
 				return true;
 			}
 			
-			SavedMap smap = new SavedMap(plugin, id);
-			//map = ImgUtility.getMap(plugin, id);
-			
-			if(!smap.LoadMap())
+			SingleMap smap;
+			try
 			{
-				if(joueur.isOp())
-					joueur.sendMessage(ChatColor.RED+ "Can't retrieve the map ! Check if map"+ id+ " exists in your maps.yml or if the dat file in the world folder exists");
+				smap = new SingleMap(id);
+				
+				if(!smap.load())
+				{
+					if(joueur.isOp())
+						joueur.sendMessage(ChatColor.RED+ "Can't retrieve the map ! Check if map"+ id+ " exists in your maps.yml or if the dat file in the world folder exists");
+					else
+						joueur.sendMessage(ChatColor.RED+ "ERROR: This map doesn't exists");
+					return true;
+				}
 				else
-					joueur.sendMessage(ChatColor.RED+ "ERROR: This map doesn't exists");
-				return true;
+				{
+					if(inv.firstEmpty() == -1)
+					{
+						joueur.sendMessage("Your inventory is full, you can't take the map !");
+						return true;
+					}
+					
+					smap.give(joueur.getInventory());
+					joueur.sendMessage("Map "+ ChatColor.ITALIC+ id+ ChatColor.RESET+ " was added in your inventory.");
+				}
 			}
-			
-			
-			if(inv.firstEmpty() == -1)
+			catch (Exception e)
 			{
-				joueur.sendMessage("Your inventory is full, you can't take the map !");
+				joueur.sendMessage(ChatColor.RED+ "ERROR while loading maps");
+			}
+			
+			
+			
+			
+			return true;
+		}
+		
+		else if(arg3[0].equalsIgnoreCase("set"))
+		{
+			ImageMap smap;
+			try
+			{
+				if(arg3[1].startsWith("poster"))
+				{
+					smap = new PosterMap(arg3[1]);
+				}
+				else
+				{
+					id = Short.parseShort(arg3[1]);
+					smap = new SingleMap(id);
+				}
+			}
+			catch(NumberFormatException err)
+			{
+				joueur.sendMessage("you must enter a number !");
+				return true;
+			} catch (Exception e)
+			{
+				e.printStackTrace();
+				joueur.sendMessage(ChatColor.RED+ "ERROR while loading maps");
 				return true;
 			}
 			
-			map = Bukkit.getMap(id);
-			inv.addItem(new ItemStack(Material.MAP, 1, map.getId()));
-			joueur.sendMap(map);
-			joueur.sendMessage("Map "+ ChatColor.ITALIC+ id+ ChatColor.RESET+ " was added in your inventory.");
+			
+			if(!arg3[2].startsWith("http"))
+			{
+				joueur.sendMessage("You must enter a valid URL.");
+				return true;
+			}
+			else if(arg3[2].startsWith("https"))
+			{
+				joueur.sendMessage("WARNING: you have entered a secure HTTP link, ImageOnMap can't guarantee " +
+						"that the image is downloadable");
+				return true;
+			}
+			
+			
+			TacheTraitementMajMap tache = new TacheTraitementMajMap(smap, arg3[2], joueur);
+			tache.runTaskTimer(plugin, 0, 5);
+			
+			
+			
 			
 			return true;
 		}

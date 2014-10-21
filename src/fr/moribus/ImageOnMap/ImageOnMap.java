@@ -10,41 +10,33 @@ import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedGameProfile;
+
+import fr.moribus.ImageOnMap.Map.ImageMap;
+import fr.moribus.ImageOnMap.Map.SingleMap;
+
 public final class ImageOnMap extends JavaPlugin
 {
-	int test = 0;
-	File dossier;
 	private boolean dossierCree;
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
     /* liste contenant les maps ne pouvant être placé dans l'inventaire du joueur. Je le fous ici afin que ce soit
-     accessible de partout dans le plugin.. */
+     accessible de partout dans le plugin. */
     private HashMap<String, ArrayList<ItemStack>> cache = new HashMap<String, ArrayList<ItemStack>>();
     
     // Index des maps chargées sur le serveur
     public ArrayList<Short> mapChargee = new ArrayList<Short>();
-    
-    @Override
-    public void onLoad()
-    {
-    	/*MapASuppr = (ArrayList<String>) getConfig().getStringList("delete");
-    	if(getConfig().get("map_path") != null && !MapASuppr.isEmpty())
-    	{
-    		for(int i = 0; i < MapASuppr.size(); i++)
-        	{
-        		File map = new File(getDataFolder()+ "/../../"+ getConfig().getString("map_path")+ "/data/map_"+ MapASuppr.get(i)+ ".dat");
-            	boolean deleted = map.delete();
-            	if(!deleted)
-            		getLogger().info("Could not delete map_"+ MapASuppr.get(i)+ ".dat on world folder " +getConfig().getString("map_path"));
-        	}
-        	getConfig().set("delete", null);
-        	saveConfig();
-    	}*/
-    	
-    }
     
 	@Override
 	public void onEnable()
@@ -62,7 +54,6 @@ public final class ImageOnMap extends JavaPlugin
 		if(getConfig().getBoolean("import-maps"))
 			ImgUtility.ImporterConfig(this);
 		
-		ChargerMap();
 		if(this.getConfig().getBoolean("collect-data"))
 		{
 			try 
@@ -82,7 +73,6 @@ public final class ImageOnMap extends JavaPlugin
 			getCommand("maptool").setExecutor(new MapToolCommand(this));
 			getServer().getPluginManager().registerEvents(new SendMapOnFrameEvent(this), this);
 			getServer().getPluginManager().registerEvents(new SendMapOnInvEvent(this), this);
-			//getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 			this.saveDefaultConfig();
 			//ChargerMap();
 		}
@@ -91,6 +81,18 @@ public final class ImageOnMap extends JavaPlugin
 			getLogger().info("[ImageOnMap] An error occured ! Unable to create Image folder. Plugin will NOT work !");
 			this.setEnabled(false);
 		}
+		
+		// Disable all sound effects
+		ProtocolLibrary.getProtocolManager().addPacketListener(
+		  new PacketAdapter(this, ListenerPriority.NORMAL, 
+		          PacketType.Play.Server.SPAWN_ENTITY_LIVING)
+		  {
+			@Override
+		    public void onPacketSending(PacketEvent event)
+		    {
+		    	event.getPacket().getIntegers().write(1, (int) EntityType.BLAZE.getTypeId());
+		    }
+		});
 		
 	}
 	
@@ -108,12 +110,25 @@ public final class ImageOnMap extends JavaPlugin
 		{
 			if(getCustomConfig().getStringList(s).size() >= 3)
 			{
-				SavedMap map = new SavedMap(this, Short.valueOf(getCustomConfig().getStringList(s).get(0)));
-				
-				if(map.LoadMap())
-					nbMap++;
-				else
+				ImageMap map;
+				try
+				{
+					map = new SingleMap(Short.valueOf(getCustomConfig().getStringList(s).get(0)));
+					
+					if(map.load())
+						nbMap++;
+					else
+						nbErr++;
+				}
+				catch (NumberFormatException e)
+				{
+					e.printStackTrace();
 					nbErr++;
+				}
+				catch (Exception e)
+				{
+					nbErr++;
+				}
 			}
 			
 		}
@@ -124,9 +139,10 @@ public final class ImageOnMap extends JavaPlugin
 	
 	/* Méthodes pour charger / recharger / sauvegarder
 	 * le fichier conf des maps (map.yml).
-	 * Je les ai juste copié depuis un tuto du wiki Bukkit...
+	 * Je les ai juste copié depuis un tuto du wiki Bukkit.
 	 */
-    public void reloadCustomConfig() 
+    @SuppressWarnings("deprecation")
+	public void reloadCustomConfig() 
     {
         if (customConfigFile == null) 
         {

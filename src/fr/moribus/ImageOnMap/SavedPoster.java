@@ -124,7 +124,8 @@ public class SavedPoster
 	 * le fichier conf des Posters (poster.yml).
 	 * Je les ai juste copié depuis un tuto du wiki Bukkit...
 	 */
-    public void reloadCustomConfig() 
+    @SuppressWarnings("deprecation")
+	public void reloadCustomConfig() 
     {
         if (customConfigFile == null) 
         {

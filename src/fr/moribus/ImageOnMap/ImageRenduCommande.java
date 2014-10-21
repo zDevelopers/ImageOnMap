@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 
 public class ImageRenduCommande implements CommandExecutor
 {
-
 	Player joueur;
 	boolean renderName, imgSvg;
 	ImageOnMap plugin;
@@ -19,7 +18,7 @@ public class ImageRenduCommande implements CommandExecutor
 	{
 		plugin = p;
 	}
-
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command arg1, String arg2,
 			String[] arg3) 
@@ -59,14 +58,6 @@ public class ImageRenduCommande implements CommandExecutor
 			return true;
 		}
 		
-		/*if(arg3.length == 1 && arg3[0].equalsIgnoreCase("test"))
-		{
-			MapView map = Bukkit.createMap(joueur.getWorld());
-			TacheHorloge tache = new TacheHorloge(joueur, map);
-			tache.runTaskTimer(plugin, 0, 150);
-			return true;
-		}*/
-		
 		if(arg3.length >= 2)
 		{
 			for(int i = 1; i < arg3.length; i++)
@@ -79,8 +70,8 @@ public class ImageRenduCommande implements CommandExecutor
 		}
 		
 		
-		TacheTraitementMap tache = new TacheTraitementMap(joueur, arg3[0], plugin, resize, rename);
-		tache.runTaskTimer(plugin, 0, 10);
+		TacheTraitementMap tache = new TacheTraitementNouvelleMap(joueur, arg3[0], resize, rename);
+		tache.runTaskTimer(plugin, 0, 5);
 		
 		return true;
 	}

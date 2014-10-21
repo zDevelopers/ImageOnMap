@@ -11,6 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 
+import fr.moribus.ImageOnMap.Map.SingleMap;
+
 public class SendMapOnFrameEvent implements Listener
 {
 	ImageOnMap plugin;
@@ -22,7 +24,6 @@ public class SendMapOnFrameEvent implements Listener
 	{
 		plugin = plug;
 	}
-	
 	
 	@EventHandler
 	public void onChunkLoad(ChunkLoadEvent event)
@@ -39,8 +40,15 @@ public class SendMapOnFrameEvent implements Listener
 				ItemStack stack = frame.getItem();
 				if(stack.getType() == Material.MAP && !ListeId.contains(stack.getDurability()))
 				{
-					SavedMap map = new SavedMap(plugin, stack.getDurability());
-					map.LoadMap();
+					try
+					{
+						new SingleMap(stack.getDurability()).load();
+					}
+					catch (Exception e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
 				}
 				

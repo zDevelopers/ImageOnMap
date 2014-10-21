@@ -11,15 +11,14 @@ import org.bukkit.map.MapView;
 public class Rendu extends MapRenderer implements Runnable 
 {
 	
-	boolean estRendu;
-	Image touhou;
-	private Thread TRendu;
-	public MapCanvas canvas;
+	private boolean estRendu;
+	private Image imageARendre;
+	private MapCanvas canvas;
 	
 	public Rendu(Image img)
 	{
 		estRendu = false;
-		touhou = img;
+		setImageARendre(img);
 	}
 	
 	@Override
@@ -30,19 +29,30 @@ public class Rendu extends MapRenderer implements Runnable
 
 		if (!estRendu) // Si la map a déjà été rendu, on n'entre plus dans la fonction, ce qui évite de surcharger le serveur
 		{
-			// On instancie et démarre le thread de rendu
-			TRendu = new Thread(this);
-			TRendu.start();
+			run();
 			estRendu = true;
 		}
 	}
 
-	// Le chargement et le rendu de l'image se font dans un thread afin d'éviter le lag..
 	@Override
 	public void run() 
 	{
 		// on dessine l'image redimensionnée dans le canvas (et donc, sur la map !)
-		canvas.drawImage(0, 0, touhou);
+		canvas.drawImage(0, 0, getImageARendre());
 
+	}
+
+	public Image getImageARendre()
+	{
+		return imageARendre;
+	}
+
+	public void setImageARendre(Image imageARendre)
+	{
+		if(imageARendre != null)
+		{
+			this.imageARendre = imageARendre;
+			estRendu = false;
+		}
 	}
 }

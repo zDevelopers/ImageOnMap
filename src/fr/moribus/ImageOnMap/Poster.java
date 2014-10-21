@@ -6,13 +6,13 @@ import java.util.HashMap;
 /* Class which represents a picture cut into several parts */
 public class Poster 
 {
-	BufferedImage src;
-	BufferedImage ImgDecoupe[];
-	HashMap<Integer, String> NumeroMap;
-	int nbPartie;
-	int nbColonne;
+	private BufferedImage src;
+	private BufferedImage[] ImgDecoupe;
+	private HashMap<Integer, String> NumeroMap;
+	private int nbPartie;
+	private int nbColonne;
 	
-	Poster(BufferedImage img)
+	public Poster(BufferedImage img)
 	{
 		src = img;
 		NumeroMap = new HashMap<Integer, String>();
