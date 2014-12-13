@@ -6,6 +6,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import fr.moribus.ImageOnMap.Map.MapType;
+
 
 public class ImageRenduCommande implements CommandExecutor
 {
@@ -13,6 +15,7 @@ public class ImageRenduCommande implements CommandExecutor
 	boolean renderName, imgSvg;
 	ImageOnMap plugin;
 	boolean resize, rename;
+	MapType type;
 	
 	public ImageRenduCommande(ImageOnMap p)
 	{
@@ -60,17 +63,19 @@ public class ImageRenduCommande implements CommandExecutor
 		
 		if(arg3.length >= 2)
 		{
-			for(int i = 1; i < arg3.length; i++)
+			try
 			{
-				if(arg3[i].equalsIgnoreCase("resize:true"))
-					resize = true;
-				if(arg3[i].equalsIgnoreCase("rename:false"))
-					rename = false;
+				type = Enum.valueOf(MapType.class, arg3[1]);
 			}
+			catch(IllegalArgumentException ex)
+			{
+				joueur.sendMessage("Specified map type doesn't exist");
+			}
+			
 		}
 		
 		
-		TacheTraitementMap tache = new TacheTraitementNouvelleMap(joueur, arg3[0], resize, rename);
+		TacheTraitementMap tache = new TacheTraitementNouvelleMap(joueur, arg3[0], type, resize, rename);
 		tache.runTaskTimer(plugin, 0, 5);
 		
 		return true;

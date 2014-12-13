@@ -18,13 +18,16 @@ public class SingleMap implements ImageMap
 	private MapView map;
 	private boolean named;
 	
+	public final int LARGEUR = 128;
+	public final int HAUTEUR = 128;
+	
 	@SuppressWarnings("deprecation")
 	public SingleMap(Image img, Player joueur)
 	{
 		map = Bukkit.createMap(joueur.getWorld());
 		this.named = false;
 		
-		data = new MapData(map.getId(), joueur.getName(), img, joueur.getWorld().getName());
+		data = new MapData(map.getId(), joueur.getName(), img.getScaledInstance(LARGEUR, HAUTEUR, Image.SCALE_FAST), joueur.getWorld().getName());
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -32,7 +35,7 @@ public class SingleMap implements ImageMap
 	{
 		map = Bukkit.createMap(joueur.getWorld());
 		
-		data = new MapData(map.getId(), joueur.getName(), img, joueur.getWorld().getName(), name);
+		data = new MapData(map.getId(), joueur.getName(), img.getScaledInstance(LARGEUR, HAUTEUR, Image.SCALE_FAST), joueur.getWorld().getName(), name);
 	}
 	
 	@SuppressWarnings("deprecation")

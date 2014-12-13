@@ -16,13 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.WrappedGameProfile;
-
 import fr.moribus.ImageOnMap.Map.ImageMap;
 import fr.moribus.ImageOnMap.Map.SingleMap;
 
@@ -81,18 +74,6 @@ public final class ImageOnMap extends JavaPlugin
 			getLogger().info("[ImageOnMap] An error occured ! Unable to create Image folder. Plugin will NOT work !");
 			this.setEnabled(false);
 		}
-		
-		// Disable all sound effects
-		ProtocolLibrary.getProtocolManager().addPacketListener(
-		  new PacketAdapter(this, ListenerPriority.NORMAL, 
-		          PacketType.Play.Server.SPAWN_ENTITY_LIVING)
-		  {
-			@Override
-		    public void onPacketSending(PacketEvent event)
-		    {
-		    	event.getPacket().getIntegers().write(1, (int) EntityType.BLAZE.getTypeId());
-		    }
-		});
 		
 	}
 	

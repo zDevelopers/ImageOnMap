@@ -42,12 +42,6 @@ public class ImageRendererThread extends Thread
 			return null;
 	}
 	
-	public HashMap<Integer, String> getNumeroMap()
-	{
-		return poster.NumeroMap;
-	}
-	
-	
 
 	public Boolean getStatut()
 	{
