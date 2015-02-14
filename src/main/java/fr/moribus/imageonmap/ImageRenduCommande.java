@@ -58,7 +58,6 @@ public class ImageRenduCommande implements CommandExecutor
 		{
 			joueur.sendMessage("WARNING: you have entered a secure HTTP link, ImageOnMap can't guarantee " +
 					"that the image is downloadable");
-			return true;
 		}
 		
 		if(arg3.length >= 2)

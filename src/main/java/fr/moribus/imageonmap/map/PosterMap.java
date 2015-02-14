@@ -13,9 +13,9 @@ public class PosterMap implements ImageMap
 	private SingleMap[] posterMap;
 	private PosterData data;
 	
-	public PosterMap(Image img, Player joueur)
+	public PosterMap(BufferedImage img, Player joueur)
 	{
-		Poster poster = new Poster((BufferedImage)img);
+		Poster poster = new Poster(img);
 		BufferedImage[] imgs = poster.getPoster();
 		posterMap = new SingleMap[imgs.length];
 		
@@ -106,9 +106,9 @@ public class PosterMap implements ImageMap
 	}
 
 	@Override
-	public void setImage(Image image)
+	public void setImage(BufferedImage image)
 	{
-		Poster poster = new Poster((BufferedImage)image);
+		Poster poster = new Poster(image);
 		BufferedImage[] imgs = poster.getPoster();
 		int i = 0;
 		do

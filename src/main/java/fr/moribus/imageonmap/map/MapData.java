@@ -20,7 +20,7 @@ public class MapData
 	private String joueur;
 	private String monde;
 	private String nom;
-	private Image image;
+	private BufferedImage image;
 	
 	
 	public Image getImage()
@@ -28,12 +28,12 @@ public class MapData
 		return image;
 	}
 	
-	public void setImage(Image image)
+	public void setImage(BufferedImage image)
 	{
 		this.image = image;
 	}
 
-	public MapData(short id, String joueur, Image image, String monde)
+	public MapData(short id, String joueur, BufferedImage image, String monde)
 	{
 		this.id = id;
 		this.joueur = joueur;
@@ -62,7 +62,7 @@ public class MapData
 		try
         {
             File outputfile = new File("./plugins/ImageOnMap/Image/"+ nomImg + ".png");
-            ImageIO.write((BufferedImage)image, "png", outputfile);
+            ImageIO.write(image, "png", outputfile);
                 
              // Enregistrement de la map dans la config
     		ArrayList<String> liste = new ArrayList<String>();

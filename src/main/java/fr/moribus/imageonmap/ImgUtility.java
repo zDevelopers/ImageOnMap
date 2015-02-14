@@ -16,6 +16,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 
 import fr.moribus.imageonmap.map.SingleMap;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 public class ImgUtility 
 {
@@ -251,4 +254,13 @@ public class ImgUtility
 			restant.add(reste.get(0));
 		}
 	}
+        
+        public static BufferedImage scaleImage(Image image, int width, int height)
+        {
+            BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = newImage.createGraphics();
+            g.drawImage(image, 0, 0, width, height, null);
+            g.dispose();
+            return newImage;
+        }
 }
