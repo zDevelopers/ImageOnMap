@@ -10,20 +10,18 @@ import javax.imageio.ImageIO;
 
 public class DownloadImageThread implements Callable<BufferedImage>
 {
-    private final String stringUrl;
+    private final URL imageURL;
     private BufferedImage imgSrc;
 
-    DownloadImageThread(String u)
+    DownloadImageThread(URL imageURL)
     {
-        stringUrl = u;
+        this.imageURL = imageURL;
     }
 
     @Override
     public BufferedImage call() throws IOException
     {
-        URL url = new URL(stringUrl);
-
-        imgSrc = ImageIO.read(url);
+        imgSrc = ImageIO.read(imageURL);
         
         if(imgSrc == null) throw new IOException("URL does not points to a valid image.");
 

@@ -1,134 +1,104 @@
 package fr.moribus.imageonmap.map;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import fr.moribus.imageonmap.Poster;
+import java.io.IOException;
 
 public class PosterMap implements ImageMap
 {
-	private SingleMap[] posterMap;
-	private PosterData data;
-	
-	public PosterMap(BufferedImage img, Player joueur)
-	{
-		Poster poster = new Poster(img);
-		BufferedImage[] imgs = poster.getPoster();
-		posterMap = new SingleMap[imgs.length];
-		
-		short[] idsMap = new short[posterMap.length];
-		for(int i = 0; i < posterMap.length; i++)
-		{
-			SingleMap map = new SingleMap(imgs[i], joueur);
-			posterMap[i] = map;
-			idsMap[i] = map.getId();
-		}
-		
-		data = new PosterData(joueur.getName(), idsMap);
-	}
-	
-	public PosterMap(String id) throws Exception
-	{
-		data = new PosterData(id);
-		
-		short[] ids = data.getIdMaps();
-		posterMap = new SingleMap[ids.length];
-		for(int i = 0; i < ids.length; i++)
-		{
-			SingleMap map = new SingleMap(ids[i]);
-			posterMap[i] = map;
-		}
-	}
 
-	@Override
-	public boolean load()
-	{
-		boolean ok;
-		
-		int i = 0;
-		do
-		{
-			ok = posterMap[i].load();
-			i++;
-		}
-		while(ok && i < posterMap.length);
-		
-		return ok;
-	}
+    private SingleMap[] posterMap;
+    private PosterData data;
 
-	@Override
-	public boolean save()
-	{
-		boolean ok;
-		
-		int i = 0;
-		do
-		{
-			ok = posterMap[i].save();
-			i++;
-		}
-		while(ok && i < posterMap.length);
-		
-		data.save();
-		
-		return ok;
-	}
+    public PosterMap(BufferedImage img, Player joueur)
+    {
+        Poster poster = new Poster(img);
+        BufferedImage[] imgs = poster.getPoster();
+        posterMap = new SingleMap[imgs.length];
 
-	@Override
-	public void give(Inventory inv)
-	{
-		int i = 0;
-		do
-		{
-			posterMap[i].give(inv);
-			i++;
-		}
-		while(i < posterMap.length);
-	}
+        short[] idsMap = new short[posterMap.length];
+        for (int i = 0; i < posterMap.length; i++)
+        {
+            SingleMap map = new SingleMap(imgs[i], joueur);
+            posterMap[i] = map;
+            idsMap[i] = map.getId();
+        }
 
-	@Override
-	public boolean isNamed()
-	{
-		boolean ok;
-		
-		int i = 0;
-		do
-		{
-			ok = posterMap[i].isNamed();
-			i++;
-		}
-		while(ok && i < posterMap.length);
-		
-		return ok;
-	}
+        data = new PosterData(joueur.getName(), idsMap);
+    }
 
-	@Override
-	public void setImage(BufferedImage image)
-	{
-		Poster poster = new Poster(image);
-		BufferedImage[] imgs = poster.getPoster();
-		int i = 0;
-		do
-		{
-			posterMap[i].setImage(imgs[i]);
-			i++;
-		}
-		while(i < imgs.length);
-	}
+    public PosterMap(String id) throws Exception
+    {
+        data = new PosterData(id);
 
-	@Override
-	public void send(Player joueur)
-	{
-		int i = 0;
-		do
-		{
-			posterMap[i].send(joueur);
-			i++;
-		}
-		while(i < posterMap.length);
-	}
+        short[] ids = data.getIdMaps();
+        posterMap = new SingleMap[ids.length];
+        for (int i = 0; i < ids.length; i++)
+        {
+            SingleMap map = new SingleMap(ids[i]);
+            posterMap[i] = map;
+        }
+    }
+
+    @Override
+    public void load() 
+    {
+        for(SingleMap map : posterMap)
+        {
+            map.load();
+        }
+    }
+
+    @Override
+    public void save() throws IOException
+    {
+        for(SingleMap map : posterMap)
+        {
+            map.save();
+        }
+    }
+
+    @Override
+    public void give(Inventory inv)
+    {
+        for(SingleMap map : posterMap)
+        {
+            map.give(inv);
+        }
+    }
+
+    @Override
+    public boolean isNamed()
+    {
+        for(SingleMap map : posterMap)
+        {
+            if(!map.isNamed()) return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void setImage(BufferedImage image)
+    {
+        Poster poster = new Poster(image);
+        BufferedImage[] imgs = poster.getPoster();
+        for(int i = 0; i < posterMap.length; i++)
+        {
+            posterMap[i].setImage(imgs[i]);
+        }
+    }
+
+    @Override
+    public void send(Player player)
+    {
+        for(SingleMap map : posterMap)
+        {
+            map.send(player);
+        }
+    }
 
 }

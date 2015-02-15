@@ -12,54 +12,48 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.moribus.imageonmap.map.SingleMap;
 
-
 public class SendMapOnInvEvent implements Listener
 {
-	
-	ImageOnMap plugin;
+    ImageOnMap plugin;
 
-	SendMapOnInvEvent(ImageOnMap p)
-	{
-		plugin = p;
-	}
+    SendMapOnInvEvent(ImageOnMap p)
+    {
+        plugin = p;
+    }
 
-	@EventHandler
-	public void onPlayerInv(PlayerItemHeldEvent event)
-	{
-		Player joueur = event.getPlayer();
-		int slot = event.getNewSlot();
-		ItemStack stack = joueur.getInventory().getItem(slot);
+    @EventHandler
+    public void onPlayerInv(PlayerItemHeldEvent event)
+    {
+        Player joueur = event.getPlayer();
+        int slot = event.getNewSlot();
+        ItemStack stack = joueur.getInventory().getItem(slot);
 
-			if(stack != null && stack.getType() == Material.MAP)
-			{
-				
-				ArrayList<Short> listeId = plugin.mapChargee;
-				Set<String> cle = plugin.getCustomConfig().getKeys(false);
-				for (String s: cle)
-				{
-					
-					
-					if(!listeId.contains(stack.getDurability()))
-					{
-						if(plugin.getCustomConfig().getStringList(s).get(0).equals(String.valueOf(stack.getDurability())))
-						{
-							try
-							{
-								new SingleMap(stack.getDurability()).load();
-							}
-							catch (Exception e)
-							{
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-								
-						}
-					}
-					
-					
-				}
-			}
-			
-		
-	}
+        if (stack != null && stack.getType() == Material.MAP)
+        {
+
+            ArrayList<Short> listeId = plugin.mapChargee;
+            Set<String> cle = plugin.getCustomConfig().getKeys(false);
+            for (String s : cle)
+            {
+
+                if (!listeId.contains(stack.getDurability()))
+                {
+                    if (plugin.getCustomConfig().getStringList(s).get(0).equals(String.valueOf(stack.getDurability())))
+                    {
+                        try
+                        {
+                            new SingleMap(stack.getDurability()).load();
+                        }
+                        catch (Exception e)
+                        {
+                            PluginLogger.LogWarning("Could not send inventory map.", e);
+                        }
+
+                    }
+                }
+
+            }
+        }
+
+    }
 }

@@ -1,7 +1,6 @@
 package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ImgUtility;
-import java.awt.Image;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,116 +12,101 @@ import org.bukkit.map.MapView;
 
 import fr.moribus.imageonmap.Rendu;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class SingleMap implements ImageMap
 {
-	private MapData data;
-	private MapView map;
-	private boolean named;
-	
-	public final int LARGEUR = 128;
-	public final int HAUTEUR = 128;
-	
-	@SuppressWarnings("deprecation")
-	public SingleMap(BufferedImage img, Player joueur)
-	{
-		map = Bukkit.createMap(joueur.getWorld());
-		this.named = false;
-		data = new MapData(map.getId(), joueur.getName(), ImgUtility.scaleImage(img, LARGEUR, HAUTEUR), joueur.getWorld().getName());
-	}
-	
-	@SuppressWarnings("deprecation")
-	public SingleMap(Image img, Player joueur, String name)
-	{
-		map = Bukkit.createMap(joueur.getWorld());
-		
-		data = new MapData(map.getId(), joueur.getName(), ImgUtility.scaleImage(img, LARGEUR, HAUTEUR), joueur.getWorld().getName(), name);
-	}
-	
-	@SuppressWarnings("deprecation")
-	public SingleMap(short id) throws Exception
-	{
-		try
-		{
-			data = new MapData(id);
-			data.load();
-			map = Bukkit.getMap(id);
-		}
-		catch (Exception e)
-		{
-			throw e;
-		}
-	}
+    private final MapData data;
+    private final MapView map;
 
-	@Override
-	public boolean save()
-	{
-		return data.save();
-	}
+    public final int LARGEUR = 128;
+    public final int HAUTEUR = 128;
 
-	@SuppressWarnings("deprecation")
-	@Override
-	public void give(Inventory inv)
-	{
-		ItemStack itemMap = new ItemStack(Material.MAP, 1, map.getId());
-		if(isNamed())
-		{
-			ItemMeta meta = itemMap.getItemMeta();
-			meta.setDisplayName(data.getNom());
-			itemMap.setItemMeta(meta);
-		}
-		inv.addItem(itemMap);
-	}
+    public SingleMap(BufferedImage img, Player player)
+    {
+        this(img, player, null);
+    }
 
-	@Override
-	public boolean load()
-	{
-		if(map != null)
-		{
-			SingleMap.SupprRendu(map);
-			map.addRenderer(new Rendu(data.getImage()));
-			return true;
-		}
-		else
-			return false;
-	}
+    public SingleMap(BufferedImage img, Player player, String imageName)
+    {
+        map = Bukkit.createMap(player.getWorld());
 
-	@Override
-	public boolean isNamed()
-	{
-		return named;
-	}
-	
-	@SuppressWarnings("deprecation")
-	public short getId()
-	{
-		return map.getId();
-	}
+        data = new MapData(map.getId(), player.getName(), ImgUtility.scaleImage(img, LARGEUR, HAUTEUR), player.getWorld().getName(), imageName);
+    }
 
-	@Override
-	public void setImage(BufferedImage image)
-	{
-		data.setImage(image);
-		load();
-	}
+    @SuppressWarnings("deprecation")
+    public SingleMap(short id) throws IOException, IllegalArgumentException
+    {
+        data = new MapData(id);
+        data.load();
+        map = Bukkit.getMap(id);
+        if(map == null) 
+            throw new IllegalArgumentException("Map ID '"+id+"' doesn't exist");
+    }
 
-	@Override
-	public void send(Player joueur)
-	{
-		joueur.sendMap(map);
-	}
+    @Override
+    public void save() throws IOException
+    {
+        data.save();
+    }
 
-	public static void SupprRendu(MapView map)
-	{
-		if (map.getRenderers().size() > 0)
-		{
-			int i = 0, t = map.getRenderers().size();
-			while (i < t)
-			{
-				map.removeRenderer(map.getRenderers().get(i));
-				i++;
-			}
-		}
-	}
+    @SuppressWarnings("deprecation")
+    @Override
+    public void give(Inventory inv)
+    {
+        ItemStack itemMap = new ItemStack(Material.MAP, 1, map.getId());
+        if (isNamed())
+        {
+            ItemMeta meta = itemMap.getItemMeta();
+            meta.setDisplayName(data.getName());
+            itemMap.setItemMeta(meta);
+        }
+        inv.addItem(itemMap);
+    }
+
+    @Override
+    public void load()
+    {
+        SingleMap.SupprRendu(map);
+        map.addRenderer(new Rendu(data.getImage()));
+    }
+
+    @Override
+    public boolean isNamed()
+    {
+        return data.getName() != null;
+    }
+
+    @SuppressWarnings("deprecation")
+    public short getId()
+    {
+        return map.getId();
+    }
+
+    @Override
+    public void setImage(BufferedImage image)
+    {
+        data.setImage(image);
+        load();
+    }
+
+    @Override
+    public void send(Player joueur)
+    {
+        joueur.sendMap(map);
+    }
+
+    public static void SupprRendu(MapView map)
+    {
+        if (map.getRenderers().size() > 0)
+        {
+            int i = 0, t = map.getRenderers().size();
+            while (i < t)
+            {
+                map.removeRenderer(map.getRenderers().get(i));
+                i++;
+            }
+        }
+    }
 
 }

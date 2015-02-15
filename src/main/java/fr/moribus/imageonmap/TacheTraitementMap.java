@@ -1,6 +1,8 @@
 package fr.moribus.imageonmap;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,7 +17,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public abstract class TacheTraitementMap extends BukkitRunnable
 {
-
     private Player joueur;
     private DownloadImageThread renduImg;
     private PlayerInventory inv;
@@ -26,17 +27,17 @@ public abstract class TacheTraitementMap extends BukkitRunnable
     private Future<BufferedImage> futurDlImg;
     private int compteurExec;
 
-    protected TacheTraitementMap(String u)
+    protected TacheTraitementMap(URL url)
     {
-        renduImg = new DownloadImageThread(u);
+        renduImg = new DownloadImageThread(url);
         dlImg = Executors.newSingleThreadExecutor();
         futurDlImg = dlImg.submit(renduImg);
         plugin = (ImageOnMap) Bukkit.getPluginManager().getPlugin("ImageOnMap");
     }
 
-    public TacheTraitementMap(Player j, String u, boolean rs, boolean rn)
+    public TacheTraitementMap(Player j, URL url, boolean rs, boolean rn)
     {
-        this(u);
+        this(url);
         joueur = j;
         inv = joueur.getInventory();
         resized = rs;
@@ -83,15 +84,22 @@ public abstract class TacheTraitementMap extends BukkitRunnable
                     traiterMap(dlimg);
                     joueur.sendMessage("Image successfuly downloaded !");
                 }
-                catch (InterruptedException e)
+                catch (InterruptedException ex)
                 {
-                    joueur.sendMessage(ChatColor.RED + "ERROR: download task has been interrupted. Make sure your URL is valid.");
+                    joueur.sendMessage(ChatColor.RED + "Download task has been interrupted unexpectedly. Check server console for details.");
+                    PluginLogger.LogError("Download task has been interrupted", ex);
                 }
-                catch (ExecutionException e)
+                catch (ExecutionException ex)
                 {
-                    joueur.sendMessage(ChatColor.RED + "Download failed : " + e.getMessage());
+                    joueur.sendMessage(ChatColor.RED + "Download failed : " + ex.getMessage());
                     joueur.sendMessage(ChatColor.RED + "Please check your URL");
                 }
+                catch(IOException ex)
+                {
+                    joueur.sendMessage(ChatColor.RED + "Failed to process the image. Check server console for details.");
+                    PluginLogger.LogError("Image processing failed", ex);
+                }
+                
             }
             else
             {
@@ -100,7 +108,7 @@ public abstract class TacheTraitementMap extends BukkitRunnable
         }
     }
 
-    public abstract void traiterMap(BufferedImage img);
+    public abstract void traiterMap(BufferedImage img) throws IOException;
 
     protected Player getJoueur()
     {

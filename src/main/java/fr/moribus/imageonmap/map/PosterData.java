@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -61,20 +60,12 @@ public class PosterData
 		{
 			nomPoster = id;
 			setJoueur(svg.get(0));
-			
-			try
-			{
-				short[] ids = new short[svg.size()-1];
-				for(int i = 0; i < ids.length; i++)
-				{
-					ids[i] = Short.parseShort(svg.get(i+1));
-				}
-				setIdMaps(ids);
-			}
-			catch(NumberFormatException e)
-			{
-				throw e;
-			}
+                        short[] ids = new short[svg.size()-1];
+                        for(int i = 0; i < ids.length; i++)
+                        {
+                                ids[i] = Short.parseShort(svg.get(i+1));
+                        }
+                        setIdMaps(ids);
 		}
 		else
 		{
@@ -83,7 +74,7 @@ public class PosterData
 		
 	}
 	
-	public void save()
+	public void save() throws IOException
 	{
 		ArrayList<String> liste = new ArrayList<String>();
 		liste.add(joueur);
@@ -139,17 +130,13 @@ public class PosterData
         return customConfig;
     }
     
-    public void saveCustomConfig() 
+    public void saveCustomConfig() throws IOException
     {
     	ImageOnMap plugin = (ImageOnMap)Bukkit.getPluginManager().getPlugin("ImageOnMap");
         if (customConfig == null || customConfigFile == null) {
             return;
         }
-        try {
-            getCustomConfig().save(customConfigFile);
-        } catch (IOException ex) {
-            plugin.getLogger().log(Level.SEVERE, "Could not save config to " + customConfigFile, ex);
-        }
+        getCustomConfig().save(customConfigFile);
     }
 
 }
