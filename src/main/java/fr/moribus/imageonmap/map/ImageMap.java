@@ -14,7 +14,7 @@ public abstract class ImageMap
 {
     static public enum Type
     {
-        SINGLE, POSTER, ANIMATED;
+        SINGLE, POSTER;
         
         static public ImageMap createNewMap(Type type, BufferedImage image, Player player)
         {
@@ -31,8 +31,6 @@ public abstract class ImageMap
         { 
             switch(string.toLowerCase())
             {
-                case "animated":
-                    return ANIMATED;
                 case "poster":
                 case "multi":
                     return POSTER;
