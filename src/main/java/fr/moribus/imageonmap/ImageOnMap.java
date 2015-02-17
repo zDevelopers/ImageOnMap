@@ -1,5 +1,7 @@
 package fr.moribus.imageonmap;
 
+import fr.moribus.imageonmap.commands.MapToolCommand;
+import fr.moribus.imageonmap.commands.ImageRenduCommande;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

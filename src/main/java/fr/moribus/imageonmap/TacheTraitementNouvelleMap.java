@@ -5,17 +5,15 @@ import java.awt.image.BufferedImage;
 import org.bukkit.entity.Player;
 
 import fr.moribus.imageonmap.map.ImageMap;
-import fr.moribus.imageonmap.map.MapType;
-import fr.moribus.imageonmap.map.PosterMap;
-import fr.moribus.imageonmap.map.SingleMap;
+import fr.moribus.imageonmap.map.ImageMap.Type;
 import java.io.IOException;
 import java.net.URL;
 
 public class TacheTraitementNouvelleMap extends TacheTraitementMap
 {
-	private final MapType type;
+	private final Type type;
 
-	public TacheTraitementNouvelleMap(Player player, URL url, MapType type, boolean rs, boolean rn)
+	public TacheTraitementNouvelleMap(Player player, URL url, Type type, boolean rs, boolean rn)
 	{
 		super(player, url, rs, rn);
 		this.type = type;
@@ -24,12 +22,7 @@ public class TacheTraitementNouvelleMap extends TacheTraitementMap
 	@Override
 	public void traiterMap(BufferedImage img) throws IOException
 	{
-		ImageMap m;
-		
-		if(type == MapType.Single)
-			m = new SingleMap(img, getJoueur());
-		else
-			m = new PosterMap(img, getJoueur());
+		ImageMap m = ImageMap.Type.createNewMap(type, img, getJoueur());
 		
 		m.load();
 		m.give(getJoueur().getInventory());

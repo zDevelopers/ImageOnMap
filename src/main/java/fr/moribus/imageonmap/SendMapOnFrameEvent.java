@@ -31,9 +31,8 @@ public class SendMapOnFrameEvent implements Listener
     {
         chunk = event.getChunk();
         entites = chunk.getEntities().clone();
-        for (int i = 0; i < entites.length; i++)
+        for (Entity entite : entites)
         {
-            Entity entite = entites[i];
             if (entite instanceof ItemFrame)
             {
                 ArrayList<Short> ListeId = plugin.mapChargee;

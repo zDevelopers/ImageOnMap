@@ -1,12 +1,16 @@
-package fr.moribus.imageonmap;
+package fr.moribus.imageonmap.commands;
 
+import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.ImgUtility;
+import fr.moribus.imageonmap.TacheTraitementMap;
+import fr.moribus.imageonmap.TacheTraitementNouvelleMap;
+import fr.moribus.imageonmap.map.ImageMap;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import fr.moribus.imageonmap.map.MapType;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -16,7 +20,6 @@ public class ImageRenduCommande implements CommandExecutor
     boolean renderName, imgSvg;
     ImageOnMap plugin;
     boolean resize, rename;
-    MapType type;
 
     public ImageRenduCommande(ImageOnMap p)
     {
@@ -59,11 +62,13 @@ public class ImageRenduCommande implements CommandExecutor
             return false;
         }
 
+        ImageMap.Type type = ImageMap.Type.SINGLE;
+        
         if (args.length >= 2)
         {
             try
             {
-                type = Enum.valueOf(MapType.class, args[1]);
+                type = Enum.valueOf(ImageMap.Type.class, args[1]);
             }
             catch (IllegalArgumentException ex)
             {

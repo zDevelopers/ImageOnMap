@@ -1,5 +1,6 @@
-package fr.moribus.imageonmap;
+package fr.moribus.imageonmap.image;
 
+import fr.moribus.imageonmap.image.PosterImage;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -17,7 +18,7 @@ public class ImageRendererThread extends Thread
 	private String URL;
 	private BufferedImage imgSrc;
 	private BufferedImage[] img;
-	private Poster poster;
+	private PosterImage poster;
 	private boolean estPrete = false, resized;
 	public boolean erreur = false;
 	
@@ -26,7 +27,7 @@ public class ImageRendererThread extends Thread
 		return erreur;
 	}
 
-	ImageRendererThread(String u, boolean r)
+	public ImageRendererThread(String u, boolean r)
 	{
 		URL = u;
 		resized = r;
@@ -124,9 +125,10 @@ public class ImageRendererThread extends Thread
 				//graph.rotate(45);
 				// on dessine l'image dans le canvas
 				graph.drawImage(imgSrc, null, null);
+                                
 				// on crée un Poster à partir de notre canvas
-				poster = new Poster(canvas);
-				img = poster.getPoster();
+				poster = new PosterImage(canvas);
+				img = poster.getImages();
 			}
 			
 			estPrete = true;
@@ -134,7 +136,7 @@ public class ImageRendererThread extends Thread
 		
 	}
 	
-	static void SupprRendu(MapView map)
+	static public void SupprRendu(MapView map)
 	{
 		if (map.getRenderers().size() > 0)
 		{

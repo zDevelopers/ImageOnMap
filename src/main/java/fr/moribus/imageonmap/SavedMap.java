@@ -1,5 +1,7 @@
 package fr.moribus.imageonmap;
 
+import fr.moribus.imageonmap.image.Renderer;
+import fr.moribus.imageonmap.image.ImageRendererThread;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -83,13 +85,13 @@ public class SavedMap
     }
 
     @SuppressWarnings("deprecation")
-    Boolean LoadMap()
+    public Boolean LoadMap()
     {
         MapView carte = Bukkit.getMap(idMap);
         if (carte != null && loaded)
         {
             ImageRendererThread.SupprRendu(carte);
-            carte.addRenderer(new Rendu(image));
+            carte.addRenderer(new Renderer(image));
             if (!plugin.mapChargee.contains(idMap))
             {
                 plugin.mapChargee.add(idMap);

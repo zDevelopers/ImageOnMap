@@ -1,5 +1,6 @@
 package fr.moribus.imageonmap;
 
+import fr.moribus.imageonmap.image.DownloadImageThread;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;

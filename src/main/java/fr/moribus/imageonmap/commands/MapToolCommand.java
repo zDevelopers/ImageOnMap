@@ -1,5 +1,10 @@
-package fr.moribus.imageonmap;
+package fr.moribus.imageonmap.commands;
 
+import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.ImgUtility;
+import fr.moribus.imageonmap.PluginLogger;
+import fr.moribus.imageonmap.SavedPoster;
+import fr.moribus.imageonmap.TacheTraitementMajMap;
 import java.util.ArrayList;
 
 import org.bukkit.ChatColor;

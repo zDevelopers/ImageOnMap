@@ -1,4 +1,4 @@
-package fr.moribus.imageonmap;
+package fr.moribus.imageonmap.image;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -13,7 +13,7 @@ public class DownloadImageThread implements Callable<BufferedImage>
     private final URL imageURL;
     private BufferedImage imgSrc;
 
-    DownloadImageThread(URL imageURL)
+    public DownloadImageThread(URL imageURL)
     {
         this.imageURL = imageURL;
     }

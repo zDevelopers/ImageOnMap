@@ -24,7 +24,7 @@ public class ImgUtility
 {
 
 	// Vérifie que c'est bien un joueur qui exécute la commande
-	static boolean VerifierIdentite(CommandSender sender)
+	static public boolean VerifierIdentite(CommandSender sender)
 	{
 		if (sender instanceof Player)
 		{
@@ -39,7 +39,7 @@ public class ImgUtility
 	}
 	
 	// Creation du dossier où sera stocké les images
-	static boolean CreeRepImg(ImageOnMap plugin)
+	static public boolean CreeRepImg(ImageOnMap plugin)
 	{
 		File dossier;
 		dossier = new File(plugin.getDataFolder().getPath() + "/Image");
@@ -170,7 +170,7 @@ public class ImgUtility
 		return map;
 	}
 	
-	static boolean RemoveMap(ImageOnMap plugin, short id)
+	static public boolean RemoveMap(ImageOnMap plugin, short id)
 	{
 		@SuppressWarnings("deprecation")
 		MapView carte = Bukkit.getMap(id);
@@ -231,7 +231,7 @@ public class ImgUtility
 		return false;
 	}
 	
-	static ArrayList<String> getListMapByPlayer(ImageOnMap plugin, String pseudo)
+	static public ArrayList<String> getListMapByPlayer(ImageOnMap plugin, String pseudo)
 	{
 		ArrayList<String> listeMap = new ArrayList<String>();
 		Set<String> cle = plugin.getCustomConfig().getKeys(false);
@@ -245,7 +245,7 @@ public class ImgUtility
 		return listeMap;
 	}
 	
-	static void AddMap(ItemStack map, Inventory inv, ArrayList<ItemStack> restant)
+	static public void AddMap(ItemStack map, Inventory inv, ArrayList<ItemStack> restant)
 	{
 		HashMap<Integer,ItemStack> reste = inv.addItem(map);
 		

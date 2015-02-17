@@ -98,7 +98,7 @@ public class SavedPoster
         return posterName;
     }
 
-    ArrayList<String> getListMapByPlayer(ImageOnMap plugin, String pseudo)
+    public ArrayList<String> getListMapByPlayer(ImageOnMap plugin, String pseudo)
     {
         ArrayList<String> listeMap = new ArrayList<String>();
         Set<String> cle = getCustomConfig().getKeys(false);
