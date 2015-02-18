@@ -96,9 +96,11 @@ public class PosterMap extends ImageMap
     @Override
     public void give(Inventory inv)
     {
-        for(short mapID : mapsIDs)
+        String itemName;
+        for(int i = 0; i < mapsIDs.length; i++)
         {
-            give(inv, mapID);
+            itemName = "Map (row " + (image.getLineAt(i) + 1) + ", column " + (image.getColumnAt(i) + 1) + ")";
+            give(inv, mapsIDs[i], itemName);
         }
     }
 

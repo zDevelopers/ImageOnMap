@@ -69,11 +69,16 @@ public abstract class ImageMap
     
     protected void give(Inventory inventory, short mapID)
     {
+        give(inventory, mapID, getImageName());
+    }
+    
+    protected void give(Inventory inventory, short mapID, String itemName)
+    {
         ItemStack itemMap = new ItemStack(Material.MAP, 1, mapID);
-        if(isNamed())
+        if(itemName != null)
         {
             ItemMeta meta = itemMap.getItemMeta();
-            meta.setDisplayName(imageName);
+            meta.setDisplayName(itemName);
             itemMap.setItemMeta(meta);
         }
         inventory.addItem(itemMap);

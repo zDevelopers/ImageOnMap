@@ -99,6 +99,16 @@ public class PosterImage
         return cutImages[x * columns + y];
     }
     
+    public int getColumnAt(int i)
+    {
+        return i % columns;
+    }
+    
+    public int getLineAt(int i)
+    {
+        return i / columns;
+    }
+    
     /**
      * 
      * @return the number of lines of the poster
