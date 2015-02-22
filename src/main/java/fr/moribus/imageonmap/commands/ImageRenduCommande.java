@@ -62,17 +62,18 @@ public class ImageRenduCommande implements CommandExecutor
             return false;
         }
 
-        ImageMap.Type type = ImageMap.Type.SINGLE;
+        ImageMap.Type type = ImageMap.Type.POSTER;
         
         if (args.length >= 2)
         {
-            try
+            if(args[1].equals("resize"))
             {
-                type = Enum.valueOf(ImageMap.Type.class, args[1]);
+                type = ImageMap.Type.SINGLE;
             }
-            catch (IllegalArgumentException ex)
+            else
             {
-                joueur.sendMessage("Specified map type doesn't exist");
+                joueur.sendMessage("Invalid argument.");
+                return true;
             }
 
         }

@@ -34,8 +34,10 @@ public abstract class ImageMap
                 case "poster":
                 case "multi":
                     return POSTER;
-                default:
+                case "single":
                     return SINGLE;
+                default:
+                    return null;
             }
         }
     }
