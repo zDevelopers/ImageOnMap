@@ -43,10 +43,10 @@ public class PosterImage
         cutImages = new BufferedImage[cutImagesCount];
         
         int imageX;
-        int imageY = (remainderY - ImageMap.HEIGHT) / 2;
+        int imageY = (remainderY > 0) ? (remainderY - ImageMap.HEIGHT) / 2 : 0;
         for(int i = 0; i < lines; i++)
         {
-            imageX = (remainderX - ImageMap.WIDTH) / 2;
+            imageX = (remainderX > 0) ? (remainderX - ImageMap.WIDTH) / 2 : 0;
             for(int j = 0; j < columns; j++)
             {
                 cutImages[i * columns + j] = makeSubImage(originalImage, imageX, imageY);
