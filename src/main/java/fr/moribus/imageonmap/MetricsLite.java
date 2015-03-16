@@ -50,7 +50,25 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
 
-public class MetricsLite {
+public class MetricsLite 
+{
+    /**
+     * Starts MetricsLite, unless disabled in config
+     */
+    
+    static public void startMetrics()
+    {
+        if(!PluginConfiguration.COLLECT_DATA.getBoolean()) return;
+        try
+        {
+            MetricsLite metrics = new MetricsLite(ImageOnMap.getPlugin());
+            metrics.start();
+        }
+        catch (IOException e)
+        {
+            PluginLogger.LogError("Failed to start MetricsLite", e);
+        }
+    }
 
     /**
 * The current revision number

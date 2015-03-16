@@ -16,37 +16,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.moribus.imageonmap.map;
+package fr.moribus.imageonmap.worker;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import org.bukkit.Bukkit;
 
-public class SingleMap extends ImageMap
+class WorkerCallbackManager implements Runnable
 {
-    protected short mapID;
+    static private final int WATCH_LOOP_DELAY = 5;
     
-    public SingleMap(UUID ownerUUID, short mapID)
+    private final HashMap<WorkerRunnable, WorkerCallback> callbacks;
+    private final ArrayDeque<WorkerCallback> callbackQueue;
+    
+    private final String name;
+    
+    public WorkerCallbackManager(String name)
     {
-        super(ownerUUID);
-        this.mapID = mapID;
+        callbacks = new HashMap<>();
+        callbackQueue = new ArrayDeque<>();
+        this.name = name;
+    }
+    
+    public void init()
+    {
+        //Bukkit.getScheduler().runTaskTimer(null, this, 0, WATCH_LOOP_DELAY);
+    }
+    
+    public void exit()
+    {
+        
     }
     
     @Override
-    public short[] getMapsIDs()
+    public void run()
     {
-        return new short[]{mapID};
     }
-
-    @Override
-    public boolean managesMap(short mapID)
-    {
-        return this.mapID == mapID;
-    }
-
-    @Override
-    protected void postSerialize(Map<String, Object> map)
-    {
-        map.put("mapID", mapID);
-    }
-
 }

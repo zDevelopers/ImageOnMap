@@ -1,90 +1,77 @@
+/*
+ * Copyright (C) 2013 Moribus
+ * Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package fr.moribus.imageonmap.map;
 
-import fr.moribus.imageonmap.image.PosterImage;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import org.bukkit.Material;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-public abstract class ImageMap 
+public abstract class ImageMap implements ConfigurationSerializable
 {
-    static public enum Type
-    {
-        SINGLE, POSTER;
-        
-        static public ImageMap createNewMap(Type type, BufferedImage image, Player player)
-        {
-            switch(type)
-            {
-                case POSTER:
-                    return new PosterMap(new PosterImage(image), player);
-                default:
-                    return new SingleMap(image, player);
-            }
-        }
-        
-        static public Type fromString(String string)
-        { 
-            switch(string.toLowerCase())
-            {
-                case "poster":
-                case "multi":
-                    return POSTER;
-                default:
-                    return SINGLE;
-            }
-        }
-    }
-    
     static public final int WIDTH = 128;
     static public final int HEIGHT = 128;
     
-    protected String imageName;
-    protected String ownerName;
-    protected String worldName;
+    private final UUID userUUID;
+    private String imageName;
     
-    public abstract void load() throws IOException;
-    public abstract void save() throws IOException;
-    public abstract void give(Inventory inv);
-    public abstract void setImage(BufferedImage image);
-    public abstract void send(Player joueur);
-    
-    public ImageMap()
+    protected ImageMap(UUID userUUID)
     {
-        this(null, null, null);
-    }
-    
-    public ImageMap(String imageName, String ownerName, String worldName)
-    {
-        this.imageName = imageName;
-        this.ownerName = ownerName;
-        this.worldName = worldName;
+        this.userUUID = userUUID;
     }
     
     
+    public abstract short[] getMapsIDs();
+    public abstract boolean managesMap(short mapID);
     
-    protected void give(Inventory inventory, short mapID)
-    {
-        give(inventory, mapID, getImageName());
-    }
+    /*** Serialization methods ***/
     
-    protected void give(Inventory inventory, short mapID, String itemName)
+    protected ImageMap(Map<String, Object> map, UUID userUUID) throws IllegalArgumentException
     {
-        ItemStack itemMap = new ItemStack(Material.MAP, 1, mapID);
-        if(itemName != null)
+        try
         {
-            ItemMeta meta = itemMap.getItemMeta();
-            meta.setDisplayName(itemName);
-            itemMap.setItemMeta(meta);
+            this.userUUID = userUUID;
+            this.imageName = (String) map.get("name");
         }
-        inventory.addItem(itemMap);
+        catch(ClassCastException ex)
+        {
+            throw new IllegalArgumentException(ex);
+        }
     }
     
-    // Getters & Setters
+    protected abstract void postSerialize(Map<String, Object> map);
+    
+    @Override
+    public Map<String, Object> serialize()
+    {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("name", imageName);
+        return map;
+    }
+
+    
+    /*** Getters & Setters ***/
+    
+    public UUID getUserUUID()
+    {
+        return userUUID;
+    }
 
     public String getImageName()
     {
@@ -94,30 +81,5 @@ public abstract class ImageMap
     public void setImageName(String imageName)
     {
         this.imageName = imageName;
-    }
-    
-    public boolean isNamed()
-    {
-        return imageName != null;
-    }
-    
-    public String getOwnerName()
-    {
-        return ownerName;
-    }
-
-    public void setOwnerName(String ownerName)
-    {
-        this.ownerName = ownerName;
-    }
-    
-    public String getWorldName()
-    {
-        return worldName;
-    }
-
-    public void setWorldName(String worldName)
-    {
-        this.worldName = worldName;
     }
 }

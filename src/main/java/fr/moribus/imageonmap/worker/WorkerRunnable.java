@@ -15,38 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package fr.moribus.imageonmap.worker;
 
-package fr.moribus.imageonmap.map;
-
-import java.util.Map;
-import java.util.UUID;
-
-public class SingleMap extends ImageMap
+public interface WorkerRunnable
 {
-    protected short mapID;
-    
-    public SingleMap(UUID ownerUUID, short mapID)
-    {
-        super(ownerUUID);
-        this.mapID = mapID;
-    }
-    
-    @Override
-    public short[] getMapsIDs()
-    {
-        return new short[]{mapID};
-    }
-
-    @Override
-    public boolean managesMap(short mapID)
-    {
-        return this.mapID == mapID;
-    }
-
-    @Override
-    protected void postSerialize(Map<String, Object> map)
-    {
-        map.put("mapID", mapID);
-    }
-
+    public void run() throws Throwable;
 }

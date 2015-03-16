@@ -18,35 +18,32 @@
 
 package fr.moribus.imageonmap.map;
 
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.UUID;
 
-public class SingleMap extends ImageMap
+public class PlayerMapStore 
 {
-    protected short mapID;
+    private final UUID playerUUID;
+    private final ArrayList<ImageMap> mapList = new ArrayList<ImageMap>();
     
-    public SingleMap(UUID ownerUUID, short mapID)
+    public PlayerMapStore(UUID playerUUID)
     {
-        super(ownerUUID);
-        this.mapID = mapID;
+        this.playerUUID = playerUUID;
     }
     
-    @Override
-    public short[] getMapsIDs()
-    {
-        return new short[]{mapID};
-    }
-
-    @Override
     public boolean managesMap(short mapID)
     {
-        return this.mapID == mapID;
+        for(ImageMap map : mapList)
+        {
+            if(map.managesMap(mapID)) return true;
+        }
+        return false;
     }
-
-    @Override
-    protected void postSerialize(Map<String, Object> map)
+    
+    /* ===== Getters & Setters ===== */
+    
+    public UUID getUUID()
     {
-        map.put("mapID", mapID);
+        return playerUUID;
     }
-
 }
