@@ -40,7 +40,7 @@ public abstract class ImageMap implements ConfigurationSerializable
     public abstract short[] getMapsIDs();
     public abstract boolean managesMap(short mapID);
     
-    /*** Serialization methods ***/
+    /* ====== Serialization methods ====== */
     
     protected ImageMap(Map<String, Object> map, UUID userUUID) throws IllegalArgumentException
     {
@@ -66,7 +66,7 @@ public abstract class ImageMap implements ConfigurationSerializable
     }
 
     
-    /*** Getters & Setters ***/
+    /* ====== Getters & Setters ====== */
     
     public UUID getUserUUID()
     {

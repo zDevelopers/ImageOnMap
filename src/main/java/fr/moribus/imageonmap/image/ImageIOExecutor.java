@@ -18,7 +18,6 @@
 
 package fr.moribus.imageonmap.image;
 
-import fr.moribus.imageonmap.PluginLogger;
 import fr.moribus.imageonmap.worker.Worker;
 import fr.moribus.imageonmap.worker.WorkerRunnable;
 import java.awt.image.BufferedImage;
