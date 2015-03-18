@@ -1,0 +1,2 @@
+This command manages and creates ImagesOnMaps.
+new: Creates a new ImageOnMap.

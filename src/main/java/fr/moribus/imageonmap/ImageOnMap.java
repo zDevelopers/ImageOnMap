@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap;
 
+import fr.moribus.imageonmap.commands.Commands;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import java.io.File;
@@ -63,6 +64,7 @@ public final class ImageOnMap extends JavaPlugin
          
         MetricsLite.startMetrics();
         ImageIOExecutor.start();
+        Commands.init(this);
         getServer().getPluginManager().registerEvents(new MapInitEvent(), this);
     }
 
