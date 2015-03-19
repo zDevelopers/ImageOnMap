@@ -22,6 +22,8 @@ import fr.moribus.imageonmap.commands.Command;
 import fr.moribus.imageonmap.commands.CommandException;
 import fr.moribus.imageonmap.commands.CommandInfo;
 import fr.moribus.imageonmap.commands.Commands;
+import fr.moribus.imageonmap.image.ImageRendererExecutor;
+import fr.moribus.imageonmap.worker.WorkerCallback;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.bukkit.entity.Player;
@@ -36,7 +38,7 @@ public class NewCommand  extends Command
     @Override
     protected void run() throws CommandException
     {
-        Player player = playerSender();
+        final Player player = playerSender();
         URL url;
         
         if(args.length < 1) throwInvalidArgument("You must give an URL to take the image from.");
@@ -55,7 +57,21 @@ public class NewCommand  extends Command
             
         }
         
-        info("Not implemented.");
+        info("Working ...");
+        ImageRendererExecutor.Test(new WorkerCallback()
+        {
+            @Override
+            public void finished(Object... args)
+            {
+                player.sendMessage("Long task finished !");
+            }
+
+            @Override
+            public void errored(Throwable exception)
+            {
+                player.sendMessage("Whoops, an error occured !");
+            }
+        });
     }
 
 }

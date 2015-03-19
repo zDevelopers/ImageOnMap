@@ -42,6 +42,7 @@ public abstract class Worker
             PluginLogger.LogWarning("Restarting " + name + " thread.");
             exit();
         }
+        callbackManager.init();
         thread = createThread();
         thread.start();
     }
@@ -49,6 +50,7 @@ public abstract class Worker
     public void exit()
     {
         thread.interrupt();
+        callbackManager.exit();
         thread = null;
     }
     
@@ -74,10 +76,11 @@ public abstract class Worker
             try
             {
                 currentRunnable.run();
+                callbackManager.callback(currentRunnable);
             }
             catch(Throwable ex)
             {
-                PluginLogger.LogError("Exception from thread " + name, ex);
+                callbackManager.callback(currentRunnable, ex);
             }
         }
     }
@@ -89,6 +92,12 @@ public abstract class Worker
             runQueue.add(runnable);
             runQueue.notify();
         }
+    }
+    
+    protected void submitQuery(WorkerRunnable runnable, WorkerCallback callback, Object... args)
+    {
+        callbackManager.setupCallback(runnable, callback, args);
+        submitQuery(runnable);
     }
     
     
