@@ -20,6 +20,7 @@ package fr.moribus.imageonmap.map;
 
 import java.util.Map;
 import java.util.UUID;
+import org.bukkit.configuration.InvalidConfigurationException;
 
 public class SingleMap extends ImageMap
 {
@@ -27,7 +28,7 @@ public class SingleMap extends ImageMap
     
     public SingleMap(UUID ownerUUID, short mapID)
     {
-        super(ownerUUID);
+        super(ownerUUID, Type.SINGLE);
         this.mapID = mapID;
     }
     
@@ -42,7 +43,15 @@ public class SingleMap extends ImageMap
     {
         return this.mapID == mapID;
     }
-
+    
+    /* ====== Serialization methods ====== */
+    
+    public SingleMap(Map<String, Object> map, UUID userUUID) throws InvalidConfigurationException
+    {
+        super(map, userUUID, Type.SINGLE);
+        mapID = getFieldValue(map, "mapID");
+    }
+    
     @Override
     protected void postSerialize(Map<String, Object> map)
     {

@@ -21,19 +21,27 @@ package fr.moribus.imageonmap.map;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public abstract class ImageMap implements ConfigurationSerializable
 {
+    static public enum Type 
+    {
+        SINGLE, POSTER;
+    };
+    
     static public final int WIDTH = 128;
     static public final int HEIGHT = 128;
     
     private final UUID userUUID;
+    private final Type mapType;
     private String imageName;
     
-    protected ImageMap(UUID userUUID)
+    protected ImageMap(UUID userUUID, Type mapType)
     {
         this.userUUID = userUUID;
+        this.mapType = mapType;
     }
     
     
@@ -42,17 +50,30 @@ public abstract class ImageMap implements ConfigurationSerializable
     
     /* ====== Serialization methods ====== */
     
-    protected ImageMap(Map<String, Object> map, UUID userUUID) throws IllegalArgumentException
+    static public ImageMap fromConfig(Map<String, Object> map, UUID userUUID) throws InvalidConfigurationException
     {
+        Type mapType;
         try
         {
-            this.userUUID = userUUID;
-            this.imageName = (String) map.get("name");
+            mapType = Type.valueOf((String) map.get("type"));
         }
         catch(ClassCastException ex)
         {
-            throw new IllegalArgumentException(ex);
+            throw new InvalidConfigurationException(ex);
         }
+        
+        switch(mapType)
+        {
+            case SINGLE: return new SingleMap(map, userUUID);
+            case POSTER: return new PosterMap(map, userUUID);
+            default: throw new IllegalArgumentException("Unhandled map type given");
+        }
+    }
+    
+    protected ImageMap(Map<String, Object> map, UUID userUUID, Type mapType) throws InvalidConfigurationException
+    {
+        this(userUUID, mapType);
+        this.imageName = getFieldValue(map, "name");
     }
     
     protected abstract void postSerialize(Map<String, Object> map);
@@ -61,8 +82,21 @@ public abstract class ImageMap implements ConfigurationSerializable
     public Map<String, Object> serialize()
     {
         Map<String, Object> map = new HashMap<String, Object>();
+        map.put("type", mapType.toString());
         map.put("name", imageName);
         return map;
+    }
+    
+    static protected <T> T getFieldValue(Map<String, Object> map, String fieldName) throws InvalidConfigurationException
+    {
+        try
+        {
+            return (T)map.get(fieldName);
+        }
+        catch(ClassCastException ex)
+        {
+            throw new InvalidConfigurationException("Invalid field \"" + fieldName + "\"", ex);
+        }
     }
 
     

@@ -18,12 +18,17 @@
 
 package fr.moribus.imageonmap.map;
 
+import fr.moribus.imageonmap.ImageOnMap;
 import java.util.ArrayList;
 import java.util.UUID;
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 abstract public class MapManager 
 {
-    static private final ArrayList<PlayerMapStore> playerMaps = new ArrayList<PlayerMapStore>();;
+    static private final long SAVE_DELAY = 200;
+    static private final ArrayList<PlayerMapStore> playerMaps = new ArrayList<PlayerMapStore>();
+    static private BukkitTask autosaveTask;
     
     static public void init()
     {
@@ -33,6 +38,8 @@ abstract public class MapManager
     static public void exit()
     {
         playerMaps.clear();
+        save();
+        if(autosaveTask != null) autosaveTask.cancel();
     }
     
     static public boolean managesMap(short mapID)
@@ -45,6 +52,24 @@ abstract public class MapManager
             }
         }
         return false;
+    }
+    
+    static public void notifyModification(UUID playerUUID)
+    {
+        getPlayerMapStore(playerUUID).notifyModification();
+        if(autosaveTask == null) 
+            Bukkit.getScheduler().runTaskLater(ImageOnMap.getPlugin(), new AutosaveRunnable(), SAVE_DELAY);
+    }
+    
+    static public void save()
+    {
+        synchronized(playerMaps)
+        {
+            for(PlayerMapStore tStore : playerMaps)
+            {
+                tStore.saveMapsFile();
+            }
+        }
     }
     
     static private PlayerMapStore getPlayerMapStore(UUID playerUUID)
@@ -68,5 +93,22 @@ abstract public class MapManager
             }
         }
         return null;
+    }
+    
+    static private class AutosaveRunnable implements Runnable
+    {
+        @Override
+        public void run() 
+        {
+            synchronized(playerMaps)
+            {
+                for(PlayerMapStore toolStore : playerMaps)
+                {
+                    if(toolStore.isModified()) toolStore.saveMapsFile();
+                }
+                autosaveTask = null;
+            }
+        }
+        
     }
 }

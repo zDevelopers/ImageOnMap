@@ -20,6 +20,7 @@ package fr.moribus.imageonmap.map;
 
 import java.util.Map;
 import java.util.UUID;
+import org.bukkit.configuration.InvalidConfigurationException;
 
 public class PosterMap extends ImageMap
 {
@@ -29,7 +30,7 @@ public class PosterMap extends ImageMap
     
     public PosterMap(UUID userUUID, short[] mapsIDs, int columnCount, int rowCount)
     {
-        super(userUUID);
+        super(userUUID, Type.POSTER);
         this.mapsIDs = mapsIDs;
         this.columnCount = columnCount;
         this.rowCount = rowCount;
@@ -52,6 +53,17 @@ public class PosterMap extends ImageMap
         return false;
     }
 
+    /* ====== Serialization methods ====== */
+    
+    public PosterMap(Map<String, Object> map, UUID userUUID) throws InvalidConfigurationException
+    {
+        super(map, userUUID, Type.POSTER);
+        
+        columnCount = getFieldValue(map, "columns");
+        rowCount = getFieldValue(map, "rows");
+        mapsIDs = getFieldValue(map, "mapIDs");
+    }
+    
     @Override
     protected void postSerialize(Map<String, Object> map)
     {

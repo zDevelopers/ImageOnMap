@@ -29,13 +29,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class ImageOnMap extends JavaPlugin
 {
     static private final String IMAGES_DIRECTORY_NAME = "images";
+    static private final String MAPS_DIRECTORY_NAME = "maps";
     static private ImageOnMap plugin;
     
     private final File imagesDirectory;
+    private final File mapsDirectory;
 
     public ImageOnMap()
     {
         imagesDirectory = new File(this.getDataFolder(), IMAGES_DIRECTORY_NAME);
+        mapsDirectory = new File(this.getDataFolder(), MAPS_DIRECTORY_NAME);
         plugin = this;
     }
 
@@ -45,6 +48,7 @@ public final class ImageOnMap extends JavaPlugin
     }
     
     public File getImagesDirectory() {return imagesDirectory;}
+    public File getMapsDirectory() {return mapsDirectory;}
     public File getImageFile(short mapID)
     {
         return new File(imagesDirectory, "map"+mapID+".png");
@@ -57,6 +61,16 @@ public final class ImageOnMap extends JavaPlugin
         if(!imagesDirectory.exists())
         {
             if(!imagesDirectory.mkdirs())
+            {
+                PluginLogger.LogError("FATAL : Could not create the images directory.", null);
+                this.setEnabled(false);
+                return;
+            }
+        }
+        
+        if(!mapsDirectory.exists())
+        {
+            if(!mapsDirectory.mkdirs())
             {
                 PluginLogger.LogError("FATAL : Could not create the images directory.", null);
                 this.setEnabled(false);
