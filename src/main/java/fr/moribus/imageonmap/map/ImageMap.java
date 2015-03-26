@@ -21,8 +21,11 @@ package fr.moribus.imageonmap.map;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 public abstract class ImageMap implements ConfigurationSerializable
 {
@@ -47,6 +50,16 @@ public abstract class ImageMap implements ConfigurationSerializable
     
     public abstract short[] getMapsIDs();
     public abstract boolean managesMap(short mapID);
+    
+    public void give(Inventory inventory)
+    {
+        short[] mapsIDs = getMapsIDs();
+        for(short mapID : mapsIDs)
+        {
+            ItemStack itemMap = new ItemStack(Material.MAP, 1, mapID);
+            inventory.addItem(itemMap);
+        }
+    }
     
     /* ====== Serialization methods ====== */
     
@@ -73,7 +86,7 @@ public abstract class ImageMap implements ConfigurationSerializable
     protected ImageMap(Map<String, Object> map, UUID userUUID, Type mapType) throws InvalidConfigurationException
     {
         this(userUUID, mapType);
-        this.imageName = getFieldValue(map, "name");
+        this.imageName = getNullableFieldValue(map, "name");
     }
     
     protected abstract void postSerialize(Map<String, Object> map);
@@ -84,10 +97,18 @@ public abstract class ImageMap implements ConfigurationSerializable
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("type", mapType.toString());
         map.put("name", imageName);
+        this.postSerialize(map);
         return map;
     }
     
     static protected <T> T getFieldValue(Map<String, Object> map, String fieldName) throws InvalidConfigurationException
+    {
+        T value = getNullableFieldValue(map, fieldName);
+        if(value == null) throw new InvalidConfigurationException("Field value not found for \"" + fieldName + "\"");
+        return value;
+    }
+    
+    static protected <T> T getNullableFieldValue(Map<String, Object> map, String fieldName) throws InvalidConfigurationException
     {
         try
         {

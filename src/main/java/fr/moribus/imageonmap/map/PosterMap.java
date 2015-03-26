@@ -61,7 +61,7 @@ public class PosterMap extends ImageMap
         
         columnCount = getFieldValue(map, "columns");
         rowCount = getFieldValue(map, "rows");
-        mapsIDs = getFieldValue(map, "mapIDs");
+        mapsIDs = getFieldValue(map, "mapsIDs");
     }
     
     @Override

@@ -48,14 +48,28 @@ public class ImageIOExecutor extends Worker
     
     static public void loadImage(final File file, final Renderer mapRenderer) 
     {
-        instance.submitQuery(new WorkerRunnable()
+        instance.submitQuery(new WorkerRunnable<Void>()
             {
                 @Override
-                public void run() throws Exception
+                public Void run() throws Exception
                 {
                     BufferedImage image = ImageIO.read(file);
                     mapRenderer.setImage(image);
+                    return null;
                 }
             });
+    }
+    
+    static public void saveImage(final File file, final BufferedImage image)
+    {
+        instance.submitQuery(new WorkerRunnable<Void>()
+        {
+            @Override
+            public Void run() throws Throwable
+            {
+                ImageIO.write(image, "png", file);
+                return null;
+            }
+        });
     }
 }

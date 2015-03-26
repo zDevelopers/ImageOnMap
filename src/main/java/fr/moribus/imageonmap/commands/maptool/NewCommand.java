@@ -18,11 +18,13 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.PluginLogger;
 import fr.moribus.imageonmap.commands.Command;
 import fr.moribus.imageonmap.commands.CommandException;
 import fr.moribus.imageonmap.commands.CommandInfo;
 import fr.moribus.imageonmap.commands.Commands;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
+import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.worker.WorkerCallback;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,6 +41,7 @@ public class NewCommand  extends Command
     protected void run() throws CommandException
     {
         final Player player = playerSender();
+        boolean scaling = false;
         URL url;
         
         if(args.length < 1) throwInvalidArgument("You must give an URL to take the image from.");
@@ -50,26 +53,29 @@ public class NewCommand  extends Command
         catch(MalformedURLException ex)
         {
             throwInvalidArgument("Invalid URL.");
+            return;
         }
         
-        if(args.length < 2)
+        if(args.length >= 2)
         {
-            
+            if(args[1].equals("resize")) scaling = true;
         }
         
-        info("Working ...");
-        ImageRendererExecutor.Test(new WorkerCallback()
+        info("Rendering ...");
+        ImageRendererExecutor.Render(url, scaling, player.getUniqueId(), new WorkerCallback<ImageMap>()
         {
             @Override
-            public void finished(Object... args)
+            public void finished(ImageMap result)
             {
-                player.sendMessage("Long task finished !");
+                player.sendMessage("§7Rendering finished !");
+                result.give(player.getInventory());
             }
 
             @Override
             public void errored(Throwable exception)
             {
-                player.sendMessage("Whoops, an error occured !");
+                player.sendMessage("§cMap rendering failed : " + exception.getMessage());
+                PluginLogger.LogWarning("Rendering from '" + player.getName() + "' failed", exception);
             }
         });
     }

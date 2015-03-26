@@ -26,7 +26,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 class WorkerCallbackManager implements Runnable
 {
-    static private final int WATCH_LOOP_DELAY = 40;
+    static private final int WATCH_LOOP_DELAY = 5;
     
     private final HashMap<WorkerRunnable, WorkerRunnableInfo> callbacks;
     private final ArrayDeque<WorkerRunnableInfo> callbackQueue;
@@ -47,28 +47,29 @@ class WorkerCallbackManager implements Runnable
         selfTask = Bukkit.getScheduler().runTaskTimer(ImageOnMap.getPlugin(), this, 0, WATCH_LOOP_DELAY);
     }
     
-    public void setupCallback(WorkerRunnable runnable, WorkerCallback callback, Object[] args)
+    public void setupCallback(WorkerRunnable runnable, WorkerCallback callback)
     {
         synchronized(callbacks)
         {
-            callbacks.put(runnable, new WorkerRunnableInfo(callback, args));
+            callbacks.put(runnable, new WorkerRunnableInfo(callback));
         }
     }
     
-    public void callback(WorkerRunnable runnable)
+    public <T> void callback(WorkerRunnable<T> runnable, T result)
     {
-        callback(runnable, null);
+        callback(runnable, result, null);
     }
     
-    public void callback(WorkerRunnable runnable, Throwable exception)
+    public <T> void callback(WorkerRunnable<T> runnable, T result, Throwable exception)
     {
-        WorkerRunnableInfo runnableInfo;
+        WorkerRunnableInfo<T> runnableInfo;
         synchronized(callbacks)
         {
             runnableInfo = callbacks.get(runnable);
         }
         if(runnableInfo == null) return;
         runnableInfo.setRunnableException(exception);
+        runnableInfo.setResult(result);
         
         enqueueCallback(runnableInfo);
     }
@@ -99,16 +100,15 @@ class WorkerCallbackManager implements Runnable
         currentRunnableInfo.runCallback();
     }
     
-    private class WorkerRunnableInfo
+    private class WorkerRunnableInfo<T>
     {
-        private final WorkerCallback callback;
-        private final Object[] args;
+        private final WorkerCallback<T> callback;
+        private T result;
         private Throwable runnableException;
         
-        public WorkerRunnableInfo(WorkerCallback callback, Object[] args)
+        public WorkerRunnableInfo(WorkerCallback callback)
         {
             this.callback = callback;
-            this.args = args;
             this.runnableException = null;
         }
 
@@ -125,8 +125,13 @@ class WorkerCallbackManager implements Runnable
             }
             else
             {
-                callback.finished(args);
+                callback.finished(result);
             }
+        }
+        
+        public void setResult(T result)
+        {
+            this.result = result;
         }
 
         public Throwable getRunnableException()

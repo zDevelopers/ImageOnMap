@@ -17,7 +17,7 @@
  */
 package fr.moribus.imageonmap.worker;
 
-public interface WorkerRunnable
+public interface WorkerRunnable<T>
 {
-    public void run() throws Throwable;
+    public T run() throws Throwable;
 }

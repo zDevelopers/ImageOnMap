@@ -29,6 +29,7 @@ public class PosterImage
     static private final int WIDTH = 128;
     static private final int HEIGHT = 128;
     
+    private BufferedImage originalImage;
     private BufferedImage[] cutImages;
     private int lines;
     private int columns;
@@ -36,15 +37,16 @@ public class PosterImage
     private int remainderX, remainderY;
     
     /**
-     * Creates and splits a new Poster from an entire image
+     * Creates a new Poster from an entire image
      * @param originalImage the original image
      */
     public PosterImage(BufferedImage originalImage)
     {
-        splitImages(originalImage);
+        this.originalImage = originalImage;
+        calculateDimensions();
     }
     
-    private void splitImages(BufferedImage originalImage)
+    private void calculateDimensions()
     {
         int originalWidth = originalImage.getWidth();
         int originalHeight = originalImage.getHeight();
@@ -59,6 +61,10 @@ public class PosterImage
         if(remainderY > 0) lines++;
         
         cutImagesCount = columns * lines;
+    }
+    
+    public void splitImages()
+    {
         cutImages = new BufferedImage[cutImagesCount];
         
         int imageX;
@@ -73,6 +79,8 @@ public class PosterImage
             }
             imageY += HEIGHT;
         }
+        
+        originalImage = null;
     }
     
     /**

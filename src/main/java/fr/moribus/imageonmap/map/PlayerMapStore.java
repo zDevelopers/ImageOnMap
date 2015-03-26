@@ -54,6 +54,12 @@ public class PlayerMapStore implements ConfigurationSerializable
         return false;
     }
     
+    public void addMap(ImageMap map)
+    {
+        mapList.add(map);
+        notifyModification();
+    }
+    
     /* ===== Getters & Setters ===== */
     
     public UUID getUUID()
@@ -104,7 +110,7 @@ public class PlayerMapStore implements ConfigurationSerializable
                 }
                 catch(InvalidConfigurationException ex)
                 {
-                    PluginLogger.LogWarning("Could not load map data", ex);
+                    PluginLogger.LogWarning("Could not load map data : " + ex.getMessage());
                 }
             }
         }
@@ -145,6 +151,7 @@ public class PlayerMapStore implements ConfigurationSerializable
         {
             PluginLogger.LogError("Could not save maps file for player " + playerUUID.toString(), ex);
         }
+        PluginLogger.LogInfo("Saving maps file for " + playerUUID.toString());
         modified = false;
     }
 }

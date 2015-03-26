@@ -20,6 +20,8 @@ package fr.moribus.imageonmap.worker;
 
 import fr.moribus.imageonmap.PluginLogger;
 import java.util.ArrayDeque;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 public abstract class Worker
 {
@@ -27,12 +29,19 @@ public abstract class Worker
     private final ArrayDeque<WorkerRunnable> runQueue = new ArrayDeque<>();
     
     private final WorkerCallbackManager callbackManager;
+    private final WorkerMainThreadExecutor mainThreadExecutor;
     private Thread thread;
     
     protected Worker(String name)
     {
+        this(name, false);
+    }
+    
+    protected Worker(String name, boolean runMainThreadExecutor)
+    {
         this.name = name;
         this.callbackManager = new WorkerCallbackManager(name);
+        this.mainThreadExecutor = runMainThreadExecutor ? new WorkerMainThreadExecutor(name) : null;
     }
     
     public void init()
@@ -43,6 +52,7 @@ public abstract class Worker
             exit();
         }
         callbackManager.init();
+        if(mainThreadExecutor != null) mainThreadExecutor.init();
         thread = createThread();
         thread.start();
     }
@@ -51,6 +61,7 @@ public abstract class Worker
     {
         thread.interrupt();
         callbackManager.exit();
+        if(mainThreadExecutor != null) mainThreadExecutor.exit();
         thread = null;
     }
     
@@ -75,12 +86,11 @@ public abstract class Worker
             
             try
             {
-                currentRunnable.run();
-                callbackManager.callback(currentRunnable);
+                callbackManager.callback(currentRunnable, currentRunnable.run());
             }
             catch(Throwable ex)
             {
-                callbackManager.callback(currentRunnable, ex);
+                callbackManager.callback(currentRunnable, null, ex);
             }
         }
     }
@@ -94,12 +104,17 @@ public abstract class Worker
         }
     }
     
-    protected void submitQuery(WorkerRunnable runnable, WorkerCallback callback, Object... args)
+    protected void submitQuery(WorkerRunnable runnable, WorkerCallback callback)
     {
-        callbackManager.setupCallback(runnable, callback, args);
+        callbackManager.setupCallback(runnable, callback);
         submitQuery(runnable);
     }
     
+    protected <T> Future<T> submitToMainThread(Callable<T> callable)
+    {
+        if(mainThreadExecutor != null) return mainThreadExecutor.submit(callable);
+        return null;
+    }
     
     private Thread createThread()
     {

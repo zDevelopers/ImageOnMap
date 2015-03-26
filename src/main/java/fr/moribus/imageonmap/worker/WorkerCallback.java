@@ -17,8 +17,8 @@
  */
 package fr.moribus.imageonmap.worker;
 
-public interface WorkerCallback
+public interface WorkerCallback<T>
 {
-    public void finished(Object... args);
+    public void finished(T result);
     public void errored(Throwable exception);
 }

@@ -19,6 +19,7 @@
 package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.image.PosterImage;
 import java.util.ArrayList;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -37,8 +38,8 @@ abstract public class MapManager
     
     static public void exit()
     {
-        playerMaps.clear();
         save();
+        playerMaps.clear();
         if(autosaveTask != null) autosaveTask.cancel();
     }
     
@@ -52,6 +53,43 @@ abstract public class MapManager
             }
         }
         return false;
+    }
+    
+    static public ImageMap createMap(UUID playerUUID, short mapID)
+    {
+        ImageMap newMap = new SingleMap(playerUUID, mapID);
+        addMap(newMap, playerUUID);
+        return newMap;
+    }
+    
+    static public ImageMap createMap(PosterImage image, UUID playerUUID, short[] mapsIDs)
+    {
+        ImageMap newMap;
+        if(image.getImagesCount() == 1)
+        {
+            newMap = new SingleMap(playerUUID, mapsIDs[0]);
+        }
+        else
+        {
+            newMap = new PosterMap(playerUUID, mapsIDs, image.getColumns(), image.getLines());
+        }
+        addMap(newMap, playerUUID);
+        return newMap;
+    }
+    
+    static public short[] getNewMapsIds(int amount)
+    {
+        short[] mapsIds = new short[amount];
+        for(int i = 0; i < amount; i++)
+        {
+            mapsIds[i] = Bukkit.createMap(Bukkit.getWorlds().get(0)).getId();
+        }
+        return mapsIds;
+    }
+    
+    static public void addMap(ImageMap map, UUID playerUUID)
+    {
+        getPlayerMapStore(playerUUID).addMap(map);
     }
     
     static public void notifyModification(UUID playerUUID)

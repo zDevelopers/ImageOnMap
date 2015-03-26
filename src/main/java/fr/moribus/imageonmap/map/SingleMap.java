@@ -49,7 +49,8 @@ public class SingleMap extends ImageMap
     public SingleMap(Map<String, Object> map, UUID userUUID) throws InvalidConfigurationException
     {
         super(map, userUUID, Type.SINGLE);
-        mapID = getFieldValue(map, "mapID");
+        int _mapID = getFieldValue(map, "mapID");
+        mapID = (short) _mapID;//Meh
     }
     
     @Override

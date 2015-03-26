@@ -19,6 +19,7 @@
 package fr.moribus.imageonmap.image;
 
 import java.awt.image.BufferedImage;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
@@ -33,6 +34,19 @@ public class Renderer extends MapRenderer
             if(renderer instanceof Renderer) return true;
         }
         return false;
+    }
+    
+    static public void installRenderer(PosterImage image, short[] mapsIds)
+    {
+        for(int i = 0; i < mapsIds.length; i++)
+        {
+            installRenderer(image.getImageAt(i), mapsIds[i]);
+        }
+    }
+    
+    static public void installRenderer(BufferedImage image, short mapID)
+    {
+        installRenderer(Bukkit.getMap(mapID)).setImage(image);
     }
     
     static public Renderer installRenderer(MapView map)
