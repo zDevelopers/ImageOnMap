@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.image;
 
+import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.worker.Worker;
 import fr.moribus.imageonmap.worker.WorkerRunnable;
 import java.awt.image.BufferedImage;
@@ -71,5 +72,18 @@ public class ImageIOExecutor extends Worker
                 return null;
             }
         });
+    }
+    
+    static public void saveImage(short mapID, BufferedImage image)
+    {
+        saveImage(ImageOnMap.getPlugin().getImageFile(mapID), image);
+    }
+    
+    static public void saveImage(short[] mapsIDs, PosterImage image)
+    {
+        for(int i = 0, c = mapsIDs.length; i < c; i++)
+        {
+            ImageIOExecutor.saveImage(ImageOnMap.getPlugin().getImageFile(mapsIDs[i]), image.getImageAt(i));
+        }
     }
 }

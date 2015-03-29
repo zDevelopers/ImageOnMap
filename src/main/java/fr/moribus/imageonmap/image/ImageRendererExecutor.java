@@ -18,7 +18,6 @@
 
 package fr.moribus.imageonmap.image;
 
-import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.PluginLogger;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
@@ -98,7 +97,7 @@ public class ImageRendererExecutor extends Worker
         
         final BufferedImage finalImage = ResizeImage(image, ImageMap.WIDTH, ImageMap.HEIGHT);
         
-        ImageIOExecutor.saveImage(ImageOnMap.getPlugin().getImageFile(mapID), finalImage);
+        ImageIOExecutor.saveImage(mapID, finalImage);
         
         final ImageMap newMap = instance.submitToMainThread(new Callable<ImageMap>()
         {
@@ -132,10 +131,7 @@ public class ImageRendererExecutor extends Worker
 
         final short[] mapsIDs = futureMapsIds.get();
         
-        for(short mapID : mapsIDs)
-        {
-            ImageIOExecutor.saveImage(ImageOnMap.getPlugin().getImageFile(mapID), image);
-        }
+        ImageIOExecutor.saveImage(mapsIDs, poster);
         
         final ImageMap newMap = instance.submitToMainThread(new Callable<ImageMap>()
         {
