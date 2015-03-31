@@ -119,9 +119,9 @@ public abstract class ImageMap implements ConfigurationSerializable
     public Map<String, Object> serialize()
     {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("id", id);
+        map.put("id", getId());
         map.put("type", mapType.toString());
-        map.put("name", name);
+        map.put("name", getName());
         this.postSerialize(map);
         return map;
     }
@@ -153,17 +153,17 @@ public abstract class ImageMap implements ConfigurationSerializable
         return userUUID;
     }
 
-    public String getName()
+    public synchronized String getName()
     {
         return name;
     }
     
-    public String getId()
+    public synchronized String getId()
     {
         return id;
     }
 
-    public void rename(String id, String name)
+    public synchronized void rename(String id, String name)
     {
         this.id = id;
         this.name = name;
@@ -171,8 +171,7 @@ public abstract class ImageMap implements ConfigurationSerializable
     
     public void rename(String name)
     {
-        if(this.name.equals(name)) return;
-        this.id = MapManager.getNextAvailableMapID(name, userUUID);
-        this.name = name;
+        if(getName().equals(name)) return;
+        rename(MapManager.getNextAvailableMapID(name, getUserUUID()), name);
     }
 }

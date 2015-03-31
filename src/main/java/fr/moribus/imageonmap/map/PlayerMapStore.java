@@ -45,7 +45,7 @@ public class PlayerMapStore implements ConfigurationSerializable
         this.playerUUID = playerUUID;
     }
     
-    public boolean managesMap(short mapID)
+    public synchronized boolean managesMap(short mapID)
     {
         for(ImageMap map : mapList)
         {
@@ -54,7 +54,7 @@ public class PlayerMapStore implements ConfigurationSerializable
         return false;
     }
     
-    public boolean managesMap(ItemStack item)
+    public synchronized boolean managesMap(ItemStack item)
     {
         for(ImageMap map : mapList)
         {
@@ -63,19 +63,19 @@ public class PlayerMapStore implements ConfigurationSerializable
         return false;
     }
     
-    public void addMap(ImageMap map)
+    public synchronized void addMap(ImageMap map)
     {
         mapList.add(map);
         notifyModification();
     }
     
-    public void deleteMap(ImageMap map)
+    public synchronized void deleteMap(ImageMap map)
     {
         mapList.remove(map);
         notifyModification();
     }
     
-    public boolean mapExists(String id)
+    public synchronized boolean mapExists(String id)
     {
         for(ImageMap map : mapList)
         {
@@ -98,12 +98,12 @@ public class PlayerMapStore implements ConfigurationSerializable
         return mapId + "-" + id;
     }
     
-    public List<ImageMap> getMapList()
+    public synchronized List<ImageMap> getMapList()
     {
         return new ArrayList(mapList);
     }
     
-    public ImageMap getMap(String mapId)
+    public synchronized ImageMap getMap(String mapId)
     {
         for(ImageMap map : mapList)
         {
@@ -120,12 +120,12 @@ public class PlayerMapStore implements ConfigurationSerializable
         return playerUUID;
     }
     
-    public boolean isModified()
+    public synchronized boolean isModified()
     {
         return modified;
     }
     
-    public void notifyModification()
+    public synchronized void notifyModification()
     {
         this.modified = true;
     }
@@ -137,7 +137,7 @@ public class PlayerMapStore implements ConfigurationSerializable
     {
         Map<String, Object> map = new HashMap<String, Object>();
         ArrayList<Map> list = new ArrayList<Map>();
-        synchronized(mapList)
+        synchronized(this)
         {
             for(ImageMap tMap : mapList)
             {
@@ -153,18 +153,17 @@ public class PlayerMapStore implements ConfigurationSerializable
         if(section == null) return;
         List<Map<String, Object>> list = (List<Map<String, Object>>) section.getList("mapList");
         if(list == null) return;
-        synchronized(mapList)
+        
+        for(Map<String, Object> tMap : list)
         {
-            for(Map<String, Object> tMap : list)
+            try
             {
-                try
-                {
-                    mapList.add(ImageMap.fromConfig(tMap, playerUUID));
-                }
-                catch(InvalidConfigurationException ex)
-                {
-                    PluginLogger.LogWarning("Could not load map data : " + ex.getMessage());
-                }
+                ImageMap newMap = ImageMap.fromConfig(tMap, playerUUID);
+                synchronized(this) {mapList.add(newMap);}
+            }
+            catch(InvalidConfigurationException ex)
+            {
+                PluginLogger.LogWarning("Could not load map data : " + ex.getMessage());
             }
         }
     }
@@ -205,6 +204,6 @@ public class PlayerMapStore implements ConfigurationSerializable
             PluginLogger.LogError("Could not save maps file for player " + playerUUID.toString(), ex);
         }
         PluginLogger.LogInfo("Saving maps file for " + playerUUID.toString());
-        modified = false;
+        synchronized(this) {modified = false;}
     }
 }

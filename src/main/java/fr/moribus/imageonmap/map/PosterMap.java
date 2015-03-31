@@ -25,9 +25,9 @@ import org.bukkit.configuration.InvalidConfigurationException;
 
 public class PosterMap extends ImageMap
 {
-    protected short[] mapsIDs;
-    protected int columnCount;
-    protected int rowCount;
+    protected final short[] mapsIDs;
+    protected final int columnCount;
+    protected final int rowCount;
     
     public PosterMap(UUID userUUID, short[] mapsIDs, int columnCount, int rowCount)
     {

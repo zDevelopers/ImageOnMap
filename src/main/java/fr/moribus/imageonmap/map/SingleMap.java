@@ -24,7 +24,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 
 public class SingleMap extends ImageMap
 {
-    protected short mapID;
+    protected final short mapID;
     
     public SingleMap(UUID ownerUUID, short mapID)
     {

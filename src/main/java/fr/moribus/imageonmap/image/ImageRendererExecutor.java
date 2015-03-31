@@ -86,31 +86,32 @@ public class ImageRendererExecutor extends Worker
     
     static private ImageMap RenderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable
     {
-        final short mapID = instance.submitToMainThread(new Callable<Short>()
+        Future<Short> futureMapID = instance.submitToMainThread(new Callable<Short>()
         {
             @Override
             public Short call() throws Exception
             {
                 return MapManager.getNewMapsIds(1)[0];
             }
-        }).get();
+        });
         
         final BufferedImage finalImage = ResizeImage(image, ImageMap.WIDTH, ImageMap.HEIGHT);
         
+        final short mapID = futureMapID.get();
         ImageIOExecutor.saveImage(mapID, finalImage);
         
-        final ImageMap newMap = instance.submitToMainThread(new Callable<ImageMap>()
+        instance.submitToMainThread(new Callable<Void>()
         {
             @Override
-            public ImageMap call() throws Exception
+            public Void call() throws Exception
             {
                 Renderer.installRenderer(finalImage, mapID);
-                return MapManager.createMap(playerUUID, mapID);
+                return null;
             }
 
-        }).get();
+        });
         
-        return newMap;
+        return MapManager.createMap(playerUUID, mapID);
     }
     
     static private ImageMap RenderPoster(final BufferedImage image, final UUID playerUUID) throws Throwable
@@ -133,18 +134,18 @@ public class ImageRendererExecutor extends Worker
         
         ImageIOExecutor.saveImage(mapsIDs, poster);
         
-        final ImageMap newMap = instance.submitToMainThread(new Callable<ImageMap>()
+        instance.submitToMainThread(new Callable<Void>()
         {
             @Override
-            public ImageMap call() throws Exception
+            public Void call() throws Exception
             {
                 Renderer.installRenderer(poster, mapsIDs);
-                return MapManager.createMap(poster, playerUUID, mapsIDs);
+                return null;
             }
 
-        }).get();
+        });
         
-        return newMap;
+        return MapManager.createMap(poster, playerUUID, mapsIDs);
     }
     
     static private BufferedImage ResizeImage(BufferedImage source, int destinationW, int destinationH)
