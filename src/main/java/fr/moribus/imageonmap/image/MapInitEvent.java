@@ -22,8 +22,10 @@ import fr.moribus.imageonmap.ImageOnMap;
 import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -33,6 +35,21 @@ import org.bukkit.map.MapView;
 
 public class MapInitEvent implements Listener
 {
+    static public void init()
+    {
+        for(World world : Bukkit.getWorlds())
+        {
+            for(ItemFrame frame : world.getEntitiesByClass(ItemFrame.class))
+            {
+                initMap(frame.getItem());
+            }
+        }
+        
+        for(Player player : Bukkit.getOnlinePlayers())
+        {
+            initMap(player.getItemInHand());
+        }
+    }
     
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event)
@@ -41,12 +58,7 @@ public class MapInitEvent implements Listener
         {
             if (entity instanceof ItemFrame)
             {
-                ItemStack item = ((ItemFrame)entity).getItem();
-                if (item.getType() == Material.MAP)
-                {
-                    MapView map = Bukkit.getMap(item.getDurability());
-                    if(!Renderer.isHandled(map)) initMap(map);
-                }
+                initMap(((ItemFrame)entity).getItem());
             }
         }
     }
@@ -55,16 +67,22 @@ public class MapInitEvent implements Listener
     public void onPlayerInv(PlayerItemHeldEvent event)
     {
         ItemStack item = event.getPlayer().getInventory().getItem(event.getNewSlot());
-
+        initMap(item);
+    }
+    
+    static protected void initMap(ItemStack item)
+    {
         if (item != null && item.getType() == Material.MAP)
         {
             MapView map = Bukkit.getMap(item.getDurability());
-            if (!Renderer.isHandled(map))   initMap(map);
+            initMap(map);
         }
     }
     
-    protected void initMap(MapView map)
+    static protected void initMap(MapView map)
     {
+        if(Renderer.isHandled(map)) return;
+        
         File imageFile = ImageOnMap.getPlugin().getImageFile(map.getId());
         if(imageFile.isFile())
         {

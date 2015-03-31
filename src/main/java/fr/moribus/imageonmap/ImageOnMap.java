@@ -85,6 +85,7 @@ public final class ImageOnMap extends JavaPlugin
         MapManager.init();
         Commands.init(this);
         getServer().getPluginManager().registerEvents(new MapInitEvent(), this);
+        MapInitEvent.init();
     }
 
     @Override
