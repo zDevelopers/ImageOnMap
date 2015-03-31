@@ -41,7 +41,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 public enum Commands implements TabCompleter, CommandExecutor
 {
     MAPTOOL(new String[]{"maptool"},
-            NewCommand.class),
+            NewCommand.class,
+            ListCommand.class,
+            GetCommand.class,
+            DeleteConfirmCommand.class,
+            DeleteNoConfirmCommand.class
+    ),
     TOMAP(MAPTOOL, NewCommand.class, "tomap");
     
     

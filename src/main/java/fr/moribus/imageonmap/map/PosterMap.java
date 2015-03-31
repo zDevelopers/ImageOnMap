@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.map;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -61,7 +62,13 @@ public class PosterMap extends ImageMap
         
         columnCount = getFieldValue(map, "columns");
         rowCount = getFieldValue(map, "rows");
-        mapsIDs = getFieldValue(map, "mapsIDs");
+        
+        List<Integer> idList = getFieldValue(map, "mapsIDs");
+        mapsIDs = new short[idList.size()];
+        for(int i = 0, c = idList.size(); i < c; i++)
+        {
+            mapsIDs[i] = (short) ((int) idList.get(i));
+        }
     }
     
     @Override

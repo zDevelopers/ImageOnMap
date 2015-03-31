@@ -36,20 +36,42 @@ public abstract class ImageMap implements ConfigurationSerializable
     
     static public final int WIDTH = 128;
     static public final int HEIGHT = 128;
+    static public final String DEFAULT_NAME = "Map";
     
+    private String id;
     private final UUID userUUID;
     private final Type mapType;
-    private String imageName;
+    private String name;
     
     protected ImageMap(UUID userUUID, Type mapType)
     {
+        this(userUUID, mapType, null, null);
+    }
+    
+    protected ImageMap(UUID userUUID, Type mapType, String id, String name)
+    {
         this.userUUID = userUUID;
         this.mapType = mapType;
+        this.id = id;
+        this.name = name;
+        
+        if(this.id == null)
+        {
+            if(this.name == null) this.name = DEFAULT_NAME;
+            this.id = MapManager.getNextAvailableMapID(name, userUUID);
+        }
     }
     
     
     public abstract short[] getMapsIDs();
     public abstract boolean managesMap(short mapID);
+    
+    public boolean managesMap(ItemStack item)
+    {
+        if(item == null) return false;
+        if(item.getType() != Material.MAP) return false;
+        return managesMap(item.getDurability());
+    }
     
     public void give(Inventory inventory)
     {
@@ -85,8 +107,10 @@ public abstract class ImageMap implements ConfigurationSerializable
     
     protected ImageMap(Map<String, Object> map, UUID userUUID, Type mapType) throws InvalidConfigurationException
     {
-        this(userUUID, mapType);
-        this.imageName = getNullableFieldValue(map, "name");
+        this(userUUID, mapType,
+                (String) getNullableFieldValue(map, "id"),
+                (String) getNullableFieldValue(map, "name"));
+        
     }
     
     protected abstract void postSerialize(Map<String, Object> map);
@@ -95,8 +119,9 @@ public abstract class ImageMap implements ConfigurationSerializable
     public Map<String, Object> serialize()
     {
         Map<String, Object> map = new HashMap<String, Object>();
+        map.put("id", id);
         map.put("type", mapType.toString());
-        map.put("name", imageName);
+        map.put("name", name);
         this.postSerialize(map);
         return map;
     }
@@ -128,13 +153,26 @@ public abstract class ImageMap implements ConfigurationSerializable
         return userUUID;
     }
 
-    public String getImageName()
+    public String getName()
     {
-        return imageName;
+        return name;
+    }
+    
+    public String getId()
+    {
+        return id;
     }
 
-    public void setImageName(String imageName)
+    public void rename(String id, String name)
     {
-        this.imageName = imageName;
+        this.id = id;
+        this.name = name;
+    }
+    
+    public void rename(String name)
+    {
+        if(this.name.equals(name)) return;
+        this.id = MapManager.getNextAvailableMapID(name, userUUID);
+        this.name = name;
     }
 }

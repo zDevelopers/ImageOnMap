@@ -32,6 +32,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.inventory.ItemStack;
 
 public class PlayerMapStore implements ConfigurationSerializable
 {
@@ -42,7 +43,6 @@ public class PlayerMapStore implements ConfigurationSerializable
     public PlayerMapStore(UUID playerUUID)
     {
         this.playerUUID = playerUUID;
-        loadMapsFile();
     }
     
     public boolean managesMap(short mapID)
@@ -54,10 +54,63 @@ public class PlayerMapStore implements ConfigurationSerializable
         return false;
     }
     
+    public boolean managesMap(ItemStack item)
+    {
+        for(ImageMap map : mapList)
+        {
+            if(map.managesMap(item)) return true;
+        }
+        return false;
+    }
+    
     public void addMap(ImageMap map)
     {
         mapList.add(map);
         notifyModification();
+    }
+    
+    public void deleteMap(ImageMap map)
+    {
+        mapList.remove(map);
+        notifyModification();
+    }
+    
+    public boolean mapExists(String id)
+    {
+        for(ImageMap map : mapList)
+        {
+            if(map.getId().equals(id)) return true;
+        }
+        
+        return false;
+    }
+    
+    public String getNextAvailableMapID(String mapId)
+    {
+        if(!mapExists(mapId)) return mapId;
+        int id = 0;
+        
+        do
+        {
+            id++;
+        }while(mapExists(mapId + "-" + id));
+        
+        return mapId + "-" + id;
+    }
+    
+    public List<ImageMap> getMapList()
+    {
+        return new ArrayList(mapList);
+    }
+    
+    public ImageMap getMap(String mapId)
+    {
+        for(ImageMap map : mapList)
+        {
+            if(map.getId().equals(mapId)) return map;
+        }
+        
+        return null;
     }
     
     /* ===== Getters & Setters ===== */
@@ -123,23 +176,23 @@ public class PlayerMapStore implements ConfigurationSerializable
     
     private FileConfiguration getToolConfig()
     {
-        if(mapConfig == null) loadMapsFile();
+        if(mapConfig == null) load();
         
         return mapConfig;
     }
     
-    private void loadMapsFile()
+    public void load()
     {
         if(mapsFile == null)
         {
             mapsFile = new File(ImageOnMap.getPlugin().getMapsDirectory(), playerUUID.toString() + ".yml");
-            if(!mapsFile.exists()) saveMapsFile();
+            if(!mapsFile.exists()) save();
         }
         mapConfig = YamlConfiguration.loadConfiguration(mapsFile);
         loadFromConfig(getToolConfig().getConfigurationSection("PlayerMapStore"));
     }
     
-    public void saveMapsFile()
+    public void save()
     {
         if(mapsFile == null || mapConfig == null) return;
         getToolConfig().set("PlayerMapStore", this.serialize());

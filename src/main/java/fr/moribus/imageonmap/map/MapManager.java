@@ -19,10 +19,15 @@
 package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.PosterImage;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 abstract public class MapManager 
@@ -55,10 +60,22 @@ abstract public class MapManager
         return false;
     }
     
+    static public boolean managesMap(ItemStack item)
+    {
+        synchronized(playerMaps)
+        {
+            for(PlayerMapStore mapStore : playerMaps)
+            {
+                if(mapStore.managesMap(item)) return true;
+            }
+        }
+        return false;
+    }
+    
     static public ImageMap createMap(UUID playerUUID, short mapID)
     {
         ImageMap newMap = new SingleMap(playerUUID, mapID);
-        addMap(newMap, playerUUID);
+        addMap(newMap);
         return newMap;
     }
     
@@ -73,7 +90,7 @@ abstract public class MapManager
         {
             newMap = new PosterMap(playerUUID, mapsIDs, image.getColumns(), image.getLines());
         }
-        addMap(newMap, playerUUID);
+        addMap(newMap);
         return newMap;
     }
     
@@ -87,9 +104,15 @@ abstract public class MapManager
         return mapsIds;
     }
     
-    static public void addMap(ImageMap map, UUID playerUUID)
+    static public void addMap(ImageMap map)
     {
-        getPlayerMapStore(playerUUID).addMap(map);
+        getPlayerMapStore(map.getUserUUID()).addMap(map);
+    }
+    
+    static public void deleteMap(ImageMap map)
+    {
+        ImageIOExecutor.deleteImage(map);
+        getPlayerMapStore(map.getUserUUID()).deleteMap(map);
     }
     
     static public void notifyModification(UUID playerUUID)
@@ -99,13 +122,50 @@ abstract public class MapManager
             Bukkit.getScheduler().runTaskLater(ImageOnMap.getPlugin(), new AutosaveRunnable(), SAVE_DELAY);
     }
     
+    static public String getNextAvailableMapID(String mapId, UUID playerUUID)
+    {
+        return getPlayerMapStore(playerUUID).getNextAvailableMapID(mapId);
+    }
+    
+    static public List<ImageMap> getMapList(UUID playerUUID)
+    {
+        return getPlayerMapStore(playerUUID).getMapList();
+    }
+    
+    static public ImageMap getMap(UUID playerUUID, String mapId)
+    {
+        return getPlayerMapStore(playerUUID).getMap(mapId);
+    }
+    
+    static public void clear(Inventory inventory)
+    {
+        for(int i = 0, c = inventory.getSize(); i < c; i++)
+        {
+            if(managesMap(inventory.getItem(i)))
+            {
+                inventory.setItem(i, new ItemStack(Material.AIR));
+            }
+        }
+    }
+    
+    static public void clear(Inventory inventory, ImageMap map)
+    {
+        for(int i = 0, c = inventory.getSize(); i < c; i++)
+        {
+            if(map.managesMap(inventory.getItem(i)))
+            {
+                inventory.setItem(i, new ItemStack(Material.AIR));
+            }
+        }
+    }
+    
     static public void save()
     {
         synchronized(playerMaps)
         {
             for(PlayerMapStore tStore : playerMaps)
             {
-                tStore.saveMapsFile();
+                tStore.save();
             }
         }
     }
@@ -117,6 +177,7 @@ abstract public class MapManager
         {
             store = new PlayerMapStore(playerUUID);
             synchronized(playerMaps){playerMaps.add(store);}
+            store.load();
         }
         return store;
     }
@@ -142,7 +203,7 @@ abstract public class MapManager
             {
                 for(PlayerMapStore toolStore : playerMaps)
                 {
-                    if(toolStore.isModified()) toolStore.saveMapsFile();
+                    if(toolStore.isModified()) toolStore.save();
                 }
                 autosaveTask = null;
             }

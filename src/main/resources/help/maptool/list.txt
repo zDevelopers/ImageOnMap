@@ -1,0 +1,1 @@
+Gives you a list of all the maps you currently have.

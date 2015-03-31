@@ -19,10 +19,13 @@
 package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.worker.Worker;
+import fr.moribus.imageonmap.worker.WorkerCallback;
 import fr.moribus.imageonmap.worker.WorkerRunnable;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Files;
 import javax.imageio.ImageIO;
 
 public class ImageIOExecutor extends Worker
@@ -85,5 +88,28 @@ public class ImageIOExecutor extends Worker
         {
             ImageIOExecutor.saveImage(ImageOnMap.getPlugin().getImageFile(mapsIDs[i]), image.getImageAt(i));
         }
+    }
+    
+    static public void deleteImage(ImageMap map)
+    {
+        short[] mapsIDs = map.getMapsIDs();
+        for(int i = 0, c = mapsIDs.length; i < c; i++)
+        {
+            deleteImage(ImageOnMap.getPlugin().getImageFile(mapsIDs[i]));
+        }
+    }
+    
+    static public void deleteImage(final File file)
+    {
+        instance.submitQuery(new WorkerRunnable<Void>()
+        {
+            @Override
+            public Void run() throws Throwable
+            {
+                Files.delete(file.toPath());
+                return null;
+            }
+            
+        });
     }
 }

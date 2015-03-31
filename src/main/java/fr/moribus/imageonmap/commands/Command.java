@@ -19,6 +19,8 @@
 package fr.moribus.imageonmap.commands;
 
 import fr.moribus.imageonmap.commands.CommandException.Reason;
+import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -129,6 +131,35 @@ abstract public class Command
         return (Player)sender;
     }
     
+    protected ImageMap getMapFromArgs() throws CommandException
+    {
+        return getMapFromArgs(playerSender(), 0, true);
+    }
+    
+    protected ImageMap getMapFromArgs(Player player, int index, boolean expand) throws CommandException
+    {
+        if(args.length <= index) throwInvalidArgument("You need to give a map name.");
+        
+        ImageMap map;
+        String mapName = args[index];
+        
+        if(expand)
+        {
+            for(int i = index + 1, c = args.length; i < c; i++)
+            {
+                mapName += " " + args[i];
+            }
+        }
+        
+        mapName = mapName.trim();
+        
+        map = MapManager.getMap(player.getUniqueId(), mapName);
+        
+        if(map == null) error("This map does not exist.");
+        
+        return map;
+    }
+    
     
     ///////////// Methods for command execution /////////////
     
@@ -190,21 +221,21 @@ abstract public class Command
         return matches;
     }
     
-    /*protected List<String> getMatchingToolNames(Player player, String prefix)
+    protected List<String> getMatchingMapNames(Player player, String prefix)
     {
-        return getMatchingToolNames(ToolManager.getToolList(player.getUniqueId()), prefix);
+        return getMatchingToolNames(MapManager.getMapList(player.getUniqueId()), prefix);
     }
     
-    protected List<String> getMatchingToolNames(Iterable<? extends CommandTool> tools, String prefix)
+    protected List<String> getMatchingToolNames(Iterable<? extends ImageMap> maps, String prefix)
     {
         List<String> matches = new ArrayList<String>();
         
-        for(CommandTool tool : tools)
+        for(ImageMap map : maps)
         {
-            if(tool.getId().startsWith(prefix)) matches.add(tool.getId());
+            if(map.getId().startsWith(prefix)) matches.add(map.getId());
         }
         
         return matches;
-    }*/
+    }
 
 }
