@@ -58,7 +58,7 @@ public abstract class ImageMap implements ConfigurationSerializable
         if(this.id == null)
         {
             if(this.name == null) this.name = DEFAULT_NAME;
-            this.id = MapManager.getNextAvailableMapID(name, userUUID);
+            this.id = MapManager.getNextAvailableMapID(this.name, userUUID);
         }
     }
     
