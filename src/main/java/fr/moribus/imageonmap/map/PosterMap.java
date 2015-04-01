@@ -78,5 +78,27 @@ public class PosterMap extends ImageMap
         map.put("rows", rowCount);
         map.put("mapsIDs", mapsIDs);
     }
+    
+    /* ====== Getters & Setters ====== */
+    
+    public int getColumnCount()
+    {
+        return columnCount;
+    }
+    
+    public int getRowCount()
+    {
+        return rowCount;
+    }
+    
+    public int getColumnAt(int i)
+    {
+        return (i % columnCount) + 1;
+    }
+    
+    public int getRowAt(int i)
+    {
+        return (i / columnCount) + 1;
+    }
 
 }

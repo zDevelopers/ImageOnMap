@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.map;
 
+import fr.moribus.imageonmap.ui.MapItemManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -75,12 +76,7 @@ public abstract class ImageMap implements ConfigurationSerializable
     
     public void give(Inventory inventory)
     {
-        short[] mapsIDs = getMapsIDs();
-        for(short mapID : mapsIDs)
-        {
-            ItemStack itemMap = new ItemStack(Material.MAP, 1, mapID);
-            inventory.addItem(itemMap);
-        }
+        MapItemManager.give(inventory, this);
     }
     
     /* ====== Serialization methods ====== */
