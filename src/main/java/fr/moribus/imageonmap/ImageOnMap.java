@@ -23,6 +23,7 @@ import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.ui.MapItemManager;
 import java.io.File;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -86,6 +87,7 @@ public final class ImageOnMap extends JavaPlugin
         Commands.init(this);
         getServer().getPluginManager().registerEvents(new MapInitEvent(), this);
         MapInitEvent.init();
+        MapItemManager.init();
     }
 
     @Override
@@ -94,6 +96,7 @@ public final class ImageOnMap extends JavaPlugin
         ImageIOExecutor.stop();
         ImageRendererExecutor.stop();
         MapManager.exit();
+        MapItemManager.exit();
     }
 
 }

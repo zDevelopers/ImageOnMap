@@ -45,7 +45,8 @@ public enum Commands implements TabCompleter, CommandExecutor
             ListCommand.class,
             GetCommand.class,
             DeleteConfirmCommand.class,
-            DeleteNoConfirmCommand.class
+            DeleteNoConfirmCommand.class,
+            GetRemainingCommand.class
     ),
     TOMAP(MAPTOOL, NewCommand.class, "tomap");
     

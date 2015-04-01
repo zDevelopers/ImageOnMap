@@ -25,7 +25,7 @@ import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class ImageMap implements ConfigurationSerializable
@@ -74,9 +74,9 @@ public abstract class ImageMap implements ConfigurationSerializable
         return managesMap(item.getDurability());
     }
     
-    public void give(Inventory inventory)
+    public boolean give(Player player)
     {
-        MapItemManager.give(inventory, this);
+        return MapItemManager.give(player, this);
     }
     
     /* ====== Serialization methods ====== */

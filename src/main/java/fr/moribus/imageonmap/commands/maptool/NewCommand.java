@@ -68,7 +68,11 @@ public class NewCommand  extends Command
             public void finished(ImageMap result)
             {
                 player.sendMessage("§7Rendering finished !");
-                result.give(player.getInventory());
+                if(result.give(player))
+                {
+                    info("The rendered map was too big to fit in your inventory.");
+                    info("Use '/maptool getremaining' to get the remaining maps.");
+                }
             }
 
             @Override

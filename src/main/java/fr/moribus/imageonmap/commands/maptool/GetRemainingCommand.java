@@ -18,14 +18,17 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.commands.*;
-import java.util.List;
+import fr.moribus.imageonmap.commands.Command;
+import fr.moribus.imageonmap.commands.CommandException;
+import fr.moribus.imageonmap.commands.CommandInfo;
+import fr.moribus.imageonmap.commands.Commands;
+import fr.moribus.imageonmap.ui.MapItemManager;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "get")
-public class GetCommand extends Command
+@CommandInfo(name = "getremaining", aliases = {"getrest"})
+public class GetRemainingCommand extends Command
 {
-    public GetCommand(Commands commandGroup) {
+    public GetRemainingCommand(Commands commandGroup) {
         super(commandGroup);
     }
     
@@ -33,18 +36,22 @@ public class GetCommand extends Command
     protected void run() throws CommandException
     {
         Player player = playerSender();
-        if(getMapFromArgs().give(player))
+        
+        if(MapItemManager.getCacheSize(player) <= 0)
         {
-            info("The requested map was too big to fit in your inventory.");
-            info("Use '/maptool getremaining' to get the remaining maps.");
+            info("You have no remaining map.");
+            return;
         }
-    }
-    
-    @Override
-    protected List<String> complete() throws CommandException
-    {
-        if(args.length == 1) 
-            return getMatchingMapNames(playerSender(), args[0]);
-        return null;
+        
+        int givenMaps = MapItemManager.giveCache(player);
+        
+        if(givenMaps == 0)
+        {
+            error("Your inventory is full ! Make some space before requesting the remaining maps.");
+        }
+        else
+        {
+            info("There are " + MapItemManager.getCacheSize(player) + " maps remaining.");
+        }
     }
 }

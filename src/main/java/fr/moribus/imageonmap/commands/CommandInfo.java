@@ -26,4 +26,5 @@ public @interface CommandInfo
 {
     String name();
     String usageParameters() default "";
+    String[] aliases() default {};
 }

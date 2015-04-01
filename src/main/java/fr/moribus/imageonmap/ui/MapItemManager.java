@@ -21,7 +21,12 @@ package fr.moribus.imageonmap.ui;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Queue;
+import java.util.UUID;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -29,25 +34,73 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class MapItemManager implements Listener
 {
-    static public void give(Inventory inventory, ImageMap map)
+    static private HashMap<UUID, Queue<ItemStack>> mapItemCache;
+    
+    static public void init()
     {
-        if(map instanceof PosterMap) give(inventory, (PosterMap) map);
-        else if(map instanceof SingleMap) give(inventory, (SingleMap) map);
+        mapItemCache = new HashMap();
     }
     
-    static public void give(Inventory inventory, SingleMap map)
+    static public void exit()
     {
-        inventory.addItem(createMapItem(map.getMapsIDs()[0], map.getName()));
+        mapItemCache.clear();
+        mapItemCache = null;
     }
     
-    static public void give(Inventory inventory, PosterMap map)
+    static public boolean give(Player player, ImageMap map)
+    {
+        if(map instanceof PosterMap) return give(player, (PosterMap) map);
+        else if(map instanceof SingleMap) return give(player, (SingleMap) map);
+        return false;
+    }
+    
+    static public boolean give(Player player, SingleMap map)
+    {
+        return give(player, createMapItem(map.getMapsIDs()[0], map.getName()));
+    }
+    
+    static public boolean give(Player player, PosterMap map)
     {
         short[] mapsIDs = map.getMapsIDs();
+        boolean inventoryFull = false;
+        
         for(int i = 0, c = mapsIDs.length; i < c; i++)
         {
-            inventory.addItem(createMapItem(mapsIDs[i], map.getName() + 
+            inventoryFull = give(player,
+                    createMapItem(mapsIDs[i], map.getName() + 
                     " (row " + map.getRowAt(i) + 
-                    ", column " + map.getColumnAt(i) + ")"));
+                    ", column " + map.getColumnAt(i) + ")")) || inventoryFull;
+        }
+        
+        return inventoryFull;
+    }
+    
+    static public int giveCache(Player player)
+    {
+        Queue<ItemStack> cache = getCache(player);
+        Inventory inventory = player.getInventory();
+        int givenItemsCount = 0;
+        
+        while(inventory.firstEmpty() >= 0 && !cache.isEmpty())
+        {
+            inventory.addItem(cache.poll());
+            givenItemsCount++;
+        }
+        
+        return givenItemsCount;
+    }
+    
+    static private boolean give(Player player, ItemStack item)
+    {
+        if(player.getInventory().firstEmpty() <= -1)
+        {
+            getCache(player).add(item);
+            return true;
+        }
+        else
+        {
+            player.getInventory().addItem(item);
+            return false;
         }
     }
     
@@ -60,5 +113,21 @@ public class MapItemManager implements Listener
         itemMap.setItemMeta(meta);
         
         return itemMap;
+    }
+    
+    static public int getCacheSize(Player player)
+    {
+        return getCache(player).size();
+    }
+    
+    static private Queue<ItemStack> getCache(Player player)
+    {
+        Queue<ItemStack> cache = mapItemCache.get(player.getUniqueId());
+        if(cache == null)
+        {
+            cache = new ArrayDeque<>();
+            mapItemCache.put(player.getUniqueId(), cache);
+        }
+        return cache;
     }
 }

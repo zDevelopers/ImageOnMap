@@ -34,6 +34,7 @@ abstract public class Command
     protected final String commandName;
     protected final String usageParameters;
     protected final String commandDescription;
+    protected final String[] aliases;
     
     protected CommandSender sender;
     protected String[] args;
@@ -51,6 +52,7 @@ abstract public class Command
         commandName = commandInfo.name().toLowerCase();
         usageParameters = commandInfo.usageParameters();
         commandDescription = commandGroup.getDescription(commandName);
+        aliases = commandInfo.aliases();
     }
     
     public boolean canExecute(CommandSender sender)
@@ -111,9 +113,21 @@ abstract public class Command
         return commandGroup;
     }
     
+    public String[] getAliases()
+    {
+        return aliases;
+    }
+    
     public boolean matches(String name)
     {
-        return commandName.equals(name.toLowerCase());
+        if(commandName.equals(name.toLowerCase())) return true;
+        
+        for(String alias : aliases)
+        {
+            if(alias.equals(name)) return true;
+        }
+        
+        return false;
     }
     
     
