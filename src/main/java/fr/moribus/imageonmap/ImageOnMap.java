@@ -80,13 +80,13 @@ public final class ImageOnMap extends JavaPlugin
         }
          
         //Init all the things !
+        PluginConfiguration.init(this);
         MetricsLite.startMetrics();
         ImageIOExecutor.start();
         ImageRendererExecutor.start();
         MapManager.init();
         Commands.init(this);
-        getServer().getPluginManager().registerEvents(new MapInitEvent(), this);
-        MapInitEvent.init();
+        MapInitEvent.init(this);
         MapItemManager.init();
     }
 

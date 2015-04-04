@@ -86,6 +86,7 @@ public class ImageRendererExecutor extends Worker
     
     static private ImageMap RenderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable
     {
+        MapManager.checkMapLimit(1, playerUUID);
         Future<Short> futureMapID = instance.submitToMainThread(new Callable<Short>()
         {
             @Override
@@ -118,7 +119,8 @@ public class ImageRendererExecutor extends Worker
     {
         final PosterImage poster = new PosterImage(image);
         final int mapCount = poster.getImagesCount();
-
+        
+        MapManager.checkMapLimit(mapCount, playerUUID);
         final Future<short[]> futureMapsIds = instance.submitToMainThread(new Callable<short[]>()
         {
             @Override

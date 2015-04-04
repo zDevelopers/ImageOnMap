@@ -19,21 +19,24 @@
 package fr.moribus.imageonmap;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.Plugin;
 
 public enum PluginConfiguration
 {
     //Configuration field Names, with default values
     COLLECT_DATA("collect-data", true),
-    MAP_GLOBAL_LIMIT("map-global-limit", 0),
-    MAP_PLAYER_LIMIT("map-player-limit", 0);
+    MAP_GLOBAL_LIMIT("map-global-limit", 0, "Limit-map-by-server"),
+    MAP_PLAYER_LIMIT("map-player-limit", 0, "Limit-map-by-player");
     
     private final String fieldName;
     private final Object defaultValue;
+    private final String[] deprecatedNames;
     
-    private PluginConfiguration(String fieldName, Object defaultValue)
+    private PluginConfiguration(String fieldName, Object defaultValue, String ... deprecatedNames)
     {
         this.fieldName = fieldName;
         this.defaultValue = defaultValue;
+        this.deprecatedNames = deprecatedNames;
     }
     
     public Object get()
@@ -46,9 +49,9 @@ public enum PluginConfiguration
         return defaultValue;
     }
     
-    public boolean isDefaultValue()
+    public boolean isDefined()
     {
-        return get().equals(defaultValue);
+        return getConfig().contains(fieldName);
     }
     
     @Override
@@ -72,8 +75,51 @@ public enum PluginConfiguration
         return getConfig().getBoolean(fieldName, (Boolean)defaultValue);
     }
     
+    private boolean init()
+    {
+        boolean affected = false;
+        
+        if(!isDefined())
+        {
+            getConfig().set(fieldName, defaultValue);
+            affected = true;
+        }
+        
+        for(String deprecatedName : deprecatedNames)
+        {
+            if(getConfig().contains(deprecatedName))
+            {
+                getConfig().set(fieldName, getConfig().get(deprecatedName));
+                getConfig().set(deprecatedName, null);
+                affected = true;
+            }
+        }
+        return affected;
+    }
+    
+    /* ===== Static API ===== */
+    
+    static private Plugin plugin;
     static public FileConfiguration getConfig()
     {
-        return ImageOnMap.getPlugin().getConfig();
+        return plugin.getConfig();
+    }
+    
+    static public void init(Plugin plugin)
+    {
+        PluginConfiguration.plugin = plugin;
+        loadDefaultValues();
+    }
+    
+    static private void loadDefaultValues()
+    {
+        boolean affected = false;
+        
+        for(PluginConfiguration configField : PluginConfiguration.values())
+        {
+            if(configField.init()) affected = true;
+        }
+        
+        if(affected) plugin.saveConfig();
     }
 }

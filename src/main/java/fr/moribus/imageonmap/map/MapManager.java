@@ -19,8 +19,10 @@
 package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.PosterImage;
+import fr.moribus.imageonmap.map.MapManagerException.Reason;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -72,14 +74,14 @@ abstract public class MapManager
         return false;
     }
     
-    static public ImageMap createMap(UUID playerUUID, short mapID)
+    static public ImageMap createMap(UUID playerUUID, short mapID) throws MapManagerException
     {
         ImageMap newMap = new SingleMap(playerUUID, mapID);
         addMap(newMap);
         return newMap;
     }
     
-    static public ImageMap createMap(PosterImage image, UUID playerUUID, short[] mapsIDs)
+    static public ImageMap createMap(PosterImage image, UUID playerUUID, short[] mapsIDs) throws MapManagerException
     {
         ImageMap newMap;
         if(image.getImagesCount() == 1)
@@ -104,15 +106,15 @@ abstract public class MapManager
         return mapsIds;
     }
     
-    static public void addMap(ImageMap map)
+    static public void addMap(ImageMap map) throws MapManagerException
     {
         getPlayerMapStore(map.getUserUUID()).addMap(map);
     }
     
-    static public void deleteMap(ImageMap map)
+    static public void deleteMap(ImageMap map) throws MapManagerException
     {
-        ImageIOExecutor.deleteImage(map);
         getPlayerMapStore(map.getUserUUID()).deleteMap(map);
+        ImageIOExecutor.deleteImage(map);
     }
     
     static public void notifyModification(UUID playerUUID)
@@ -170,14 +172,48 @@ abstract public class MapManager
         }
     }
     
+    static public void checkMapLimit(ImageMap map) throws MapManagerException
+    {
+        checkMapLimit(map.getMapCount(), map.getUserUUID());
+    }
+    
+    static public void checkMapLimit(int newMapsCount, UUID userUUID) throws MapManagerException
+    {
+        int limit = PluginConfiguration.MAP_GLOBAL_LIMIT.getInteger();
+        if(limit > 0)
+        {
+            if(getMapCount() + newMapsCount > limit)
+                throw new MapManagerException(Reason.MAXIMUM_SERVER_MAPS_EXCEEDED);
+        }
+        getPlayerMapStore(userUUID).checkMapLimit(newMapsCount);
+    }
+    
+    static public int getMapCount()
+    {
+        int mapCount = 0;
+        synchronized(playerMaps)
+        {
+            for(PlayerMapStore tStore : playerMaps)
+            {
+                mapCount += tStore.getMapCount();
+            }
+        }
+        return mapCount;
+    }
+    
     static private PlayerMapStore getPlayerMapStore(UUID playerUUID)
     {
-        PlayerMapStore store = getExistingPlayerMapStore(playerUUID);
-        if(store == null)
+        PlayerMapStore store;
+        synchronized(playerMaps)
         {
-            store = new PlayerMapStore(playerUUID);
-            synchronized(playerMaps){playerMaps.add(store);}
-            store.load();
+            store = getExistingPlayerMapStore(playerUUID);
+            if(store == null)
+            {
+                store = new PlayerMapStore(playerUUID);
+
+                playerMaps.add(store);
+                store.load();
+            }
         }
         return store;
     }

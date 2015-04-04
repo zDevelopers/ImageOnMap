@@ -44,6 +44,12 @@ public class SingleMap extends ImageMap
         return this.mapID == mapID;
     }
     
+    @Override
+    public int getMapCount()
+    {
+        return 1;
+    }
+    
     /* ====== Serialization methods ====== */
     
     public SingleMap(Map<String, Object> map, UUID userUUID) throws InvalidConfigurationException

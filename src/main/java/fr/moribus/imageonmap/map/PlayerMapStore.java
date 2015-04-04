@@ -19,7 +19,9 @@
 package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.PluginLogger;
+import fr.moribus.imageonmap.map.MapManagerException.Reason;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ public class PlayerMapStore implements ConfigurationSerializable
     private final UUID playerUUID;
     private final ArrayList<ImageMap> mapList = new ArrayList<ImageMap>();
     private boolean modified = false;
+    private int mapCount = 0;
     
     public PlayerMapStore(UUID playerUUID)
     {
@@ -63,16 +66,32 @@ public class PlayerMapStore implements ConfigurationSerializable
         return false;
     }
     
-    public synchronized void addMap(ImageMap map)
+    public synchronized void addMap(ImageMap map) throws MapManagerException
     {
-        mapList.add(map);
+        checkMapLimit(map);
+        _addMap(map);
         notifyModification();
     }
     
-    public synchronized void deleteMap(ImageMap map)
+    private void _addMap(ImageMap map)
     {
-        mapList.remove(map);
+        mapList.add(map);
+        mapCount += map.getMapCount();
+    }
+    
+    public synchronized void deleteMap(ImageMap map) throws MapManagerException
+    {
+        _removeMap(map);
         notifyModification();
+    }
+    
+    private void _removeMap(ImageMap map) throws MapManagerException
+    {
+        if(!mapList.remove(map))
+        {
+            throw new MapManagerException(Reason.IMAGEMAP_DOES_NOT_EXIST);
+        }
+        mapCount -= map.getMapCount();
     }
     
     public synchronized boolean mapExists(String id)
@@ -113,6 +132,20 @@ public class PlayerMapStore implements ConfigurationSerializable
         return null;
     }
     
+    public void checkMapLimit(ImageMap map) throws MapManagerException
+    {
+        checkMapLimit(map.getMapCount());
+    }
+    
+    public void checkMapLimit(int newMapsCount) throws MapManagerException
+    {
+        int limit = PluginConfiguration.MAP_PLAYER_LIMIT.getInteger();
+        if(limit <= 0) return;
+        
+        if(getMapCount() + newMapsCount > limit)
+            throw new MapManagerException(Reason.MAXIMUM_PLAYER_MAPS_EXCEEDED, limit);
+    }
+    
     /* ===== Getters & Setters ===== */
     
     public UUID getUUID()
@@ -128,6 +161,11 @@ public class PlayerMapStore implements ConfigurationSerializable
     public synchronized void notifyModification()
     {
         this.modified = true;
+    }
+    
+    public synchronized int getMapCount()
+    {
+        return this.mapCount;
     }
     
     /* ****** Serializing ***** */
@@ -159,12 +197,19 @@ public class PlayerMapStore implements ConfigurationSerializable
             try
             {
                 ImageMap newMap = ImageMap.fromConfig(tMap, playerUUID);
-                synchronized(this) {mapList.add(newMap);}
+                synchronized(this) {_addMap(newMap);}
             }
             catch(InvalidConfigurationException ex)
             {
                 PluginLogger.LogWarning("Could not load map data : " + ex.getMessage());
             }
+        }
+        
+        try { checkMapLimit(0); }
+        catch(MapManagerException ex)
+        {
+            PluginLogger.LogWarning("Map limit exceeded for player " + playerUUID.toString() +
+                    " (" + mapList.size() + " maps loaded).");
         }
     }
     

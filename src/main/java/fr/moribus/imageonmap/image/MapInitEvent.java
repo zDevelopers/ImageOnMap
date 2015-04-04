@@ -32,11 +32,14 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
+import org.bukkit.plugin.Plugin;
 
 public class MapInitEvent implements Listener
 {
-    static public void init()
+    static public void init(Plugin plugin)
     {
+        plugin.getServer().getPluginManager().registerEvents(new MapInitEvent(), plugin);
+        
         for(World world : Bukkit.getWorlds())
         {
             for(ItemFrame frame : world.getEntitiesByClass(ItemFrame.class))

@@ -18,9 +18,11 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.PluginLogger;
 import fr.moribus.imageonmap.commands.*;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.map.MapManagerException;
 import java.util.List;
 import org.bukkit.entity.Player;
 
@@ -39,8 +41,16 @@ public class DeleteNoConfirmCommand extends Command
         Player player = playerSender();
         ImageMap map = getMapFromArgs();
         MapManager.clear(player.getInventory(), map);
-        MapManager.deleteMap(map);
-        info("Map successfully deleted.");
+        try
+        {
+            MapManager.deleteMap(map);
+            info("Map successfully deleted.");
+        }
+        catch (MapManagerException ex)
+        {
+            PluginLogger.LogWarning("A non-existent map was requested to be deleted", ex);
+            warning("This map does not exist.");
+        }
     }
     
     @Override

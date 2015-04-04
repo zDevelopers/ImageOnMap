@@ -101,4 +101,10 @@ public class PosterMap extends ImageMap
         return (i / columnCount) + 1;
     }
 
+    @Override
+    public int getMapCount()
+    {
+        return mapsIDs.length;
+    }
+
 }

@@ -18,6 +18,8 @@
 
 package fr.moribus.imageonmap.commands;
 
+import fr.moribus.imageonmap.PluginLogger;
+
 public class CommandException extends Exception
 {
     public enum Reason
@@ -63,6 +65,7 @@ public class CommandException extends Exception
             case SENDER_NOT_AUTHORIZED:
                 return "You do not have the permission to use this command.";
             default:
+                PluginLogger.LogWarning("Unknown CommandException caught", this);
                 return "An unknown error suddenly happened.";
         }
     }
