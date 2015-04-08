@@ -23,8 +23,10 @@ import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.migration.V3Migrator;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import java.io.File;
+import java.io.IOException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ImageOnMap extends JavaPlugin
@@ -33,7 +35,7 @@ public final class ImageOnMap extends JavaPlugin
     static private final String MAPS_DIRECTORY_NAME = "maps";
     static private ImageOnMap plugin;
     
-    private final File imagesDirectory;
+    private File imagesDirectory;
     private final File mapsDirectory;
 
     public ImageOnMap()
@@ -58,27 +60,19 @@ public final class ImageOnMap extends JavaPlugin
     @Override
     public void onEnable()
     {
-        // Creating the images directory if necessary
-        if(!imagesDirectory.exists())
+        // Creating the images and maps directories if necessary
+        try
         {
-            if(!imagesDirectory.mkdirs())
-            {
-                PluginLogger.LogError("FATAL : Could not create the images directory.", null);
-                this.setEnabled(false);
-                return;
-            }
+            imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
+            checkPluginDirectory(mapsDirectory);
+        }
+        catch(IOException ex)
+        {
+            PluginLogger.LogError("FATAL : " + ex.getMessage(), null);
+            this.setEnabled(false);
+            return;
         }
         
-        if(!mapsDirectory.exists())
-        {
-            if(!mapsDirectory.mkdirs())
-            {
-                PluginLogger.LogError("FATAL : Could not create the images directory.", null);
-                this.setEnabled(false);
-                return;
-            }
-        }
-         
         //Init all the things !
         PluginConfiguration.init(this);
         MetricsLite.startMetrics();
@@ -97,6 +91,18 @@ public final class ImageOnMap extends JavaPlugin
         ImageRendererExecutor.stop();
         MapManager.exit();
         MapItemManager.exit();
+    }
+    
+    private File checkPluginDirectory(File primaryFile, File... alternateFiles) throws IOException
+    {
+        if(primaryFile.exists()) return primaryFile;
+        for(File file : alternateFiles)
+        {
+            if(file.exists()) return file;
+        }
+        if(!primaryFile.mkdirs()) 
+            throw new IOException("Could not create '" + primaryFile.getName() + "' plugin directory.");
+        return primaryFile;
     }
 
 }
