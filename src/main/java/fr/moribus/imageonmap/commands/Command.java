@@ -65,12 +65,18 @@ abstract public class Command
         return null;
     }
     
+    public boolean hasPermission(CommandSender sender)
+    {
+        if(!commandGroup.getPermission().hasPermission(sender)) return false;
+        return canExecute(sender);
+    }
+    
     public void execute(CommandSender sender, String[] args)
     {
         this.sender = sender; this.args = args;
         try
         {
-            if(!canExecute(sender))
+            if(!hasPermission(sender))
                 throw new CommandException(this, Reason.SENDER_NOT_AUTHORIZED);
             run();
         }
@@ -177,14 +183,24 @@ abstract public class Command
     
     ///////////// Methods for command execution /////////////
     
-    protected void info(String message)
+    static protected void info(CommandSender sender, String message)
     {
         sender.sendMessage("§7" + message);
     }
     
-    protected void warning(String message)
+    protected void info(String message)
+    {
+        info(sender, message);
+    }
+    
+    static protected void warning(CommandSender sender, String message)
     {
         sender.sendMessage("§c" + message);
+    }
+    
+    protected void warning(String message)
+    {
+        info(sender, message);
     }
     
     protected void error(String message) throws CommandException

@@ -43,7 +43,7 @@ public class MapItemManager implements Listener
     
     static public void exit()
     {
-        mapItemCache.clear();
+        if(mapItemCache != null) mapItemCache.clear();
         mapItemCache = null;
     }
     

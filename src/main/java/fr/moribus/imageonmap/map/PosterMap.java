@@ -29,9 +29,17 @@ public class PosterMap extends ImageMap
     protected final int columnCount;
     protected final int rowCount;
     
+    public PosterMap(UUID userUUID, short[] mapsIDs, String id, String name, int columnCount, int rowCount)
+    {
+        super(userUUID, Type.POSTER, id, name);
+        this.mapsIDs = mapsIDs;
+        this.columnCount = columnCount;
+        this.rowCount = rowCount;
+    }
+    
     public PosterMap(UUID userUUID, short[] mapsIDs, int columnCount, int rowCount)
     {
-        super(userUUID, Type.POSTER);
+        super(userUUID, Type.POSTER, null, null);
         this.mapsIDs = mapsIDs;
         this.columnCount = columnCount;
         this.rowCount = rowCount;

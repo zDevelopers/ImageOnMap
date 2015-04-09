@@ -18,8 +18,10 @@
 
 package fr.moribus.imageonmap.commands;
 
+import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.PluginLogger;
 import fr.moribus.imageonmap.commands.maptool.*;
+import fr.moribus.imageonmap.commands.migration.*;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -48,16 +50,20 @@ public enum Commands implements TabCompleter, CommandExecutor
             DeleteNoConfirmCommand.class,
             GetRemainingCommand.class
     ),
-    TOMAP(MAPTOOL, NewCommand.class, "tomap");
+    TOMAP(MAPTOOL, NewCommand.class, "tomap"),
+    MAPTOOL_MIGRATION(new String[]{"maptool-migration"}, CommandPermission.OP_ONLY,
+            StartCommand.class
+    );
     
     
-    
+    static private JavaPlugin plugin;
     static private final Commands[] commandGroups = Commands.class.getEnumConstants();
     private final Commands shortcutCommandGroup;
     private final String[] names;
     private final Class<? extends Command>[] commandsClasses;
     private final ArrayList<Command> commands = new ArrayList<>();
     private final HashMap<String, String> commandsDescriptions = new HashMap<>();
+    private final CommandPermission commandPermission;
     private String description = "";
     
     private Commands(Commands shortcutCommandGroup, Class<? extends Command> commandClass, String ... names)
@@ -65,16 +71,23 @@ public enum Commands implements TabCompleter, CommandExecutor
         this.names = names;
         this.commandsClasses = new Class[]{commandClass};
         this.shortcutCommandGroup = shortcutCommandGroup;
+        this.commandPermission = shortcutCommandGroup.getPermission();
+        initCommands();
+    }
+    
+    private Commands(String[] names, CommandPermission permission, Class<? extends Command> ... commandsClasses)
+    {
+        this.names = names;
+        this.commandsClasses = commandsClasses;
+        this.shortcutCommandGroup = null;
+        this.commandPermission = permission;
+        initDescriptions();
         initCommands();
     }
     
     private Commands(String[] names, Class<? extends Command> ... commandsClasses)
     {
-        this.names = names;
-        this.commandsClasses = commandsClasses;
-        this.shortcutCommandGroup = null;
-        initDescriptions();
-        initCommands();
+        this(names, CommandPermission.bukkitPermission(ImageOnMap.getPlugin(), names[0]), commandsClasses);
     }
     
     private void initDescriptions()
@@ -328,5 +341,6 @@ public enum Commands implements TabCompleter, CommandExecutor
     public String getDescription(String commandName) { return commandsDescriptions.get(commandName); }
     public boolean isShortcutCommand() { return shortcutCommandGroup != null; }
     public Commands getShortcutCommandGroup() { return shortcutCommandGroup; }
+    public CommandPermission getPermission() { return commandPermission; }
 
 }

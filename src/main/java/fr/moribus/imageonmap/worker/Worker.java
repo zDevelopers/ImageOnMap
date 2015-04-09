@@ -44,7 +44,7 @@ public abstract class Worker
         this.mainThreadExecutor = runMainThreadExecutor ? new WorkerMainThreadExecutor(name) : null;
     }
     
-    public void init()
+    protected void init()
     {
         if(thread != null && thread.isAlive())
         {
@@ -57,7 +57,7 @@ public abstract class Worker
         thread.start();
     }
     
-    public void exit()
+    protected void exit()
     {
         thread.interrupt();
         callbackManager.exit();
@@ -118,7 +118,7 @@ public abstract class Worker
     
     private Thread createThread()
     {
-        return new Thread()
+        return new Thread("ImageOnMap " + name)
         {
             @Override
             public void run()
