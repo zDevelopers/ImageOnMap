@@ -23,6 +23,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,20 +36,72 @@ import org.json.simple.parser.ParseException;
 
 abstract public class UUIDFetcher 
 {
-    static private final String PROFILE_URL = "https://api.mojang.com/profiles/minecraft"; //The URI of the name->UUID API from Mojang
-    static private final JSONParser jsonParser = new JSONParser();
-
-    static public Map<String, UUID> fetch(List<String> names) throws IOException
+    /**
+     * The maximal amount of usernames to send to mojang per request
+     * This allows not to overload mojang's service with too many usernames at a time
+     */
+    static private final int MOJANG_USERNAMES_PER_REQUEST = 100;
+    
+    /**
+     * The maximal amount of requests to send to Mojang
+     * The time limit for this amount is MOJANG_MAX_REQUESTS_TIME
+     * Read : You can only send MOJANG_MAX_REQUESTS in MOJANG_MAX_REQUESTS_TIME seconds
+     */
+    static private final int MOJANG_MAX_REQUESTS = 600;
+    
+    /**
+     * The timeframe for the Mojang request limit (in seconds)
+     */
+    static private final int MOJANG_MAX_REQUESTS_TIME = 600;
+    
+    /**
+     * The minimum time between two requests to mojang (in milliseconds)
+     */
+    static private final int TIME_BETWEEN_REQUESTS = 200;
+    
+    /**
+     * The (approximative) timestamp of the date when Mojang name changing feature
+     * was announced to be released
+     */
+    static private final int NAME_CHANGE_TIMESTAMP = 1420844400;
+    
+    static private final String PROFILE_URL = "https://api.mojang.com/profiles/minecraft";
+    static private final String TIMED_PROFILE_URL = "https://api.mojang.com/users/profiles/minecraft/";
+    
+    static public Map<String, UUID> fetch(List<String> names) throws IOException, InterruptedException
+    {
+        return fetch(names, MOJANG_USERNAMES_PER_REQUEST);
+    }
+    
+    static public Map<String, UUID> fetch(List<String> names, int limitByRequest) throws IOException, InterruptedException
+    {
+        Map<String, UUID> UUIDs = new HashMap<String, UUID>();
+        int requests = (names.size() / limitByRequest) + 1;
+        
+        List<String> tempNames;
+        Map<String, UUID> tempUUIDs;
+        
+        for(int i = 0; i < requests; i++)
+        {
+            tempNames = names.subList(limitByRequest * i, Math.min((limitByRequest * (i+1)) - 1, names.size()));
+            tempUUIDs = rawFetch(tempNames);
+            UUIDs.putAll(tempUUIDs);
+            Thread.sleep(TIME_BETWEEN_REQUESTS);
+        }
+        
+        return UUIDs;
+    }
+    
+    static private Map<String, UUID> rawFetch(List<String> names) throws IOException
     {
         Map<String, UUID> uuidMap = new HashMap<String, UUID>();
-        HttpURLConnection connection = createConnection();
+        HttpURLConnection connection = getPOSTConnection(PROFILE_URL);
         
         writeBody(connection, names);
-        
         JSONArray array;
         try
         {
-            array = (JSONArray) jsonParser.parse(new InputStreamReader(connection.getInputStream()));
+            array = (JSONArray) readResponse(connection);
         }
         catch(ParseException ex)
         {
@@ -62,33 +116,63 @@ abstract public class UUIDFetcher
             uuidMap.put(name, fromMojangUUID(id));
         }
         
-        
         return uuidMap;
     }
     
-    static public Map<String, UUID> fetch(List<String> names, int limitByRequest) throws IOException, InterruptedException
+    static public void fetchRemaining(Collection<String> names, Map<String, UUID> uuids) throws IOException, InterruptedException
     {
-        Map<String, UUID> UUIDs = new HashMap<String, UUID>();
-        int requests = (names.size() / limitByRequest) + 1;
+        ArrayList<String> remainingNames = new ArrayList<>();
         
-        List<String> tempNames;
-        Map<String, UUID> tempUUIDs;
-        
-        for(int i = 0; i < requests; i++)
+        for(String name : names)
         {
-            tempNames = names.subList(limitByRequest * i, Math.min((limitByRequest * (i+1)) - 1, names.size()));
-            tempUUIDs = fetch(tempNames);
-            UUIDs.putAll(tempUUIDs);
-            Thread.sleep(400);
+            if(!uuids.containsKey(name)) remainingNames.add(name);
         }
         
-        return UUIDs;
+        int timeBetweenRequests;
+        if(remainingNames.size() > MOJANG_MAX_REQUESTS)
+        {
+            timeBetweenRequests = (MOJANG_MAX_REQUESTS / MOJANG_MAX_REQUESTS_TIME) * 1000;
+        }
+        else
+        {
+            timeBetweenRequests = TIME_BETWEEN_REQUESTS;
+        }
+        
+        User user;
+        for(String name : remainingNames)
+        {
+            user = fetchOriginalUUID(name);
+            uuids.put(user.name, user.uuid);
+            Thread.sleep(timeBetweenRequests);
+        }
+        
     }
-
-    private static HttpURLConnection createConnection() throws IOException 
+    
+    static private User fetchOriginalUUID(String name) throws IOException
     {
-        URL url = new URL(PROFILE_URL);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = getGETConnection(TIMED_PROFILE_URL + name + "?at=" + NAME_CHANGE_TIMESTAMP);
+        sendRequest(connection);
+        
+        JSONObject object;
+        
+        try
+        {
+            object = (JSONObject) readResponse(connection);
+        }
+        catch(ParseException ex)
+        {
+            throw new IOException("Invalid response from server, unable to parse received JSON : " + ex.toString());
+        }
+        
+        User user = new User();
+        user.name = (String) object.get("name");
+        user.uuid = fromMojangUUID((String)object.get("id"));
+        return user;
+    }
+    
+    static private HttpURLConnection getPOSTConnection(String url) throws IOException
+    {
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setUseCaches(false);
@@ -96,7 +180,22 @@ abstract public class UUIDFetcher
         connection.setDoOutput(true);
         return connection;
     }
-
+    
+    static private HttpURLConnection getGETConnection(String url) throws IOException
+    {
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setRequestMethod("GET");
+        connection.setUseCaches(false);
+        connection.setDoInput(true);
+        return connection;
+    }
+    
+    static private void sendRequest(HttpURLConnection connection) throws IOException
+    {
+        OutputStream stream = connection.getOutputStream();
+        stream.flush();
+        stream.close();
+    }
     
     private static void writeBody(HttpURLConnection connection, List<String> names) throws IOException 
     {
@@ -106,7 +205,11 @@ abstract public class UUIDFetcher
         stream.flush();
         stream.close();
     }
-
+    
+    private static Object readResponse(HttpURLConnection connection) throws IOException, ParseException
+    {
+        return new JSONParser().parse(new InputStreamReader(connection.getInputStream()));
+    }
 
     private static UUID fromMojangUUID(String id) //Mojang sends string UUIDs without dashes ...
     {
@@ -114,6 +217,12 @@ abstract public class UUIDFetcher
                                id.substring(12, 16) + "-" + id.substring(16, 20) + "-" + 
                                id.substring(20, 32));
     }
-
+    
+    static private class User
+    {
+        public String name;
+        public UUID uuid;
+    }
+    
 }
 

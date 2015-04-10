@@ -72,12 +72,6 @@ public class V3Migrator
     static private final String BACKUPS_POSTV3_DIRECTORY_NAME = "backups_post-v3";
     
     /**
-     * The maximal amount of usernames to send to mojang per request
-     * This allows not to overload mojang's service with too many usernames at a time
-     */
-    static private final int MOJANG_USERNAMES_PER_REQUEST = 100;
-    
-    /**
      * Returns the former images directory of a given plugin
      * @param plugin The plugin.
      * @return the corresponding 'Image' directory
@@ -167,9 +161,8 @@ public class V3Migrator
             if(checkForExistingBackups()) return;
             if(!loadOldFiles()) return;
             backupMapData();
-            loadOldFiles();
             fetchUUIDs();
-            if(!checkMissingUUIDs()) return;
+            if(!fetchMissingUUIDs()) return;
         }
         catch(Exception ex)
         {
@@ -341,7 +334,7 @@ public class V3Migrator
         logInfo("Fetching UUIDs from Mojang ...");
         try
         {
-            usersUUIDs = UUIDFetcher.fetch(new ArrayList<String>(userNamesToFetch), MOJANG_USERNAMES_PER_REQUEST);
+            usersUUIDs = UUIDFetcher.fetch(new ArrayList<String>(userNamesToFetch));
         }
         catch(IOException ex)
         {
@@ -357,14 +350,30 @@ public class V3Migrator
     }
     
     /**
-     * Check if any UUID has been retreived.
+     * Fetches the UUIDs that could not be retreived via Mojang's standard API
      * @return true if at least one UUID has been retreived, false otherwise
      */
-    private boolean checkMissingUUIDs()
+    private boolean fetchMissingUUIDs() throws IOException, InterruptedException
     {
         if(usersUUIDs.size() == userNamesToFetch.size()) return true;
-        logInfo("Mojang did not find UUIDs for all the registered players.");
-        logInfo("This means some of the users do not actually exist, or they have changed names before migrating.");
+        int remainingUsersCount = userNamesToFetch.size() - usersUUIDs.size();
+        logInfo("Mojang did not find UUIDs for "+remainingUsersCount+" players.");
+        logInfo("The Mojang servers limit requests rate at one per second, this may take some time...");
+        
+        try
+        {
+            UUIDFetcher.fetchRemaining(userNamesToFetch, usersUUIDs);
+        }
+        catch(IOException ex)
+        {
+            logError("An error occured while fetching the UUIDs from Mojang", ex);
+            throw ex;
+        }
+        catch(InterruptedException ex)
+        {
+            logError("The migration worker has been interrupted", ex);
+            throw ex;
+        }
         
         if(usersUUIDs.size() <= 0)
         {
@@ -373,15 +382,6 @@ public class V3Migrator
             return false;
         }
         
-        String missingUsersList = "";
-        
-        for(String user : userNamesToFetch)
-        {
-            if(!usersUUIDs.containsKey(user)) missingUsersList += user + ",";
-        }
-        missingUsersList = missingUsersList.substring(0, missingUsersList.length());
-        
-        logInfo("Here are the missing players : " + missingUsersList);
         return true;
     }
     
