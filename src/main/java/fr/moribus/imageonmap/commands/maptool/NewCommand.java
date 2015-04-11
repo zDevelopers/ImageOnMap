@@ -79,7 +79,7 @@ public class NewCommand  extends Command
             public void errored(Throwable exception)
             {
                 player.sendMessage("§cMap rendering failed : " + exception.getMessage());
-                PluginLogger.LogWarning("Rendering from '" + player.getName() + "' failed", exception);
+                PluginLogger.warning("Rendering from '{0}' failed", exception, player.getName());
             }
         });
     }

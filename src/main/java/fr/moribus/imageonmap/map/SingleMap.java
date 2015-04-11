@@ -26,10 +26,15 @@ public class SingleMap extends ImageMap
 {
     protected final short mapID;
     
+    public SingleMap(UUID ownerUUID, short mapID, String id, String name)
+    {
+        super(ownerUUID, Type.SINGLE, id, name);
+        this.mapID = mapID;
+    }
+    
     public SingleMap(UUID ownerUUID, short mapID)
     {
-        super(ownerUUID, Type.SINGLE);
-        this.mapID = mapID;
+        this(ownerUUID, mapID, null, null);
     }
     
     @Override

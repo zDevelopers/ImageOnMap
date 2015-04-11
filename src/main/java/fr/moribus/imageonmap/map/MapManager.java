@@ -111,6 +111,11 @@ abstract public class MapManager
         getPlayerMapStore(map.getUserUUID()).addMap(map);
     }
     
+    static public void insertMap(ImageMap map)
+    {
+        getPlayerMapStore(map.getUserUUID()).insertMap(map);
+    }
+    
     static public void deleteMap(ImageMap map) throws MapManagerException
     {
         getPlayerMapStore(map.getUserUUID()).deleteMap(map);

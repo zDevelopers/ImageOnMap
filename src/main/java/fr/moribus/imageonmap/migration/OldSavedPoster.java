@@ -18,16 +18,23 @@
 
 package fr.moribus.imageonmap.migration;
 
+import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.PosterMap;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.InvalidConfigurationException;
 
 class OldSavedPoster 
 {
-    private String userName;
-    private short[] mapsIds;
+    private final String userName;
+    private final String posterName;
+    private final short[] mapsIds;
     
-    public OldSavedPoster(Object rawData) throws InvalidConfigurationException
+    public OldSavedPoster(Object rawData, String key) throws InvalidConfigurationException
     {
+        posterName = key;
         List<String> data;
         try
         {
@@ -66,6 +73,25 @@ class OldSavedPoster
         }
         
         return false;
+    }
+    
+    public ImageMap toImageMap(UUID userUUID)
+    {
+        return new PosterMap(userUUID, mapsIds, null, "poster", 0, 0);
+    }
+    
+    public void serialize(Configuration configuration)
+    {
+        ArrayList<String> data = new ArrayList<String>();
+        data.add(userName);
+        
+        for(short mapId : mapsIds)
+        {
+            data.add(Short.toString(mapId));
+        }
+        
+        configuration.set(posterName, data);
+        
     }
     
     public String getUserName() {return userName;}

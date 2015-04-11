@@ -69,6 +69,11 @@ public class PlayerMapStore implements ConfigurationSerializable
     public synchronized void addMap(ImageMap map) throws MapManagerException
     {
         checkMapLimit(map);
+        insertMap(map);
+    }
+    
+    public synchronized void insertMap(ImageMap map)
+    {
         _addMap(map);
         notifyModification();
     }
@@ -201,15 +206,15 @@ public class PlayerMapStore implements ConfigurationSerializable
             }
             catch(InvalidConfigurationException ex)
             {
-                PluginLogger.LogWarning("Could not load map data : " + ex.getMessage());
+                PluginLogger.warning("Could not load map data : ", ex);
             }
         }
         
         try { checkMapLimit(0); }
         catch(MapManagerException ex)
         {
-            PluginLogger.LogWarning("Map limit exceeded for player " + playerUUID.toString() +
-                    " (" + mapList.size() + " maps loaded).");
+            PluginLogger.warning("Map limit exceeded for player '{0}' ({1} maps loaded)",
+                    playerUUID.toString(),mapList.size());
         }
     }
     
@@ -246,9 +251,8 @@ public class PlayerMapStore implements ConfigurationSerializable
         } 
         catch (IOException ex) 
         {
-            PluginLogger.LogError("Could not save maps file for player " + playerUUID.toString(), ex);
+            PluginLogger.error("Could not save maps file for player '{0}'", ex, playerUUID.toString());
         }
-        PluginLogger.LogInfo("Saving maps file for " + playerUUID.toString());
         synchronized(this) {modified = false;}
     }
 }

@@ -16,17 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.moribus.imageonmap.commands.migration;
+package fr.moribus.imageonmap.commands.maptool;
 
 import fr.moribus.imageonmap.commands.*;
-import fr.moribus.imageonmap.migration.Migrator;
-import fr.moribus.imageonmap.worker.WorkerCallback;
+import fr.moribus.imageonmap.migration.MigratorExecutor;
 import org.bukkit.command.CommandSender;
 
-@CommandInfo(name = "start")
-public class StartCommand extends Command
+@CommandInfo(name = "migrate")
+public class MigrateCommand extends Command
 {
-    public StartCommand(Commands commandGroup) {
+    public MigrateCommand(Commands commandGroup) {
         super(commandGroup);
     }
     
@@ -34,28 +33,20 @@ public class StartCommand extends Command
     protected void run() throws CommandException
     {
         final CommandSender cmdSender = sender;
-        if(Migrator.isMigrationRunning())
+        if(MigratorExecutor.isRunning())
         {
             error("A migration process is already running. Check console for details.");
         }
         else
         {
-            Migrator.runMigration(new WorkerCallback<Void>()
-            {
-                @Override
-                public void finished(Void result)
-                {
-                    info(cmdSender, "Migration finished. See console for details.");
-                }
-
-                @Override
-                public void errored(Throwable exception)
-                {
-                    warning(cmdSender, "Migration ended unexpectedly. See console for details.");
-                }
-            });
-            
             info("Migration started. See console for details.");
+            MigratorExecutor.migrate();
         }
+    }
+    
+    @Override
+    public boolean canExecute(CommandSender sender)
+    {
+        return sender.isOp();
     }
 }

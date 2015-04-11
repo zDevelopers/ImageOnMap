@@ -170,7 +170,6 @@ public class ImageRendererExecutor extends Worker
         int x, y;
         x = (destinationW - finalW) / 2;
         y = (destinationH - finalH) / 2;
-        PluginLogger.LogInfo(finalW + " " + finalH + " : " + x + " " + y);
         
         BufferedImage newImage = new BufferedImage(destinationW, destinationH, BufferedImage.TYPE_INT_ARGB);
         

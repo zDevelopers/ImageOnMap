@@ -18,33 +18,112 @@
 
 package fr.moribus.imageonmap;
 
+import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import org.bukkit.plugin.Plugin;
 
 abstract public class PluginLogger 
 {
+    static private Plugin plugin;
+    static private Thread mainThread;
+    static private HashMap<Thread, PluginThreadLogger> loggers;
+    
+    static public void init(Plugin plugin)
+    {
+        PluginLogger.plugin = plugin;
+        mainThread = Thread.currentThread();
+        loggers = new HashMap<>();
+    }
+    
+    static public void exit()
+    {
+        plugin = null;
+        mainThread = null;
+        loggers = null;
+    }
+    
+    static public void log(Level level, String message, Throwable ex)
+    {
+        getLogger().log(level, message, ex);
+    }
+    
+    static public void log(Level level, String message, Object...args)
+    {
+        getLogger().log(level, message, args);
+    }
+        
+    static public void log(Level level, String message, Throwable ex, Object... args)
+    {
+        log(level, message + " : " + ex.getMessage(), args);
+    }
+    
+    static public void info(String message, Object...args)
+    {
+        log(Level.INFO, message, args);
+    }
+    
+    static public void warning(String message, Object... args)
+    {
+        log(Level.WARNING, message, args);
+    }
+    
+    static public void warning(String message, Throwable ex)
+    {
+        warning(message + " : " + ex.getMessage());
+    }
+    
+    static public void error(String message)
+    {
+        log(Level.SEVERE, message);
+    }
+    
+    static public void error(String message, Throwable ex)
+    {
+        log(Level.SEVERE, message, ex);
+    }
+    
+    static public void error(String message, Throwable ex, Object... args)
+    {
+        log(Level.SEVERE, message, ex, args);
+    }
+    
     static private Logger getLogger()
     {
-        return ImageOnMap.getPlugin().getLogger();
+        Thread currentThread = Thread.currentThread();
+        if(currentThread.equals(mainThread)) return plugin.getLogger();
+        return getLogger(currentThread);
     }
     
-    static public void LogInfo(String message)
+    static private Logger getLogger(Thread thread)
     {
-        getLogger().log(Level.INFO, message);
+        PluginThreadLogger logger = loggers.get(thread);
+        if(logger == null)
+        {
+            logger = new PluginThreadLogger(thread);
+            loggers.put(thread, logger);
+        }
+        return logger;
     }
     
-    static public void LogWarning(String message)
+    static private class PluginThreadLogger extends Logger
     {
-        getLogger().log(Level.WARNING, message);
-    }
-    
-    static public void LogWarning(String message, Throwable ex)
-    {
-        getLogger().log(Level.WARNING, message, ex);
-    }
-    
-    static public void LogError(String message, Throwable ex)
-    {
-        getLogger().log(Level.SEVERE, message, ex);
+        private final String loggerName;
+        public PluginThreadLogger(Thread thread)
+        {
+            super(plugin.getClass().getCanonicalName(), null);
+            setParent(plugin.getLogger());
+            setLevel(Level.ALL);
+            loggerName = "[" + thread.getName() + "] ";
+        }
+        
+        @Override
+        public void log(LogRecord logRecord) 
+        {
+            logRecord.setMessage(loggerName + logRecord.getMessage());
+            super.log(logRecord);
+        }
     }
 }

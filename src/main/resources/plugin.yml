@@ -8,9 +8,6 @@ commands:
       usage: /<command> [URL]
    maptool:
       description: manage maps
-   maptool-migration:
-      description: Manages the ImageOnMap migrations
-      permission: op
 permissions:
     imageonmap.userender:
         description: Allows you to use /tomap

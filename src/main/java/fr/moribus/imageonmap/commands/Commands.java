@@ -18,10 +18,9 @@
 
 package fr.moribus.imageonmap.commands;
 
-import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.commands.maptool.MigrateCommand;
 import fr.moribus.imageonmap.PluginLogger;
 import fr.moribus.imageonmap.commands.maptool.*;
-import fr.moribus.imageonmap.commands.migration.*;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -36,10 +35,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- *
- * @author Prokopyl<prokopylmc@gmail.com>
- */
+
 public enum Commands implements TabCompleter, CommandExecutor
 {
     MAPTOOL(new String[]{"maptool"},
@@ -48,22 +44,17 @@ public enum Commands implements TabCompleter, CommandExecutor
             GetCommand.class,
             DeleteConfirmCommand.class,
             DeleteNoConfirmCommand.class,
-            GetRemainingCommand.class
+            GetRemainingCommand.class,
+            MigrateCommand.class
     ),
-    TOMAP(MAPTOOL, NewCommand.class, "tomap"),
-    MAPTOOL_MIGRATION(new String[]{"maptool-migration"}, CommandPermission.OP_ONLY,
-            StartCommand.class
-    );
+    TOMAP(MAPTOOL, NewCommand.class, "tomap");
     
-    
-    static private JavaPlugin plugin;
     static private final Commands[] commandGroups = Commands.class.getEnumConstants();
     private final Commands shortcutCommandGroup;
     private final String[] names;
     private final Class<? extends Command>[] commandsClasses;
     private final ArrayList<Command> commands = new ArrayList<>();
     private final HashMap<String, String> commandsDescriptions = new HashMap<>();
-    private final CommandPermission commandPermission;
     private String description = "";
     
     private Commands(Commands shortcutCommandGroup, Class<? extends Command> commandClass, String ... names)
@@ -71,23 +62,16 @@ public enum Commands implements TabCompleter, CommandExecutor
         this.names = names;
         this.commandsClasses = new Class[]{commandClass};
         this.shortcutCommandGroup = shortcutCommandGroup;
-        this.commandPermission = shortcutCommandGroup.getPermission();
-        initCommands();
-    }
-    
-    private Commands(String[] names, CommandPermission permission, Class<? extends Command> ... commandsClasses)
-    {
-        this.names = names;
-        this.commandsClasses = commandsClasses;
-        this.shortcutCommandGroup = null;
-        this.commandPermission = permission;
-        initDescriptions();
         initCommands();
     }
     
     private Commands(String[] names, Class<? extends Command> ... commandsClasses)
     {
-        this(names, CommandPermission.bukkitPermission(ImageOnMap.getPlugin(), names[0]), commandsClasses);
+        this.names = names;
+        this.commandsClasses = commandsClasses;
+        this.shortcutCommandGroup = null;
+        initDescriptions();
+        initCommands();
     }
     
     private void initDescriptions()
@@ -96,7 +80,7 @@ public enum Commands implements TabCompleter, CommandExecutor
         InputStream stream = getClass().getClassLoader().getResourceAsStream(fileName);
         if(stream == null)
         {
-            PluginLogger.LogWarning("Could not load description file for the " + getUsualName() + " command");
+            PluginLogger.warning("Could not load description file for the " + getUsualName() + " command");
             return;
         }
         
@@ -154,7 +138,7 @@ public enum Commands implements TabCompleter, CommandExecutor
         } 
         catch (Exception ex) 
         {
-            PluginLogger.LogWarning("Exception while initializing command", ex);
+            PluginLogger.warning("Exception while initializing command", ex);
         }
     }
     
@@ -341,6 +325,5 @@ public enum Commands implements TabCompleter, CommandExecutor
     public String getDescription(String commandName) { return commandsDescriptions.get(commandName); }
     public boolean isShortcutCommand() { return shortcutCommandGroup != null; }
     public Commands getShortcutCommandGroup() { return shortcutCommandGroup; }
-    public CommandPermission getPermission() { return commandPermission; }
 
 }

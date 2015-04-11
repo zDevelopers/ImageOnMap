@@ -65,7 +65,7 @@ public class MetricsLite
         }
         catch (IOException e)
         {
-            PluginLogger.LogError("Failed to start MetricsLite", e);
+            PluginLogger.error("Failed to start MetricsLite", e);
         }
     }
 
@@ -197,7 +197,7 @@ public class MetricsLite
                         firstPost = false;
                     } catch (IOException e) {
                         if (debug) {
-                            PluginLogger.LogWarning("[Metrics] ", e);
+                            PluginLogger.warning("[Metrics] ", e);
                         }
                     }
                 }
@@ -219,7 +219,7 @@ public class MetricsLite
                 configuration.load(getConfigFile());
             } catch (IOException | InvalidConfigurationException ex) {
                 if (debug) {
-                    PluginLogger.LogInfo("[Metrics] " + ex.getMessage());
+                    PluginLogger.info("[Metrics] " + ex.getMessage());
                 }
                 return true;
             }
@@ -408,7 +408,7 @@ public class MetricsLite
             gzos = new GZIPOutputStream(baos);
             gzos.write(input.getBytes("UTF-8"));
         } catch (IOException e) {
-            PluginLogger.LogError("MetricsLite GZIP error : ", e);
+            PluginLogger.error("MetricsLite GZIP error : ", e);
         } finally {
             if (gzos != null) try {
                 gzos.close();

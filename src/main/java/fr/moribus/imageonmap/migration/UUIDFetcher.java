@@ -142,7 +142,7 @@ abstract public class UUIDFetcher
         for(String name : remainingNames)
         {
             user = fetchOriginalUUID(name);
-            uuids.put(user.name, user.uuid);
+            uuids.put(name, user.uuid);
             Thread.sleep(timeBetweenRequests);
         }
         
@@ -151,7 +151,6 @@ abstract public class UUIDFetcher
     static private User fetchOriginalUUID(String name) throws IOException
     {
         HttpURLConnection connection = getGETConnection(TIMED_PROFILE_URL + name + "?at=" + NAME_CHANGE_TIMESTAMP);
-        sendRequest(connection);
         
         JSONObject object;
         
@@ -187,14 +186,9 @@ abstract public class UUIDFetcher
         connection.setRequestMethod("GET");
         connection.setUseCaches(false);
         connection.setDoInput(true);
+        connection.setDoOutput(true);
+        
         return connection;
-    }
-    
-    static private void sendRequest(HttpURLConnection connection) throws IOException
-    {
-        OutputStream stream = connection.getOutputStream();
-        stream.flush();
-        stream.close();
     }
     
     private static void writeBody(HttpURLConnection connection, List<String> names) throws IOException 
@@ -208,9 +202,9 @@ abstract public class UUIDFetcher
     
     private static Object readResponse(HttpURLConnection connection) throws IOException, ParseException
     {
-        return new JSONParser().parse(new InputStreamReader(connection.getInputStream()));
+            return new JSONParser().parse(new InputStreamReader(connection.getInputStream()));
     }
-
+    
     private static UUID fromMojangUUID(String id) //Mojang sends string UUIDs without dashes ...
     {
         return UUID.fromString(id.substring(0, 8) + "-" + id.substring(8, 12) + "-" +

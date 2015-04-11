@@ -33,16 +33,13 @@ public class PosterMap extends ImageMap
     {
         super(userUUID, Type.POSTER, id, name);
         this.mapsIDs = mapsIDs;
-        this.columnCount = columnCount;
-        this.rowCount = rowCount;
+        this.columnCount = Math.max(columnCount, 0);
+        this.rowCount = Math.max(rowCount, 0);
     }
     
     public PosterMap(UUID userUUID, short[] mapsIDs, int columnCount, int rowCount)
     {
-        super(userUUID, Type.POSTER, null, null);
-        this.mapsIDs = mapsIDs;
-        this.columnCount = columnCount;
-        this.rowCount = rowCount;
+        this(userUUID, mapsIDs, null, null, columnCount, rowCount);
     }
     
     @Override
@@ -89,11 +86,19 @@ public class PosterMap extends ImageMap
     
     /* ====== Getters & Setters ====== */
     
+    /**
+     * Returns the amount of columns in the poster map
+     * @return The number of columns, or 0 if this data is missing
+     */
     public int getColumnCount()
     {
         return columnCount;
     }
     
+    /**
+     * Returns the amount of rows in the poster map
+     * @return The number of rows, or 0 if this data is missing
+     */
     public int getRowCount()
     {
         return rowCount;
@@ -101,12 +106,19 @@ public class PosterMap extends ImageMap
     
     public int getColumnAt(int i)
     {
+        if(columnCount == 0) return 0;
         return (i % columnCount) + 1;
     }
     
     public int getRowAt(int i)
     {
+        if(columnCount == 0) return 0;
         return (i / columnCount) + 1;
+    }
+    
+    public boolean hasColumnData()
+    {
+        return rowCount != 0 && columnCount != 0;
     }
 
     @Override

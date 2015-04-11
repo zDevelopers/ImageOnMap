@@ -65,18 +65,12 @@ abstract public class Command
         return null;
     }
     
-    public boolean hasPermission(CommandSender sender)
-    {
-        if(!commandGroup.getPermission().hasPermission(sender)) return false;
-        return canExecute(sender);
-    }
-    
     public void execute(CommandSender sender, String[] args)
     {
         this.sender = sender; this.args = args;
         try
         {
-            if(!hasPermission(sender))
+            if(!canExecute(sender))
                 throw new CommandException(this, Reason.SENDER_NOT_AUTHORIZED);
             run();
         }

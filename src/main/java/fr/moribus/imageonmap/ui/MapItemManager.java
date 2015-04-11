@@ -64,12 +64,20 @@ public class MapItemManager implements Listener
         short[] mapsIDs = map.getMapsIDs();
         boolean inventoryFull = false;
         
+        String mapName;
         for(int i = 0, c = mapsIDs.length; i < c; i++)
         {
-            inventoryFull = give(player,
-                    createMapItem(mapsIDs[i], map.getName() + 
+            if(map.hasColumnData())
+            {
+                mapName = map.getName() + 
                     " (row " + map.getRowAt(i) + 
-                    ", column " + map.getColumnAt(i) + ")")) || inventoryFull;
+                    ", column " + map.getColumnAt(i) + ")";
+            }
+            else
+            {
+                mapName = map.getName();
+            }
+            inventoryFull = give(player, createMapItem(mapsIDs[i], mapName)) || inventoryFull;
         }
         
         return inventoryFull;

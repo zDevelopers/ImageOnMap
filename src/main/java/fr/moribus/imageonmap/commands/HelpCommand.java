@@ -73,25 +73,27 @@ public class HelpCommand extends Command
         if(!command.canExecute(sender))
             warning("You do not have the permission to use this command.");
         
-        sender.sendMessage("§l§6 ||== ImageOnMap help ==||\n" + 
-                "§l§6 |Usage : §r" + command.getUsageString());
+        String message = "§l§6 ||== ImageOnMap help ==||\n" + 
+                "§l§6 |Usage : §r" + command.getUsageString();
         
         try
         {
             String help = getHelpText(command);
             if(help.isEmpty())
             {
+                sender.sendMessage(message);
                 warning("There is no help message for this command.");
             }
             else
             {
-                sender.sendMessage(help);
+                sender.sendMessage(message + "\n" + help);
             }
         }
         catch(IOException ex)
         {
+            sender.sendMessage(message);
             warning("Could not read help for this command.");
-            PluginLogger.LogWarning("Could not read help for the command : " + command.getName(), ex);
+            PluginLogger.warning("Could not read help for the command : " + command.getName(), ex);
         }
     }
     

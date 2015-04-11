@@ -48,7 +48,7 @@ public abstract class Worker
     {
         if(thread != null && thread.isAlive())
         {
-            PluginLogger.LogWarning("Restarting " + name + " thread.");
+            PluginLogger.warning("Restarting '{0}' thread.", name);
             exit();
         }
         callbackManager.init();
@@ -118,7 +118,7 @@ public abstract class Worker
     
     private Thread createThread()
     {
-        return new Thread("ImageOnMap " + name)
+        return new Thread("ImageOnMap-" + name)
         {
             @Override
             public void run()

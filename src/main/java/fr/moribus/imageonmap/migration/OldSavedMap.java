@@ -18,7 +18,12 @@
 
 package fr.moribus.imageonmap.migration;
 
+import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.SingleMap;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.InvalidConfigurationException;
 
 class OldSavedMap 
@@ -52,6 +57,20 @@ class OldSavedMap
         
         mapName = data.get(1);
         userName = data.get(2);
+    }
+    
+    public ImageMap toImageMap(UUID userUUID)
+    {
+        return new SingleMap(userUUID, mapId, null, mapName);
+    }
+    
+    public void serialize(Configuration configuration)
+    {
+        ArrayList<String> data = new ArrayList<String>();
+        data.add(Short.toString(mapId));
+        data.add(mapName);
+        data.add(userName);
+        configuration.set(mapName, data);
     }
     
     public short getMapId() {return mapId;}

@@ -48,7 +48,7 @@ public class DeleteNoConfirmCommand extends Command
         }
         catch (MapManagerException ex)
         {
-            PluginLogger.LogWarning("A non-existent map was requested to be deleted", ex);
+            PluginLogger.warning("A non-existent map was requested to be deleted", ex);
             warning("This map does not exist.");
         }
     }
