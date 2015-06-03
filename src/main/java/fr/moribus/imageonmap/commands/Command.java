@@ -30,6 +30,8 @@ import org.bukkit.entity.Player;
 
 abstract public class Command 
 {
+    static private final String IMAGEONMAP_GLOBAL_PERMISSION = "imageonmap.userender";
+    
     protected final Commands commandGroup;
     protected final String commandName;
     protected final String usageParameters;
@@ -57,7 +59,8 @@ abstract public class Command
     
     public boolean canExecute(CommandSender sender)
     {
-        return sender.hasPermission("commandtools." + commandGroup.getUsualName());
+        return sender.hasPermission("imageonmap." + commandGroup.getUsualName())
+                || sender.hasPermission(IMAGEONMAP_GLOBAL_PERMISSION);
     }
     
     protected List<String> complete() throws CommandException
