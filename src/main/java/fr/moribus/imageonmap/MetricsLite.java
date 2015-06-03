@@ -47,10 +47,27 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
 
-public class MetricsLite {
+public class MetricsLite 
+{
+    /**
+     * Starts MetricsLite, unless disabled in config
+     */
+    
+    static public void startMetrics()
+    {
+        if(!PluginConfiguration.COLLECT_DATA.getBoolean()) return;
+        try
+        {
+            MetricsLite metrics = new MetricsLite(ImageOnMap.getPlugin());
+            metrics.start();
+        }
+        catch (IOException e)
+        {
+            PluginLogger.error("Failed to start MetricsLite", e);
+        }
+    }
 
     /**
 * The current revision number
@@ -180,7 +197,7 @@ public class MetricsLite {
                         firstPost = false;
                     } catch (IOException e) {
                         if (debug) {
-                            Bukkit.getLogger().log(Level.INFO, "[Metrics] " + e.getMessage());
+                            PluginLogger.warning("[Metrics] ", e);
                         }
                     }
                 }
@@ -200,14 +217,9 @@ public class MetricsLite {
             try {
                 // Reload the metrics file
                 configuration.load(getConfigFile());
-            } catch (IOException ex) {
+            } catch (IOException | InvalidConfigurationException ex) {
                 if (debug) {
-                    Bukkit.getLogger().log(Level.INFO, "[Metrics] " + ex.getMessage());
-                }
-                return true;
-            } catch (InvalidConfigurationException ex) {
-                if (debug) {
-                    Bukkit.getLogger().log(Level.INFO, "[Metrics] " + ex.getMessage());
+                    PluginLogger.info("[Metrics] " + ex.getMessage());
                 }
                 return true;
             }
@@ -263,7 +275,7 @@ public class MetricsLite {
 *
 * @return the File object for the config file
 */
-    public File getConfigFile() {
+    public final File getConfigFile() {
         // I believe the easiest way to get the base folder (e.g craftbukkit set via -P) for plugins to use
         // is to abuse the plugin object we already have
         // plugin.getDataFolder() => base/plugins/PluginA/
@@ -396,7 +408,7 @@ public class MetricsLite {
             gzos = new GZIPOutputStream(baos);
             gzos.write(input.getBytes("UTF-8"));
         } catch (IOException e) {
-            e.printStackTrace();
+            PluginLogger.error("MetricsLite GZIP error : ", e);
         } finally {
             if (gzos != null) try {
                 gzos.close();
@@ -489,7 +501,8 @@ public class MetricsLite {
                 default:
                     if (chr < ' ') {
                         String t = "000" + Integer.toHexString(chr);
-                        builder.append("\\u" + t.substring(t.length() - 4));
+                        builder.append("\\u");
+                        builder.append(t.substring(t.length() - 4));
                     } else {
                         builder.append(chr);
                     }

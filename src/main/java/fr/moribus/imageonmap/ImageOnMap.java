@@ -1,30 +1,48 @@
+/*
+ * Copyright (C) 2013 Moribus
+ * Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package fr.moribus.imageonmap;
 
-import fr.moribus.imageonmap.commands.MapToolCommand;
-import fr.moribus.imageonmap.commands.ImageRenduCommande;
+import fr.moribus.imageonmap.commands.Commands;
+import fr.moribus.imageonmap.image.ImageIOExecutor;
+import fr.moribus.imageonmap.image.ImageRendererExecutor;
+import fr.moribus.imageonmap.image.MapInitEvent;
+import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.migration.MigratorExecutor;
+import fr.moribus.imageonmap.migration.V3Migrator;
+import fr.moribus.imageonmap.ui.MapItemManager;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.logging.Level;
-
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import fr.moribus.imageonmap.map.ImageMap;
-import fr.moribus.imageonmap.map.SingleMap;
 
 public final class ImageOnMap extends JavaPlugin
 {
-
+    static private final String IMAGES_DIRECTORY_NAME = "images";
+    static private final String MAPS_DIRECTORY_NAME = "maps";
     static private ImageOnMap plugin;
+    
+    private File imagesDirectory;
+    private final File mapsDirectory;
 
     public ImageOnMap()
     {
+        imagesDirectory = new File(this.getDataFolder(), IMAGES_DIRECTORY_NAME);
+        mapsDirectory = new File(this.getDataFolder(), MAPS_DIRECTORY_NAME);
         plugin = this;
     }
 
@@ -32,170 +50,63 @@ public final class ImageOnMap extends JavaPlugin
     {
         return plugin;
     }
-
-    private boolean dossierCree;
-    private FileConfiguration customConfig = null;
-    private File customConfigFile = null;
-    /* liste contenant les maps ne pouvant être placé dans l'inventaire du joueur. Je le fous ici afin que ce soit
-     accessible de partout dans le plugin. */
-    private HashMap<String, ArrayList<ItemStack>> cache = new HashMap<String, ArrayList<ItemStack>>();
-
-    // Index des maps chargées sur le serveur
-    public ArrayList<Short> mapChargee = new ArrayList<Short>();
-
+    
+    public File getImagesDirectory() {return imagesDirectory;}
+    public File getMapsDirectory() {return mapsDirectory;}
+    public File getImageFile(short mapID)
+    {
+        return new File(imagesDirectory, "map"+mapID+".png");
+    }
+    
     @Override
     public void onEnable()
     {
-        // On crée si besoin le dossier où les images seront stockées
-        dossierCree = ImgUtility.CreeRepImg(this);
-
-        // On ajoute si besoin les params par défaut du plugin
-        ImgUtility.CreeSectionConfig(this);
-        if (getConfig().get("map_path") == null)
+        PluginLogger.init(this);
+        // Creating the images and maps directories if necessary
+        try
         {
-            getConfig().set("map_path", getServer().getWorlds().get(0).getName());
+            imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
+            checkPluginDirectory(mapsDirectory);
         }
-        else if (getConfig().get("map_path") != getServer().getWorlds().get(0).getName())
+        catch(IOException ex)
         {
-            getConfig().set("map_path", getServer().getWorlds().get(0).getName());
-        }
-
-        if (getConfig().getBoolean("import-maps"))
-        {
-            ImgUtility.ImporterConfig(this);
-        }
-
-        if (this.getConfig().getBoolean("collect-data"))
-        {
-            try
-            {
-                MetricsLite metrics = new MetricsLite(this);
-                metrics.start();
-                getLogger().info("Metrics launched for ImageOnMap");
-            }
-            catch (IOException e)
-            {
-                PluginLogger.LogError("Failed to start Plugin metrics", e);
-            }
-        }
-
-        if (dossierCree)
-        {
-            getCommand("tomap").setExecutor(new ImageRenduCommande(this));
-            getCommand("maptool").setExecutor(new MapToolCommand(this));
-            getServer().getPluginManager().registerEvents(new SendMapOnFrameEvent(this), this);
-            getServer().getPluginManager().registerEvents(new SendMapOnInvEvent(this), this);
-            this.saveDefaultConfig();
-            //ChargerMap();
-        }
-        else
-        {
-            getLogger().info("[ImageOnMap] An error occured ! Unable to create Image folder. Plugin will NOT work !");
+            PluginLogger.error("FATAL : " + ex.getMessage(), null);
             this.setEnabled(false);
+            return;
         }
-
+        
+        //Init all the things !
+        PluginConfiguration.init(this);
+        MetricsLite.startMetrics();
+        ImageIOExecutor.start();
+        ImageRendererExecutor.start();
+        MapManager.init();
+        Commands.init(this);
+        MapInitEvent.init(this);
+        MapItemManager.init();
     }
 
     @Override
     public void onDisable()
     {
-        getLogger().info("Stopping ImageOnMap");
+        ImageIOExecutor.stop();
+        ImageRendererExecutor.stop();
+        MapManager.exit();
+        MapItemManager.exit();
+        MigratorExecutor.waitForMigration();
+        PluginLogger.exit();
     }
-
-    public void ChargerMap()
+    
+    private File checkPluginDirectory(File primaryFile, File... alternateFiles) throws IOException
     {
-        Set<String> cle = getCustomConfig().getKeys(false);
-        int nbMap = 0, nbErr = 0;
-        for (String s : cle)
+        if(primaryFile.exists()) return primaryFile;
+        for(File file : alternateFiles)
         {
-            if (getCustomConfig().getStringList(s).size() >= 3)
-            {
-                ImageMap map;
-                String stringID = getCustomConfig().getStringList(s).get(0);
-                try
-                {
-                    map = new SingleMap(Short.valueOf(stringID));
-
-                    map.load();
-                    nbMap++;
-                }
-                catch (NumberFormatException e)
-                {
-                    PluginLogger.LogWarning("Could not parse map ID from config", e);
-                    nbErr++;
-                }
-                catch (IOException e)
-                {
-                    PluginLogger.LogError("Could not load map ID " + stringID, e);
-                    nbErr++;
-                }
-            }
-
+            if(file.exists()) return file;
         }
-        PluginLogger.LogInfo(nbMap + " maps successfuly loaded.");
-        if (nbErr != 0)
-            PluginLogger.LogWarning(nbErr + " couldn't be loaded.");
+        if(!primaryFile.mkdirs()) 
+            throw new IOException("Could not create '" + primaryFile.getName() + "' plugin directory.");
+        return primaryFile;
     }
 
-    /* Méthodes pour charger / recharger / sauvegarder
-     * le fichier conf des maps (map.yml).
-     * Je les ai juste copié depuis un tuto du wiki Bukkit.
-     */
-    @SuppressWarnings("deprecation")
-    public void reloadCustomConfig()
-    {
-        if (customConfigFile == null)
-        {
-            customConfigFile = new File(getDataFolder(), "map.yml");
-        }
-        customConfig = YamlConfiguration.loadConfiguration(customConfigFile);
-
-        // Look for defaults in the jar
-        InputStream defConfigStream = this.getResource("map.yml");
-        if (defConfigStream != null)
-        {
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-            customConfig.setDefaults(defConfig);
-        }
-    }
-
-    public FileConfiguration getCustomConfig()
-    {
-        if (customConfig == null)
-        {
-            reloadCustomConfig();
-        }
-        return customConfig;
-    }
-
-    public void saveCustomConfig()
-    {
-        if (customConfig == null || customConfigFile == null)
-        {
-            return;
-        }
-        try
-        {
-            getCustomConfig().save(customConfigFile);
-        }
-        catch (IOException ex)
-        {
-            getLogger().log(Level.SEVERE, "Could not save config to " + customConfigFile, ex);
-        }
-    }
-
-    public ArrayList<ItemStack> getRemainingMaps(String j)
-    {
-        return cache.get(j);
-    }
-
-    public void setRemainingMaps(String j, ArrayList<ItemStack> remaining)
-    {
-        cache.put(j, remaining);
-    }
-
-    public void removeRemaingMaps(String j)
-    {
-        cache.remove(j);
-    }
 }

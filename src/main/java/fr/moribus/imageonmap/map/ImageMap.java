@@ -1,125 +1,174 @@
+/*
+ * Copyright (C) 2013 Moribus
+ * Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package fr.moribus.imageonmap.map;
 
-import fr.moribus.imageonmap.image.PosterImage;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
+import fr.moribus.imageonmap.ui.MapItemManager;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.bukkit.Material;
-
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-public abstract class ImageMap 
+public abstract class ImageMap implements ConfigurationSerializable
 {
-    static public enum Type
+    static public enum Type 
     {
         SINGLE, POSTER;
-        
-        static public ImageMap createNewMap(Type type, BufferedImage image, Player player)
-        {
-            switch(type)
-            {
-                case POSTER:
-                    return new PosterMap(new PosterImage(image), player);
-                default:
-                    return new SingleMap(image, player);
-            }
-        }
-        
-        static public Type fromString(String string)
-        { 
-            switch(string.toLowerCase())
-            {
-                case "poster":
-                case "multi":
-                    return POSTER;
-                case "single":
-                    return SINGLE;
-                default:
-                    return null;
-            }
-        }
-    }
+    };
     
     static public final int WIDTH = 128;
     static public final int HEIGHT = 128;
+    static public final String DEFAULT_NAME = "Map";
     
-    protected String imageName;
-    protected String ownerName;
-    protected String worldName;
+    private String id;
+    private final UUID userUUID;
+    private final Type mapType;
+    private String name;
     
-    public abstract void load() throws IOException;
-    public abstract void save() throws IOException;
-    public abstract void give(Inventory inv);
-    public abstract void setImage(BufferedImage image);
-    public abstract void send(Player joueur);
-    
-    public ImageMap()
+    protected ImageMap(UUID userUUID, Type mapType)
     {
-        this(null, null, null);
+        this(userUUID, mapType, null, null);
     }
     
-    public ImageMap(String imageName, String ownerName, String worldName)
+    protected ImageMap(UUID userUUID, Type mapType, String id, String name)
     {
-        this.imageName = imageName;
-        this.ownerName = ownerName;
-        this.worldName = worldName;
-    }
-    
-    
-    
-    protected void give(Inventory inventory, short mapID)
-    {
-        give(inventory, mapID, getImageName());
-    }
-    
-    protected void give(Inventory inventory, short mapID, String itemName)
-    {
-        ItemStack itemMap = new ItemStack(Material.MAP, 1, mapID);
-        if(itemName != null)
+        this.userUUID = userUUID;
+        this.mapType = mapType;
+        this.id = id;
+        this.name = name;
+        
+        if(this.id == null)
         {
-            ItemMeta meta = itemMap.getItemMeta();
-            meta.setDisplayName(itemName);
-            itemMap.setItemMeta(meta);
+            if(this.name == null) this.name = DEFAULT_NAME;
+            this.id = MapManager.getNextAvailableMapID(this.name, userUUID);
         }
-        inventory.addItem(itemMap);
     }
     
-    // Getters & Setters
-
-    public String getImageName()
+    
+    public abstract short[] getMapsIDs();
+    public abstract boolean managesMap(short mapID);
+    public abstract int getMapCount();
+    
+    public boolean managesMap(ItemStack item)
     {
-        return imageName;
-    }
-
-    public void setImageName(String imageName)
-    {
-        this.imageName = imageName;
+        if(item == null) return false;
+        if(item.getType() != Material.MAP) return false;
+        return managesMap(item.getDurability());
     }
     
-    public boolean isNamed()
+    public boolean give(Player player)
     {
-        return imageName != null;
+        return MapItemManager.give(player, this);
     }
     
-    public String getOwnerName()
+    /* ====== Serialization methods ====== */
+    
+    static public ImageMap fromConfig(Map<String, Object> map, UUID userUUID) throws InvalidConfigurationException
     {
-        return ownerName;
-    }
-
-    public void setOwnerName(String ownerName)
-    {
-        this.ownerName = ownerName;
+        Type mapType;
+        try
+        {
+            mapType = Type.valueOf((String) map.get("type"));
+        }
+        catch(ClassCastException ex)
+        {
+            throw new InvalidConfigurationException(ex);
+        }
+        
+        switch(mapType)
+        {
+            case SINGLE: return new SingleMap(map, userUUID);
+            case POSTER: return new PosterMap(map, userUUID);
+            default: throw new IllegalArgumentException("Unhandled map type given");
+        }
     }
     
-    public String getWorldName()
+    protected ImageMap(Map<String, Object> map, UUID userUUID, Type mapType) throws InvalidConfigurationException
     {
-        return worldName;
+        this(userUUID, mapType,
+                (String) getNullableFieldValue(map, "id"),
+                (String) getNullableFieldValue(map, "name"));
+        
+    }
+    
+    protected abstract void postSerialize(Map<String, Object> map);
+    
+    @Override
+    public Map<String, Object> serialize()
+    {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("id", getId());
+        map.put("type", mapType.toString());
+        map.put("name", getName());
+        this.postSerialize(map);
+        return map;
+    }
+    
+    static protected <T> T getFieldValue(Map<String, Object> map, String fieldName) throws InvalidConfigurationException
+    {
+        T value = getNullableFieldValue(map, fieldName);
+        if(value == null) throw new InvalidConfigurationException("Field value not found for \"" + fieldName + "\"");
+        return value;
+    }
+    
+    static protected <T> T getNullableFieldValue(Map<String, Object> map, String fieldName) throws InvalidConfigurationException
+    {
+        try
+        {
+            return (T)map.get(fieldName);
+        }
+        catch(ClassCastException ex)
+        {
+            throw new InvalidConfigurationException("Invalid field \"" + fieldName + "\"", ex);
+        }
     }
 
-    public void setWorldName(String worldName)
+    
+    /* ====== Getters & Setters ====== */
+    
+    public UUID getUserUUID()
     {
-        this.worldName = worldName;
+        return userUUID;
+    }
+
+    public synchronized String getName()
+    {
+        return name;
+    }
+    
+    public synchronized String getId()
+    {
+        return id;
+    }
+
+    public synchronized void rename(String id, String name)
+    {
+        this.id = id;
+        this.name = name;
+    }
+    
+    public void rename(String name)
+    {
+        if(getName().equals(name)) return;
+        rename(MapManager.getNextAvailableMapID(name, getUserUUID()), name);
     }
 }

@@ -1,0 +1,3 @@
+Gives you a map, by putting it directly in your inventory.
+
+<map name> : The name of the map you want to get.

@@ -1,0 +1,4 @@
+Deletes a map, and removes all parts and copies from your inventory.
+§cWARNING: §r THERE WILL BE NO CONFIRMATION. MAP DELETION IS §lPERMANENT§r.
+
+[map name] : The name of the map you want to delete.

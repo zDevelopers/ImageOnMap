@@ -1,0 +1,36 @@
+Migrates the Map database to the new V3.x format, that uses UUIDs 
+instead of player names to designate players (among other improvements).
+Migration runs in a separate thread, therefore its progress can only be 
+watched from the server console.
+
+The migration will run the following steps :
+    - Checking if there are files to migrate. If not, the migration stops.
+    - Checking if there are backups from a previous migration.
+        If there are, the migration stops.
+    - Loading the old map and poster data to memory.
+    - Backing up old files and new files, to the backups_pre-v3 and
+        backups_post-v3 subdirectories respectively.
+        Backup's integrity are chacked using file size and SHA1 checksum.
+        If integrity could not be proved, the migration stops.
+    - Retreiving the UUIDs of the players from Mojang's servers.
+    - Checking if some UUIDs could not be retreived.
+        If there are, this means some of your players may have changed names
+        before the migration started. The plugin will therefore try to retreive
+        them specifying a time, back when usernames could not be changed.
+        If some names could still not be matched to their UUIDs, then these are 
+        probably non-paid accounts.
+        If no UUID has been retreived at all, the migration stops.
+    §c--- From this step, changes to disk will be made, and you will have to use§r
+    §c--- backups if you want to revert back from before the migration started.§r
+    - Merging the old map data with the new one, if there is any 
+        (which can be the case if your player started to use newer
+        versions of ImageOnMap before the migration started).
+    - Saving all this merged map data to disk.
+    - Removing the old map data from their former files, leaving only the data
+        that could not be migrated due to usernames that could not be matched to
+        their UUIDs. 
+        Original data is still present in the appropriate backup directory,
+        just in case.
+
+Note that this plugin will NEVER delete nor overwrite any backup directory.
+Moving or deleting these backups is left to the administrator's responsibility.

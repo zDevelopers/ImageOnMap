@@ -1,118 +1,73 @@
+/*
+ * Copyright (C) 2013 Moribus
+ * Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package fr.moribus.imageonmap.map;
 
-import fr.moribus.imageonmap.ImageOnMap;
-import fr.moribus.imageonmap.ImgUtility;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.map.MapView;
-
-import fr.moribus.imageonmap.image.Renderer;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.imageio.ImageIO;
-import org.bukkit.map.MapRenderer;
+import java.util.Map;
+import java.util.UUID;
+import org.bukkit.configuration.InvalidConfigurationException;
 
 public class SingleMap extends ImageMap
 {
-    private final short mapID;
-    private BufferedImage image;
-
-    public SingleMap(BufferedImage img, Player player)
+    protected final short mapID;
+    
+    public SingleMap(UUID ownerUUID, short mapID, String id, String name)
     {
-        this(img, null, player);
-    }
-
-    public SingleMap(BufferedImage image, String imageName, Player player)
-    {
-        super(imageName, player.getName(), player.getWorld().getName());
-        this.mapID = Bukkit.createMap(player.getWorld()).getId();
-        this.image = ImgUtility.scaleImage(image, WIDTH, HEIGHT);
-    }
-
-    public SingleMap(short mapID) throws IOException, IllegalArgumentException
-    {
+        super(ownerUUID, Type.SINGLE, id, name);
         this.mapID = mapID;
-
-        //Testing if the map id exists
-        MapView map = Bukkit.getMap(mapID);
-        if(map == null) 
-            throw new IllegalArgumentException("Map ID '" + mapID + "' doesn't exist");
-        
-        List<String> svg = ImageOnMap.getPlugin().getCustomConfig().getStringList("map" + mapID);
-        String nomImg = svg.get(1);
-        ownerName = svg.get(2);
-        image = ImageIO.read(new File("./plugins/ImageOnMap/Image/" + nomImg + ".png"));
+    }
+    
+    public SingleMap(UUID ownerUUID, short mapID)
+    {
+        this(ownerUUID, mapID, null, null);
+    }
+    
+    @Override
+    public short[] getMapsIDs()
+    {
+        return new short[]{mapID};
     }
 
     @Override
-    public void save() throws IOException
+    public boolean managesMap(short mapID)
     {
-        String mapName = "map" + mapID;
-        ImageOnMap plugin = ImageOnMap.getPlugin();
-        
-        File outputfile = new File("./plugins/ImageOnMap/Image/" + mapName + ".png");
-        ImageIO.write(image, "png", outputfile);
-
-        // Enregistrement de la map dans la config
-        ArrayList<String> liste = new ArrayList<String>();
-        liste.add(String.valueOf(mapID));
-        liste.add(mapName);
-        liste.add(ownerName);
-        liste.add(worldName);
-        plugin.getCustomConfig().set(mapName, liste);
-        plugin.saveCustomConfig();
+        return this.mapID == mapID;
     }
-
-    @SuppressWarnings("deprecation")
+    
     @Override
-    public void give(Inventory inventory)
+    public int getMapCount()
     {
-        give(inventory, mapID);
+        return 1;
     }
-
+    
+    /* ====== Serialization methods ====== */
+    
+    public SingleMap(Map<String, Object> map, UUID userUUID) throws InvalidConfigurationException
+    {
+        super(map, userUUID, Type.SINGLE);
+        int _mapID = getFieldValue(map, "mapID");
+        mapID = (short) _mapID;//Meh
+    }
+    
     @Override
-    public void load()
+    protected void postSerialize(Map<String, Object> map)
     {
-        MapView map = Bukkit.getMap(mapID);
-        SingleMap.SupprRendu(map);
-        map.addRenderer(new Renderer(image));
-    }
-
-    @Override
-    public boolean isNamed()
-    {
-        return imageName != null;
-    }
-
-    public short getId()
-    {
-        return mapID;
-    }
-
-    @Override
-    public void setImage(BufferedImage image)
-    {
-        this.image = image;
-        load();
-    }
-
-    @Override
-    public void send(Player joueur)
-    {
-        joueur.sendMap(Bukkit.getMap(mapID));
-    }
-
-    public static void SupprRendu(MapView map)
-    {
-        for(MapRenderer renderer : map.getRenderers())
-        {
-            map.removeRenderer(renderer);
-        }
+        map.put("mapID", mapID);
     }
 
 }

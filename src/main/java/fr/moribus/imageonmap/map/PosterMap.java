@@ -1,158 +1,130 @@
+/*
+ * Copyright (C) 2013 Moribus
+ * Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package fr.moribus.imageonmap.map;
 
-import fr.moribus.imageonmap.ImageOnMap;
-import fr.moribus.imageonmap.image.Renderer;
-import java.awt.image.BufferedImage;
-
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-
-import fr.moribus.imageonmap.image.PosterImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
-import javax.imageio.ImageIO;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.map.MapView;
+import java.util.Map;
+import java.util.UUID;
+import org.bukkit.configuration.InvalidConfigurationException;
 
 public class PosterMap extends ImageMap
 {
-    private PosterImage image;
-    private final short[] mapsIDs;
+    protected final short[] mapsIDs;
+    protected final int columnCount;
+    protected final int rowCount;
     
-    private FileConfiguration customConfig = null;
-    private File customConfigFile = null;
-
-    public PosterMap(PosterImage image, Player player)
+    public PosterMap(UUID userUUID, short[] mapsIDs, String id, String name, int columnCount, int rowCount)
     {
-        super(null, player.getName(), player.getWorld().getName());
-        this.image = image;
-
-        mapsIDs = new short[image.getImagesCount()];
-        for (int i = 0; i < mapsIDs.length; i++)
-        {
-            mapsIDs[i] = Bukkit.createMap(player.getWorld()).getId();
-        }
+        super(userUUID, Type.POSTER, id, name);
+        this.mapsIDs = mapsIDs;
+        this.columnCount = Math.max(columnCount, 0);
+        this.rowCount = Math.max(rowCount, 0);
     }
-
-    public PosterMap(String id) throws Exception
+    
+    public PosterMap(UUID userUUID, short[] mapsIDs, int columnCount, int rowCount)
     {
-        this.imageName = id;
-        List<String> svg = getCustomConfig().getStringList(imageName);
-        if(svg != null && !svg.isEmpty())
-        {
-                this.ownerName = svg.get(0);
-                mapsIDs = new short[svg.size()-1];
-                for(int i = 0; i < mapsIDs.length; i++)
-                {
-                        mapsIDs[i] = Short.parseShort(svg.get(i+1));
-                }
-        }
-        else
-        {
-                throw new Exception("Le poster est introuvable.");
-        }
+        this(userUUID, mapsIDs, null, null, columnCount, rowCount);
+    }
+    
+    @Override
+    public short[] getMapsIDs()
+    {
+        return mapsIDs;
     }
 
     @Override
-    public void load() 
+    public boolean managesMap(short mapID)
     {
         for(int i = 0; i < mapsIDs.length; i++)
         {
-            MapView map = Bukkit.getMap(mapsIDs[i]);
-            SingleMap.SupprRendu(map);
-            map.addRenderer(new Renderer(image.getImageAt(i)));
+            if(mapsIDs[i] == mapID) return true;
         }
-    }
-
-    @Override
-    public void save() throws IOException
-    {
-        ImageOnMap plugin = ImageOnMap.getPlugin();
         
-        for(int i = 0; i < mapsIDs.length; i++)
-        {
-            short mapID = mapsIDs[i];
-            String mapName = "map" + mapID;
-            File outputfile = new File("./plugins/ImageOnMap/Image/" + mapName + ".png");
-            ImageIO.write(image.getImageAt(i), "png", outputfile);
-
-            // Enregistrement de la map dans la config
-            ArrayList<String> liste = new ArrayList<String>();
-            liste.add(String.valueOf(mapID));
-            liste.add(mapName);
-            liste.add(ownerName);
-            liste.add(worldName);
-            plugin.getCustomConfig().set(mapName, liste);
-        }
-       
-        plugin.saveCustomConfig();
+        return false;
     }
 
-    @Override
-    public void give(Inventory inv)
+    /* ====== Serialization methods ====== */
+    
+    public PosterMap(Map<String, Object> map, UUID userUUID) throws InvalidConfigurationException
     {
-        String itemName;
-        for(int i = 0; i < mapsIDs.length; i++)
-        {
-            itemName = "Map (row " + (image.getLineAt(i) + 1) + ", column " + (image.getColumnAt(i) + 1) + ")";
-            give(inv, mapsIDs[i], itemName);
-        }
-    }
-
-    @Override
-    public void setImage(BufferedImage image)
-    {
+        super(map, userUUID, Type.POSTER);
         
+        columnCount = getFieldValue(map, "columns");
+        rowCount = getFieldValue(map, "rows");
+        
+        List<Integer> idList = getFieldValue(map, "mapsIDs");
+        mapsIDs = new short[idList.size()];
+        for(int i = 0, c = idList.size(); i < c; i++)
+        {
+            mapsIDs[i] = (short) ((int) idList.get(i));
+        }
+    }
+    
+    @Override
+    protected void postSerialize(Map<String, Object> map)
+    {
+        map.put("columns", columnCount);
+        map.put("rows", rowCount);
+        map.put("mapsIDs", mapsIDs);
+    }
+    
+    /* ====== Getters & Setters ====== */
+    
+    /**
+     * Returns the amount of columns in the poster map
+     * @return The number of columns, or 0 if this data is missing
+     */
+    public int getColumnCount()
+    {
+        return columnCount;
+    }
+    
+    /**
+     * Returns the amount of rows in the poster map
+     * @return The number of rows, or 0 if this data is missing
+     */
+    public int getRowCount()
+    {
+        return rowCount;
+    }
+    
+    public int getColumnAt(int i)
+    {
+        if(columnCount == 0) return 0;
+        return (i % columnCount) + 1;
+    }
+    
+    public int getRowAt(int i)
+    {
+        if(columnCount == 0) return 0;
+        return (i / columnCount) + 1;
+    }
+    
+    public boolean hasColumnData()
+    {
+        return rowCount != 0 && columnCount != 0;
     }
 
     @Override
-    public void send(Player player)
+    public int getMapCount()
     {
-        for(short mapID: mapsIDs)
-        {
-            player.sendMap(Bukkit.getMap(mapID));
-        }
-    }
-    
-    private void reloadCustomConfig() 
-    {
-    	ImageOnMap plugin = (ImageOnMap)Bukkit.getPluginManager().getPlugin("ImageOnMap");
-        if (customConfigFile == null) 
-        {
-        customConfigFile = new File(plugin.getDataFolder(), "poster.yml");
-        }
-        customConfig = YamlConfiguration.loadConfiguration(customConfigFile);
-     
-        // Look for defaults in the jar
-        InputStream defConfigStream = plugin.getResource("poster.yml");
-        if (defConfigStream != null) 
-        {
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-            customConfig.setDefaults(defConfig);
-        }
-    }
-    
-    private FileConfiguration getCustomConfig() 
-    {
-        if (customConfig == null) 
-        {
-            reloadCustomConfig();
-        }
-        return customConfig;
-    }
-    
-    private void saveCustomConfig() throws IOException
-    {
-    	ImageOnMap plugin = (ImageOnMap)Bukkit.getPluginManager().getPlugin("ImageOnMap");
-        if (customConfig == null || customConfigFile == null) {
-            return;
-        }
-        getCustomConfig().save(customConfigFile);
+        return mapsIDs.length;
     }
 
 }

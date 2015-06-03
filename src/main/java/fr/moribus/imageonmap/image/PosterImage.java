@@ -1,8 +1,24 @@
+/*
+ * Copyright (C) 2013 Moribus
+ * Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package fr.moribus.imageonmap.image;
 
-import fr.moribus.imageonmap.map.ImageMap;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 /**
@@ -10,6 +26,10 @@ import java.awt.image.BufferedImage;
  */
 public class PosterImage
 {
+    static private final int WIDTH = 128;
+    static private final int HEIGHT = 128;
+    
+    private BufferedImage originalImage;
     private BufferedImage[] cutImages;
     private int lines;
     private int columns;
@@ -17,43 +37,50 @@ public class PosterImage
     private int remainderX, remainderY;
     
     /**
-     * Creates and splits a new Poster from an entire image
+     * Creates a new Poster from an entire image
      * @param originalImage the original image
      */
     public PosterImage(BufferedImage originalImage)
     {
-        splitImages(originalImage);
+        this.originalImage = originalImage;
+        calculateDimensions();
     }
     
-    private void splitImages(BufferedImage originalImage)
+    private void calculateDimensions()
     {
         int originalWidth = originalImage.getWidth();
         int originalHeight = originalImage.getHeight();
         
-        columns = (int) Math.ceil(originalWidth / ImageMap.WIDTH);
-        lines = (int) Math.ceil(originalHeight / ImageMap.HEIGHT);
+        columns = (int) Math.ceil(originalWidth / WIDTH);
+        lines = (int) Math.ceil(originalHeight / HEIGHT);
         
-        remainderX = originalWidth % ImageMap.WIDTH;
-        remainderY = originalHeight % ImageMap.HEIGHT;
+        remainderX = originalWidth % WIDTH;
+        remainderY = originalHeight % HEIGHT;
         
         if(remainderX > 0) columns++;
         if(remainderY > 0) lines++;
         
         cutImagesCount = columns * lines;
+    }
+    
+    public void splitImages()
+    {
         cutImages = new BufferedImage[cutImagesCount];
         
         int imageX;
-        int imageY = (remainderY > 0) ? (remainderY - ImageMap.HEIGHT) / 2 : 0;
+        int imageY = (remainderY - HEIGHT) / 2;
         for(int i = 0; i < lines; i++)
         {
-            imageX = (remainderX > 0) ? (remainderX - ImageMap.WIDTH) / 2 : 0;
+            imageX = (remainderX - WIDTH) / 2;
             for(int j = 0; j < columns; j++)
             {
                 cutImages[i * columns + j] = makeSubImage(originalImage, imageX, imageY);
-                imageX += ImageMap.WIDTH;
+                imageX += WIDTH;
             }
-            imageY += ImageMap.HEIGHT;
+            imageY += HEIGHT;
         }
+        
+        originalImage = null;
     }
     
     /**
@@ -64,20 +91,13 @@ public class PosterImage
      */
     private BufferedImage makeSubImage(BufferedImage originalImage, int x, int y)
     {
-        BufferedImage newImage = new BufferedImage(ImageMap.WIDTH, ImageMap.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage newImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
         
         Graphics graphics = newImage.getGraphics();
         
         graphics.drawImage(originalImage, -x, -y, null);
         graphics.dispose();
         return newImage;
-    }
-    
-    
-    
-    private int boundValue(int min, int value, int max)
-    {
-        return Math.max(Math.min(value, max), min);
     }
     
     /**
