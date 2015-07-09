@@ -19,6 +19,7 @@
 package fr.moribus.imageonmap;
 
 import fr.moribus.imageonmap.commands.Commands;
+import fr.moribus.imageonmap.gui.core.*;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
@@ -84,6 +85,7 @@ public final class ImageOnMap extends JavaPlugin
         Commands.init(this);
         MapInitEvent.init(this);
         MapItemManager.init();
+        GuiManager.init(this);
     }
 
     @Override
