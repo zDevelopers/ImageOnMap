@@ -18,22 +18,15 @@
 
 package fr.moribus.imageonmap.commands;
 
-import fr.moribus.imageonmap.commands.maptool.MigrateCommand;
-import fr.moribus.imageonmap.PluginLogger;
+import fr.moribus.imageonmap.*;
 import fr.moribus.imageonmap.commands.maptool.*;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import org.apache.commons.lang.*;
+import org.bukkit.command.*;
+import org.bukkit.plugin.java.*;
 
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.plugin.java.JavaPlugin;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
 
 
 public enum Commands implements TabCompleter, CommandExecutor
@@ -45,6 +38,7 @@ public enum Commands implements TabCompleter, CommandExecutor
             DeleteConfirmCommand.class,
             DeleteNoConfirmCommand.class,
             GetRemainingCommand.class,
+            ManageCommand.class,
             MigrateCommand.class
     ),
     TOMAP(MAPTOOL, NewCommand.class, "tomap");
