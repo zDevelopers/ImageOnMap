@@ -46,30 +46,41 @@ public class GuiListener implements Listener {
 			Player player = (Player) event.getWhoClicked();
 			AbstractGui gui = GuiManager.getPlayerGui(player);
 
-			if (gui != null)
+			if(gui == null)
+				return;
+
+			if (event.getInventory() instanceof PlayerInventory)
+				return;
+
+
+			/* *** Click from player inventory (with shift) *** */
+
+			if(event.getRawSlot() != event.getSlot())
 			{
-				if (event.getInventory() instanceof PlayerInventory)
-					return;
-
-				if(event.getRawSlot() == event.getSlot()) // Chest inventory, not player one
+				if(event.isShiftClick())
 				{
-
-					if(event.getCursor() != null && event.getCursor().getType() != Material.AIR)
-					{
-						gui.onItemDeposit(player, event.getCursor(), event.getClick(), event);
-					}
-
-					else
-					{
-						String action = gui.getAction(event.getSlot());
-
-						if (action != null)
-							gui.onClick(player, event.getCurrentItem(), action, event.getClick(), event);
-					}
-
-					event.setCancelled(true);
+					gui.onItemDeposit(player, event.getCurrentItem(), event.getClick(), event.getAction(), event);
 				}
+				return;
 			}
+
+
+			/* *** Click on the “chest” *** */
+
+			if(event.getCursor() != null && event.getCursor().getType() != Material.AIR)
+			{
+				gui.onItemDeposit(player, event.getCursor(), event.getClick(), event.getAction(), event);
+			}
+
+			else
+			{
+				String action = gui.getAction(event.getSlot());
+
+				if (action != null)
+					gui.onClick(player, event.getCurrentItem(), action, event.getClick(), event.getAction(), event);
+			}
+
+			event.setCancelled(true);
 		}
 	}
 

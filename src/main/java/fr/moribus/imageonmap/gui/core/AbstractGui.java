@@ -40,7 +40,12 @@ public abstract class AbstractGui {
 
 	public void onClose(Player player) {}
 
-	public void onClick(Player player, ItemStack stack, String action, ClickType clickType, InventoryClickEvent event)
+	public void onClick(Player player, ItemStack stack, String action, ClickType clickType, InventoryAction invAction, InventoryClickEvent event)
+	{
+		this.onClick(player, stack, action, clickType, invAction);
+	}
+
+	public void onClick(Player player, ItemStack stack, String action, ClickType clickType, InventoryAction invAction)
 	{
 		this.onClick(player, stack, action, clickType);
 	}
@@ -53,7 +58,12 @@ public abstract class AbstractGui {
 	public void onClick(Player player, ItemStack stack, String action) {}
 
 
-	public void onItemDeposit(Player player, ItemStack stack, ClickType clickType, InventoryClickEvent event)
+	public void onItemDeposit(Player player, ItemStack stack, ClickType clickType, InventoryAction invAction, InventoryClickEvent event)
+	{
+		onItemDeposit(player, stack, clickType, invAction);
+	}
+
+	public void onItemDeposit(Player player, ItemStack stack, ClickType clickType, InventoryAction invAction)
 	{
 		onItemDeposit(player, stack, clickType);
 	}

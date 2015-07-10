@@ -189,7 +189,7 @@ public class MapListGui extends AbstractGui {
 	}
 
 	@Override
-	public void onItemDeposit(Player player, ItemStack stack, ClickType clickType, InventoryClickEvent ev) {
+	public void onItemDeposit(Player player, ItemStack stack, ClickType clickType, InventoryAction invAction, InventoryClickEvent ev) {
 		ev.setCancelled(true);
 
 		if (stack.getType() == Material.MAP && MapManager.managesMap(stack))

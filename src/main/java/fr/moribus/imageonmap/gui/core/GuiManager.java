@@ -31,7 +31,8 @@ import java.util.concurrent.*;
  * Changes by Amaury Carrade to use statics (beh, code style, these things).
  */
 public class GuiManager {
-	protected static ConcurrentHashMap<UUID, AbstractGui> currentGUIs;
+
+	protected static Map<UUID, AbstractGui> currentGUIs;
 
 	public static void init(ImageOnMap plugin)
 	{
@@ -72,7 +73,7 @@ public class GuiManager {
 		return null;
 	}
 
-	public static ConcurrentHashMap<UUID, AbstractGui> getPlayersGui()
+	public static Map<UUID, AbstractGui> getPlayersGui()
 	{
 		return currentGUIs;
 	}
