@@ -134,8 +134,8 @@ public class MapListGui extends AbstractGui {
 	}
 
 	@Override
-	public void onClick(Player player, ItemStack stack, String action, ClickType clickType) {
-
+	public void onClick(Player player, ItemStack stack, String action, ClickType clickType)
+	{
 		switch (action)
 		{
 			case "back":
@@ -186,6 +186,24 @@ public class MapListGui extends AbstractGui {
 
 		}
 
+	}
+
+	@Override
+	public void onItemDeposit(Player player, ItemStack stack, ClickType clickType, InventoryClickEvent ev) {
+		ev.setCancelled(true);
+
+		if (stack.getType() == Material.MAP && MapManager.managesMap(stack))
+		{
+			ImageMap map = MapManager.getMap(stack);
+
+			if (map != null)
+			{
+				MapManager.clear(player.getInventory(), map);
+
+				// Deprecated? Yes. Alternatives? No, as usual...
+				ev.setCursor(new ItemStack(Material.AIR));
+			}
+		}
 	}
 
 	private void nextPage(Player player)
