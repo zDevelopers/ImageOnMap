@@ -25,6 +25,8 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
 
+import java.util.*;
+
 
 public class CategorySelectionGui extends AbstractGui {
 
@@ -32,12 +34,29 @@ public class CategorySelectionGui extends AbstractGui {
 	public void display(Player player)
 	{
 
-		inventory = Bukkit.createInventory(player, 3 * 9, ChatColor.BLACK + "Maps » Choose a category");
+		inventory = Bukkit.createInventory(player, 3 * 9, ChatColor.BLACK + "Maps");
 
+		/* ****** Data gathering ***** */
+
+		List<ImageMap> maps = MapManager.getMapList(player.getUniqueId());
+		Integer singleCount = 0;
+		Integer posterCount = 0;
+
+		for(ImageMap map : maps)
+		{
+			if(map.getType() == ImageMap.Type.POSTER)
+				posterCount++;
+			else
+				singleCount++;
+		}
+
+
+		/* ****** Access to the sub-categories ***** */
 
 		ItemStack singleMaps = new ItemStack(Material.MAP);
 		ItemMeta meta = singleMaps.getItemMeta();
 		meta.setDisplayName(ChatColor.GREEN + "Single maps");
+		meta.setLore(Collections.singletonList(ChatColor.WHITE + "" + singleCount + " image" + (singleCount != 1 ? "s" : "")));
 		GuiUtils.removeVanillaInfos(meta);
 		singleMaps.setItemMeta(meta);
 
@@ -45,8 +64,12 @@ public class CategorySelectionGui extends AbstractGui {
 		ItemStack postersMaps = new ItemStack(Material.PAINTING);
 		meta = postersMaps.getItemMeta();
 		meta.setDisplayName(ChatColor.GREEN + "Posters");
+		meta.setLore(Collections.singletonList(ChatColor.WHITE + "" + posterCount + " image" + (posterCount != 1 ? "s" : "")));
 		postersMaps.setItemMeta(meta);
 
+
+
+		/* ****** Registration ***** */
 
 		setSlotData(singleMaps, 11, "single");
 		setSlotData(postersMaps, 15, "poster");
