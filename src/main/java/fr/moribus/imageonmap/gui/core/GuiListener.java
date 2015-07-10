@@ -19,6 +19,7 @@
 package fr.moribus.imageonmap.gui.core;
 
 import fr.moribus.imageonmap.*;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.inventory.*;
@@ -26,7 +27,7 @@ import org.bukkit.inventory.*;
 
 
 /**
- * @author IamBlueSlime
+ * @author IamBlueSlime, Amaury Carrade
  *
  * Changes by Amaury Carrade to use statics (beh, code style, these things).
  */
@@ -40,21 +41,47 @@ public class GuiListener implements Listener {
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event)
 	{
-		if (event.getWhoClicked() instanceof Player) {
+		if (event.getWhoClicked() instanceof Player)
+		{
 			Player player = (Player) event.getWhoClicked();
 			AbstractGui gui = GuiManager.getPlayerGui(player);
 
-			if (gui != null) {
+			if (gui != null)
+			{
 				if (event.getInventory() instanceof PlayerInventory)
 					return;
 
-				String action = gui.getAction(event.getSlot());
+				if(event.getRawSlot() == event.getSlot()) // Chest inventory, not player one
+				{
 
-				if (action != null)
-					gui.onClick(player, event.getCurrentItem(), action, event.getClick());
+					if(event.getCursor() != null && event.getCursor().getType() != Material.AIR)
+					{
+						gui.onItemDeposit(player, event.getCursor(), event.getClick(), event);
+					}
 
-				event.setCancelled(true);
+					else
+					{
+						String action = gui.getAction(event.getSlot());
+
+						if (action != null)
+							gui.onClick(player, event.getCurrentItem(), action, event.getClick(), event);
+					}
+
+					event.setCancelled(true);
+				}
 			}
+		}
+	}
+
+	@EventHandler
+	public void onInventoryDrag(InventoryDragEvent event)
+	{
+		Player player = (Player) event.getWhoClicked();
+		AbstractGui gui = GuiManager.getPlayerGui(player);
+
+		if (gui != null)
+		{
+			event.setCancelled(true);
 		}
 	}
 

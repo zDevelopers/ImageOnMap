@@ -28,7 +28,7 @@ import java.util.*;
 
 
 /**
- * @author IamBlueSlime
+ * @author IamBlueSlime, Amaury Carrade
  */
 public abstract class AbstractGui {
 	protected TreeMap<Integer, String> actions = new TreeMap<>();
@@ -40,6 +40,11 @@ public abstract class AbstractGui {
 
 	public void onClose(Player player) {}
 
+	public void onClick(Player player, ItemStack stack, String action, ClickType clickType, InventoryClickEvent event)
+	{
+		this.onClick(player, stack, action, clickType);
+	}
+
 	public void onClick(Player player, ItemStack stack, String action, ClickType clickType)
 	{
 		this.onClick(player, stack, action);
@@ -47,7 +52,22 @@ public abstract class AbstractGui {
 
 	public void onClick(Player player, ItemStack stack, String action) {}
 
-	public void setSlotData(Inventory inv, String name, Material material, int slot, String[] description, String action) {
+
+	public void onItemDeposit(Player player, ItemStack stack, ClickType clickType, InventoryClickEvent event)
+	{
+		onItemDeposit(player, stack, clickType);
+	}
+
+	public void onItemDeposit(Player player, ItemStack stack, ClickType clickType)
+	{
+		onItemDeposit(player, stack);
+	}
+
+	public void onItemDeposit(Player player, ItemStack stack) {}
+
+
+	public void setSlotData(Inventory inv, String name, Material material, int slot, String[] description, String action)
+	{
 		this.setSlotData(inv, name, new ItemStack(material, 1), slot, description, action);
 	}
 
