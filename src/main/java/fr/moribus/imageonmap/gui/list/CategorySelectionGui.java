@@ -38,6 +38,7 @@ public class CategorySelectionGui extends AbstractGui {
 		ItemStack singleMaps = new ItemStack(Material.MAP);
 		ItemMeta meta = singleMaps.getItemMeta();
 		meta.setDisplayName(ChatColor.GREEN + "Single maps");
+		GuiUtils.removeVanillaInfos(meta);
 		singleMaps.setItemMeta(meta);
 
 

@@ -247,6 +247,8 @@ public class MapListGui extends AbstractGui {
 		));
 		meta.setLore(lore);
 
+		GuiUtils.removeVanillaInfos(meta);
+
 		icon.setItemMeta(meta);
 
 
