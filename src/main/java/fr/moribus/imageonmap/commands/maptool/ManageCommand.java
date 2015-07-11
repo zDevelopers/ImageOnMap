@@ -27,13 +27,14 @@ import fr.moribus.imageonmap.gui.list.*;
 @CommandInfo(name = "manage")
 public class ManageCommand extends Command
 {
-
-	public ManageCommand(Commands commandGroup) {
+	public ManageCommand(Commands commandGroup)
+	{
 		super(commandGroup);
 	}
 
 	@Override
-	protected void run() throws CommandException {
-		GuiManager.openGui(playerSender(), new CategorySelectionGui());
+	protected void run() throws CommandException
+	{
+		GuiManager.openGui(playerSender(), new MapListGui());
 	}
 }

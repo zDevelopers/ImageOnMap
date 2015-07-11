@@ -42,32 +42,18 @@ public class MapListGui extends AbstractGui {
 	private int lastPage = 0;
 
 
-	public MapListGui(ImageMap.Type mapsType) {
-		this.mapsType = mapsType;
+	public MapListGui() {
+
+	}
+
+	public MapListGui(Integer initialPage) {
+		currentPage = initialPage;
 	}
 
 	@Override
 	public void display(Player player) {
 
-		String inventoryTitle = "Maps » ";
-		if(mapsType == ImageMap.Type.POSTER) {
-			inventoryTitle += "Posters";
-		} else {
-			inventoryTitle += "Single maps";
-		}
-
-		inventory = Bukkit.createInventory(player, 6 * 9, ChatColor.BLACK + inventoryTitle);
-
-		ItemStack back = new ItemStack(Material.EMERALD);
-		ItemMeta meta = back.getItemMeta();
-		meta.setDisplayName(ChatColor.GREEN + "« Back");
-		meta.setLore(Arrays.asList(
-				ChatColor.GRAY + "Go back to the map",
-				ChatColor.GRAY + "type selector."
-		));
-		back.setItemMeta(meta);
-
-		setSlotData(back, inventory.getSize() - 5, "back");
+		inventory = Bukkit.createInventory(player, 6 * 9, ChatColor.BLACK + "Your maps");
 
 		player.openInventory(getInventory());
 
@@ -90,10 +76,9 @@ public class MapListGui extends AbstractGui {
 			ItemMeta meta = empty.getItemMeta();
 			meta.setDisplayName(ChatColor.RED + "Nothing to display here");
 			meta.setLore(Arrays.asList(
-					ChatColor.GRAY + "You don't have any map in",
-					ChatColor.GRAY + "this category. Try the other",
-					ChatColor.GRAY + "one, or create a new map with",
-					ChatColor.WHITE + "/tomap <URL> [resize]"
+					ChatColor.GRAY + "You don't have any map.",
+					ChatColor.GRAY + "Get started by creating a new one",
+					ChatColor.GRAY + "with " + ChatColor.WHITE + "/tomap <URL> [resize]" + ChatColor.GRAY + "!"
 			));
 
 			empty.setItemMeta(meta);
@@ -138,10 +123,6 @@ public class MapListGui extends AbstractGui {
 	{
 		switch (action)
 		{
-			case "back":
-				GuiManager.openGui(player, new CategorySelectionGui());
-				return;
-
 			case "previousPage":
 				previousPage(player);
 				return;
@@ -223,10 +204,7 @@ public class MapListGui extends AbstractGui {
 
 	private void updateMapCache(Player player)
 	{
-		for(ImageMap map : MapManager.getMapList(player.getUniqueId()))
-		{
-			if(map.getType() == mapsType) maps.add(map);
-		}
+		maps = MapManager.getMapList(player.getUniqueId());
 
 		lastPage = (int) Math.ceil(((double) maps.size()) / ((double) MAPS_PER_PAGE)) - 1;
 
@@ -243,27 +221,12 @@ public class MapListGui extends AbstractGui {
 
 		meta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + map.getId().replace("-", " "));
 
-		if(map.getType() == ImageMap.Type.POSTER)
-		{
-			meta.setLore(Arrays.asList(
-					ChatColor.WHITE + "" + map.getMapCount() + " map" + (map.getMapCount() != 1 ? "s" : "")
-			));
-		}
-
-		else
-		{
-			meta.setLore(Arrays.asList(
-					ChatColor.WHITE + "Single map"
-			));
-		}
-
-		List<String> lore = meta.getLore();
-		lore.addAll(Arrays.asList(
+		meta.setLore(Arrays.asList(
+				ChatColor.WHITE + "" + map.getMapCount() + " map" + (map.getMapCount() != 1 ? "s" : ""),
 				"",
 				ChatColor.GRAY + "» Left-click to get this map",
 				ChatColor.GRAY + "» Right-click for details"
 		));
-		meta.setLore(lore);
 
 		GuiUtils.removeVanillaInfos(meta);
 
