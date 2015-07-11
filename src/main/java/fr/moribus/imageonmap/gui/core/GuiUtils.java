@@ -18,11 +18,12 @@
 
 package fr.moribus.imageonmap.gui.core;
 
-import org.bukkit.*;
-import org.bukkit.inventory.*;
-import org.bukkit.inventory.meta.*;
+import fr.moribus.imageonmap.PluginLogger;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 
 public class GuiUtils {
@@ -39,9 +40,11 @@ public class GuiUtils {
 			Method valuesMethod = itemFlagEnumClass.getDeclaredMethod("values");
 			itemFlags = (Object[]) valuesMethod.invoke(null);
 
-		} catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+		} catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
 			// Not supported :c
 			supported = false;
+		} catch (InvocationTargetException e) {
+			PluginLogger.error("Exception occurred while loading the ItemFlags.", e);
 		}
 	}
 
@@ -50,7 +53,6 @@ public class GuiUtils {
 		ItemMeta meta = stack.getItemMeta();
 		removeVanillaInfos(meta);
 		stack.setItemMeta(meta);
-
 	}
 
 	public static void removeVanillaInfos(ItemMeta meta)
@@ -62,8 +64,10 @@ public class GuiUtils {
 			addItemFlagsMethod.setAccessible(true);
 			addItemFlagsMethod.invoke(meta, (Object) itemFlags);
 
-		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {
+		} catch (NoSuchMethodException | IllegalAccessException ignored) {
 			// Should never happens, or only with breaking changes in the Bukkit API.
+		} catch (InvocationTargetException e) {
+			PluginLogger.error("Exception occurred while invoking the ItemMeta.addItemFlags method.", e);
 		}
 	}
 }
