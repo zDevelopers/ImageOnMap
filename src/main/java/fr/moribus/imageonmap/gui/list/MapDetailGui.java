@@ -55,23 +55,23 @@ public class MapDetailGui extends AbstractGui
 	/**
 	 * The map displayed in this GUI.
 	 */
-	ImageMap map;
+	private ImageMap map;
 
 	/**
 	 * The previously-viewed page of the list GUI.
 	 * Used to be able to bring the user back to the same page.
 	 */
-	int currentPage;
+	private int currentPage;
 
 	/**
 	 * The row currently at the top of the window open on the displayed map.
 	 */
-	int topRow = 0;
+	private int topRow = 0;
 
 	/**
 	 * The column currently at the top of the window open on the displayed map.
 	 */
-	int topColumn = 0;
+	private int topColumn = 0;
 
 
 	/**
@@ -108,7 +108,21 @@ public class MapDetailGui extends AbstractGui
 		));
 		back.setItemMeta(meta);
 
-		setSlotData(back, inventory.getSize() - 5, "back");
+		ItemStack delete = new ItemStack(Material.BARRIER);
+		meta = delete.getItemMeta();
+		meta.setDisplayName(ChatColor.RED + "Delete this image");
+		meta.setLore(Arrays.asList(
+				ChatColor.GRAY + "Deletes this map " + ChatColor.WHITE + "forever" + ChatColor.GRAY + ".",
+				ChatColor.GRAY + "This action cannot be undone!",
+				"",
+				ChatColor.GRAY + "You will be asked to confirm your",
+				ChatColor.GRAY + "choice if you click here."
+		));
+		delete.setItemMeta(meta);
+
+
+		setSlotData(delete, inventory.getSize() - 7, "delete");
+		setSlotData(back, inventory.getSize() - 3, "back");
 
 		update(player);
 
@@ -118,8 +132,6 @@ public class MapDetailGui extends AbstractGui
 	@Override
 	public void update(Player player)
 	{
-		/* ** The map itself ** */
-
 		if(map instanceof PosterMap && ((PosterMap) map).hasColumnData()) {
 			int slot = 10;
 
@@ -142,7 +154,7 @@ public class MapDetailGui extends AbstractGui
 				slot += 2;
 			}
 
-			placeArrowSlider('\u2B07', canGoDown(), 35, "down");
+			placeArrowSlider('\u2B07', canGoDown() , 35, "down" );
 			placeArrowSlider('\u2B06', canGoUp()   , 17, "up"   );
 			placeArrowSlider('«'     , canGoLeft() , 37, "left" );
 			placeArrowSlider('»'     , canGoRight(), 43, "right");
@@ -220,6 +232,10 @@ public class MapDetailGui extends AbstractGui
 
 			case "back":
 				goBack(player);
+				return;
+
+			case "delete":
+				GuiManager.openGui(player, new ConfirmDeleteMapGui(map, currentPage));
 				return;
 
 			default:
