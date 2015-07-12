@@ -20,6 +20,7 @@ package fr.moribus.imageonmap.gui.list;
 
 import fr.moribus.imageonmap.gui.core.*;
 import fr.moribus.imageonmap.map.*;
+import fr.moribus.imageonmap.ui.MapItemManager;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.*;
@@ -119,7 +120,7 @@ public class MapListGui extends AbstractGui {
 	}
 
 	@Override
-	public void onClick(Player player, ItemStack stack, String action, ClickType clickType)
+	public void onClick(Player player, ItemStack stack, String action, ClickType clickType, InventoryAction invAction, InventoryClickEvent ev)
 	{
 		switch (action)
 		{
@@ -149,13 +150,26 @@ public class MapListGui extends AbstractGui {
 				{
 					case LEFT:
 					case SHIFT_LEFT:
-						if(map.give(player))
+
+						if(map.getType() == ImageMap.Type.SINGLE)
 						{
-							player.sendMessage(ChatColor.GRAY + "The requested map was too big to fit in your inventory.");
-							player.sendMessage(ChatColor.GRAY + "Use '/maptool getremaining' to get the remaining maps.");
+							if(invAction == InventoryAction.MOVE_TO_OTHER_INVENTORY)
+							{
+								map.give(player);
+							}
+							else
+							{
+								ev.setCursor(MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName()));
+							}
 						}
 
-						player.closeInventory();
+						else
+						{
+							if (map.give(player)) {
+								player.sendMessage(ChatColor.GRAY + "The requested map was too big to fit in your inventory.");
+								player.sendMessage(ChatColor.GRAY + "Use '/maptool getremaining' to get the remaining maps.");
+							}
+						}
 
 						break;
 
@@ -164,9 +178,7 @@ public class MapListGui extends AbstractGui {
 						// TODO
 						break;
 				}
-
 		}
-
 	}
 
 	@Override
