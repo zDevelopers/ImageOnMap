@@ -18,10 +18,11 @@
 
 package fr.moribus.imageonmap.map;
 
+import org.bukkit.configuration.InvalidConfigurationException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.bukkit.configuration.InvalidConfigurationException;
 
 public class PosterMap extends ImageMap
 {
@@ -114,6 +115,20 @@ public class PosterMap extends ImageMap
     {
         if(columnCount == 0) return 0;
         return (i / columnCount) + 1;
+    }
+
+    /**
+     * Returns the map id at the given column and line.
+     *
+     * @param col The column. Starts at 0.
+     * @param row The row. Starts at 0.
+     * @return The Minecraft map ID.
+     *
+     * @throws ArrayIndexOutOfBoundsException if the given coordinates are too big (out of the poster).
+     */
+    public short getMapIdAt(int col, int row)
+    {
+        return mapsIDs[getColumnCount() * col + row];
     }
     
     public boolean hasColumnData()

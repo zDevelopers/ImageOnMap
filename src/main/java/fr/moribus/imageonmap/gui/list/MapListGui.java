@@ -173,7 +173,7 @@ public class MapListGui extends AbstractGui
 
 					case RIGHT:
 					case SHIFT_RIGHT:
-						// TODO
+						GuiManager.openGui(player, new MapDetailGui(map, currentPage));
 						break;
 				}
 		}
