@@ -156,7 +156,11 @@ public class MapDetailGui extends AbstractGui
 
 	private ItemStack getMapPartRepresentation(int col, int row)
 	{
-		ItemStack part = new ItemStack(Material.MAP);
+		Material partMaterial = Material.PAPER;
+		if((col % 2 == 0 && row % 2 == 0) || (col % 2 == 1 && row % 2 == 1))
+			partMaterial = Material.EMPTY_MAP;
+
+		ItemStack part = new ItemStack(partMaterial);
 		ItemMeta meta = part.getItemMeta();
 
 		meta.setDisplayName(ChatColor.GREEN + "Map part");
