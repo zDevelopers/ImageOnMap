@@ -30,12 +30,10 @@ import org.bukkit.inventory.meta.*;
 import java.util.*;
 
 
-public class MapListGui extends AbstractGui {
-
+public class MapListGui extends AbstractGui
+{
 	private final Integer MAPS_PER_PAGE = 7 * 3;
 
-
-	private ImageMap.Type mapsType;
 
 	private List<ImageMap> maps = new ArrayList<>();
 
@@ -231,10 +229,12 @@ public class MapListGui extends AbstractGui {
 
 		ItemMeta meta = icon.getItemMeta();
 
-		meta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + map.getId().replace("-", " "));
+		meta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + map.getName());
 
 		meta.setLore(Arrays.asList(
 				ChatColor.WHITE + "" + map.getMapCount() + " map" + (map.getMapCount() != 1 ? "s" : ""),
+				"",
+				ChatColor.GRAY + "Map ID: " + map.getId(),
 				"",
 				ChatColor.GRAY + "» Left-click to get this map",
 				ChatColor.GRAY + "» Right-click for details"
