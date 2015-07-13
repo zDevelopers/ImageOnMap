@@ -108,6 +108,15 @@ public class MapDetailGui extends AbstractGui
 		));
 		back.setItemMeta(meta);
 
+		ItemStack rename = new ItemStack(Material.BOOK_AND_QUILL);
+		meta = rename.getItemMeta();
+		meta.setDisplayName(ChatColor.BLUE + "Rename this image");
+		meta.setLore(Arrays.asList(
+				ChatColor.GRAY + "Click here to rename this image;",
+				ChatColor.GRAY + "this is used for your own organization."
+		));
+		rename.setItemMeta(meta);
+
 		ItemStack delete = new ItemStack(Material.BARRIER);
 		meta = delete.getItemMeta();
 		meta.setDisplayName(ChatColor.RED + "Delete this image");
@@ -121,12 +130,14 @@ public class MapDetailGui extends AbstractGui
 		delete.setItemMeta(meta);
 
 
-		setSlotData(delete, inventory.getSize() - 7, "delete");
+		setSlotData(rename, inventory.getSize() - 7, "rename");
+		setSlotData(delete, inventory.getSize() - 5, "delete");
 		setSlotData(back, inventory.getSize() - 3, "back");
+
 
 		update(player);
 
-		player.openInventory(inventory);
+		open(player);
 	}
 
 	@Override
@@ -232,6 +243,10 @@ public class MapDetailGui extends AbstractGui
 
 			case "back":
 				goBack(player);
+				return;
+
+			case "rename":
+				// TODO (no GUI ready for that yet)
 				return;
 
 			case "delete":
