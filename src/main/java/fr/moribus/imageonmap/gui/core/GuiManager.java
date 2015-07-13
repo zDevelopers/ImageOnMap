@@ -18,29 +18,44 @@
 
 package fr.moribus.imageonmap.gui.core;
 
-import fr.moribus.imageonmap.*;
-import org.bukkit.entity.*;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
- * @author IamBlueSlime (thanks c:)
+ * A tool to easily manage GUIs.
  *
- * Changes by Amaury Carrade to use statics (beh, code style, these things).
+ * @author IamBlueSlime and Amaury Carrade.
  */
 public class GuiManager {
 
 	protected static Map<UUID, AbstractGui> currentGUIs;
 
-	public static void init(ImageOnMap plugin)
+	/**
+	 * Call this when the plugin is enabled.
+	 *
+	 * @param plugin The plugin using this.
+	 */
+	public static void init(Plugin plugin)
 	{
 		currentGUIs = new ConcurrentHashMap<>();
 
 		GuiListener.init(plugin);
 	}
 
+	/**
+	 * Opens a GUI for the given player.
+	 *
+	 * Closes any GUI already open for this player.
+	 *
+	 * @param player The player this GUI will be open to.
+	 * @param gui The GUI to open.
+	 */
 	public static void openGui(Player player, AbstractGui gui)
 	{
 		if (currentGUIs.containsKey(player.getUniqueId()))
@@ -50,21 +65,41 @@ public class GuiManager {
 		gui.display(player);
 	}
 
+	/**
+	 * Closes the currently open GUI of this player, if it exists.
+	 *
+	 * Without any open GUI for this player, does nothing.
+	 *
+	 * @param player The player.
+	 */
 	public static void closeGui(Player player)
 	{
 		player.closeInventory();
 		removeClosedGui(player);
 	}
 
+	/**
+	 * Calls the {@link AbstractGui#onClose(Player)} method of the currently open GUI of the
+	 * given {@link Player} and unregisters it as open.
+	 *
+	 * @param player The player
+	 */
 	public static void removeClosedGui(Player player)
 	{
 		if (currentGUIs.containsKey(player.getUniqueId()))
 		{
+			//noinspection ConstantConditions
 			getPlayerGui(player).onClose(player);
 			currentGUIs.remove(player.getUniqueId());
 		}
 	}
 
+	/**
+	 * Returns the currently open {@link AbstractGui} of the given {@link HumanEntity}.
+	 *
+	 * @param player The HumanEntity.
+	 * @return The open GUI, or {@code null} if no GUI are open.
+	 */
 	public static AbstractGui getPlayerGui(HumanEntity player)
 	{
 		if (currentGUIs.containsKey(player.getUniqueId()))
@@ -73,6 +108,11 @@ public class GuiManager {
 		return null;
 	}
 
+	/**
+	 * Returns all open GUIs.
+	 *
+	 * @return The GUI (map: player's {@link UUID} → {@link AbstractGui}).
+	 */
 	public static Map<UUID, AbstractGui> getPlayersGui()
 	{
 		return currentGUIs;

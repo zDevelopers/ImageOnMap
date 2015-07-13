@@ -18,12 +18,15 @@
 
 package fr.moribus.imageonmap.gui.core;
 
-import fr.moribus.imageonmap.*;
-import org.bukkit.*;
-import org.bukkit.entity.*;
-import org.bukkit.event.*;
-import org.bukkit.event.inventory.*;
-import org.bukkit.inventory.*;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.Plugin;
 
 
 /**
@@ -33,7 +36,7 @@ import org.bukkit.inventory.*;
  */
 public class GuiListener implements Listener {
 
-	public static void init(ImageOnMap plugin)
+	public static void init(Plugin plugin)
 	{
 		plugin.getServer().getPluginManager().registerEvents(new GuiListener(), plugin);
 	}
@@ -65,7 +68,7 @@ public class GuiListener implements Listener {
 			}
 
 
-			/* *** Click on the “chest” *** */
+			/* *** Click on the GUI inventory *** */
 
 			if(event.getCursor() != null && event.getCursor().getType() != Material.AIR)
 			{

@@ -48,6 +48,12 @@ public class GuiUtils {
 		}
 	}
 
+	/**
+	 * Removes the vanilla informations displayed on the tooltips of the given item,
+	 * like enchantments, map infos, etc.
+	 *
+	 * @param stack The item.
+	 */
 	public static void removeVanillaInfos(ItemStack stack)
 	{
 		ItemMeta meta = stack.getItemMeta();
@@ -55,6 +61,12 @@ public class GuiUtils {
 		stack.setItemMeta(meta);
 	}
 
+	/**
+	 * Removes the vanilla informations displayed on the tooltips of the given item,
+	 * like enchantments, map infos, etc.
+	 *
+	 * @param meta The item's metadata.
+	 */
 	public static void removeVanillaInfos(ItemMeta meta)
 	{
 		if(!supported) return;
