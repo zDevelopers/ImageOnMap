@@ -43,12 +43,12 @@ public class MapDetailGui extends AbstractGui
 	/**
 	 * The max width of the window open on the image.
 	 */
-	private final int MAX_WINDOW_WIDTH = 7;
+	private final int MAX_WINDOW_WIDTH = 8;
 
 	/**
 	 * The max height of the window open on the image.
 	 */
-	private final int MAX_WINDOW_HEIGHT = 3;
+	private final int MAX_WINDOW_HEIGHT = 5;
 
 
 
@@ -131,8 +131,17 @@ public class MapDetailGui extends AbstractGui
 
 
 		setSlotData(rename, inventory.getSize() - 7, "rename");
-		setSlotData(delete, inventory.getSize() - 5, "delete");
-		setSlotData(back, inventory.getSize() - 3, "back");
+		setSlotData(delete, inventory.getSize() - 6, "delete");
+
+
+		// To keep the controls centered, the back button is shifted to the right when the
+		// arrow isn't displayed, so when the map fit on the grid without sliders.
+		int backSlot = inventory.getSize() - 4;
+
+		if(map instanceof PosterMap && ((PosterMap) map).getColumnCount() <= MAX_WINDOW_WIDTH)
+			backSlot++;
+
+		setSlotData(back, backSlot, "back");
 
 
 		update(player);
@@ -144,7 +153,7 @@ public class MapDetailGui extends AbstractGui
 	public void update(Player player)
 	{
 		if(map instanceof PosterMap && ((PosterMap) map).hasColumnData()) {
-			int slot = 10;
+			int slot = 0;
 
 			for (int row = topRow; row < topRow + MAX_WINDOW_HEIGHT; row++)
 			{
@@ -162,13 +171,13 @@ public class MapDetailGui extends AbstractGui
 					slot++;
 				}
 
-				slot += 2;
+				slot++;
 			}
 
-			placeArrowSlider('\u2B07', canGoDown() , 35, "down" );
-			placeArrowSlider('\u2B06', canGoUp()   , 17, "up"   );
-			placeArrowSlider('«'     , canGoLeft() , 37, "left" );
-			placeArrowSlider('»'     , canGoRight(), 43, "right");
+			placeArrowSlider('\u2B07', canGoDown() , ((PosterMap) map).getRowCount()    > MAX_WINDOW_HEIGHT, 44, "down" );
+			placeArrowSlider('\u2B06', canGoUp()   , ((PosterMap) map).getRowCount()    > MAX_WINDOW_HEIGHT, 8 , "up"   );
+			placeArrowSlider('«'     , canGoLeft() , ((PosterMap) map).getColumnCount() > MAX_WINDOW_WIDTH , 45, "left" );
+			placeArrowSlider('»'     , canGoRight(), ((PosterMap) map).getColumnCount() > MAX_WINDOW_WIDTH , 52, "right");
 		}
 
 		else
@@ -198,11 +207,17 @@ public class MapDetailGui extends AbstractGui
 		return part;
 	}
 
-	private void placeArrowSlider(Character nameCharacter, boolean active, int slot, String action)
+	private void placeArrowSlider(Character nameCharacter, boolean active, boolean availableInThisView, int slot, String action)
 	{
 		/* ** Item ** */
 
-		ItemStack slider = new ItemStack(Material.ARROW);
+		if(!availableInThisView)
+		{
+			setSlotData(new ItemStack(Material.AIR), slot, "");
+			return;
+		}
+
+		ItemStack slider = new ItemStack(active ? Material.ARROW : Material.STICK);
 		ItemMeta meta = slider.getItemMeta();
 
 		String title = "";
