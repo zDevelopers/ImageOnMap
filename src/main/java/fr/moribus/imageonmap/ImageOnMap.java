@@ -20,6 +20,7 @@ package fr.moribus.imageonmap;
 
 import fr.moribus.imageonmap.commands.Commands;
 import fr.moribus.imageonmap.gui.core.*;
+import fr.moribus.imageonmap.guiproko.core.Gui;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
@@ -86,6 +87,7 @@ public final class ImageOnMap extends JavaPlugin
         MapInitEvent.init(this);
         MapItemManager.init();
         GuiManager.init(this);
+        Gui.init(this);
     }
 
     @Override
@@ -97,6 +99,7 @@ public final class ImageOnMap extends JavaPlugin
         MapItemManager.exit();
         MigratorExecutor.waitForMigration();
         PluginLogger.exit();
+        Gui.exit();
     }
     
     private File checkPluginDirectory(File primaryFile, File... alternateFiles) throws IOException
