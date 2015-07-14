@@ -241,7 +241,7 @@ abstract public class Gui
             Gui openGui = openGuis.get(owner);
             if(openGui == null) return;
             
-            openGui.onClose();
+            openGui.onClick(event);
         }
         
         @EventHandler
