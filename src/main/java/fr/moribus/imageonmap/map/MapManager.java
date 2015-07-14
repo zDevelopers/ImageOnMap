@@ -138,6 +138,18 @@ abstract public class MapManager
     {
         return getPlayerMapStore(playerUUID).getMapList();
     }
+
+    /**
+     * Returns the number of minecraft maps used by the images rendered by the given player.
+     *
+     * @param playerUUID The player's UUID.
+     *
+     * @return The count.
+     */
+    static public int getMapPartCount(UUID playerUUID)
+    {
+        return getPlayerMapStore(playerUUID).getMapCount();
+    }
     
     static public ImageMap getMap(UUID playerUUID, String mapId)
     {
@@ -231,7 +243,12 @@ abstract public class MapManager
         }
         getPlayerMapStore(userUUID).checkMapLimit(newMapsCount);
     }
-    
+
+    /**
+     * Returns the total number of minecraft maps used by ImageOnMap images.
+     *
+     * @return The count.
+     */
     static public int getMapCount()
     {
         int mapCount = 0;
