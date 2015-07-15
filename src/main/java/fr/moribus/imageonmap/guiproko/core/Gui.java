@@ -66,9 +66,10 @@ abstract public class Gui
     private void open(HumanEntity player)
     {
         this.player = player;
+        openGuis.put(player, this);
         update();
-        this.open = true;
         player.openInventory(inventory);
+        this.open = true;
     }
     
     /* ===== Public API ===== */
@@ -81,8 +82,13 @@ abstract public class Gui
     {
         onUpdate();
         
-        //If inventory needs to be regenerated
+        //If inventory does not need to be regenerated
         if(inventory != null && inventory.getTitle().equals(title) && inventory.getSize() == size)
+        {
+            inventory.clear();
+            populate(inventory);
+        }
+        else
         {
             inventory = Bukkit.createInventory(player, size, title);
             populate(inventory);
@@ -91,11 +97,6 @@ abstract public class Gui
                 player.closeInventory();
                 player.openInventory(inventory);
             }
-        }
-        else
-        {
-            inventory.clear();
-            populate(inventory);
         }
     }
     
@@ -250,6 +251,7 @@ abstract public class Gui
             HumanEntity owner = event.getPlayer();
             Gui openGui = openGuis.get(owner);
             if(openGui == null) return;
+            if(!openGui.isOpen()) return;
             
             openGui.onClose();
             openGuis.remove(owner);
