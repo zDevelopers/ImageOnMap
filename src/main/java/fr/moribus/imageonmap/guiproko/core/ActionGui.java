@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -35,7 +36,6 @@ abstract public class ActionGui extends Gui
     static private final String ACTION_HANDLER_NAME = "action_";
     private final Class<? extends ActionGui> guiClass = this.getClass();
     private final HashMap<Integer, Action> actions = new HashMap<>();
-    private int maxSlot;
     
     /* ===== Protected API ===== */
     
@@ -56,31 +56,60 @@ abstract public class ActionGui extends Gui
         meta.setLore(loreLines);
         item.setItemMeta(meta);
         
-        Method callback;
-        try
-        {
-            callback = guiClass.getDeclaredMethod(ACTION_HANDLER_NAME + name);
-            callback.setAccessible(true);
-        }
-        catch (Throwable ex)
-        {
-            callback = null;
-        }
-        
+        action(name, slot, item);
+    }
+    
+    protected void action(String name, int slot, Material material)
+    {
+        action(name, slot, new ItemStack(material));
+    }
+    
+    protected void action(String name, int slot)
+    {
+        action(name, slot, (ItemStack)null);
+    }
+    
+    protected void action(String name, int slot, ItemStack item)
+    {
         if(slot > getSize() || slot < 0) 
             throw new IllegalArgumentException("Illegal slot ID");
         
-        action(new Action(name, slot, item, callback));
+        action(new Action(name, slot, item, getActionHandler(guiClass, name)));
     }
+    
     
     private void action(Action action)
     {
         actions.put(action.slot, action);
-        if(maxSlot < action.slot) maxSlot = action.slot;
+    }
+    
+    protected void updateAction(String name, Material item, String title)
+    {
+        updateAction(name, new ItemStack(item), title);
+    }
+    
+    protected void updateAction(String name, ItemStack item, String title)
+    {
+        Action action = getAction(name);
+        action.item = item;
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(title);
+        item.setItemMeta(meta);
+    }
+    
+    private Action getAction(String name)
+    {
+        for(Action action : actions.values())
+        {
+            if(action.name.equals(name)) return action;
+        }
+        throw new IllegalArgumentException("Unknown action name : " + name);
     }
     
     @Override
     protected abstract void onUpdate();
+    
+    protected void onAction_unknown(String name, int slot, ItemStack item){}
     
     @Override
     public void update()
@@ -101,10 +130,25 @@ abstract public class ActionGui extends Gui
     @Override
     protected void onClick(InventoryClickEvent event)
     {
+        if(event.getRawSlot() >= event.getInventory().getSize())//The user clicked in its own inventory
+        {
+            if(!event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY))
+                return;
+        }
         event.setCancelled(true);
         
-        Action action = actions.get(event.getRawSlot());
-        if(action == null || action.callback == null) return;
+        callAction(actions.get(event.getRawSlot()));
+    }
+    
+    private void callAction(Action action)
+    {
+        if(action == null) return;
+        if(action.callback == null)
+        {
+            onAction_unknown(action.name, action.slot, action.item);
+            return;
+        }
+        
         try
         {
             action.callback.invoke(this);
@@ -115,8 +159,36 @@ abstract public class ActionGui extends Gui
         }
         catch (InvocationTargetException ex)
         {
-            PluginLogger.error("Error while invoking action handler {0} of GUI {1}", ex, action.name, guiClass.getName());
+            PluginLogger.error("Error while invoking action handler {0} of GUI {1}", 
+                    ex.getCause(), action.name, guiClass.getName());
         }
+    }
+    
+    private Method getActionHandler(Class klass, String name)
+    {
+        Method callback = null;
+        do
+        {
+            try
+            {
+                callback = klass.getDeclaredMethod(ACTION_HANDLER_NAME + name);
+                callback.setAccessible(true);
+                break;
+            }
+            catch (Throwable ex)
+            {
+                callback = null;
+                klass = klass.getSuperclass();
+            }
+            
+        }while(klass != null);
+        
+        return callback;
+    }
+    
+    protected boolean hasActions()
+    {
+        return !actions.isEmpty();
     }
     
     

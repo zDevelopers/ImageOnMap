@@ -36,7 +36,8 @@ import org.bukkit.plugin.Plugin;
 abstract public class Gui 
 {
     static protected final int INVENTORY_ROW_SIZE = 9;
-    static protected final int MAX_INVENTORY_SIZE = INVENTORY_ROW_SIZE * 6;
+    static protected final int MAX_INVENTORY_COLUMN_SIZE = 6;
+    static protected final int MAX_INVENTORY_SIZE = INVENTORY_ROW_SIZE * MAX_INVENTORY_COLUMN_SIZE;
     
     /**
      * The player this Gui instance is associated to.
@@ -67,7 +68,7 @@ abstract public class Gui
     {
         this.player = player;
         openGuis.put(player, this);
-        update();
+        this.update();
         player.openInventory(inventory);
         this.open = true;
     }
@@ -75,18 +76,18 @@ abstract public class Gui
     /* ===== Public API ===== */
     
     /**
-     * Asks the GUI to update its data, and recreate its view accordingly.
-     * The inventory is regenerated when calling this method.
+     * Asks the GUI to update its data, and refresh its view accordingly.
+     * The inventory may be regenerated when calling this method.
      */
     public void update()
     {
         onUpdate();
+        onAfterUpdate();
         
         //If inventory does not need to be regenerated
         if(inventory != null && inventory.getTitle().equals(title) && inventory.getSize() == size)
         {
-            inventory.clear();
-            populate(inventory);
+            refresh();
         }
         else
         {
@@ -98,6 +99,16 @@ abstract public class Gui
                 player.openInventory(inventory);
             }
         }
+    }
+    
+    /**
+     * Asks the GUI to recreate its view.
+     * The inventory is cleared, but never regenerated when calling this method.
+     */
+    public void refresh()
+    {
+        inventory.clear();
+        populate(inventory);
     }
     
     /**
@@ -116,7 +127,13 @@ abstract public class Gui
      * Raised when the {@link Gui#update() } method is called.
      * Use this method to update your internal data.
      */
-    protected void onUpdate(){};
+    protected void onUpdate(){}
+    
+    /**
+     * Raised when the {@link Gui#update() } method is called, but before the inventory is populated.
+     * Use this method in a Gui subclass to analyze given data and set other parameters accordingly.
+     */
+    protected void onAfterUpdate(){}
     
     /**
      * Called when the inventory needs to be (re)populated.

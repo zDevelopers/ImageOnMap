@@ -16,28 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.moribus.imageonmap.commands.maptool;
+package fr.moribus.imageonmap.guiproko.list;
 
+import fr.moribus.imageonmap.guiproko.core.ExplorerGui;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
-import fr.moribus.imageonmap.commands.*;
-import fr.moribus.imageonmap.gui.core.*;
-import fr.moribus.imageonmap.gui.list.*;
-import fr.moribus.imageonmap.guiproko.core.Gui;
-import fr.moribus.imageonmap.guiproko.list.MaterialGui;
-
-
-@CommandInfo(name = "manage")
-public class ManageCommand extends Command
+public class MaterialGui extends ExplorerGui<Material>
 {
-	public ManageCommand(Commands commandGroup)
-	{
-		super(commandGroup);
-	}
 
-	@Override
-	protected void run() throws CommandException
-	{
-		//GuiManager.openGui(playerSender(), new MapListGui());
-            Gui.open(playerSender(), new MaterialGui());
-	}
+    @Override
+    protected ItemStack getViewItem(Material data)
+    {
+        return new ItemStack(data);
+    }
+
+    @Override
+    protected void onUpdate()
+    {
+        setTitle("All da materials");
+        setData(Material.values());
+    }
+
 }
