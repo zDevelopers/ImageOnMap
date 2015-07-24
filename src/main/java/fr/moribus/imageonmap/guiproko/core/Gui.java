@@ -185,6 +185,9 @@ abstract public class Gui
      */
     protected void setTitle(String title){this.title = title;}
     
+    /** @return The underlying inventory, or null if the Gui has not been opened yet.*/
+    public Inventory getInventory(){return inventory;}
+    
     /* ===== Static API ===== */
     
     /**
