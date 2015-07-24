@@ -211,6 +211,7 @@ abstract public class Gui
         openGuis = new HashMap<>();
         listener = new GuiListener();
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+        GuiUtils.init();
     }
     
     /**

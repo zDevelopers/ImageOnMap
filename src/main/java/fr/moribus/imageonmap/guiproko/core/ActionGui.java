@@ -51,17 +51,12 @@ abstract public class ActionGui extends Gui
     
     protected void action(String name, int slot, ItemStack item, String title, List<String> loreLines)
     {
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(title);
-        meta.setLore(loreLines);
-        item.setItemMeta(meta);
-        
-        action(name, slot, item);
+        action(name, slot, GuiUtils.makeItem(item, title, loreLines));
     }
     
     protected void action(String name, int slot, Material material)
     {
-        action(name, slot, new ItemStack(material));
+        action(name, slot, GuiUtils.makeItem(material));
     }
     
     protected void action(String name, int slot)

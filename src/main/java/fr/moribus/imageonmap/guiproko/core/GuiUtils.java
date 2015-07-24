@@ -19,17 +19,59 @@
 package fr.moribus.imageonmap.guiproko.core;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.PluginLogger;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * Various utility methods for GUIs.
  */
 abstract public class GuiUtils 
 {
+    static private Method addItemFlagsMethod = null;
+    static private Object[] itemFlagValues = null;
+    
+    /**
+     * Initializes the GUI utilities.
+     * This method must be called on plugin enabling.
+     */
+    static public void init()
+    {
+        try 
+        {
+            Class<?> itemFlagClass = Class.forName("org.bukkit.inventory.ItemFlag");
+            Method valuesMethod = itemFlagClass.getDeclaredMethod("values");
+            itemFlagValues = (Object[]) valuesMethod.invoke(null);
+            addItemFlagsMethod = ItemMeta.class.getMethod("addItemFlags", itemFlagClass);
+            addItemFlagsMethod.setAccessible(true);
+
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+            // Not supported :c
+        } catch (InvocationTargetException e) {
+            PluginLogger.error("Exception occurred while looking for the ItemFlag API.", e);
+        }
+    }
+    
+    static public void hideItemAttributes(ItemMeta meta)
+    {
+        try 
+        {
+            addItemFlagsMethod.invoke(meta, itemFlagValues);
+        } 
+        catch (IllegalAccessException | InvocationTargetException ex) 
+        {
+            PluginLogger.error("Exception occurred while invoking the ItemMeta.addItemFlags method.", ex);
+        }
+    }
     
     /**
      * Stores the ItemStack at the given index of a GUI's inventory.
@@ -43,6 +85,35 @@ abstract public class GuiUtils
     {
         Bukkit.getScheduler().scheduleSyncDelayedTask(ImageOnMap.getPlugin(), 
                 new CreateDisplayItemTask(gui.getInventory(), item, slot));
+    }
+    
+    static public ItemStack makeItem(Material material)
+    {
+        return makeItem(material, null, (List<String>)null);
+    }
+    
+    static public ItemStack makeItem(Material material, String title)
+    {
+        return makeItem(material, title, (List<String>)null);
+    }
+    
+    static public ItemStack makeItem(Material material, String title, String... loreLines)
+    {
+        return makeItem(material, title, Arrays.asList(loreLines));
+    }
+    
+    static public ItemStack makeItem(Material material, String title, List<String> loreLines)
+    {
+        return makeItem(new ItemStack(material), title, loreLines);
+    }
+    static public ItemStack makeItem(ItemStack itemStack, String title, List<String> loreLines)
+    {
+        ItemMeta meta = itemStack.getItemMeta();
+        meta.setDisplayName(title);
+        meta.setLore(loreLines);
+        if(itemStack.getType().equals(Material.MAP))
+            hideItemAttributes(meta);
+        return itemStack;
     }
     
     /**
