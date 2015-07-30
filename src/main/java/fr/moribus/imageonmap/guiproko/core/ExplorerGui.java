@@ -34,8 +34,9 @@ abstract public class ExplorerGui<T> extends ActionGui
     
     private int currentPageX = 0;
     
-    private int pageCountX = 0;
-    private int pageCountY = 0;
+    private int pageCountX;
+    private int pageCountY;
+    
     private int inventoryViewSize;
     
     private Mode mode = Mode.CREATIVE;
@@ -82,22 +83,14 @@ abstract public class ExplorerGui<T> extends ActionGui
     }
     
     @Override
-    public void update()
-    {
-        //TODO: Make inventory fit to content
-        setSize(MAX_INVENTORY_SIZE);
-        
-        super.update();
-    }
-    
-    @Override
     protected void onClick(InventoryClickEvent event)
     {
         int slot = event.getRawSlot();
         
         //Clicked in the action bar
-        if(slot > MAX_INVENTORY_SIZE - INVENTORY_ROW_SIZE
-                && slot < MAX_INVENTORY_SIZE)
+        if(hasActions() && 
+            slot >= MAX_INVENTORY_SIZE - INVENTORY_ROW_SIZE
+            && slot < MAX_INVENTORY_SIZE)
         {
             super.onClick(event);
             return;
@@ -127,13 +120,6 @@ abstract public class ExplorerGui<T> extends ActionGui
         }
     }
     
-    private int getDataIndex(int slot)
-    {
-        int inventorySize = MAX_INVENTORY_SIZE;
-        if(getPageCount() > 1) inventorySize -= INVENTORY_ROW_SIZE;
-        return currentPageX * inventorySize + slot;
-    }
-    
     private void onActionPickup(InventoryClickEvent event)
     {
         if(mode.equals(Mode.READONLY))
@@ -141,13 +127,19 @@ abstract public class ExplorerGui<T> extends ActionGui
             event.setCancelled(true);
             return;
         }
-        int dataIndex = getDataIndex(event.getSlot());
+        int dataIndex = currentPageX * inventoryViewSize + event.getSlot();
         if(dataIndex < 0 || dataIndex >= data.length)
         {
             event.setCancelled(true);
             return;
         }
-        event.setCurrentItem(getPickedUpItem(data[dataIndex]));
+        ItemStack pickedUpItem = getPickedUpItem(data[dataIndex]);
+        if(pickedUpItem == null)
+        {
+            event.setCancelled(true);
+            return;
+        }
+        event.setCurrentItem(pickedUpItem);
         GuiUtils.setItemLater(this, event.getSlot(), getViewItem(data[dataIndex]));
     }
     
@@ -170,7 +162,31 @@ abstract public class ExplorerGui<T> extends ActionGui
     @Override
     protected void onAfterUpdate()
     {
-        if(getPageCount() > 1)
+        inventoryViewSize = MAX_INVENTORY_SIZE;
+        
+        //Calculating page count
+        if(data.length <= 0)
+        {
+            pageCountX = 1;
+            pageCountY = 1;
+        }
+        else if(viewWidth <= 0)
+        {
+            if(hasActions() || data.length > MAX_INVENTORY_SIZE)
+                inventoryViewSize -= INVENTORY_ROW_SIZE;
+            pageCountX = (int)Math.ceil(data.length / inventoryViewSize);
+            pageCountY = 1;
+        }
+        else
+        {
+            //TODO: NYI
+        }
+        
+        
+        //TODO: Make inventory fit to content
+        setSize(MAX_INVENTORY_SIZE);
+        
+        if(pageCountX > 1)
         {
             action("previous", MAX_INVENTORY_SIZE - INVENTORY_ROW_SIZE);
             action("next", MAX_INVENTORY_SIZE - 1);
@@ -208,7 +224,7 @@ abstract public class ExplorerGui<T> extends ActionGui
     
     public boolean canGoNext()
     {
-        return currentPageX < getPageCount();
+        return currentPageX < pageCountX;
     }
     
     public boolean canGoPrevious()
@@ -218,22 +234,12 @@ abstract public class ExplorerGui<T> extends ActionGui
     
     public int getPageCount()
     {
-        if(data.length == 0) return 0;
-        
-        if(viewWidth > 0)
-        {
-            if(viewWidth > INVENTORY_ROW_SIZE) return 1;
-            return (int)Math.ceil(viewWidth / (INVENTORY_ROW_SIZE - 1));
-        }
-        
-        return (int)Math.ceil(data.length / (MAX_INVENTORY_SIZE - (hasActions() ? INVENTORY_ROW_SIZE : 0)));
+        return pageCountX;
     }
     
     public int getVerticalPageCount()
     {
-        if(viewWidth <= 0) return 0;
-        
-        return (int)Math.ceil(data.length / (MAX_INVENTORY_COLUMN_SIZE - (hasActions() ? 0 : 1)));
+        return pageCountY;
     }
     
     protected Mode getMode() {return mode;}

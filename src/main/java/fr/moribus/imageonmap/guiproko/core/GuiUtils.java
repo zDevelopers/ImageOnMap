@@ -63,6 +63,7 @@ abstract public class GuiUtils
     
     static public void hideItemAttributes(ItemMeta meta)
     {
+        if(addItemFlagsMethod == null) return;
         try 
         {
             addItemFlagsMethod.invoke(meta, itemFlagValues);
@@ -113,6 +114,7 @@ abstract public class GuiUtils
         meta.setLore(loreLines);
         if(itemStack.getType().equals(Material.MAP))
             hideItemAttributes(meta);
+        itemStack.setItemMeta(meta);
         return itemStack;
     }
     

@@ -138,6 +138,11 @@ abstract public class MapManager
     {
         return getPlayerMapStore(playerUUID).getMapList();
     }
+    
+    static public ImageMap[] getMaps(UUID playerUUID)
+    {
+        return getPlayerMapStore(playerUUID).getMaps();
+    }
 
     /**
      * Returns the number of minecraft maps used by the images rendered by the given player.

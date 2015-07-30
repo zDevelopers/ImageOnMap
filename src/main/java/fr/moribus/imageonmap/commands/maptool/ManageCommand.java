@@ -20,10 +20,8 @@ package fr.moribus.imageonmap.commands.maptool;
 
 
 import fr.moribus.imageonmap.commands.*;
-import fr.moribus.imageonmap.gui.core.*;
-import fr.moribus.imageonmap.gui.list.*;
+import fr.moribus.imageonmap.guiproko.list.MapListGui;
 import fr.moribus.imageonmap.guiproko.core.Gui;
-import fr.moribus.imageonmap.guiproko.list.MaterialGui;
 
 
 @CommandInfo(name = "manage")
@@ -38,6 +36,6 @@ public class ManageCommand extends Command
 	protected void run() throws CommandException
 	{
 		//GuiManager.openGui(playerSender(), new MapListGui());
-            Gui.open(playerSender(), new MaterialGui());
+            Gui.open(playerSender(), new MapListGui());
 	}
 }
