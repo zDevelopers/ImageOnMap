@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.ui;
 
+import fr.moribus.imageonmap.guiproko.core.GuiUtils;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
@@ -120,6 +121,7 @@ public class MapItemManager implements Listener
         
         ItemMeta meta = itemMap.getItemMeta();
         meta.setDisplayName(ChatColor.RESET + text);
+        GuiUtils.hideItemAttributes(meta);
         itemMap.setItemMeta(meta);
         
         return itemMap;

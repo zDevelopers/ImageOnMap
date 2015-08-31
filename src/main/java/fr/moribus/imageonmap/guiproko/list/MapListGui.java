@@ -19,6 +19,7 @@
 package fr.moribus.imageonmap.guiproko.list;
 
 import fr.moribus.imageonmap.guiproko.core.ExplorerGui;
+import fr.moribus.imageonmap.guiproko.core.Gui;
 import fr.moribus.imageonmap.guiproko.core.GuiUtils;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
@@ -42,6 +43,13 @@ public class MapListGui extends ExplorerGui<ImageMap>
         PosterMap map = (PosterMap) data;
         return GuiUtils.makeItem(Material.MAP, data.getName(), 
                 "Poster map ("+map.getColumnCount()+"x"+map.getRowCount()+")", "#" + data.getId());
+    }
+    
+    @Override
+    protected void onRightClick(ImageMap data)
+    {
+        if(data instanceof SingleMap) return;
+        Gui.open(getPlayer(), new MapDetailGui((PosterMap)data));
     }
     
     @Override

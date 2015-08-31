@@ -57,7 +57,8 @@ abstract public class PluginLogger
         
     static public void log(Level level, String message, Throwable ex, Object... args)
     {
-        log(level, message + " : " + ex.getMessage(), args);
+        log(level, message, args);
+        log(level, "Exception : ", ex);
     }
     
     static public void info(String message, Object...args)

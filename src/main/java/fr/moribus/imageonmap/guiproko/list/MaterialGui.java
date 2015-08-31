@@ -30,6 +30,12 @@ public class MaterialGui extends ExplorerGui<Material>
     {
         return new ItemStack(data);
     }
+    
+    @Override
+    protected void onRightClick(Material data)
+    {
+        getPlayer().sendMessage("You clicked : " + data.toString());
+    }
 
     @Override
     protected void onUpdate()

@@ -16,25 +16,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.moribus.imageonmap.commands.maptool;
+package fr.moribus.imageonmap.guiproko.list;
 
+import fr.moribus.imageonmap.guiproko.core.ExplorerGui;
+import fr.moribus.imageonmap.map.PosterMap;
+import fr.moribus.imageonmap.ui.MapItemManager;
+import org.bukkit.inventory.ItemStack;
 
-import fr.moribus.imageonmap.commands.*;
-import fr.moribus.imageonmap.guiproko.list.MapListGui;
-import fr.moribus.imageonmap.guiproko.core.Gui;
-
-
-@CommandInfo(name = "manage")
-public class ManageCommand extends Command
+public class MapDetailGui extends ExplorerGui<Void>
 {
-	public ManageCommand(Commands commandGroup)
-	{
-		super(commandGroup);
-	}
+    private final PosterMap map;
+    public MapDetailGui(PosterMap map)
+    {
+        this.map = map;
+    }
+    
+    @Override
+    protected ItemStack getViewItem(int x, int y)
+    {
+        return MapItemManager.createSubMapItem(map, x, y);
+    }
 
-	@Override
-	protected void run() throws CommandException
-	{
-            Gui.open(playerSender(), new MapListGui());
-	}
+    @Override
+    protected void onUpdate()
+    {
+        setTitle("Details for map " + map.getName());
+        setData(map.getColumnCount(), map.getRowCount());
+    }
+
 }

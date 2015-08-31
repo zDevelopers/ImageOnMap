@@ -25,6 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
 
@@ -148,6 +149,46 @@ abstract public class Gui
     abstract protected void onClick(InventoryClickEvent event);
     
     /**
+     * Raised when an drag is performed on the inventory.
+     * The default behaviour is to cancel any event that affects the GUI.
+     * @param event The drag event data.
+     */
+    protected void onDrag(InventoryDragEvent event)
+    {
+        if(affectsGui(event)) event.setCancelled(true);
+    }
+    
+    /**
+     * Returns if the given event affects the GUI's inventory
+     * @param event The event to test
+     * @return true if the event's slot is in the GUI's inventory, 
+     *         false otherwise.
+     */
+    static protected boolean affectsGui(InventoryClickEvent event)
+    {
+        return event.getRawSlot() < event.getInventory().getSize();
+    }
+    
+    /**
+     * Returns if the given event affects the GUI's inventory
+     * @param event The event to test
+     * @return true if any of the event's slots is in the GUI's inventory, 
+     *         false otherwise.
+     */
+    static protected boolean affectsGui(InventoryDragEvent event)
+    {
+        for(int slot : event.getRawSlots())
+        {
+            if(slot < event.getInventory().getSize())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
+    /**
      * Raised when the GUI is being closed.
      * Use this method to cleanup data.
      */
@@ -256,6 +297,16 @@ abstract public class Gui
      */
     static private class GuiListener implements Listener
     {
+        @EventHandler
+        public void onInventoryDrag(InventoryDragEvent event)
+        {
+            HumanEntity owner = event.getWhoClicked();
+            Gui openGui = openGuis.get(owner);
+            if(openGui == null) return;
+            
+            openGui.onDrag(event);
+        }
+        
         @EventHandler
 	public void onInventoryClick(InventoryClickEvent event)
         {

@@ -19,8 +19,10 @@
 package fr.moribus.imageonmap.guiproko.core;
 
 import org.bukkit.Material;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -30,21 +32,35 @@ abstract public class ExplorerGui<T> extends ActionGui
     static protected enum Mode {READONLY, CREATIVE};
     
     private T[] data;
+    private boolean isData2D = false;
+    
+    private int viewSize;
+    private int viewHeight;
     private int viewWidth;
     
     private int currentPageX = 0;
+    private int currentPageY = 0;
+    
+    private int dataHeight;
+    private int dataWidth;
     
     private int pageCountX;
     private int pageCountY;
     
-    private int inventoryViewSize;
-    
     private Mode mode = Mode.CREATIVE;
     
-    protected void setData(T[] data, int viewWidth)
+    protected void setData(T[] data, int dataWidth)
     {
         this.data = data;
-        this.viewWidth = viewWidth;
+        if(dataWidth > 0)
+            setData(dataWidth, (int) Math.ceil((double)data.length / (double)dataWidth));
+    }
+    
+    protected void setData(int dataWidth, int dataHeight)
+    {
+        this.dataWidth = dataWidth;
+        this.dataHeight = dataHeight;
+        this.isData2D = dataWidth > 0;
     }
     
     protected void setData(T[] data)
@@ -55,10 +71,8 @@ abstract public class ExplorerGui<T> extends ActionGui
     @Override
     protected void populate(Inventory inventory)
     {
-        int inventorySize = MAX_INVENTORY_SIZE;
-        if(getPageCount() > 1)
+        if(pageCountX > 1)
         {
-            inventorySize -= INVENTORY_ROW_SIZE;
             if(canGoNext())
                 updateAction("next", Material.ARROW, "Next page");
             else
@@ -70,13 +84,42 @@ abstract public class ExplorerGui<T> extends ActionGui
                 updateAction("previous", Material.STICK, "No previous page");
         }
         
-        if(viewWidth <= 0)
+        if(pageCountY > 1)
         {
-            int start = currentPageX * inventorySize;
-            int max = Math.min(inventorySize, data.length - start);
+            if(canGoUp())
+                updateAction("up", Material.ARROW, "Go Up");
+            else
+                updateAction("up", Material.STICK, "Top page");
+            
+            if(canGoDown())
+                updateAction("down", Material.ARROW, "Go Down");
+            else
+                updateAction("down", Material.STICK, "Bottom page");
+        }
+        
+        if(!isData2D)
+        {
+            int start = currentPageX * viewSize;
+            int max = Math.min(viewSize, data.length - start);
             for(int i = 0; i < max; i++)
             {
-                inventory.setItem(i, getViewItem(data[i + start]));
+                inventory.setItem(i, getViewItem(i + start));
+            }
+        }
+        else
+        {
+            int startX = currentPageX * viewWidth;
+            int startY = currentPageY * viewHeight;
+            
+            int maxX = Math.min(viewWidth, dataWidth - startX);
+            int maxY = Math.min(viewHeight, dataHeight - startY);
+            
+            for(int i = maxY; i --> 0;)
+            {
+                for(int j = maxX; j --> 0;)
+                {
+                    inventory.setItem(i*INVENTORY_ROW_SIZE + j, getViewItem(j + startX, i + startY));
+                }
             }
         }
         if(hasActions()) super.populate(inventory);
@@ -96,7 +139,14 @@ abstract public class ExplorerGui<T> extends ActionGui
             return;
         }
         
-        if(slot < event.getInventory().getSize())//The user clicked in its own inventory
+        if(isData2D && pageCountY > 1 &&
+                slot % INVENTORY_ROW_SIZE == INVENTORY_ROW_SIZE - 1)
+        {
+            super.onClick(event);
+            return;
+        }
+        
+        if(affectsGui(event))//The user clicked in its own inventory
         {
             switch(event.getAction())
             {
@@ -120,27 +170,53 @@ abstract public class ExplorerGui<T> extends ActionGui
         }
     }
     
+    @Override
+    protected void onDrag(InventoryDragEvent event)
+    {
+        if(!affectsGui(event)) return;
+        
+        for(int slot : event.getRawSlots())
+        {
+            //Clicked in the action bar
+            if(hasActions() && 
+                slot >= MAX_INVENTORY_SIZE - INVENTORY_ROW_SIZE
+                && slot < MAX_INVENTORY_SIZE)
+            {
+                super.onDrag(event);
+                return;
+            }
+
+            if(isData2D && pageCountY > 1 &&
+                    slot % INVENTORY_ROW_SIZE == INVENTORY_ROW_SIZE - 1)
+            {
+                super.onDrag(event);
+                return;
+            }
+        }
+        
+        event.setCancelled(true);
+        if(mode.equals(Mode.READONLY)) return;
+        if(!onPutItem(event.getOldCursor())) return;
+        event.setCursor(new ItemStack(Material.AIR));
+    }
+    
     private void onActionPickup(InventoryClickEvent event)
     {
-        if(mode.equals(Mode.READONLY))
+        int dataIndex = getDataIndex(event.getSlot());
+        if(event.getClick().equals(ClickType.RIGHT))
         {
+            onRightClick(getData(dataIndex));
             event.setCancelled(true);
             return;
         }
-        int dataIndex = currentPageX * inventoryViewSize + event.getSlot();
-        if(dataIndex < 0 || dataIndex >= data.length)
-        {
-            event.setCancelled(true);
-            return;
-        }
-        ItemStack pickedUpItem = getPickedUpItem(data[dataIndex]);
-        if(pickedUpItem == null)
+        ItemStack pickedUpItem = getPickedUpItem(dataIndex);
+        if(pickedUpItem == null || mode.equals(Mode.READONLY))
         {
             event.setCancelled(true);
             return;
         }
         event.setCurrentItem(pickedUpItem);
-        GuiUtils.setItemLater(this, event.getSlot(), getViewItem(data[dataIndex]));
+        GuiUtils.setItemLater(this, event.getSlot(), getViewItem(dataIndex));
     }
     
     private void onActionPut(InventoryClickEvent event)
@@ -162,34 +238,56 @@ abstract public class ExplorerGui<T> extends ActionGui
     @Override
     protected void onAfterUpdate()
     {
-        inventoryViewSize = MAX_INVENTORY_SIZE;
         
         //Calculating page count
-        if(data.length <= 0)
+        if(data != null && data.length <= 0)
         {
+            viewWidth = INVENTORY_ROW_SIZE;
+            viewHeight = 1;
+            viewSize = viewWidth;
+            
             pageCountX = 1;
             pageCountY = 1;
         }
-        else if(viewWidth <= 0)
+        else if(!isData2D)
         {
+            viewWidth = INVENTORY_ROW_SIZE;
+            viewHeight = Math.min((int)Math.ceil((double)data.length / (double)viewWidth),
+                                   MAX_INVENTORY_COLUMN_SIZE);
+            
             if(hasActions() || data.length > MAX_INVENTORY_SIZE)
-                inventoryViewSize -= INVENTORY_ROW_SIZE;
-            pageCountX = (int)Math.ceil(data.length / inventoryViewSize);
+                viewHeight--;
+            viewSize = viewWidth * viewHeight;
+            
+            pageCountX = (int)Math.ceil((double)data.length / (double)viewSize);
             pageCountY = 1;
         }
         else
         {
-            //TODO: NYI
+            viewWidth = Math.min(dataWidth, INVENTORY_ROW_SIZE);
+            viewHeight = Math.min(dataHeight, MAX_INVENTORY_COLUMN_SIZE);
+            
+            pageCountX = (int)Math.ceil((double)dataWidth / (double)viewWidth);
+            pageCountY = (int)Math.ceil((double)dataHeight / (double)viewHeight);
+            
+            if(pageCountY > 1 && viewWidth == INVENTORY_ROW_SIZE) viewWidth--;
+            if(pageCountX > 1 && viewHeight == MAX_INVENTORY_COLUMN_SIZE) viewHeight--;
+            
+            pageCountX = (int)Math.ceil((double)dataWidth / (double)viewWidth);
+            pageCountY = (int)Math.ceil((double)dataHeight / (double)viewHeight);
         }
         
-        
-        //TODO: Make inventory fit to content
         setSize(MAX_INVENTORY_SIZE);
         
         if(pageCountX > 1)
         {
             action("previous", MAX_INVENTORY_SIZE - INVENTORY_ROW_SIZE);
-            action("next", MAX_INVENTORY_SIZE - 1);
+            action("next", MAX_INVENTORY_SIZE - 1 - (pageCountY > 1 ? 1 : 0));
+        }
+        if(pageCountY > 1)
+        {
+            action("up", INVENTORY_ROW_SIZE - 1);
+            action("down", MAX_INVENTORY_SIZE - 1);
         }
     }
     
@@ -203,9 +301,58 @@ abstract public class ExplorerGui<T> extends ActionGui
         previous();
     }
     
-    abstract protected ItemStack getViewItem(T data);
+    private void action_up()
+    {
+        up();
+    }
+    
+    private void action_down()
+    {
+        down();
+    }
+    
+    private int getDataIndex(int inventorySlot)
+    {
+        if(isData2D)
+        {
+            int column = currentPageX * viewWidth + inventorySlot % INVENTORY_ROW_SIZE;
+            int row = currentPageY * viewHeight + inventorySlot / INVENTORY_ROW_SIZE;
+            return row * dataWidth + column;
+        }
+        else
+        {
+            return currentPageX * viewSize + inventorySlot;
+        }
+    }
+    
+    private T getData(int i)
+    {
+        if(i < 0 || i >= data.length)
+            return null;
+        return data[i];
+    }
+    
+    protected ItemStack getViewItem(int i)
+    {
+        return getViewItem(getData(i));
+    }
+    
+    protected ItemStack getViewItem(int x, int y)
+    {
+        return getViewItem(y * dataWidth + x);
+    }
+    
+    protected ItemStack getViewItem(T data){return null;};
+    
+    private ItemStack getPickedUpItem(int dataIndex)
+    {
+        if(dataIndex < 0 || dataIndex >= data.length)
+            return null;
+        return getPickedUpItem(getData(dataIndex));
+    }
     
     protected ItemStack getPickedUpItem(T data){return getViewItem(data);}
+    protected void onRightClick(T data){}
     protected boolean onPutItem(ItemStack item){return true;}
     
     public void next()
@@ -222,14 +369,38 @@ abstract public class ExplorerGui<T> extends ActionGui
         refresh();
     }
     
+    public void up()
+    {
+        if(!canGoUp()) return;
+        currentPageY--;
+        refresh();
+    }
+    
+    public void down()
+    {
+        if(!canGoDown()) return;
+        currentPageY++;
+        refresh();
+    }
+    
     public boolean canGoNext()
     {
-        return currentPageX < pageCountX;
+        return currentPageX < pageCountX - 1;
     }
     
     public boolean canGoPrevious()
     {
         return currentPageX > 0;
+    }
+    
+    public boolean canGoUp()
+    {
+        return currentPageY > 0;
+    }
+    
+    public boolean canGoDown()
+    {
+        return currentPageY < pageCountY - 1;
     }
     
     public int getPageCount()
