@@ -20,7 +20,7 @@ package fr.moribus.imageonmap.guiproko.core;
 
 import java.util.HashMap;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -43,7 +43,7 @@ abstract public class Gui
     /**
      * The player this Gui instance is associated to.
      */
-    private HumanEntity player;
+    private Player player;
     
     /**
      * The size of the inventory.
@@ -65,7 +65,7 @@ abstract public class Gui
      */
     private boolean open = false;
     
-    private void open(HumanEntity player)
+    private void open(Player player)
     {
         this.player = player;
         openGuis.put(player, this);
@@ -200,7 +200,7 @@ abstract public class Gui
     public boolean isOpen(){return open;}
     
     /** @return The player this Gui instance is associated to.*/
-    protected HumanEntity getPlayer(){return player;}
+    protected Player getPlayer(){return player;}
     
     /** @return The size of the inventory.*/
     protected int getSize(){return size;}
@@ -235,7 +235,7 @@ abstract public class Gui
      * A map of all the currently open GUIs, associated to the HumanEntity
      * that requested it.
      */
-    static private HashMap<HumanEntity, Gui> openGuis = null;
+    static private HashMap<Player, Gui> openGuis = null;
     
     /**
      * The Bukkit listener for all GUI-related events.
@@ -273,7 +273,7 @@ abstract public class Gui
      * @param gui The GUI.
      * @return The opened GUI.
      */
-    static public <T extends Gui> T open(HumanEntity owner, T gui)
+    static public <T extends Gui> T open(Player owner, T gui)
     {
         close(owner);
         ((Gui)gui).open(owner);/* JAVA GENERICS Y U NO WORK */
@@ -284,7 +284,7 @@ abstract public class Gui
      * Closes any open GUI for a given player.
      * @param owner The player.
      */
-    static public void close(HumanEntity owner)
+    static public void close(Player owner)
     {
         Gui openGui = openGuis.get(owner);
         if(openGui == null) return;
@@ -300,7 +300,8 @@ abstract public class Gui
         @EventHandler
         public void onInventoryDrag(InventoryDragEvent event)
         {
-            HumanEntity owner = event.getWhoClicked();
+            if(!(event.getWhoClicked() instanceof Player)) return;
+            Player owner = (Player) event.getWhoClicked();
             Gui openGui = openGuis.get(owner);
             if(openGui == null) return;
             
@@ -310,7 +311,8 @@ abstract public class Gui
         @EventHandler
 	public void onInventoryClick(InventoryClickEvent event)
         {
-            HumanEntity owner = event.getWhoClicked();
+            if(!(event.getWhoClicked() instanceof Player)) return;
+            Player owner = (Player) event.getWhoClicked();
             Gui openGui = openGuis.get(owner);
             if(openGui == null) return;
             
@@ -320,7 +322,8 @@ abstract public class Gui
         @EventHandler
 	public void onInventoryClose(InventoryCloseEvent event)
         {
-            HumanEntity owner = event.getPlayer();
+            if(!(event.getPlayer() instanceof Player)) return;
+            Player owner = (Player) event.getPlayer();
             Gui openGui = openGuis.get(owner);
             if(openGui == null) return;
             if(!openGui.isOpen()) return;
