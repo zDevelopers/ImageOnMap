@@ -31,39 +31,107 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+/**
+ * This class implements an action-based GUI.
+ * Actions are buttons which trigger an event when getting clicked on by the user.
+ * They are represented by (customizable) items, which are immutable by the user.
+ * 
+ * Events handlers are (usually private) methods implemented in the derived 
+ * class(es). They are named using the pattern 'action_[action name]', and 
+ * are called when the associated action is triggered.
+ */
 abstract public class ActionGui extends Gui
 {
+    /**
+     * The prefix for action handlers.
+     */
     static private final String ACTION_HANDLER_NAME = "action_";
+    
+    /**
+     * The class of this GUI.
+     * Useful to retreive methods from the derived classes.
+     */
     private final Class<? extends ActionGui> guiClass = this.getClass();
+    
+    /**
+     * A map containing all the actions defined by the derived class, indexed by
+     * their position in the inventory.
+     */
     private final HashMap<Integer, Action> actions = new HashMap<>();
     
     /* ===== Protected API ===== */
     
+    /**
+     * Creates a new action, represented by the given item.
+     * The item's metadata is changed to use the given title and lore.
+     * @param name The identifier of the action.
+     * @param slot The slot the action will be placed on.
+     * @param material The material used to represent the action.
+     * @param title The title the item will show.
+     * @param loreLines The lore the item will show.
+     */
     protected void action(String name, int slot, Material material, String title, String ... loreLines)
     {
         action(name, slot, new ItemStack(material), title, Arrays.asList(loreLines));
     }
     
+    /**
+     * Creates a new action, represented by the given item.
+     * The item's metadata is changed to use the given title and lore.
+     * @param name The identifier of the action.
+     * @param slot The slot the action will be placed on.
+     * @param item The item used to represent the action.
+     * @param title The title the item will show.
+     * @param loreLines The lore the item will show.
+     */
     protected void action(String name, int slot, ItemStack item, String title, String ... loreLines)
     {
         action(name, slot, item, title, Arrays.asList(loreLines));
     }
     
+    /**
+     * Creates a new action, represented by the given item.
+     * The item's metadata is changed to use the given title and lore.
+     * @param name The identifier of the action.
+     * @param slot The slot the action will be placed on.
+     * @param item The item used to represent the action.
+     * @param title The title the item will show.
+     * @param loreLines The lore the item will show.
+     */
     protected void action(String name, int slot, ItemStack item, String title, List<String> loreLines)
     {
         action(name, slot, GuiUtils.makeItem(item, title, loreLines));
     }
     
+    /**
+     * Creates a new action, represented by the given material.
+     * @param name The identifier of the action.
+     * @param slot The slot the action will be placed on.
+     * @param material The material used to represent the action.
+     */
     protected void action(String name, int slot, Material material)
     {
         action(name, slot, GuiUtils.makeItem(material));
     }
     
+    /**
+     * Creates a new action, represented by no item.
+     * This action will not be rendered to the user until {@link #updateAction(java.lang.String, org.bukkit.inventory.ItemStack, java.lang.String) 
+     * } is called.
+     * @param name The identifier of the action.
+     * @param slot The slot the action will be placed on.
+     */
     protected void action(String name, int slot)
     {
         action(name, slot, (ItemStack)null);
     }
     
+    /**
+     * Creates a new action, and adds it to the GUI.
+     * @param name The identifier of the action.
+     * @param slot The slot the action will be placed on.
+     * @param item The item used to represent the action.
+     */
     protected void action(String name, int slot, ItemStack item)
     {
         if(slot > getSize() || slot < 0) 
@@ -72,17 +140,34 @@ abstract public class ActionGui extends Gui
         action(new Action(name, slot, item, getActionHandler(guiClass, name)));
     }
     
-    
+    /**
+     * Adds an action to the GUI.
+     * @param action 
+     */
     private void action(Action action)
     {
         actions.put(action.slot, action);
     }
     
+    /**
+     * Updates the action represented by the given name.
+     * @param name The name of the action to update.
+     * @param item The new material to affect to the action.
+     * @param title The new title to affect to the action.
+     * @throws IllegalArgumentException If no action has the given name.
+     */
     protected void updateAction(String name, Material item, String title)
     {
         updateAction(name, new ItemStack(item), title);
     }
     
+    /**
+     * Updates the action represented by the given name.
+     * @param name The name of the action to update.
+     * @param item The new item to affect to the action.
+     * @param title The new title to affect to the action.
+     * @throws IllegalArgumentException If no action has the given name.
+     */
     protected void updateAction(String name, ItemStack item, String title)
     {
         Action action = getAction(name);
@@ -92,7 +177,13 @@ abstract public class ActionGui extends Gui
         item.setItemMeta(meta);
     }
     
-    private Action getAction(String name)
+    /**
+     * Retreives the action represented by the given name.
+     * @param name The name of the action to retreive.
+     * @return The action represented by the given name.
+     * @throws IllegalArgumentException If no action has the given name.
+     */
+    private Action getAction(String name) throws IllegalArgumentException
     {
         for(Action action : actions.values())
         {
@@ -101,9 +192,19 @@ abstract public class ActionGui extends Gui
         throw new IllegalArgumentException("Unknown action name : " + name);
     }
     
+    /**
+     * Raised when the Gui needs to be updated.
+     * Use this method to create your actions.
+     */
     @Override
     protected abstract void onUpdate();
     
+    /**
+     * Raised when an action whithout any event handler has been triggered.
+     * @param name The name of the triggered action.
+     * @param slot The slot of the action.
+     * @param item The item of the action.
+     */
     protected void onAction_unknown(String name, int slot, ItemStack item){}
     
     @Override
@@ -135,6 +236,10 @@ abstract public class ActionGui extends Gui
         callAction(actions.get(event.getRawSlot()));
     }
     
+    /**
+     * Triggers the given action's event handler.
+     * @param action The action to trigger.
+     */
     private void callAction(Action action)
     {
         if(action == null) return;
@@ -159,6 +264,12 @@ abstract public class ActionGui extends Gui
         }
     }
     
+    /**
+     * Retreives the event handler matching the given name from a class (or any of its parents).
+     * @param klass The class to retreive the event handler from.
+     * @param name The name of the action.
+     * @return The event handler matching the action name, or null if none was found.
+     */
     private Method getActionHandler(Class klass, String name)
     {
         Method callback = null;
@@ -181,17 +292,34 @@ abstract public class ActionGui extends Gui
         return callback;
     }
     
+    /**
+     * @return if this GUI has any actions defined.
+     */
     protected boolean hasActions()
     {
         return !actions.isEmpty();
     }
     
-    
+    /**
+     * This structure represents an action.
+     */
     static private class Action
     {
+        /**
+         * The name of the action.
+         */
         public String name;
+        /**
+         * The slot the action will be put in.
+         */
         public int slot;
+        /**
+         * The item this action will be represented by.
+         */
         public ItemStack item;
+        /**
+         * The callback this action will call when triggered.
+         */
         public Method callback;
         
         public Action(String name, int slot, ItemStack item, Method callback)
