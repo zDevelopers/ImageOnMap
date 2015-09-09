@@ -41,7 +41,7 @@ public class MapDetailGui extends ExplorerGui<Void>
     protected void onUpdate()
     {
         setTitle("Details for map " + map.getName());
-        setData(map.getColumnCount(), map.getRowCount());
+        setDataShape(map.getColumnCount(), map.getRowCount());
     }
 
 }

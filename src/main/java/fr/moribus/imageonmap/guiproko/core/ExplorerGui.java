@@ -27,9 +27,33 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 
+/**
+ * This class implements an exploration GUI, allowing users to see a set of data
+ * in a paginated view, and to manipulate it or get it (if the
+ * {@link fr.moribus.imageonmap.guiproko.core.ExplorerGui.Mode#CREATIVE Creative} mode
+ * is enabled for this GUI — enabled by default).
+ *
+ * This GUI supports both one- and two-dimensional contents; two-dimensional content is
+ * represented by a one-dimension list and a width, or by {@link #getViewItem(int, int)}
+ * if you override it (in this case you need to call {@link #setDataShape(int, int)} in the
+ * {@link #onUpdate()} method).
+ *
+ * @param <T> The type of data this GUI will display.
+ *
+ * @author ProkopyL (main) and Amaury Carrade
+ */
 abstract public class ExplorerGui<T> extends ActionGui
 {
-    static protected enum Mode {READONLY, CREATIVE};
+    /**
+     * The explorer GUI's reading mode.
+     *
+     * In creative mode (the default mode), the players are able to manipulate the content, get it
+     * inside their own inventory (without consumption, just like the creative mode), and whatever
+     * you want if you override some methods.
+     *
+     * In read-only mode, they are only able to browse the content.
+     */
+    protected enum Mode {READONLY, CREATIVE}
     
     private T[] data;
     private boolean isData2D = false;
@@ -48,21 +72,42 @@ abstract public class ExplorerGui<T> extends ActionGui
     private int pageCountY;
     
     private Mode mode = Mode.CREATIVE;
-    
+
+    /**
+     * Sets the displayed data.
+     *
+     * @param data The data.
+     * @param dataWidth The data's width, if this data is in two dimensions.
+     *                  In this case the data array will be read like a matrix, with
+     *                  lines stored in a consecutive way; the height is automatically
+     *                  calculated.
+     */
     protected void setData(T[] data, int dataWidth)
     {
         this.data = data;
         if(dataWidth > 0)
-            setData(dataWidth, (int) Math.ceil((double)data.length / (double)dataWidth));
+            setDataShape(dataWidth, (int) Math.ceil((double) data.length / (double) dataWidth));
     }
-    
-    protected void setData(int dataWidth, int dataHeight)
+
+    /**
+     * Sets the data's shape. Use this if you're providing data through
+     * {@link #getViewItem(int, int)}, as example.
+     *
+     * @param dataWidth The data's width.
+     * @param dataHeight The data's height.
+     */
+    protected void setDataShape(int dataWidth, int dataHeight)
     {
         this.dataWidth = dataWidth;
         this.dataHeight = dataHeight;
         this.isData2D = dataWidth > 0;
     }
-    
+
+    /**
+     * Sets the displayed data, assuming this data is in one dimension.
+     *
+     * @param data The data.
+     */
     protected void setData(T[] data)
     {
         setData(data, 0);
@@ -101,6 +146,7 @@ abstract public class ExplorerGui<T> extends ActionGui
         {
             int start = currentPageX * viewSize;
             int max = Math.min(viewSize, data.length - start);
+
             for(int i = 0; i < max; i++)
             {
                 inventory.setItem(i, getViewItem(i + start));
@@ -118,10 +164,11 @@ abstract public class ExplorerGui<T> extends ActionGui
             {
                 for(int j = maxX; j --> 0;)
                 {
-                    inventory.setItem(i*INVENTORY_ROW_SIZE + j, getViewItem(j + startX, i + startY));
+                    inventory.setItem(i * INVENTORY_ROW_SIZE + j, getViewItem(j + startX, i + startY));
                 }
             }
         }
+
         if(hasActions()) super.populate(inventory);
     }
     
@@ -130,7 +177,7 @@ abstract public class ExplorerGui<T> extends ActionGui
     {
         int slot = event.getRawSlot();
         
-        //Clicked in the action bar
+        // Clicked in the action bar
         if(hasActions() && 
             slot >= MAX_INVENTORY_SIZE - INVENTORY_ROW_SIZE
             && slot < MAX_INVENTORY_SIZE)
@@ -146,7 +193,7 @@ abstract public class ExplorerGui<T> extends ActionGui
             return;
         }
         
-        if(affectsGui(event))//The user clicked in its own inventory
+        if(affectsGui(event)) // The user clicked in its own inventory
         {
             switch(event.getAction())
             {
@@ -154,11 +201,14 @@ abstract public class ExplorerGui<T> extends ActionGui
                 case HOTBAR_MOVE_AND_READD: case HOTBAR_SWAP:
                 case MOVE_TO_OTHER_INVENTORY:
                     onActionPickup(event); break;
+
                 case PLACE_ALL: case PLACE_ONE: case PLACE_SOME:
                 case SWAP_WITH_CURSOR:
                     onActionPut(event); break;
+
                 case DROP_ALL_CURSOR: case DROP_ONE_CURSOR: 
                     break;
+
                 default:
                     event.setCancelled(true);
             }
@@ -195,11 +245,18 @@ abstract public class ExplorerGui<T> extends ActionGui
         }
         
         event.setCancelled(true);
+
         if(mode.equals(Mode.READONLY)) return;
         if(!onPutItem(event.getOldCursor())) return;
+
         event.setCursor(new ItemStack(Material.AIR));
     }
-    
+
+    /**
+     * Triggered when a player clicks on the GUI to get an item.
+     *
+     * @param event The triggered event.
+     */
     private void onActionPickup(InventoryClickEvent event)
     {
         int dataIndex = getDataIndex(event.getSlot());
@@ -209,16 +266,23 @@ abstract public class ExplorerGui<T> extends ActionGui
             event.setCancelled(true);
             return;
         }
+
         ItemStack pickedUpItem = getPickedUpItem(dataIndex);
         if(pickedUpItem == null || mode.equals(Mode.READONLY))
         {
             event.setCancelled(true);
             return;
         }
+
         event.setCurrentItem(pickedUpItem);
         GuiUtils.setItemLater(this, event.getSlot(), getViewItem(dataIndex));
     }
-    
+
+    /**
+     * Triggered when a player clicks on the GUI to place an item.
+     *
+     * @param event The triggered event.
+     */
     private void onActionPut(InventoryClickEvent event)
     {
         event.setCancelled(true);
@@ -226,7 +290,12 @@ abstract public class ExplorerGui<T> extends ActionGui
         if(!onPutItem(event.getCursor())) return;
         event.setCursor(new ItemStack(Material.AIR));
     }
-    
+
+    /**
+     * Triggered when a player moves an item on the GUI.
+     *
+     * @param event The triggered event.
+     */
     private void onActionMove(InventoryClickEvent event)
     {
         event.setCancelled(true);
@@ -238,7 +307,6 @@ abstract public class ExplorerGui<T> extends ActionGui
     @Override
     protected void onAfterUpdate()
     {
-        
         //Calculating page count
         if(data != null && data.length <= 0)
         {
@@ -251,15 +319,17 @@ abstract public class ExplorerGui<T> extends ActionGui
         }
         else if(!isData2D)
         {
+            int dataLength = (data == null) ? 0 : data.length;
+
             viewWidth = INVENTORY_ROW_SIZE;
-            viewHeight = Math.min((int)Math.ceil((double)data.length / (double)viewWidth),
+            viewHeight = Math.min((int)Math.ceil((double)dataLength / (double)viewWidth),
                                    MAX_INVENTORY_COLUMN_SIZE);
             
-            if(hasActions() || data.length > MAX_INVENTORY_SIZE)
+            if(hasActions() || dataLength > MAX_INVENTORY_SIZE)
                 viewHeight--;
             viewSize = viewWidth * viewHeight;
             
-            pageCountX = (int)Math.ceil((double)data.length / (double)viewSize);
+            pageCountX = (int)Math.ceil((double)dataLength / (double)viewSize);
             pageCountY = 1;
         }
         else
@@ -329,53 +399,111 @@ abstract public class ExplorerGui<T> extends ActionGui
     {
         if(i < 0 || i >= data.length)
             return null;
+
         return data[i];
     }
-    
+
+    /**
+     * Returns the stack to display at the given index.
+     *
+     * @param i The index.
+     * @return The stack.
+     */
     protected ItemStack getViewItem(int i)
     {
         return getViewItem(getData(i));
     }
-    
+
+    /**
+     * Returns the stack to display at the given coordinates.
+     *
+     * @param x The x-coordinate (left to right).
+     * @param y The y-coordinate (top to bottom).
+     * @return The stack.
+     */
     protected ItemStack getViewItem(int x, int y)
     {
         return getViewItem(y * dataWidth + x);
     }
-    
-    protected ItemStack getViewItem(T data){return null;};
-    
+
+    /**
+     * Returns the ItemStack representation of the given piece of data.
+     *
+     * @param data The piece of data.
+     * @return The piece's representation.
+     */
+    protected ItemStack getViewItem(T data) { return null; }
+
+
     private ItemStack getPickedUpItem(int dataIndex)
     {
         if(dataIndex < 0 || dataIndex >= data.length)
             return null;
+
         return getPickedUpItem(getData(dataIndex));
     }
-    
-    protected ItemStack getPickedUpItem(T data){return getViewItem(data);}
-    protected void onRightClick(T data){}
-    protected boolean onPutItem(ItemStack item){return true;}
-    
+
+    /**
+     * Returns the stack the players will get when they try to take an item from
+     * the GUI, in {@link fr.moribus.imageonmap.guiproko.core.ExplorerGui.Mode#CREATIVE}
+     * mode.
+     *
+     * @param data The picked-up piece of data.
+     * @return The stack to pick-up ({@code null} to cancel the pick-up).
+     */
+    protected ItemStack getPickedUpItem(T data) { return getViewItem(data); }
+
+    /**
+     * Triggered when the player right-clicks an item on the GUI.
+     *
+     * @param data The right-clicked piece of data.
+     */
+    protected void onRightClick(T data) {}
+
+    /**
+     * Triggered when the player try to place an item inside the GUI.
+     *
+     * This will not place the item in the GUI, it's up to you to update the data and refresh
+     * the GUI if you need so.
+     *
+     * @param item The {@link ItemStack} the player is trying to put.
+     * @return {@code false} to cancel the placement; {@code true} to accept it.
+     */
+    protected boolean onPutItem(ItemStack item) { return true; }
+
+    /**
+     * Displays the next horizontal page, if possible.
+     */
     public void next()
     {
         if(!canGoNext()) return;
         currentPageX++;
         refresh();
     }
-    
+
+    /**
+     * Displays the previous horizontal page, if possible.
+     */
     public void previous()
     {
         if(!canGoPrevious()) return;
         currentPageX--;
         refresh();
     }
-    
+
+    /**
+     * Displays the previous vertical page, if possible.
+     */
     public void up()
     {
         if(!canGoUp()) return;
         currentPageY--;
         refresh();
     }
-    
+
+    /**
+     * Displays the next vertical page, if possible.
+     */
     public void down()
     {
         if(!canGoDown()) return;
@@ -402,17 +530,40 @@ abstract public class ExplorerGui<T> extends ActionGui
     {
         return currentPageY < pageCountY - 1;
     }
-    
+
+    /**
+     * Returns the amount of horizontal pages.
+     *
+     * @return The pages' amount.
+     */
     public int getPageCount()
     {
         return pageCountX;
     }
-    
+
+    /**
+     * Returns the amount of vertical pages.
+     * This will always be 1 if the GUI is representing a one-dimensional data set.
+     *
+     * @return The pages' amount.
+     */
     public int getVerticalPageCount()
     {
         return pageCountY;
     }
-    
-    protected Mode getMode() {return mode;}
-    protected void setMode(Mode mode) {this.mode = mode;}
+
+    /** @return The GUI's manipulation mode. */
+    protected Mode getMode()
+    {
+        return mode;
+    }
+
+    /**
+     * Sets the GUI's manipulation mode.
+     * @param mode The mode.
+     */
+    protected void setMode(Mode mode)
+    {
+        this.mode = mode;
+    }
 }

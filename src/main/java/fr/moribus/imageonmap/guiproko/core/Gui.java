@@ -18,16 +18,14 @@
 
 package fr.moribus.imageonmap.guiproko.core;
 
-import java.util.HashMap;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
+import org.bukkit.event.inventory.*;
+import org.bukkit.inventory.*;
+import org.bukkit.plugin.*;
+
+import java.util.*;
 
 /**
  * This class provides the basic needs for chest-type GUIs.
@@ -64,7 +62,8 @@ abstract public class Gui
      * If the inventory is currently open.
      */
     private boolean open = false;
-    
+
+
     private void open(Player player)
     {
         this.player = player;
@@ -73,7 +72,8 @@ abstract public class Gui
         player.openInventory(inventory);
         this.open = true;
     }
-    
+
+
     /* ===== Public API ===== */
     
     /**
@@ -94,7 +94,8 @@ abstract public class Gui
         {
             inventory = Bukkit.createInventory(player, size, title);
             populate(inventory);
-            if(isOpen())//Reopening the inventory
+
+            if(isOpen()) // Reopening the inventory
             {
                 player.closeInventory();
                 player.openInventory(inventory);
@@ -125,32 +126,36 @@ abstract public class Gui
     /* ===== Protected API ===== */
     
     /**
-     * Raised when the {@link Gui#update() } method is called.
+     * Raised when the {@link Gui#update()} method is called.
      * Use this method to update your internal data.
      */
-    protected void onUpdate(){}
+    protected void onUpdate() {}
     
     /**
-     * Raised when the {@link Gui#update() } method is called, but before the inventory is populated.
+     * Raised when the {@link Gui#update()} method is called, but before the inventory is populated.
      * Use this method in a Gui subclass to analyze given data and set other parameters accordingly.
      */
-    protected void onAfterUpdate(){}
+    protected void onAfterUpdate() {}
     
     /**
      * Called when the inventory needs to be (re)populated.
+     *
      * @param inventory The inventory to populate
      */
     abstract protected void populate(Inventory inventory);
     
     /**
      * Raised when an action is performed on an item in the inventory.
+     *
      * @param event The click event data.
      */
     abstract protected void onClick(InventoryClickEvent event);
-    
+
+
     /**
      * Raised when an drag is performed on the inventory.
      * The default behaviour is to cancel any event that affects the GUI.
+     *
      * @param event The drag event data.
      */
     protected void onDrag(InventoryDragEvent event)
@@ -159,18 +164,20 @@ abstract public class Gui
     }
     
     /**
-     * Returns if the given event affects the GUI's inventory
+     * Returns if the given event affects the GUI's inventory.
+     *
      * @param event The event to test
-     * @return true if the event's slot is in the GUI's inventory, 
-     *         false otherwise.
+     * @return {@code true} if the event's slot is in the GUI's inventory,
+     *         {@code false} otherwise.
      */
     static protected boolean affectsGui(InventoryClickEvent event)
     {
         return event.getRawSlot() < event.getInventory().getSize();
     }
-    
+
     /**
-     * Returns if the given event affects the GUI's inventory
+     * Returns if the given event affects the GUI's inventory.
+     *
      * @param event The event to test
      * @return true if any of the event's slots is in the GUI's inventory, 
      *         false otherwise.
@@ -192,18 +199,19 @@ abstract public class Gui
      * Raised when the GUI is being closed.
      * Use this method to cleanup data.
      */
-    protected void onClose(){};
-    
+    protected void onClose() {}
+
+
     /* ===== Getters & Setters ===== */
     
-    /** @return If the GUI is currently open or not.*/
-    public boolean isOpen(){return open;}
+    /** @return If the GUI is currently open or not. */
+    public boolean isOpen() { return open; }
     
-    /** @return The player this Gui instance is associated to.*/
-    protected Player getPlayer(){return player;}
+    /** @return The player this Gui instance is associated to. */
+    protected Player getPlayer() { return player; }
     
-    /** @return The size of the inventory.*/
-    protected int getSize(){return size;}
+    /** @return The size of the inventory. */
+    protected int getSize() { return size; }
     
     /**
      * Sets the new size of the inventory.
@@ -217,8 +225,9 @@ abstract public class Gui
         this.size = Math.min(((int)(Math.ceil((double) size / INVENTORY_ROW_SIZE))) * INVENTORY_ROW_SIZE, MAX_INVENTORY_SIZE);
     }
     
-    /** @return The title of the inventory.*/
-    protected String getTitle(){return title;}
+    /** @return The title of the inventory. */
+    protected String getTitle() { return title; }
+
     /**
      * Sets the new title of the inventory.
      * It will be applied on the next GUI update.
@@ -226,9 +235,10 @@ abstract public class Gui
      */
     protected void setTitle(String title){this.title = title;}
     
-    /** @return The underlying inventory, or null if the Gui has not been opened yet.*/
-    public Inventory getInventory(){return inventory;}
-    
+    /** @return The underlying inventory, or null if the Gui has not been opened yet. */
+    public Inventory getInventory() { return inventory; }
+
+
     /* ===== Static API ===== */
     
     /**
@@ -277,6 +287,7 @@ abstract public class Gui
     {
         close(owner);
         ((Gui)gui).open(owner);/* JAVA GENERICS Y U NO WORK */
+
         return gui;
     }
     
@@ -287,11 +298,10 @@ abstract public class Gui
     static public void close(Player owner)
     {
         Gui openGui = openGuis.get(owner);
-        if(openGui == null) return;
-        
-        openGui.close();
+        if(openGui != null) openGui.close();
     }
-    
+
+
     /**
      * Implements a Bukkit listener for all GUI-related events.
      */
@@ -307,9 +317,9 @@ abstract public class Gui
             
             openGui.onDrag(event);
         }
-        
+
         @EventHandler
-	public void onInventoryClick(InventoryClickEvent event)
+        public void onInventoryClick(InventoryClickEvent event)
         {
             if(!(event.getWhoClicked() instanceof Player)) return;
             Player owner = (Player) event.getWhoClicked();
@@ -318,9 +328,9 @@ abstract public class Gui
             
             openGui.onClick(event);
         }
-        
+
         @EventHandler
-	public void onInventoryClose(InventoryCloseEvent event)
+        public void onInventoryClose(InventoryCloseEvent event)
         {
             if(!(event.getPlayer() instanceof Player)) return;
             Player owner = (Player) event.getPlayer();
