@@ -18,13 +18,16 @@
 
 package fr.moribus.imageonmap.guiproko.core;
 
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.*;
+
+import java.util.*;
 
 
 /**
@@ -118,28 +121,14 @@ abstract public class ExplorerGui<T> extends ActionGui
     {
         if(pageCountX > 1)
         {
-            if(canGoNext())
-                updateAction("next", Material.ARROW, "Next page");
-            else
-                updateAction("next", Material.STICK, "No next page");
-            
-            if(canGoPrevious())
-                updateAction("previous", Material.ARROW, "Previous page");
-            else
-                updateAction("previous", Material.STICK, "No previous page");
+            updateAction("next", getPageItem("next", canGoNext()));
+            updateAction("previous", getPageItem("previous", canGoPrevious()));
         }
         
         if(pageCountY > 1)
         {
-            if(canGoUp())
-                updateAction("up", Material.ARROW, "Go Up");
-            else
-                updateAction("up", Material.STICK, "Top page");
-            
-            if(canGoDown())
-                updateAction("down", Material.ARROW, "Go Down");
-            else
-                updateAction("down", Material.STICK, "Bottom page");
+            updateAction("up", getPageItem("up", canGoUp()));
+            updateAction("down", getPageItem("down", canGoDown()));
         }
         
         if(!isData2D)
@@ -452,6 +441,70 @@ abstract public class ExplorerGui<T> extends ActionGui
      * @return The stack to pick-up ({@code null} to cancel the pick-up).
      */
     protected ItemStack getPickedUpItem(T data) { return getViewItem(data); }
+
+    /**
+     * Returns the item to use to display the pagination buttons.
+     *
+     * @param paginationButtonType The type of button (either "next", "previous", "up", "down").
+     * @param canUse {@code true} if the button is usable (i.e. not in the last or first page of
+     *               its kind.
+     * @return The item.
+     */
+    protected ItemStack getPageItem(String paginationButtonType, boolean canUse)
+    {
+        ItemStack icon = new ItemStack(canUse ? Material.ARROW : Material.STICK);
+        ItemMeta meta = icon.getItemMeta();
+
+        String title;
+        Integer newPage;
+        Integer lastPage;
+
+        switch (paginationButtonType)
+        {
+            case "next":
+                title = canUse ? "Next page" : "No next page";
+
+                newPage = currentPageX + 1;
+                lastPage = getPageCount();
+                break;
+
+            case "previous":
+                title = canUse ? "Previous page" : "No previous page";
+
+                newPage = currentPageX - 1;
+                lastPage = getPageCount();
+                break;
+
+            case "up":
+                title = canUse ? "Go up" : "Top page";
+
+                newPage = currentPageY + 1;
+                lastPage = getVerticalPageCount();
+                break;
+
+            case "down":
+                title = canUse ? "Go down" : "Bottom page";
+
+                newPage = currentPageY - 1;
+                lastPage = getVerticalPageCount();
+                break;
+
+            default:
+                return null; // invalid page type
+        }
+
+        meta.setDisplayName((canUse ? ChatColor.WHITE : ChatColor.GRAY) + title);
+
+        if(canUse)
+        {
+            meta.setLore(Collections.singletonList(
+                    ChatColor.GRAY + "Go to page " + ChatColor.WHITE + (newPage) + ChatColor.GRAY + " of " + ChatColor.WHITE + lastPage
+            ));
+        }
+
+        icon.setItemMeta(meta);
+        return icon;
+    }
 
     /**
      * Triggered when the player right-clicks an item on the GUI.

@@ -180,13 +180,25 @@ abstract public class ActionGui extends Gui
      */
     protected void updateAction(String name, ItemStack item, String title)
     {
-        Action action = getAction(name);
-        action.item = item;
+        updateAction(name, item);
+
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(title);
         item.setItemMeta(meta);
     }
-    
+
+    /**
+     * Updates the action represented by the given name.
+     *
+     * @param name The name of the action to update.
+     * @param item The new item to affect to the action.
+     * @throws IllegalArgumentException If no action has the given name.
+     */
+    protected void updateAction(String name, ItemStack item)
+    {
+        getAction(name).item = item;
+    }
+
     /**
      * Retrieves the action represented by the given name.
      *
