@@ -71,8 +71,8 @@ abstract public class ExplorerGui<T> extends ActionGui
     private int currentPageX = 0;
     private int currentPageY = 0;
     
-    private int dataHeight;
-    private int dataWidth;
+    private int dataHeight = 0;
+    private int dataWidth = 0;
     
     private int pageCountX;
     private int pageCountY;
@@ -125,6 +125,17 @@ abstract public class ExplorerGui<T> extends ActionGui
     {
         setData(data, 0);
     }
+
+    /**
+     * Checks if this GUI contains data, either with the data entry or through
+     * {@link #getViewItem(int, int)} and {@link #setDataShape(int, int)}.
+     *
+     * @return {@code true} if this GUI contains some data.
+     */
+    protected boolean hasData()
+    {
+        return (data == null || data.length == 0) && (dataWidth == 0 && dataHeight == 0);
+    }
     
     @Override
     protected void populate(Inventory inventory)
@@ -141,7 +152,7 @@ abstract public class ExplorerGui<T> extends ActionGui
             updateAction("down", getPageItem("down", canGoDown()));
         }
 
-        if(data != null && data.length > 0)
+        if(hasData())
         {
             if (!isData2D)
             {
@@ -181,7 +192,7 @@ abstract public class ExplorerGui<T> extends ActionGui
 
         if(hasActions()) super.populate(inventory);
     }
-    
+
     @Override
     protected void onClick(InventoryClickEvent event)
     {
@@ -206,7 +217,7 @@ abstract public class ExplorerGui<T> extends ActionGui
         // The user clicked in the GUI
         if(affectsGui(event))
         {
-            if(data != null && data.length > 0)
+            if(hasData())
             {
                 switch (event.getAction())
                 {
@@ -254,7 +265,7 @@ abstract public class ExplorerGui<T> extends ActionGui
         
         for(int slot : event.getRawSlots())
         {
-            //Clicked in the action bar
+            // Clicked in the action bar
             if(hasActions() && 
                 slot >= MAX_INVENTORY_SIZE - INVENTORY_ROW_SIZE
                 && slot < MAX_INVENTORY_SIZE)
