@@ -18,10 +18,11 @@
 
 package fr.moribus.imageonmap.guiproko.list;
 
-import fr.moribus.imageonmap.guiproko.core.ExplorerGui;
-import fr.moribus.imageonmap.map.PosterMap;
-import fr.moribus.imageonmap.ui.MapItemManager;
-import org.bukkit.inventory.ItemStack;
+import fr.moribus.imageonmap.guiproko.core.*;
+import fr.moribus.imageonmap.map.*;
+import fr.moribus.imageonmap.ui.*;
+import org.bukkit.inventory.*;
+
 
 public class MapDetailGui extends ExplorerGui<Void>
 {
@@ -43,5 +44,4 @@ public class MapDetailGui extends ExplorerGui<Void>
         setTitle("Details for map " + map.getName());
         setDataShape(map.getColumnCount(), map.getRowCount());
     }
-
 }
