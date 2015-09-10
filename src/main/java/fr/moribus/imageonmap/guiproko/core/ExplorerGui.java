@@ -79,6 +79,13 @@ abstract public class ExplorerGui<T> extends ActionGui
     
     private Mode mode = Mode.CREATIVE;
 
+
+    public ExplorerGui()
+    {
+        // Defined early to be able to use getSize() in the onUpdate method.
+        setSize(MAX_INVENTORY_SIZE);
+    }
+
     /**
      * Sets the displayed data.
      *
@@ -342,8 +349,6 @@ abstract public class ExplorerGui<T> extends ActionGui
             pageCountX = (int)Math.ceil((double)dataWidth / (double)viewWidth);
             pageCountY = (int)Math.ceil((double)dataHeight / (double)viewHeight);
         }
-        
-        setSize(MAX_INVENTORY_SIZE);
         
         if(pageCountX > 1)
         {
