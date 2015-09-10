@@ -87,8 +87,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
     @Override
     protected void onRightClick(ImageMap data)
     {
-        if(data instanceof SingleMap) return;
-        Gui.open(getPlayer(), new MapDetailGui((PosterMap)data));
+        Gui.open(getPlayer(), new MapDetailGui(data));
     }
     
     @Override
