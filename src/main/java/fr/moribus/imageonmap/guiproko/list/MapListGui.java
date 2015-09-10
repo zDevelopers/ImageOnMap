@@ -108,7 +108,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
     {
         ImageMap[] maps = MapManager.getMaps(getPlayer().getUniqueId());
         setData(maps);
-        setTitle("Your maps (" + maps.length + " total)");
+        setTitle(ChatColor.BLACK + "Your maps " + ChatColor.RESET + "(" + maps.length + ")");
 
         setKeepHorizontalScrollingSpace(true);
 

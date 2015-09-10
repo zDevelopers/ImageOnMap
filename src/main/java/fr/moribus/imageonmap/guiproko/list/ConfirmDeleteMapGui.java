@@ -102,7 +102,7 @@ public class ConfirmDeleteMapGui extends ActionGui
     @Override
     protected void onUpdate()
     {
-        setTitle(ChatColor.BLACK + "Are you sure ?");
+        setTitle(mapToDelete.getName() + " » " + ChatColor.BLACK + "Confirm deletion");
         setSize(6 * 9);
         
         /* ** Item representation of the image being deleted ** */

@@ -21,6 +21,7 @@ package fr.moribus.imageonmap.guiproko.list;
 import fr.moribus.imageonmap.guiproko.core.*;
 import fr.moribus.imageonmap.map.*;
 import fr.moribus.imageonmap.ui.*;
+import org.bukkit.*;
 import org.bukkit.inventory.*;
 
 
@@ -41,7 +42,7 @@ public class MapDetailGui extends ExplorerGui<Void>
     @Override
     protected void onUpdate()
     {
-        setTitle("Details for map " + map.getName());
+        setTitle("Your maps » " + ChatColor.BLACK + map.getName());
         setDataShape(map.getColumnCount(), map.getRowCount());
     }
 }
