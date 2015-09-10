@@ -36,15 +36,36 @@ public class MapListGui extends ExplorerGui<ImageMap>
 
 
     @Override
-    protected ItemStack getViewItem(ImageMap data)
+    protected ItemStack getViewItem(ImageMap map)
     {
-        if(data instanceof SingleMap)
-        {
-            return GuiUtils.makeItem(Material.EMPTY_MAP, data.getName(), "Single map", "#" + data.getId());
-        }
-        PosterMap map = (PosterMap) data;
-        return GuiUtils.makeItem(Material.MAP, data.getName(), 
-                "Poster map ("+map.getColumnCount()+"x"+map.getRowCount()+")", "#" + data.getId());
+        ItemStack icon = new ItemStack(Material.MAP);
+
+
+        ItemMeta meta = icon.getItemMeta();
+
+        meta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + map.getName());
+
+        String mapDescription;
+        if(map instanceof SingleMap)
+            mapDescription = "Single map";
+        else
+            mapDescription = "Poster map (" + ((PosterMap) map).getColumnCount() + "×" + ((PosterMap) map).getRowCount() + ")";
+
+        meta.setLore(Arrays.asList(
+                ChatColor.WHITE + mapDescription,
+                "",
+                ChatColor.GRAY + "Map ID: " + map.getId(),
+                "",
+                ChatColor.GRAY + "» Left-click to get this map",
+                ChatColor.GRAY + "» Right-click for details and options"
+        ));
+
+        GuiUtils.hideItemAttributes(meta);
+
+        icon.setItemMeta(meta);
+
+
+        return icon;
     }
 
     @Override
