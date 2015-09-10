@@ -38,10 +38,11 @@ public enum Commands implements TabCompleter, CommandExecutor
             DeleteConfirmCommand.class,
             DeleteNoConfirmCommand.class,
             GetRemainingCommand.class,
-            ManageCommand.class,
+            ExploreCommand.class,
             MigrateCommand.class
     ),
-    TOMAP(MAPTOOL, NewCommand.class, "tomap");
+    TOMAP(MAPTOOL, NewCommand.class, "tomap"),
+    MAPS(MAPTOOL, ExploreCommand.class, "maps");
     
     static private final Commands[] commandGroups = Commands.class.getEnumConstants();
     private final Commands shortcutCommandGroup;

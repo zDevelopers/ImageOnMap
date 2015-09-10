@@ -24,10 +24,10 @@ import fr.moribus.imageonmap.guiproko.list.MapListGui;
 import fr.moribus.imageonmap.guiproko.core.Gui;
 
 
-@CommandInfo(name = "manage")
-public class ManageCommand extends Command
+@CommandInfo(name = "explore")
+public class ExploreCommand extends Command
 {
-	public ManageCommand(Commands commandGroup)
+	public ExploreCommand(Commands commandGroup)
 	{
 		super(commandGroup);
 	}
