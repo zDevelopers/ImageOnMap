@@ -46,7 +46,23 @@ public class MapListGui extends ExplorerGui<ImageMap>
         return GuiUtils.makeItem(Material.MAP, data.getName(), 
                 "Poster map ("+map.getColumnCount()+"x"+map.getRowCount()+")", "#" + data.getId());
     }
-    
+
+    @Override
+    protected ItemStack getEmptyViewItem()
+    {
+        ItemStack empty = new ItemStack(Material.BARRIER);
+        ItemMeta meta = empty.getItemMeta();
+
+        meta.setDisplayName(ChatColor.RED + "You don't have any map.");
+        meta.setLore(Arrays.asList(
+                ChatColor.GRAY + "Get started by creating a new one",
+                ChatColor.GRAY + "using " + ChatColor.WHITE + "/tomap <URL> [resize]" + ChatColor.GRAY + "!"
+        ));
+
+        empty.setItemMeta(meta);
+        return empty;
+    }
+
     @Override
     protected void onRightClick(ImageMap data)
     {
@@ -124,12 +140,11 @@ public class MapListGui extends ExplorerGui<ImageMap>
             lore.add("");
             lore.add(getStatisticText("Current consumption", ((int) Math.rint(percentageUsed)) + " %"));
             lore.add(getStatisticText("Maps left", mapPartLeft));
-            lore.add("");
 
             meta.setLore(lore);
         }
 
-        fr.moribus.imageonmap.gui.core.GuiUtils.removeVanillaInfos(meta);
+        GuiUtils.hideItemAttributes(meta);
 
         statistics.setItemMeta(meta);
         action("", getSize() - 5, statistics);

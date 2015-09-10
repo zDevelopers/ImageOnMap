@@ -140,31 +140,42 @@ abstract public class ExplorerGui<T> extends ActionGui
             updateAction("up", getPageItem("up", canGoUp()));
             updateAction("down", getPageItem("down", canGoDown()));
         }
-        
-        if(!isData2D)
-        {
-            int start = currentPageX * viewSize;
-            int max = Math.min(viewSize, data.length - start);
 
-            for(int i = 0; i < max; i++)
+        if(data != null && data.length > 0)
+        {
+            if (!isData2D)
             {
-                inventory.setItem(i, getViewItem(i + start));
+                int start = currentPageX * viewSize;
+                int max = Math.min(viewSize, data.length - start);
+
+                for (int i = 0; i < max; i++)
+                {
+                    inventory.setItem(i, getViewItem(i + start));
+                }
+            }
+            else
+            {
+                int startX = currentPageX * viewWidth;
+                int startY = currentPageY * viewHeight;
+
+                int maxX = Math.min(viewWidth, dataWidth - startX);
+                int maxY = Math.min(viewHeight, dataHeight - startY);
+
+                for (int i = maxY; i-- > 0; )
+                {
+                    for (int j = maxX; j-- > 0; )
+                    {
+                        inventory.setItem(i * INVENTORY_ROW_SIZE + j, getViewItem(j + startX, i + startY));
+                    }
+                }
             }
         }
         else
         {
-            int startX = currentPageX * viewWidth;
-            int startY = currentPageY * viewHeight;
-            
-            int maxX = Math.min(viewWidth, dataWidth - startX);
-            int maxY = Math.min(viewHeight, dataHeight - startY);
-            
-            for(int i = maxY; i --> 0;)
+            ItemStack emptyIndicator = getEmptyViewItem();
+            if(emptyIndicator != null)
             {
-                for(int j = maxX; j --> 0;)
-                {
-                    inventory.setItem(i * INVENTORY_ROW_SIZE + j, getViewItem(j + startX, i + startY));
-                }
+                action("", 22, emptyIndicator);
             }
         }
 
@@ -177,7 +188,7 @@ abstract public class ExplorerGui<T> extends ActionGui
         int slot = event.getRawSlot();
         
         // Clicked in the action bar
-        if(hasActions() && 
+        if(hasActions() &&
             slot >= MAX_INVENTORY_SIZE - INVENTORY_ROW_SIZE
             && slot < MAX_INVENTORY_SIZE)
         {
@@ -191,25 +202,42 @@ abstract public class ExplorerGui<T> extends ActionGui
             super.onClick(event);
             return;
         }
-        
-        if(affectsGui(event)) // The user clicked in its own inventory
+
+        // The user clicked in the GUI
+        if(affectsGui(event))
         {
-            switch(event.getAction())
+            if(data != null && data.length > 0)
             {
-                case PICKUP_ALL: case PICKUP_HALF: case PICKUP_ONE: case PICKUP_SOME:
-                case HOTBAR_MOVE_AND_READD: case HOTBAR_SWAP:
-                case MOVE_TO_OTHER_INVENTORY:
-                    onActionPickup(event); break;
+                switch (event.getAction())
+                {
+                    case PICKUP_ALL:
+                    case PICKUP_HALF:
+                    case PICKUP_ONE:
+                    case PICKUP_SOME:
+                    case HOTBAR_MOVE_AND_READD:
+                    case HOTBAR_SWAP:
+                    case MOVE_TO_OTHER_INVENTORY:
+                        onActionPickup(event);
+                        break;
 
-                case PLACE_ALL: case PLACE_ONE: case PLACE_SOME:
-                case SWAP_WITH_CURSOR:
-                    onActionPut(event); break;
+                    case PLACE_ALL:
+                    case PLACE_ONE:
+                    case PLACE_SOME:
+                    case SWAP_WITH_CURSOR:
+                        onActionPut(event);
+                        break;
 
-                case DROP_ALL_CURSOR: case DROP_ONE_CURSOR: 
-                    break;
+                    case DROP_ALL_CURSOR:
+                    case DROP_ONE_CURSOR:
+                        break;
 
-                default:
-                    event.setCancelled(true);
+                    default:
+                        event.setCancelled(true);
+                }
+            }
+            else
+            {
+                event.setCancelled(true);
             }
         }
         else
@@ -434,6 +462,13 @@ abstract public class ExplorerGui<T> extends ActionGui
      * @return The piece's representation.
      */
     protected ItemStack getViewItem(T data) { return null; }
+
+    /**
+     * Returns the stack displayed in the center of the GUI if it is empty.
+     *
+     * @return The stack.
+     */
+    protected ItemStack getEmptyViewItem() { return null; }
 
 
     private ItemStack getPickedUpItem(int dataIndex)
