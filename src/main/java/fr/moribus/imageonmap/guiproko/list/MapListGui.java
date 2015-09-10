@@ -18,21 +18,15 @@
 
 package fr.moribus.imageonmap.guiproko.list;
 
-import fr.moribus.imageonmap.guiproko.core.ExplorerGui;
-import fr.moribus.imageonmap.guiproko.core.Gui;
-import fr.moribus.imageonmap.guiproko.core.GuiUtils;
-import fr.moribus.imageonmap.map.ImageMap;
-import fr.moribus.imageonmap.map.MapManager;
-import fr.moribus.imageonmap.map.PosterMap;
-import fr.moribus.imageonmap.map.SingleMap;
-import fr.moribus.imageonmap.ui.MapItemManager;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import fr.moribus.imageonmap.guiproko.core.*;
+import fr.moribus.imageonmap.map.*;
+import fr.moribus.imageonmap.ui.*;
+import org.bukkit.*;
+import org.bukkit.inventory.*;
 
 public class MapListGui extends ExplorerGui<ImageMap>
 {
-    
+
     @Override
     protected ItemStack getViewItem(ImageMap data)
     {
@@ -60,7 +54,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
             return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName());
         }
         
-        MapItemManager.give((Player) getPlayer(), map);
+        MapItemManager.give(getPlayer(), map);
         return null;
     }
 
@@ -70,6 +64,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
         ImageMap[] maps = MapManager.getMaps(getPlayer().getUniqueId());
         setData(maps);
         setTitle("Your maps (" + maps.length + " total)");
+
+        setKeepHorizontalScrollingSpace(true);
     }
-    
 }

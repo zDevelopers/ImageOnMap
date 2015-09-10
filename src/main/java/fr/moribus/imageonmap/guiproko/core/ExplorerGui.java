@@ -64,7 +64,10 @@ abstract public class ExplorerGui<T> extends ActionGui
     private int viewSize;
     private int viewHeight;
     private int viewWidth;
-    
+
+    private boolean keepHorizontalScrollingSpace = false;
+    private boolean keepVerticalScrollingSpace = false;
+
     private int currentPageX = 0;
     private int currentPageY = 0;
     
@@ -208,7 +211,7 @@ abstract public class ExplorerGui<T> extends ActionGui
                 onActionMove(event);
         }
     }
-    
+
     @Override
     protected void onDrag(InventoryDragEvent event)
     {
@@ -314,8 +317,9 @@ abstract public class ExplorerGui<T> extends ActionGui
             viewHeight = Math.min((int)Math.ceil((double)dataLength / (double)viewWidth),
                                    MAX_INVENTORY_COLUMN_SIZE);
             
-            if(hasActions() || dataLength > MAX_INVENTORY_SIZE)
+            if(hasActions() || dataLength > MAX_INVENTORY_SIZE || keepHorizontalScrollingSpace)
                 viewHeight--;
+
             viewSize = viewWidth * viewHeight;
             
             pageCountX = (int)Math.ceil((double)dataLength / (double)viewSize);
@@ -329,8 +333,11 @@ abstract public class ExplorerGui<T> extends ActionGui
             pageCountX = (int)Math.ceil((double)dataWidth / (double)viewWidth);
             pageCountY = (int)Math.ceil((double)dataHeight / (double)viewHeight);
             
-            if(pageCountY > 1 && viewWidth == INVENTORY_ROW_SIZE) viewWidth--;
-            if(pageCountX > 1 && viewHeight == MAX_INVENTORY_COLUMN_SIZE) viewHeight--;
+            if((pageCountY > 1 && viewWidth == INVENTORY_ROW_SIZE) || keepVerticalScrollingSpace)
+                viewWidth--;
+
+            if((pageCountX > 1 && viewHeight == MAX_INVENTORY_COLUMN_SIZE) || keepHorizontalScrollingSpace)
+                viewHeight--;
             
             pageCountX = (int)Math.ceil((double)dataWidth / (double)viewWidth);
             pageCountY = (int)Math.ceil((double)dataHeight / (double)viewHeight);
@@ -498,7 +505,7 @@ abstract public class ExplorerGui<T> extends ActionGui
         if(canUse)
         {
             meta.setLore(Collections.singletonList(
-                    ChatColor.GRAY + "Go to page " + ChatColor.WHITE + (newPage) + ChatColor.GRAY + " of " + ChatColor.WHITE + lastPage
+                    ChatColor.GRAY + "Go to page " + ChatColor.WHITE + (newPage + 1) + ChatColor.GRAY + " of " + ChatColor.WHITE + lastPage
             ));
         }
 
@@ -618,5 +625,33 @@ abstract public class ExplorerGui<T> extends ActionGui
     protected void setMode(Mode mode)
     {
         this.mode = mode;
+    }
+
+    /**
+     * If set to {@code true}, the horizontal scrolling line will remain empty even without
+     * scrolls (with one page typically), so you can place buttons or things like that in this
+     * area.
+     *
+     * Else, with one page, the place will be used to display an additional row of data.
+     *
+     * @param keepHorizontalScrollingSpace {@code true} if enabled.
+     */
+    public void setKeepHorizontalScrollingSpace(boolean keepHorizontalScrollingSpace)
+    {
+        this.keepHorizontalScrollingSpace = keepHorizontalScrollingSpace;
+    }
+
+    /**
+     * If set to {@code true}, the vertical scrolling line will remain empty even without
+     * scrolls (with one page typically), so you can place buttons or things like that in this
+     * area.
+     *
+     * Else, with one page, the place will be used to display an additional column of data.
+     *
+     * @param keepVerticalScrollingSpace {@code true} if enabled.
+     */
+    public void setKeepVerticalScrollingSpace(boolean keepVerticalScrollingSpace)
+    {
+        this.keepVerticalScrollingSpace = keepVerticalScrollingSpace;
     }
 }
