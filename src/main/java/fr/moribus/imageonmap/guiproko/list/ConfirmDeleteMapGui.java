@@ -36,34 +36,51 @@ public class ConfirmDeleteMapGui extends ActionGui
     static private final int FIRST_SLOT_DELETE_BUTTON = 27;
     static private final int SHIFT_CANCEL_BUTTON = 5;
 
+    /**
+     * The messages randomly displayed in the lore of the “delete” buttons.
+     */
+    static private final String[] DELETE_MESSAGES = new String[]{
+        "Please", "I'm still alive", "Don't do that", "I'm still loving you", "I want to live",
+        "Please please", "Please please please", "What are you doing?!", "Nooooo!",
+        "Click and I'll be dead", "Why?", "Please don't do that", "Think about my family",
+        "Click, I don't like you anymore.", "I don't hate you.", "Click, I'm ready.",
+        "I'm a green button.", "I'm different.", "Thanks anyway.", "Excuse me.", "Get mad.",
+        "Sorry!", "My fault!", "I don't blame you.", "No hard feelings.",
+        "But I need to protect the humans!", "Noooo!", "I'm scared!", "What are you doing?",
+        "It burns.", "This is not good.", "Can't breathe.", "Thanks anyway.", "These things happen.",
+        "That was nobody's fault.", "I probably deserved it.", "I blame myself."
+    };
 
+    /**
+     * The messages randomly displayed in the lore of the “cancel” buttons.
+     */
+    static private final String[] CANCEL_MESSAGES = new String[] {
+        "Yay!", "Still aliiiive!", "Click click click", "Yes do that", "I'm a red button.",
+        "Please click here", "The other button is ugly", "Save me", "This is the good choice",
+        "Click, I want to live!", "I'll be dead another day anyway", "Are you sure?",
+        "So you're still loving me?", "Please save me", "Take me with you.",
+        "Excuse me.", "Don't make lemonade.", "Sleep mode activated.", "Hybernating.",
+        "Your business is appreciated.", "Hey! It's me! Don't shoot!", "Wheee!", "Hurray!",
+        "You have excellent aim!", "Please please please"
+    };
+    
     /**
      * The map being deleted.
      */
-    private ImageMap mapToDelete;
+    private final ImageMap mapToDelete;
 
     /**
      * The previously-viewed page of the list GUI.
      * Used to be able to bring the user back to the same page.
      */
-    private int currentPage;
-
-    /**
-     * The messages randomly displayed in the lore of the “delete” buttons.
-     */
-    private String[] deleteMessages;
-
-    /**
-     * The messages randomly displayed in the lore of the “cancel” buttons.
-     */
-    private String[] cancelMessages;
+    private final int currentPage;
 
     /**
      * A source of randomness.
      *
      * Yes, this javadoc comment is REALLY useful. Trust me.
      */
-    private Random random = new Random();
+    private final Random random = new Random();
 
 
     /**
@@ -75,28 +92,6 @@ public class ConfirmDeleteMapGui extends ActionGui
     {
         this.mapToDelete = mapToDelete;
         this.currentPage = currentPage;
-
-        deleteMessages = new String[]{
-                "Please", "I'm still alive", "Don't do that", "I'm still loving you", "I want to live",
-                "Please please", "Please please please", "What are you doing?!", "Nooooo!",
-                "Click and I'll be dead", "Why?", "Please don't do that", "Think about my family",
-                "Click, I don't like you anymore.", "I don't hate you.", "Click, I'm ready.",
-                "I'm a green button.", "I'm different.", "Thanks anyway.", "Excuse me.", "Get mad.",
-                "Sorry!", "My fault!", "I don't blame you.", "No hard feelings.",
-                "But I need to protect the humans!", "Noooo!", "I'm scared!", "What are you doing?",
-                "It burns.", "This is not good.", "Can't breathe.", "Thanks anyway.", "These things happen.",
-                "That was nobody's fault.", "I probably deserved it.", "I blame myself."
-        };
-
-        cancelMessages = new String[] {
-                "Yay!", "Still aliiiive!", "Click click click", "Yes do that", "I'm a red button.",
-                "Please click here", "The other button is ugly", "Save me", "This is the good choice",
-                "Click, I want to live!", "I'll be dead another day anyway", "Are you sure?",
-                "So you're still loving me?", "Please save me", "Take me with you.",
-                "Excuse me.", "Don't make lemonade.", "Sleep mode activated.", "Hybernating.",
-                "Your business is appreciated.", "Hey! It's me! Don't shoot!", "Wheee!", "Hurray!",
-                "You have excellent aim!", "Please please please"
-        };
     }
 
     @Override
@@ -140,13 +135,13 @@ public class ConfirmDeleteMapGui extends ActionGui
     private ItemStack createDeleteSubButton()
     {
         // Orange? Nooo. In the real world this is red. True story.
-        return createSubButton(DyeColor.ORANGE, ChatColor.RED + "Delete the map", deleteMessages);
+        return createSubButton(DyeColor.ORANGE, ChatColor.RED + "Delete the map", DELETE_MESSAGES);
     }
 
     private ItemStack createCancelSubButton()
     {
         // YES. Purple = lime. BECAUSE. Just accept it.
-        return createSubButton(DyeColor.PURPLE, ChatColor.GREEN + "Cancel", cancelMessages);
+        return createSubButton(DyeColor.PURPLE, ChatColor.GREEN + "Cancel", CANCEL_MESSAGES);
     }
 
     private ItemStack createSubButton(DyeColor color, String title, String[] messages)
@@ -167,11 +162,13 @@ public class ConfirmDeleteMapGui extends ActionGui
         return subButton;
     }
     
+    @GuiAction
     protected void action_cancel()
     {
-        Gui.open(getPlayer(), new MapDetailGui(null /*mapToDelete, currentPage */));
+        Gui.open(getPlayer(), new MapDetailGui(mapToDelete)).setCurrentPageX(currentPage);
     }
     
+    @GuiAction
     protected void action_delete()
     {
         MapManager.clear(getPlayer().getInventory(), mapToDelete);
@@ -183,8 +180,8 @@ public class ConfirmDeleteMapGui extends ActionGui
         }
         catch (MapManagerException ex)
         {
-            PluginLogger.warning("A non-existent map was requested to be deleted", ex);
-            getPlayer().sendMessage(ChatColor.RED + "This map does not exists.");
+            PluginLogger.warning("Error while deleting map", ex);
+            getPlayer().sendMessage(ChatColor.RED + ex.getMessage());
         }
 
         Gui.open(getPlayer(), new MapListGui(/* currentPage */));

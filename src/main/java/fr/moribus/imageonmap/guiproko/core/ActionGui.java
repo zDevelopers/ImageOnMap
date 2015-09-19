@@ -272,14 +272,14 @@ abstract public class ActionGui extends Gui
 
         event.setCancelled(true);
         
-        callAction(actions.get(event.getRawSlot()));
+        callAction(actions.get(event.getRawSlot()), event);
     }
     
     /**
      * Triggers the given action's event handler.
      * @param action The action to trigger.
      */
-    private void callAction(Action action)
+    private void callAction(Action action, InventoryClickEvent event)
     {
         if(action == null) return;
 
@@ -291,7 +291,14 @@ abstract public class ActionGui extends Gui
         
         try
         {
-            action.callback.invoke(this);
+            if(action.callback.getParameterCount() == 1)
+            {
+                action.callback.invoke(this, event);
+            }
+            else
+            {
+                action.callback.invoke(this);
+            }
         }
         catch (IllegalAccessException | IllegalArgumentException ex)
         {
@@ -305,6 +312,30 @@ abstract public class ActionGui extends Gui
     }
     
     /**
+     * Returns if the given method is a valid action handler.
+     * An action handler is valid only if it is accessible and parameter types matches.
+     * @param method The method to test
+     * @return true if the given method is valid, false otherwise.
+     */
+    private boolean isActionHandlerValid(Method method)
+    {
+        if(method.getParameterCount() >= 2) return false;
+        if(method.getParameterCount() == 1)
+            if(method.getParameterTypes()[0] != InventoryClickEvent.class) 
+                return false;
+        
+        try
+        {
+            method.setAccessible(true);
+        }
+        catch(SecurityException ex)
+        {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
      * Retrieves the event handler matching the given name from a class (or any of its parents).
      *
      * @param klass The class to retrieve the event handler from.
@@ -313,32 +344,38 @@ abstract public class ActionGui extends Gui
      */
     private Method getActionHandler(Class<?> klass, String name)
     {
-        Method callback;
-
         do
         {
-            try
+            GuiAction actionAnnotation;
+            String methodName;
+            
+            for(Method method : klass.getDeclaredMethods())
             {
-                try
+                actionAnnotation = method.getDeclaredAnnotation(GuiAction.class);
+                if(actionAnnotation == null) continue;
+                if(!(actionAnnotation.value() == null || actionAnnotation.value().isEmpty()))
                 {
-                    callback = klass.getDeclaredMethod(ACTION_HANDLER_NAME + name, InventoryClickEvent.class);
+                    if(actionAnnotation.value().equals(name)) 
+                        if(isActionHandlerValid(method)) 
+                            return method;
                 }
-                catch(NoSuchMethodException e)
+                else
                 {
-                    callback = klass.getDeclaredMethod(ACTION_HANDLER_NAME + name);
+                    methodName = method.getName();
+                    if(methodName.equals(name)) 
+                        if(isActionHandlerValid(method)) 
+                            return method;
+                    
+                    if(methodName.startsWith(ACTION_HANDLER_NAME))
+                        if(methodName.substring(ACTION_HANDLER_NAME.length()).equals(name))
+                            if(isActionHandlerValid(method))
+                                return method;
                 }
-
-                callback.setAccessible(true);
-                break;
             }
-            catch (Throwable ex)
-            {
-                callback = null;
-                klass = klass.getSuperclass();
-            }
+            klass = klass.getSuperclass();
         } while (klass != null);
         
-        return callback;
+        return null;
     }
     
     /**

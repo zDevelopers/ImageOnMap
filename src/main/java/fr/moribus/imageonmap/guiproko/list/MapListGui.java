@@ -38,56 +38,38 @@ public class MapListGui extends ExplorerGui<ImageMap>
     @Override
     protected ItemStack getViewItem(ImageMap map)
     {
-        ItemStack icon = new ItemStack(Material.MAP);
-
-
-        ItemMeta meta = icon.getItemMeta();
-
-        meta.setDisplayName(ChatColor.GREEN + "" + ChatColor.BOLD + map.getName());
-
         String mapDescription;
+        
         if(map instanceof SingleMap)
             mapDescription = "Single map";
         else
             mapDescription = "Poster map (" + ((PosterMap) map).getColumnCount() + "×" + ((PosterMap) map).getRowCount() + ")";
-
-        meta.setLore(Arrays.asList(
+        
+        return GuiUtils.makeItem(Material.MAP, 
+                ChatColor.GREEN + "" + ChatColor.BOLD + map.getName(), 
+                
                 ChatColor.WHITE + mapDescription,
                 "",
                 ChatColor.GRAY + "Map ID: " + map.getId(),
                 "",
                 ChatColor.GRAY + "» Left-click to get this map",
-                ChatColor.GRAY + "» Right-click for details and options"
-        ));
-
-        GuiUtils.hideItemAttributes(meta);
-
-        icon.setItemMeta(meta);
-
-
-        return icon;
+                ChatColor.GRAY + "» Right-click for details and options");
     }
 
     @Override
     protected ItemStack getEmptyViewItem()
     {
-        ItemStack empty = new ItemStack(Material.BARRIER);
-        ItemMeta meta = empty.getItemMeta();
-
-        meta.setDisplayName(ChatColor.RED + "You don't have any map.");
-        meta.setLore(Arrays.asList(
+        return GuiUtils.makeItem(Material.BARRIER, 
+                ChatColor.RED + "You don't have any map.", 
+                
                 ChatColor.GRAY + "Get started by creating a new one",
-                ChatColor.GRAY + "using " + ChatColor.WHITE + "/tomap <URL> [resize]" + ChatColor.GRAY + "!"
-        ));
-
-        empty.setItemMeta(meta);
-        return empty;
+                ChatColor.GRAY + "using " + ChatColor.WHITE + "/tomap <URL>" + ChatColor.GRAY + "!");
     }
 
     @Override
-    protected void onRightClick(ImageMap data)
+    protected void onRightClick(ImageMap map)
     {
-        Gui.open(getPlayer(), new MapDetailGui(data));
+        Gui.open(getPlayer(), new MapDetailGui(map));
     }
     
     @Override
@@ -149,7 +131,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
         if(mapPartLeft >= 0)
         {
             List<String> lore = meta.getLore();
-
+            
             lore.add("");
             lore.add(ChatColor.BLUE + "Minecraft maps limits");
 

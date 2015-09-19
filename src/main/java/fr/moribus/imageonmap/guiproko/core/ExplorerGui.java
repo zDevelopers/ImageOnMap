@@ -100,6 +100,8 @@ abstract public class ExplorerGui<T> extends ActionGui
         this.data = data;
         if(dataWidth > 0)
             setDataShape(dataWidth, (int) Math.ceil((double) data.length / (double) dataWidth));
+        else
+            setDataShape(0, data.length);
     }
 
     /**
@@ -134,7 +136,10 @@ abstract public class ExplorerGui<T> extends ActionGui
      */
     protected boolean hasData()
     {
-        return (data == null || data.length == 0) && (dataWidth == 0 && dataHeight == 0);
+        if(isData2D)
+            return dataWidth > 0 && dataHeight > 0;
+        else
+            return data != null && data.length > 0;
     }
     
     @Override
@@ -161,7 +166,7 @@ abstract public class ExplorerGui<T> extends ActionGui
 
                 for (int i = 0; i < max; i++)
                 {
-                    inventory.setItem(i, getViewItem(i + start));
+                    inventory.setItem(i, getViewItem(getData(i + start)));
                 }
             }
             else
@@ -183,11 +188,7 @@ abstract public class ExplorerGui<T> extends ActionGui
         }
         else
         {
-            ItemStack emptyIndicator = getEmptyViewItem();
-            if(emptyIndicator != null)
-            {
-                action("", 22, emptyIndicator);
-            }
+            updateAction("__empty__", getEmptyViewItem());
         }
 
         if(hasActions()) super.populate(inventory);
@@ -297,23 +298,23 @@ abstract public class ExplorerGui<T> extends ActionGui
      */
     private void onActionPickup(InventoryClickEvent event)
     {
-        int dataIndex = getDataIndex(event.getSlot());
+        ExplorerGuiEvent eventSlot = new ExplorerGuiEvent(this, event);
         if(event.getClick().equals(ClickType.RIGHT))
         {
-            onRightClick(getData(dataIndex));
+            onRightClick(eventSlot);
             event.setCancelled(true);
             return;
         }
 
-        ItemStack pickedUpItem = getPickedUpItem(dataIndex);
+        ItemStack pickedUpItem = getPickedUpItem(eventSlot);
         if(pickedUpItem == null || mode.equals(Mode.READONLY))
         {
             event.setCancelled(true);
             return;
         }
-
+        
         event.setCurrentItem(pickedUpItem);
-        GuiUtils.setItemLater(this, event.getSlot(), getViewItem(dataIndex));
+        GuiUtils.setItemLater(this, event.getSlot(), getViewItem(eventSlot));
     }
 
     /**
@@ -363,8 +364,9 @@ abstract public class ExplorerGui<T> extends ActionGui
             viewHeight = Math.min((int)Math.ceil((double)dataLength / (double)viewWidth),
                                    MAX_INVENTORY_COLUMN_SIZE);
             
-            if(hasActions() || dataLength > MAX_INVENTORY_SIZE || keepHorizontalScrollingSpace)
-                viewHeight--;
+            if(viewHeight >= MAX_INVENTORY_COLUMN_SIZE)
+                if(hasActions() || dataLength > MAX_INVENTORY_SIZE || keepHorizontalScrollingSpace)
+                    viewHeight--;
 
             viewSize = viewWidth * viewHeight;
             
@@ -379,11 +381,13 @@ abstract public class ExplorerGui<T> extends ActionGui
             pageCountX = (int)Math.ceil((double)dataWidth / (double)viewWidth);
             pageCountY = (int)Math.ceil((double)dataHeight / (double)viewHeight);
             
-            if((pageCountY > 1 && viewWidth == INVENTORY_ROW_SIZE) || keepVerticalScrollingSpace)
-                viewWidth--;
-
-            if((pageCountX > 1 && viewHeight == MAX_INVENTORY_COLUMN_SIZE) || keepHorizontalScrollingSpace)
-                viewHeight--;
+            if(viewWidth >= INVENTORY_ROW_SIZE)
+                if((pageCountY > 1 && viewWidth == INVENTORY_ROW_SIZE) || keepVerticalScrollingSpace)
+                    viewWidth--;
+            
+            if(viewHeight >= MAX_INVENTORY_COLUMN_SIZE)
+                if((pageCountX > 1 && viewHeight == MAX_INVENTORY_COLUMN_SIZE) || keepHorizontalScrollingSpace)
+                    viewHeight--;
             
             pageCountX = (int)Math.ceil((double)dataWidth / (double)viewWidth);
             pageCountY = (int)Math.ceil((double)dataHeight / (double)viewHeight);
@@ -399,39 +403,10 @@ abstract public class ExplorerGui<T> extends ActionGui
             action("up", INVENTORY_ROW_SIZE - 1);
             action("down", MAX_INVENTORY_SIZE - 1);
         }
-    }
-    
-    private void action_next()
-    {
-        next();
-    }
-    
-    private void action_previous()
-    {
-        previous();
-    }
-    
-    private void action_up()
-    {
-        up();
-    }
-    
-    private void action_down()
-    {
-        down();
-    }
-    
-    private int getDataIndex(int inventorySlot)
-    {
-        if(isData2D)
+        
+        if(!hasData())
         {
-            int column = currentPageX * viewWidth + inventorySlot % INVENTORY_ROW_SIZE;
-            int row = currentPageY * viewHeight + inventorySlot / INVENTORY_ROW_SIZE;
-            return row * dataWidth + column;
-        }
-        else
-        {
-            return currentPageX * viewSize + inventorySlot;
+            action("__empty__", 22);
         }
     }
     
@@ -442,18 +417,20 @@ abstract public class ExplorerGui<T> extends ActionGui
 
         return data[i];
     }
-
-    /**
-     * Returns the stack to display at the given index.
-     *
-     * @param i The index.
-     * @return The stack.
-     */
-    protected ItemStack getViewItem(int i)
+    
+    private ItemStack getViewItem(ExplorerGuiEvent event)
     {
-        return getViewItem(getData(i));
+        if(!event.isValid) return null;
+        if(isData2D)
+        {
+            return getViewItem(event.xData, event.yData);
+        }
+        else
+        {
+            return getViewItem(getData(event.posData));
+        }
     }
-
+    
     /**
      * Returns the stack to display at the given coordinates.
      *
@@ -463,7 +440,7 @@ abstract public class ExplorerGui<T> extends ActionGui
      */
     protected ItemStack getViewItem(int x, int y)
     {
-        return getViewItem(y * dataWidth + x);
+        return getViewItem(getData(y * dataWidth + x));
     }
 
     /**
@@ -475,12 +452,32 @@ abstract public class ExplorerGui<T> extends ActionGui
     protected ItemStack getViewItem(T data) { return null; }
 
     /**
-     * Returns the stack displayed in the center of the GUI if it is empty.
+     * Returns the item displayed in the center of the GUI if it is empty.
      *
-     * @return The stack.
+     * @return The item.
      */
-    protected ItemStack getEmptyViewItem() { return null; }
-
+    protected ItemStack getEmptyViewItem() 
+    { 
+        return GuiUtils.makeItem(Material.BARRIER, "Empty", "There's nothing to see here"); 
+    }
+    
+    private ItemStack getPickedUpItem(ExplorerGuiEvent event)
+    {
+        if(!event.isValid) return null;
+        if(isData2D)
+        {
+            return getPickedUpItem(event.xData, event.yData);
+        }
+        else
+        {
+            return getPickedUpItem(event.posData);
+        }
+    }
+    
+    protected ItemStack getPickedUpItem(int x, int y)
+    {
+        return getViewItem(x,y);
+    }
 
     private ItemStack getPickedUpItem(int dataIndex)
     {
@@ -496,7 +493,7 @@ abstract public class ExplorerGui<T> extends ActionGui
      * mode.
      *
      * @param data The picked-up piece of data.
-     * @return The stack to pick-up ({@code null} to cancel the pick-up).
+     * @return The stack to pick-up (or {@code null} to cancel the pick-up).
      */
     protected ItemStack getPickedUpItem(T data) { return getViewItem(data); }
 
@@ -563,7 +560,27 @@ abstract public class ExplorerGui<T> extends ActionGui
         icon.setItemMeta(meta);
         return icon;
     }
-
+    
+    private void onRightClick(ExplorerGuiEvent event)
+    {
+        if(!event.isValid) return;
+        if(isData2D)
+        {
+            onRightClick(event.xData, event.yData);
+        }
+        else
+        {
+            onRightClick(getData(event.posData));
+        }
+    }
+    
+    /**
+     * Triggered when the player right-clicks an item on the GUI.
+     * @param x The X position of the right-clicked data.
+     * @param y The Y position of the right-clicked data.
+     */
+    protected void onRightClick(int x, int y) {}
+    
     /**
      * Triggered when the player right-clicks an item on the GUI.
      *
@@ -572,7 +589,7 @@ abstract public class ExplorerGui<T> extends ActionGui
     protected void onRightClick(T data) {}
 
     /**
-     * Triggered when the player try to place an item inside the GUI.
+     * Triggered when the player tries to place an item inside the GUI.
      *
      * This will not place the item in the GUI, it's up to you to update the data and refresh
      * the GUI if you need so.
@@ -582,44 +599,69 @@ abstract public class ExplorerGui<T> extends ActionGui
      */
     protected boolean onPutItem(ItemStack item) { return true; }
 
+    static private final class ExplorerGuiEvent
+    {
+        //2D Explorer
+        public final int xData;
+        public final int yData;
+        
+        //1D Explorer
+        public final int posData;
+        
+        public final boolean isValid;
+        
+        public ExplorerGuiEvent(ExplorerGui gui, InventoryClickEvent event)
+        {
+            if(gui.isData2D)
+            {
+                xData = gui.currentPageX * gui.viewWidth + event.getSlot() % INVENTORY_ROW_SIZE;
+                yData = gui.currentPageY * gui.viewHeight + event.getSlot() / INVENTORY_ROW_SIZE;
+                posData = -1;
+                isValid = (xData < gui.dataWidth && xData >= 0 && yData < gui.dataHeight && yData >= 0);
+            }
+            else
+            {
+                xData = yData = -1;
+                posData = gui.currentPageX * gui.viewSize + event.getSlot();
+                isValid = (posData >= 0 && posData < gui.dataHeight);
+            }
+        }
+    }
+    
     /**
      * Displays the next horizontal page, if possible.
      */
+    @GuiAction
     public void next()
     {
-        if(!canGoNext()) return;
-        currentPageX++;
-        refresh();
+        setCurrentPageX(currentPageX - 1);
     }
 
     /**
      * Displays the previous horizontal page, if possible.
      */
+    @GuiAction
     public void previous()
     {
-        if(!canGoPrevious()) return;
-        currentPageX--;
-        refresh();
+        setCurrentPageX(currentPageX - 1);
     }
 
     /**
      * Displays the previous vertical page, if possible.
      */
+    @GuiAction
     public void up()
     {
-        if(!canGoUp()) return;
-        currentPageY--;
-        refresh();
+        setCurrentPageY(currentPageY - 1);
     }
 
     /**
      * Displays the next vertical page, if possible.
      */
+    @GuiAction
     public void down()
     {
-        if(!canGoDown()) return;
-        currentPageY++;
-        refresh();
+        setCurrentPageY(currentPageY + 1);
     }
     
     public boolean canGoNext()
@@ -640,6 +682,35 @@ abstract public class ExplorerGui<T> extends ActionGui
     public boolean canGoDown()
     {
         return currentPageY < pageCountY - 1;
+    }
+    
+    public int getCurrentPageX()
+    {
+        return currentPageX;
+    }
+
+    public void setCurrentPageX(int currentPageX)
+    {
+        setCurrentPage(currentPageX, currentPageY);
+    }
+
+    public int getCurrentPageY()
+    {
+        return currentPageY;
+    }
+
+    public void setCurrentPageY(int currentPageY)
+    {
+        setCurrentPage(currentPageX, currentPageY);
+    }
+    
+    public void setCurrentPage(int currentPageX, int currentPageY)
+    {
+        if(currentPageX < 1 || currentPageX > pageCountX - 1) return;
+        if(currentPageY < 1 || currentPageY > pageCountY - 1) return;
+        this.currentPageX = currentPageX;
+        this.currentPageY = currentPageY;
+        refresh();
     }
 
     /**

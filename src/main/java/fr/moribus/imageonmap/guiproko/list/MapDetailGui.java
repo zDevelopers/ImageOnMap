@@ -42,7 +42,7 @@ public class MapDetailGui extends ExplorerGui<Void>
         Material partMaterial = Material.PAPER;
         if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1))
             partMaterial = Material.EMPTY_MAP;
-
+        
         ItemStack part = new ItemStack(partMaterial);
         ItemMeta meta = part.getItemMeta();
 
@@ -65,12 +65,20 @@ public class MapDetailGui extends ExplorerGui<Void>
         {
             return getViewItem(0, 0);
         }
-        else return null;
+        else return super.getEmptyViewItem();
+    }
+    
+    @GuiAction
+    private void delete()
+    {
+        Gui.open(getPlayer(), new ConfirmDeleteMapGui(map, getCurrentPageX()));
     }
 
     @Override
     protected void onUpdate()
     {
+        ItemStack back, rename, delete;
+        
         setTitle("Your maps » " + ChatColor.BLACK + map.getName());
         setKeepHorizontalScrollingSpace(true);
 
@@ -79,36 +87,21 @@ public class MapDetailGui extends ExplorerGui<Void>
         else
             setData(null); // Fallback to the empty view item.
 
-
-        ItemStack back = new ItemStack(Material.EMERALD);
-        ItemMeta meta = back.getItemMeta();
-        meta.setDisplayName(ChatColor.GREEN + "« Back");
-        meta.setLore(Collections.singletonList(
-                ChatColor.GRAY + "Go back to the list."
-        ));
-        back.setItemMeta(meta);
-
-        ItemStack rename = new ItemStack(Material.BOOK_AND_QUILL);
-        meta = rename.getItemMeta();
-        meta.setDisplayName(ChatColor.BLUE + "Rename this image");
-        meta.setLore(Arrays.asList(
-                ChatColor.GRAY + "Click here to rename this image;",
-                ChatColor.GRAY + "this is used for your own organization."
-        ));
-        rename.setItemMeta(meta);
-
-        ItemStack delete = new ItemStack(Material.BARRIER);
-        meta = delete.getItemMeta();
-        meta.setDisplayName(ChatColor.RED + "Delete this image");
-        meta.setLore(Arrays.asList(
+        back = GuiUtils.makeItem(Material.EMERALD, 
+                ChatColor.GREEN + "« Back", 
+                
+                ChatColor.GRAY + "Go back to the list.");
+        
+        rename = GuiUtils.makeItem(Material.BOOK_AND_QUILL, 
+                ChatColor.BLUE + "Rename", 
+                
+                ChatColor.GRAY + "Renames this image");
+        
+        delete = GuiUtils.makeItem(Material.BARRIER, 
+                ChatColor.RED + "Delete", 
+                
                 ChatColor.GRAY + "Deletes this map " + ChatColor.WHITE + "forever" + ChatColor.GRAY + ".",
-                ChatColor.GRAY + "This action cannot be undone!",
-                "",
-                ChatColor.GRAY + "You will be asked to confirm your",
-                ChatColor.GRAY + "choice if you click here."
-        ));
-        delete.setItemMeta(meta);
-
+                ChatColor.GRAY + "This action cannot be undone!");
 
         action("rename", getSize() - 7, rename);
         action("delete", getSize() - 6, delete);
