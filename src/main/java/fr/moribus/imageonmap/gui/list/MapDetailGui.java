@@ -20,7 +20,6 @@ package fr.moribus.imageonmap.gui.list;
 
 import fr.moribus.imageonmap.gui.core.AbstractGui;
 import fr.moribus.imageonmap.gui.core.GuiManager;
-import fr.moribus.imageonmap.guiproko.core.Gui;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.ui.MapItemManager;

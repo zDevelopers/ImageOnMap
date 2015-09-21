@@ -86,7 +86,7 @@ abstract public class GuiUtils
 	 * @param slot The slot where to put the ItemStack
 	 * @param item The ItemStack to set
 	 */
-	static public void setItemLater(Gui gui, int slot, ItemStack item)
+	static public void setItemLater(InventoryGui gui, int slot, ItemStack item)
 	{
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ImageOnMap.getPlugin(),
 				new CreateDisplayItemTask(gui.getInventory(), item, slot));

@@ -39,7 +39,7 @@ import java.util.*;
  *
  * @author ProkopyL (main) and Amaury Carrade
  */
-abstract public class ActionGui extends Gui
+abstract public class ActionGui extends InventoryGui
 {
     /**
      * The prefix for action handlers.
