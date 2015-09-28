@@ -69,6 +69,25 @@ public class MapDetailGui extends ExplorerGui<Void>
     }
     
     @GuiAction
+    private void rename()
+    {
+        PromptGui.prompt(getPlayer(), new Callback<String>()
+        {
+            @Override
+            public void call(String newName)
+            {
+                if(newName == null || newName.isEmpty())
+                {
+                    getPlayer().sendMessage(ChatColor.RED + "Map names can't be empty.");
+                    return;
+                }
+                map.rename(newName);
+                getPlayer().sendMessage(ChatColor.GRAY + "Map successfuly renamed.");
+            }
+        }, map.getName());
+    }
+    
+    @GuiAction
     private void delete()
     {
         Gui.open(getPlayer(), new ConfirmDeleteMapGui(map, getCurrentPageX()));

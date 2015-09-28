@@ -35,6 +35,7 @@ abstract public class InventoryGui extends Gui
     static protected final int INVENTORY_ROW_SIZE = 9;
     static protected final int MAX_INVENTORY_COLUMN_SIZE = 6;
     static protected final int MAX_INVENTORY_SIZE = INVENTORY_ROW_SIZE * MAX_INVENTORY_COLUMN_SIZE;
+    static protected final int MAX_TITLE_LENGTH = 32;
     
     public InventoryGui()
     {
@@ -197,7 +198,14 @@ abstract public class InventoryGui extends Gui
      * It will be applied on the next GUI update.
      * @param title The new title of the inventory
      */
-    protected void setTitle(String title){this.title = title;}
+    protected void setTitle(String title)
+    {
+        if(title != null && title.length() > MAX_TITLE_LENGTH)
+        {
+            title = title.substring(0, MAX_TITLE_LENGTH - 4) + "...";
+        }
+        this.title = title;
+    }
     
     /** @return The underlying inventory, or null if the Gui has not been opened yet. */
     public Inventory getInventory() { return inventory; }

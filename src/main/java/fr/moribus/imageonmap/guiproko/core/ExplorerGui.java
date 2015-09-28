@@ -98,10 +98,11 @@ abstract public class ExplorerGui<T> extends ActionGui
     protected void setData(T[] data, int dataWidth)
     {
         this.data = data;
+        int dataLength = data == null ? 0 : data.length;
         if(dataWidth > 0)
-            setDataShape(dataWidth, (int) Math.ceil((double) data.length / (double) dataWidth));
+            setDataShape(dataWidth, (int) Math.ceil((double) dataLength / (double) dataWidth));
         else
-            setDataShape(0, data.length);
+            setDataShape(0, dataLength);
     }
 
     /**
