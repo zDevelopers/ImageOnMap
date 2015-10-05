@@ -21,6 +21,7 @@ package fr.moribus.imageonmap.guiproko.core;
 import fr.moribus.imageonmap.PluginLogger;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -33,6 +34,10 @@ abstract public class Gui
      */
     private Player player;
     
+    /**
+     * The parent of this GUI (if any).
+     */
+    private Gui parent;
     
     /**
      * If the inventory is currently open.
@@ -40,14 +45,11 @@ abstract public class Gui
     private boolean open = false;
     
     /**
-     * Closes this inventory.
+     * If the GUI is immune to close events.
+     * Useful to filter out excessive InventoryCloseEvents Bukkit sends ...
      */
-    public void close()
-    {
-        setClosed();
-    }
+    private boolean immune = false;
     
-
     /* ===== Public API ===== */
     
     /**
@@ -57,6 +59,27 @@ abstract public class Gui
     {
         onUpdate();
         onAfterUpdate();
+    }
+    
+    /**
+     * Closes this inventory.
+     */
+    public void close()
+    {
+        close(false);
+    }
+    
+    /**
+     * Closes this inventory.
+     * (Dirty hack edition)
+     * @param immune if true, the parent of this GUI will be set immune when opened
+     */
+    protected void close(boolean immune)
+    {
+        onClose();
+        
+        if(parent != null)
+           Gui.open(player, parent).setImmune(immune);
     }
     
     /* ===== Protected API ===== */
@@ -74,7 +97,7 @@ abstract public class Gui
     protected void onAfterUpdate() {}
     
     
-    protected final void setClosed()
+    protected void onClose()
     {
         if(open == false) return;
         open = false;
@@ -94,8 +117,30 @@ abstract public class Gui
     /** @return If the GUI is currently open or not. */
     public final boolean isOpen() { return open; }
     
+    /** @return The parent of this GUI. */
+    public final Gui getParent() { return parent; }
+    
+    private void setParent(Gui parent)
+    {
+        if(parent == this)
+            throw new IllegalArgumentException("A GUI cannot be its own parent.");
+        this.parent = parent;
+    }
+    
     /** @return The player this Gui instance is associated to. */
     protected final Player getPlayer() { return player; }
+    
+    protected boolean checkImmune()
+    {
+        if(!immune) return false;
+        immune = false;
+        return true;
+    }
+    
+    private void setImmune(boolean immune)
+    {
+        this.immune = immune;
+    }
     
     /* ===== Static API ===== */
     
@@ -164,14 +209,36 @@ abstract public class Gui
      * @param <T> A GUI type.
      * @param owner The player the GUI will be shown to.
      * @param gui The GUI.
+     * @param parent The parent of the newly created GUI. Can be null.
+     * @return The opened GUI.
+     */
+    static public final <T extends Gui> T open(final Player owner, final T gui, final Gui parent)
+    {
+        Gui openGui = openGuis.get(owner);
+        if(openGui != null) openGui.onClose();
+        if(parent != null) ((Gui)gui).setParent(parent);
+        
+         Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+                @Override
+                public void run()
+                {
+                    ((Gui)gui).open(owner);/* JAVA GENERICS Y U NO WORK */
+                }
+            }, 0);
+        
+        return gui;
+    }
+    
+    /**
+     * Opens a GUI for a player.
+     * @param <T> A GUI type.
+     * @param owner The player the GUI will be shown to.
+     * @param gui The GUI.
      * @return The opened GUI.
      */
     static public final <T extends Gui> T open(Player owner, T gui)
     {
-        close(owner);
-        ((Gui)gui).open(owner);/* JAVA GENERICS Y U NO WORK */
-
-        return gui;
+        return open(owner, gui, null);
     }
     
     /**
@@ -193,6 +260,7 @@ abstract public class Gui
     static public final <T extends Gui> T getOpenGui(HumanEntity entity, Class<T> guiClass)
     {
         Gui openGui = getOpenGui(entity);
+        if(openGui == null) return null;
         if(!guiClass.isAssignableFrom(openGui.getClass())) return null;
         return (T) openGui;
     }

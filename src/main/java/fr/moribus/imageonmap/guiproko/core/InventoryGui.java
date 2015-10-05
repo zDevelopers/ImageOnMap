@@ -112,8 +112,13 @@ abstract public class InventoryGui extends Gui
     @Override
     public void close()
     {
+        if(!isOpen()) return;
+        
+        //If close() is called manually, not from InventoryCloseEvent
+        if(getPlayer().getOpenInventory().equals(inventory))
+            getPlayer().closeInventory();
+        
         super.close();
-        getPlayer().closeInventory();
     }
     
     /**
@@ -236,11 +241,16 @@ abstract public class InventoryGui extends Gui
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event)
         {
-            Gui openGui = getOpenGui(event.getPlayer());
+            InventoryGui openGui = getOpenGui(event.getPlayer(), InventoryGui.class);
             if(openGui == null) return;
             
-            if(!openGui.isOpen());
-                openGui.setClosed();
+            if(!event.getInventory().equals(openGui.inventory)) return;
+            
+            if(openGui.isOpen())
+            {
+                if(openGui.checkImmune()) return;
+                openGui.close();
+            }
         }
     }
     

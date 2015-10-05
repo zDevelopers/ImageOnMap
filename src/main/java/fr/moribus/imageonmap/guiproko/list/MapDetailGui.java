@@ -84,13 +84,13 @@ public class MapDetailGui extends ExplorerGui<Void>
                 map.rename(newName);
                 getPlayer().sendMessage(ChatColor.GRAY + "Map successfuly renamed.");
             }
-        }, map.getName());
+        }, map.getName(), this);
     }
     
     @GuiAction
     private void delete()
     {
-        Gui.open(getPlayer(), new ConfirmDeleteMapGui(map, getCurrentPageX()));
+        Gui.open(getPlayer(), new ConfirmDeleteMapGui(map), this);
     }
 
     @Override

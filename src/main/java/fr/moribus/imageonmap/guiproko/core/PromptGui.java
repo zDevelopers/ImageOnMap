@@ -23,8 +23,6 @@ import fr.moribus.imageonmap.PluginLogger;
 import fr.moribus.imageonmap.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -46,10 +44,8 @@ public class PromptGui extends Gui
     
     /* ===== Reflection to Sign API ===== */
     static private Field fieldSign = null;//CraftSign.sign
-    static private Field fieldIsEditable = null;//TileEntitySign.isEditable
     static private Method methodGetHandle = null;//CraftPlayer.getHandle()
     static private Method methodOpenSign = null;//EntityHuman.openSign()
-    static private Field fieldSignEditor = null;//TileEntitySign.k{EntityHuman}
     static private Class classTileEntitySign = null;//CraftBlock.class
     
     static public boolean isAvailable()
@@ -60,12 +56,12 @@ public class PromptGui extends Gui
     
     static public void prompt(Player owner, Callback<String> callback)
     {
-        prompt(owner, callback, "");
+        prompt(owner, callback, "", null);
     }
     
-    static public void prompt(Player owner, Callback<String> callback, String contents)
+    static public void prompt(Player owner, Callback<String> callback, String contents, Gui parent)
     {
-        Gui.open(owner, new PromptGui(callback, contents));
+        Gui.open(owner, new PromptGui(callback, contents), parent);
     }
     
     static private void init()
@@ -81,10 +77,8 @@ public class PromptGui extends Gui
             
             
             fieldSign = ReflectionUtils.getField(CraftSign, "sign");
-            fieldIsEditable = ReflectionUtils.getField(classTileEntitySign, "isEditable");
             methodGetHandle = CraftPlayer.getDeclaredMethod("getHandle");
             methodOpenSign = EntityHuman.getDeclaredMethod("openSign", classTileEntitySign);
-            fieldSignEditor = ReflectionUtils.getField(classTileEntitySign, EntityHuman);
         }
         catch (Exception ex)
         {
@@ -144,17 +138,17 @@ public class PromptGui extends Gui
     }
     
     @Override
-    public void close()
+    protected void onClose()
     {
         Block block = getPlayer().getWorld().getBlockAt(signLocation);
         block.setType(Material.AIR);
-        super.close();
+        super.onClose();
     }
     
     private void validate(String[] lines)
     {
         callback.call(getSignContents(lines));
-        this.close();
+        this.close(true);//Bukkit sends extra InventoryCloseEvents when closing a sign GUI...
     }
     
     static private String getSignContents(String[] lines)

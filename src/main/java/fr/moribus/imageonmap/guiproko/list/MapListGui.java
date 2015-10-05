@@ -69,7 +69,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
     @Override
     protected void onRightClick(ImageMap map)
     {
-        Gui.open(getPlayer(), new MapDetailGui(map));
+        Gui.open(getPlayer(), new MapDetailGui(map), this);
     }
     
     @Override

@@ -70,12 +70,6 @@ public class ConfirmDeleteMapGui extends ActionGui
     private final ImageMap mapToDelete;
 
     /**
-     * The previously-viewed page of the list GUI.
-     * Used to be able to bring the user back to the same page.
-     */
-    private final int currentPage;
-
-    /**
      * A source of randomness.
      *
      * Yes, this javadoc comment is REALLY useful. Trust me.
@@ -86,12 +80,10 @@ public class ConfirmDeleteMapGui extends ActionGui
     /**
      *
      * @param mapToDelete The map being deleted.
-     * @param currentPage The previously-viewed page of the list GUI.
      */
-    public ConfirmDeleteMapGui(ImageMap mapToDelete, int currentPage)
+    public ConfirmDeleteMapGui(ImageMap mapToDelete)
     {
         this.mapToDelete = mapToDelete;
-        this.currentPage = currentPage;
     }
 
     @Override
@@ -165,7 +157,7 @@ public class ConfirmDeleteMapGui extends ActionGui
     @GuiAction
     protected void action_cancel()
     {
-        Gui.open(getPlayer(), new MapDetailGui(mapToDelete)).setCurrentPageX(currentPage);
+        close();
     }
     
     @GuiAction
@@ -184,6 +176,6 @@ public class ConfirmDeleteMapGui extends ActionGui
             getPlayer().sendMessage(ChatColor.RED + ex.getMessage());
         }
 
-        Gui.open(getPlayer(), new MapListGui(/* currentPage */));
+        close();
     }
 }
