@@ -51,7 +51,7 @@ public class MapDetailGui extends ExplorerGui<Void>
         Material partMaterial = Material.PAPER;
         if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1))
             partMaterial = Material.EMPTY_MAP;
-
+        
         ItemStack part = new ItemStack(partMaterial);
         ItemMeta meta = part.getItemMeta();
 
@@ -74,7 +74,7 @@ public class MapDetailGui extends ExplorerGui<Void>
         {
             return getViewItem(0, 0);
         }
-        else return null;
+        else return super.getEmptyViewItem();
     }
 
     @Override
@@ -119,13 +119,21 @@ public class MapDetailGui extends ExplorerGui<Void>
     @GuiAction ("rename")
     public void rename()
     {
-        Gui.open(getPlayer(), new PromptGui(new Callback<String>() {
+        PromptGui.prompt(getPlayer(), new Callback<String>()
+        {
             @Override
-            public void call(String name)
+            public void call(String newName)
             {
-                map.rename(name);
+                if (newName == null || newName.isEmpty())
+                {
+                    getPlayer().sendMessage(ChatColor.RED + "Map names can't be empty.");
+                    return;
+                }
+
+                map.rename(newName);
+                getPlayer().sendMessage(ChatColor.GRAY + "Map successfully renamed.");
             }
-        }, map.getName()), this);
+        }, map.getName(), this);
     }
 
     @GuiAction ("delete")
