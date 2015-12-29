@@ -18,46 +18,29 @@
 
 package fr.moribus.imageonmap.image;
 
-import fr.moribus.imageonmap.PluginLogger;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.moribus.imageonmap.worker.Worker;
-import fr.moribus.imageonmap.worker.WorkerCallback;
-import fr.moribus.imageonmap.worker.WorkerRunnable;
-import java.awt.Graphics;
+import fr.zcraft.zlib.components.worker.Worker;
+import fr.zcraft.zlib.components.worker.WorkerAttributes;
+import fr.zcraft.zlib.components.worker.WorkerCallback;
+import fr.zcraft.zlib.components.worker.WorkerRunnable;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import javax.imageio.ImageIO;
 
+
+@WorkerAttributes (name = "Image IO", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker
 {
-    static private ImageRendererExecutor instance;
-    
-    static public void start()
-    {
-        if(instance != null) stop();
-        instance = new ImageRendererExecutor();
-        instance.init();
-    }
-    
-    static public void stop()
-    {
-        instance.exit();
-        instance = null;
-    }
-    
-    private ImageRendererExecutor()
-    {
-        super("Image IO", true);
-    }
-    
     static public void Test(WorkerCallback callback)
     {
-        instance.submitQuery(new WorkerRunnable<Void>()
+        submitQuery(new WorkerRunnable<Void>()
         {
             @Override
             public Void run() throws Throwable
@@ -70,15 +53,15 @@ public class ImageRendererExecutor extends Worker
     
     static public void Render(final URL url, final boolean scaling, final UUID playerUUID, WorkerCallback<ImageMap> callback)
     {
-        instance.submitQuery(new WorkerRunnable<ImageMap>()
+        submitQuery(new WorkerRunnable<ImageMap>()
         {
             @Override
             public ImageMap run() throws Throwable
             {
                 final BufferedImage image = ImageIO.read(url);
-                if(image == null) throw new IOException("The given URL is not a valid image");
-                
-                if(scaling) return RenderSingle(image, playerUUID);
+                if (image == null) throw new IOException("The given URL is not a valid image");
+
+                if (scaling) return RenderSingle(image, playerUUID);
                 else return RenderPoster(image, playerUUID);
             }
         }, callback);
@@ -87,7 +70,7 @@ public class ImageRendererExecutor extends Worker
     static private ImageMap RenderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable
     {
         MapManager.checkMapLimit(1, playerUUID);
-        Future<Short> futureMapID = instance.submitToMainThread(new Callable<Short>()
+        Future<Short> futureMapID = submitToMainThread(new Callable<Short>()
         {
             @Override
             public Short call() throws Exception
@@ -101,7 +84,7 @@ public class ImageRendererExecutor extends Worker
         final short mapID = futureMapID.get();
         ImageIOExecutor.saveImage(mapID, finalImage);
         
-        instance.submitToMainThread(new Callable<Void>()
+        submitToMainThread(new Callable<Void>()
         {
             @Override
             public Void call() throws Exception
@@ -121,7 +104,7 @@ public class ImageRendererExecutor extends Worker
         final int mapCount = poster.getImagesCount();
         
         MapManager.checkMapLimit(mapCount, playerUUID);
-        final Future<short[]> futureMapsIds = instance.submitToMainThread(new Callable<short[]>()
+        final Future<short[]> futureMapsIds = submitToMainThread(new Callable<short[]>()
         {
             @Override
             public short[] call() throws Exception
@@ -136,7 +119,7 @@ public class ImageRendererExecutor extends Worker
         
         ImageIOExecutor.saveImage(mapsIDs, poster);
         
-        instance.submitToMainThread(new Callable<Void>()
+        submitToMainThread(new Callable<Void>()
         {
             @Override
             public Void call() throws Exception
@@ -178,5 +161,4 @@ public class ImageRendererExecutor extends Worker
         graphics.dispose();
         return newImage;
     }
-    
 }

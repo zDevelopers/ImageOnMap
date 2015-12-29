@@ -18,25 +18,23 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.PluginLogger;
-import fr.moribus.imageonmap.commands.*;
+import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.MapManagerException;
-import java.util.List;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.tools.PluginLogger;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 
-@CommandInfo(name =  "delete-noconfirm", usageParameters = "[map name]")
-public class DeleteNoConfirmCommand extends Command
+
+@CommandInfo (name =  "delete-noconfirm", usageParameters = "[map name]")
+public class DeleteNoConfirmCommand extends IoMCommand
 {
-
-    public DeleteNoConfirmCommand(Commands commandGroup) {
-        super(commandGroup);
-    }
-
     @Override
-    protected void run() throws CommandException 
+    protected void run() throws CommandException
     {
         Player player = playerSender();
         ImageMap map = getMapFromArgs();

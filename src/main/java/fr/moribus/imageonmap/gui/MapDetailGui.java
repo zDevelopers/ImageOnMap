@@ -16,15 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.moribus.imageonmap.guiproko.list;
+package fr.moribus.imageonmap.gui;
 
-import fr.moribus.imageonmap.guiproko.core.*;
-import fr.moribus.imageonmap.map.*;
-import org.bukkit.*;
-import org.bukkit.inventory.*;
-import org.bukkit.inventory.meta.*;
+import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.PosterMap;
+import fr.moribus.imageonmap.map.SingleMap;
+import fr.zcraft.zlib.components.gui.ExplorerGui;
+import fr.zcraft.zlib.components.gui.Gui;
+import fr.zcraft.zlib.components.gui.GuiAction;
+import fr.zcraft.zlib.components.gui.GuiUtils;
+import fr.zcraft.zlib.components.gui.PromptGui;
+import fr.zcraft.zlib.tools.Callback;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
 
 
 public class MapDetailGui extends ExplorerGui<Void>
@@ -80,38 +89,18 @@ public class MapDetailGui extends ExplorerGui<Void>
             setData(null); // Fallback to the empty view item.
 
 
-        ItemStack back = new ItemStack(Material.EMERALD);
-        ItemMeta meta = back.getItemMeta();
-        meta.setDisplayName(ChatColor.GREEN + "« Back");
-        meta.setLore(Collections.singletonList(
-                ChatColor.GRAY + "Go back to the list."
-        ));
-        back.setItemMeta(meta);
-
-        ItemStack rename = new ItemStack(Material.BOOK_AND_QUILL);
-        meta = rename.getItemMeta();
-        meta.setDisplayName(ChatColor.BLUE + "Rename this image");
-        meta.setLore(Arrays.asList(
+        action("rename", getSize() - 7, GuiUtils.makeItem(Material.BOOK_AND_QUILL, ChatColor.BLUE + "Rename this image", Arrays.asList(
                 ChatColor.GRAY + "Click here to rename this image;",
                 ChatColor.GRAY + "this is used for your own organization."
-        ));
-        rename.setItemMeta(meta);
+        )));
 
-        ItemStack delete = new ItemStack(Material.BARRIER);
-        meta = delete.getItemMeta();
-        meta.setDisplayName(ChatColor.RED + "Delete this image");
-        meta.setLore(Arrays.asList(
+        action("delete", getSize() - 6, GuiUtils.makeItem(Material.BARRIER, ChatColor.RED + "Delete this image", Arrays.asList(
                 ChatColor.GRAY + "Deletes this map " + ChatColor.WHITE + "forever" + ChatColor.GRAY + ".",
                 ChatColor.GRAY + "This action cannot be undone!",
                 "",
                 ChatColor.GRAY + "You will be asked to confirm your",
                 ChatColor.GRAY + "choice if you click here."
-        ));
-        delete.setItemMeta(meta);
-
-
-        action("rename", getSize() - 7, rename);
-        action("delete", getSize() - 6, delete);
+        )));
 
 
         // To keep the controls centered, the back button is shifted to the right when the
@@ -121,6 +110,33 @@ public class MapDetailGui extends ExplorerGui<Void>
         if(map instanceof PosterMap && ((PosterMap) map).getColumnCount() <= INVENTORY_ROW_SIZE)
             backSlot++;
 
-        action("back", backSlot, back);
+        action("back", backSlot, GuiUtils.makeItem(Material.EMERALD, ChatColor.GREEN + "« Back", Collections.singletonList(
+                ChatColor.GRAY + "Go back to the list."
+        )));
+    }
+
+
+    @GuiAction ("rename")
+    public void rename()
+    {
+        Gui.open(getPlayer(), new PromptGui(new Callback<String>() {
+            @Override
+            public void call(String name)
+            {
+                map.rename(name);
+            }
+        }, map.getName()), this);
+    }
+
+    @GuiAction ("delete")
+    public void delete()
+    {
+        Gui.open(getPlayer(), new ConfirmDeleteMapGui(map), this);
+    }
+
+    @GuiAction ("back")
+    public void back()
+    {
+        close();
     }
 }

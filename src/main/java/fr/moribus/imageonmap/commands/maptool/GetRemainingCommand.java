@@ -18,20 +18,15 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.commands.Command;
-import fr.moribus.imageonmap.commands.CommandException;
-import fr.moribus.imageonmap.commands.CommandInfo;
-import fr.moribus.imageonmap.commands.Commands;
+import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.ui.MapItemManager;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "getremaining", aliases = {"getrest"})
-public class GetRemainingCommand extends Command
+@CommandInfo (name = "getremaining", aliases = {"getrest"})
+public class GetRemainingCommand extends IoMCommand
 {
-    public GetRemainingCommand(Commands commandGroup) {
-        super(commandGroup);
-    }
-    
     @Override
     protected void run() throws CommandException
     {

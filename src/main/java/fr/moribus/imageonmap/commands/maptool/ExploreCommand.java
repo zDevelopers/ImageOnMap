@@ -19,19 +19,16 @@
 package fr.moribus.imageonmap.commands.maptool;
 
 
-import fr.moribus.imageonmap.commands.*;
-import fr.moribus.imageonmap.guiproko.list.MapListGui;
-import fr.moribus.imageonmap.guiproko.core.Gui;
+import fr.moribus.imageonmap.commands.IoMCommand;
+import fr.moribus.imageonmap.gui.MapListGui;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.gui.Gui;
 
 
-@CommandInfo(name = "explore")
-public class ExploreCommand extends Command
+@CommandInfo (name = "explore")
+public class ExploreCommand extends IoMCommand
 {
-	public ExploreCommand(Commands commandGroup)
-	{
-		super(commandGroup);
-	}
-
 	@Override
 	protected void run() throws CommandException
 	{

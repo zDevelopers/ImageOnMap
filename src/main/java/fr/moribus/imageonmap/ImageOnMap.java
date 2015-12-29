@@ -18,9 +18,14 @@
 
 package fr.moribus.imageonmap;
 
-import fr.moribus.imageonmap.commands.Commands;
-import fr.moribus.imageonmap.gui.core.*;
-import fr.moribus.imageonmap.guiproko.core.Gui;
+import fr.moribus.imageonmap.commands.maptool.DeleteConfirmCommand;
+import fr.moribus.imageonmap.commands.maptool.DeleteNoConfirmCommand;
+import fr.moribus.imageonmap.commands.maptool.ExploreCommand;
+import fr.moribus.imageonmap.commands.maptool.GetCommand;
+import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
+import fr.moribus.imageonmap.commands.maptool.ListCommand;
+import fr.moribus.imageonmap.commands.maptool.MigrateCommand;
+import fr.moribus.imageonmap.commands.maptool.NewCommand;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
@@ -28,11 +33,15 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.migration.MigratorExecutor;
 import fr.moribus.imageonmap.migration.V3Migrator;
 import fr.moribus.imageonmap.ui.MapItemManager;
+import fr.zcraft.zlib.components.commands.Commands;
+import fr.zcraft.zlib.components.gui.Gui;
+import fr.zcraft.zlib.core.ZPlugin;
+import fr.zcraft.zlib.tools.PluginLogger;
+
 import java.io.File;
 import java.io.IOException;
-import org.bukkit.plugin.java.JavaPlugin;
 
-public final class ImageOnMap extends JavaPlugin
+public final class ImageOnMap extends ZPlugin
 {
     static private final String IMAGES_DIRECTORY_NAME = "images";
     static private final String MAPS_DIRECTORY_NAME = "maps";
@@ -60,10 +69,10 @@ public final class ImageOnMap extends JavaPlugin
         return new File(imagesDirectory, "map"+mapID+".png");
     }
     
+    @SuppressWarnings ("unchecked")
     @Override
     public void onEnable()
     {
-        PluginLogger.init(this);
         // Creating the images and maps directories if necessary
         try
         {
@@ -76,30 +85,40 @@ public final class ImageOnMap extends JavaPlugin
             this.setEnabled(false);
             return;
         }
+
+        loadComponents(Gui.class, Commands.class, ImageIOExecutor.class, ImageRendererExecutor.class);
         
         //Init all the things !
         PluginConfiguration.init(this);
         MetricsLite.startMetrics();
-        ImageIOExecutor.start();
-        ImageRendererExecutor.start();
         MapManager.init();
-        Commands.init(this);
         MapInitEvent.init(this);
         MapItemManager.init();
-        GuiManager.init(this);
-        Gui.init(this);
+
+        Commands.register(
+                "maptool",
+                NewCommand.class,
+                ListCommand.class,
+                GetCommand.class,
+                DeleteConfirmCommand.class,
+                DeleteNoConfirmCommand.class,
+                GetRemainingCommand.class,
+                ExploreCommand.class,
+                MigrateCommand.class
+        );
+
+        Commands.registerShortcut("maptool", NewCommand.class, "tomap");
+        Commands.registerShortcut("maptool", ExploreCommand.class, "maps");
     }
 
     @Override
     public void onDisable()
     {
-        ImageIOExecutor.stop();
-        ImageRendererExecutor.stop();
         MapManager.exit();
         MapItemManager.exit();
         MigratorExecutor.waitForMigration();
-        PluginLogger.exit();
-        Gui.exit();
+
+        super.onDisable();
     }
     
     private File checkPluginDirectory(File primaryFile, File... alternateFiles) throws IOException
@@ -113,5 +132,4 @@ public final class ImageOnMap extends JavaPlugin
             throw new IOException("Could not create '" + primaryFile.getName() + "' plugin directory.");
         return primaryFile;
     }
-
 }

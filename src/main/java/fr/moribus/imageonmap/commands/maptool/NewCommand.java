@@ -18,25 +18,21 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.PluginLogger;
-import fr.moribus.imageonmap.commands.Command;
-import fr.moribus.imageonmap.commands.CommandException;
-import fr.moribus.imageonmap.commands.CommandInfo;
-import fr.moribus.imageonmap.commands.Commands;
+import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.map.ImageMap;
-import fr.moribus.imageonmap.worker.WorkerCallback;
-import java.net.MalformedURLException;
-import java.net.URL;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.worker.WorkerCallback;
+import fr.zcraft.zlib.tools.PluginLogger;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "new", usageParameters = "<URL> [resize]")
-public class NewCommand  extends Command
+import java.net.MalformedURLException;
+import java.net.URL;
+
+@CommandInfo (name = "new", usageParameters = "<URL> [resize]")
+public class NewCommand  extends IoMCommand
 {
-    public NewCommand(Commands commandGroup) {
-        super(commandGroup);
-    }
-    
     @Override
     protected void run() throws CommandException
     {
@@ -83,5 +79,4 @@ public class NewCommand  extends Command
             }
         });
     }
-
 }

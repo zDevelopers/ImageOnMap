@@ -18,19 +18,18 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.commands.*;
+import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
-import java.util.List;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "list")
-public class ListCommand extends Command
+import java.util.List;
+
+@CommandInfo (name = "list")
+public class ListCommand extends IoMCommand
 {
-    public ListCommand(Commands commandGroup) {
-        super(commandGroup);
-    }
-    
     @Override
     protected void run() throws CommandException
     {
@@ -52,5 +51,4 @@ public class ListCommand extends Command
         }
         player.sendMessage(sMapList);
     }
-
 }

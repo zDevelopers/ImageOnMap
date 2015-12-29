@@ -18,10 +18,10 @@
 
 package fr.moribus.imageonmap.ui;
 
-import fr.moribus.imageonmap.guiproko.core.GuiUtils;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
+import fr.zcraft.zlib.components.gui.GuiUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

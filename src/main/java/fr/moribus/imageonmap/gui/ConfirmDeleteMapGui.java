@@ -16,17 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.moribus.imageonmap.guiproko.list;
+package fr.moribus.imageonmap.gui;
 
-import fr.moribus.imageonmap.*;
-import fr.moribus.imageonmap.guiproko.core.*;
-import fr.moribus.imageonmap.map.*;
-import org.bukkit.*;
-import org.bukkit.inventory.*;
-import org.bukkit.inventory.meta.*;
-import org.bukkit.material.*;
+import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.map.MapManagerException;
+import fr.zcraft.zlib.components.gui.ActionGui;
+import fr.zcraft.zlib.components.gui.Gui;
+import fr.zcraft.zlib.components.gui.GuiAction;
+import fr.zcraft.zlib.tools.PluginLogger;
+import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.Dye;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Random;
 
 
 public class ConfirmDeleteMapGui extends ActionGui
@@ -41,12 +48,6 @@ public class ConfirmDeleteMapGui extends ActionGui
      * The map being deleted.
      */
     private ImageMap mapToDelete;
-
-    /**
-     * The previously-viewed page of the list GUI.
-     * Used to be able to bring the user back to the same page.
-     */
-    private int currentPage;
 
     /**
      * The messages randomly displayed in the lore of the “delete” buttons.
@@ -69,12 +70,10 @@ public class ConfirmDeleteMapGui extends ActionGui
     /**
      *
      * @param mapToDelete The map being deleted.
-     * @param currentPage The previously-viewed page of the list GUI.
      */
-    public ConfirmDeleteMapGui(ImageMap mapToDelete, int currentPage)
+    public ConfirmDeleteMapGui(ImageMap mapToDelete)
     {
         this.mapToDelete = mapToDelete;
-        this.currentPage = currentPage;
 
         deleteMessages = new String[]{
                 "Please", "I'm still alive", "Don't do that", "I'm still loving you", "I want to live",
@@ -166,13 +165,15 @@ public class ConfirmDeleteMapGui extends ActionGui
         subButton.setItemMeta(meta);
         return subButton;
     }
-    
-    protected void action_cancel()
+
+    @GuiAction ("cancel")
+    protected void cancel()
     {
-        Gui.open(getPlayer(), new MapDetailGui(null /*mapToDelete, currentPage */));
+        close();
     }
-    
-    protected void action_delete()
+
+    @GuiAction ("delete")
+    protected void delete()
     {
         MapManager.clear(getPlayer().getInventory(), mapToDelete);
 
@@ -187,6 +188,12 @@ public class ConfirmDeleteMapGui extends ActionGui
             getPlayer().sendMessage(ChatColor.RED + "This map does not exists.");
         }
 
-        Gui.open(getPlayer(), new MapListGui(/* currentPage */));
+
+        // We try to open the map list GUI, if the map was deleted, before the details GUI
+        // (so the grandparent GUI)..
+        if (getParent() != null && getParent().getParent() != null)
+            Gui.open(getPlayer(), getParent().getParent());
+        else
+            close();
     }
 }
