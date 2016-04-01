@@ -59,7 +59,7 @@ public class MapItemManager implements Listener
     
     static public boolean give(Player player, SingleMap map)
     {
-        return give(player, createMapItem(map.getMapsIDs()[0], map.getName()));
+        return give(player, createMapItem(map));
     }
     
     static public boolean give(Player player, PosterMap map)
@@ -113,6 +113,27 @@ public class MapItemManager implements Listener
             player.getInventory().addItem(item);
             return false;
         }
+    }
+    
+    static public ItemStack createMapItem(SingleMap map)
+    {
+        return createMapItem(map.getMapsIDs()[0], map.getName());
+    }
+    
+    static public ItemStack createMapItem(PosterMap map, int x, int y)
+    {
+        String mapName;
+        if(map.hasColumnData())
+        {
+            mapName = map.getName() +
+                " (row " + x + 
+                ", column " + y + ")";
+        }
+        else
+        {
+            mapName = map.getName();
+        }
+        return createMapItem(map.getMapIdAt(x, y), mapName);
     }
     
     static public ItemStack createMapItem(short mapID, String text)

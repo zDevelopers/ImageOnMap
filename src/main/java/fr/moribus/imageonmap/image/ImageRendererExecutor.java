@@ -35,7 +35,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 
-@WorkerAttributes (name = "Image IO", queriesMainThread = true)
+@WorkerAttributes (name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker
 {
     static public void Test(WorkerCallback callback)

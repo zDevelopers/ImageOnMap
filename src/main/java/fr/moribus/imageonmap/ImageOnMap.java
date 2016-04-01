@@ -81,7 +81,7 @@ public final class ImageOnMap extends ZPlugin
         }
         catch(IOException ex)
         {
-            PluginLogger.error("FATAL : " + ex.getMessage(), null);
+            PluginLogger.error("FATAL : " + ex.getMessage());
             this.setEnabled(false);
             return;
         }

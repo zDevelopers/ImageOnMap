@@ -21,6 +21,7 @@ package fr.moribus.imageonmap.gui;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
+import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.zlib.components.gui.ExplorerGui;
 import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.gui.GuiAction;
@@ -36,7 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 
-public class MapDetailGui extends ExplorerGui<Void>
+public class MapDetailGui extends ExplorerGui
 {
     private final ImageMap map;
 
@@ -65,6 +66,21 @@ public class MapDetailGui extends ExplorerGui<Void>
 
         part.setItemMeta(meta);
         return part;
+    }
+    
+    @Override
+    protected ItemStack getPickedUpItem(int x, int y)
+    {
+        if(map instanceof SingleMap)
+        {
+            return MapItemManager.createMapItem((SingleMap)map);
+        }
+        else if(map instanceof PosterMap)
+        {
+            return MapItemManager.createMapItem((PosterMap)map, x, y);
+        }
+        
+        throw new IllegalStateException("Unsupported map type : " + map.getType());
     }
 
     @Override
