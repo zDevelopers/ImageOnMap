@@ -28,7 +28,9 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
@@ -71,6 +73,26 @@ public class MapInitEvent implements Listener
     {
         ItemStack item = event.getPlayer().getInventory().getItem(event.getNewSlot());
         initMap(item);
+    }
+    
+    @EventHandler
+    public void onPlayerPickup(PlayerPickupItemEvent event)
+    {
+        ItemStack item = event.getItem().getItemStack();
+        initMap(item);
+    }
+    
+    @EventHandler
+    public void onPlayerInventoryPlace(InventoryClickEvent event)
+    {
+        switch(event.getAction())
+        {
+            case PLACE_ALL:
+            case PLACE_ONE:
+            case PLACE_SOME:
+            case SWAP_WITH_CURSOR:
+                initMap(event.getCursor());
+        }
     }
     
     static protected void initMap(ItemStack item)

@@ -28,6 +28,7 @@ package fr.moribus.imageonmap;
 * either expressed or implied, of anybody else.
 */
 
+import fr.zcraft.zlib.tools.PluginLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;

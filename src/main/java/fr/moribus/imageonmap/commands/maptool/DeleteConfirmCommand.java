@@ -18,20 +18,18 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.commands.*;
+import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
+
 import java.util.List;
 
-@CommandInfo(name =  "delete", usageParameters = "[tool name]")
-public class DeleteConfirmCommand extends Command
+@CommandInfo (name =  "delete", usageParameters = "[tool name]")
+public class DeleteConfirmCommand extends IoMCommand
 {
-
-    public DeleteConfirmCommand(Commands commandGroup) {
-        super(commandGroup);
-    }
-
     @Override
-    protected void run() throws CommandException 
+    protected void run() throws CommandException
     {
         ImageMap map = getMapFromArgs();
         tellRaw("{text:\"You are going to delete \",extra:[{text:\""+ map.getId() +"\",color:gold},{text:\". Are you sure ? \",color:white}," +
@@ -45,8 +43,7 @@ public class DeleteConfirmCommand extends Command
     {
         if(args.length == 1) 
             return getMatchingMapNames(playerSender(), args[0]);
+
         return null;
     }
-
 }
-

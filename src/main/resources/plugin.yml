@@ -8,6 +8,9 @@ commands:
       usage: /<command> [URL]
    maptool:
       description: manage maps
+   maps:
+      description: manage maps through a GUI
+
 permissions:
     imageonmap.userender:
         description: Allows you to use /tomap

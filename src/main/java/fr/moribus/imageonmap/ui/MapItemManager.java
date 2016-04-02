@@ -21,16 +21,19 @@ package fr.moribus.imageonmap.ui;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Queue;
-import java.util.UUID;
+import fr.zcraft.zlib.components.gui.GuiUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Queue;
+import java.util.UUID;
 
 public class MapItemManager implements Listener
 {
@@ -56,7 +59,7 @@ public class MapItemManager implements Listener
     
     static public boolean give(Player player, SingleMap map)
     {
-        return give(player, createMapItem(map.getMapsIDs()[0], map.getName()));
+        return give(player, createMapItem(map));
     }
     
     static public boolean give(Player player, PosterMap map)
@@ -69,7 +72,7 @@ public class MapItemManager implements Listener
         {
             if(map.hasColumnData())
             {
-                mapName = map.getName() + 
+                mapName = map.getName() +
                     " (row " + map.getRowAt(i) + 
                     ", column " + map.getColumnAt(i) + ")";
             }
@@ -112,15 +115,69 @@ public class MapItemManager implements Listener
         }
     }
     
+    static public ItemStack createMapItem(SingleMap map)
+    {
+        return createMapItem(map.getMapsIDs()[0], map.getName());
+    }
+    
+    static public ItemStack createMapItem(PosterMap map, int x, int y)
+    {
+        String mapName;
+        if(map.hasColumnData())
+        {
+            mapName = map.getName() +
+                " (row " + x + 
+                ", column " + y + ")";
+        }
+        else
+        {
+            mapName = map.getName();
+        }
+        return createMapItem(map.getMapIdAt(x, y), mapName);
+    }
+    
     static public ItemStack createMapItem(short mapID, String text)
     {
         ItemStack itemMap = new ItemStack(Material.MAP, 1, mapID);
         
         ItemMeta meta = itemMap.getItemMeta();
-        meta.setDisplayName(text);
+        meta.setDisplayName(ChatColor.RESET + text);
+        GuiUtils.hideItemAttributes(meta);
         itemMap.setItemMeta(meta);
         
         return itemMap;
+    }
+
+    /**
+     * Returns the item to place to display the (col;row) part of the given poster.
+     *
+     * @param col The column to display. Starts at 0.
+     * @param row The row to display. Starts at 0.
+     *
+     * @return The map.
+     *
+     * @throws ArrayIndexOutOfBoundsException If col;row is not inside the map.
+     */
+    static public ItemStack createSubMapItem(ImageMap map, int col, int row)
+    {
+        if(map instanceof PosterMap && ((PosterMap) map).hasColumnData())
+        {
+            return MapItemManager.createMapItem(
+                    ((PosterMap) map).getMapIdAt(row, col),
+                    map.getName() +
+                            " (row " + (row + 1) +
+                            ", column " + (col + 1) + ")"
+            );
+        }
+        else
+        {
+            if(row != 0 || col != 0)
+            {
+                throw new ArrayIndexOutOfBoundsException(); // Coherence
+            }
+
+            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName());
+        }
     }
     
     static public int getCacheSize(Player player)

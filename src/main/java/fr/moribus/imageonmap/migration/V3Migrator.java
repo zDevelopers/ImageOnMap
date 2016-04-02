@@ -19,8 +19,14 @@
 package fr.moribus.imageonmap.migration;
 
 import fr.moribus.imageonmap.ImageOnMap;
-import fr.moribus.imageonmap.PluginLogger;
 import fr.moribus.imageonmap.map.MapManager;
+import fr.zcraft.zlib.tools.PluginLogger;
+import fr.zcraft.zlib.tools.mojang.UUIDFetcher;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,10 +43,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.Plugin;
 
 /**
  * This class represents and executes the ImageOnMap v3.x migration process
@@ -350,7 +352,7 @@ public class V3Migrator implements Runnable
         }
         catch(IOException ex)
         {
-            PluginLogger.error("An error occured while fetching the UUIDs from Mojang", ex);
+            PluginLogger.error("An error occurred while fetching the UUIDs from Mojang", ex);
             throw ex;
         }
         catch(InterruptedException ex)
@@ -358,12 +360,12 @@ public class V3Migrator implements Runnable
             PluginLogger.error("The migration worker has been interrupted", ex);
             throw ex;
         }
-        PluginLogger.info("Fetching done. {0} UUIDs have been retreived.", usersUUIDs.size());
+        PluginLogger.info("Fetching done. {0} UUIDs have been retrieved.", usersUUIDs.size());
     }
     
     /**
-     * Fetches the UUIDs that could not be retreived via Mojang's standard API
-     * @return true if at least one UUID has been retreived, false otherwise
+     * Fetches the UUIDs that could not be retrieved via Mojang's standard API
+     * @return true if at least one UUID has been retrieved, false otherwise
      */
     private boolean fetchMissingUUIDs() throws IOException, InterruptedException
     {
@@ -378,7 +380,7 @@ public class V3Migrator implements Runnable
         }
         catch(IOException ex)
         {
-            PluginLogger.error("An error occured while fetching the UUIDs from Mojang");
+            PluginLogger.error("An error occurred while fetching the UUIDs from Mojang");
             throw ex;
         }
         catch(InterruptedException ex)

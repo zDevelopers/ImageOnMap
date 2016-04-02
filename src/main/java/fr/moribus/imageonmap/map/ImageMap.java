@@ -18,15 +18,14 @@
 
 package fr.moribus.imageonmap.map;
 
-import fr.moribus.imageonmap.ui.MapItemManager;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import org.bukkit.Material;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import fr.moribus.imageonmap.ui.*;
+import org.bukkit.*;
+import org.bukkit.configuration.*;
+import org.bukkit.configuration.serialization.*;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.*;
+
+import java.util.*;
 
 public abstract class ImageMap implements ConfigurationSerializable
 {
@@ -158,6 +157,11 @@ public abstract class ImageMap implements ConfigurationSerializable
     public synchronized String getId()
     {
         return id;
+    }
+
+    public synchronized Type getType()
+    {
+        return mapType;
     }
 
     public synchronized void rename(String id, String name)

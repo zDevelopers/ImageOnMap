@@ -61,7 +61,7 @@ abstract public class MapManager
         }
         return false;
     }
-    
+
     static public boolean managesMap(ItemStack item)
     {
         synchronized(playerMaps)
@@ -73,7 +73,7 @@ abstract public class MapManager
         }
         return false;
     }
-    
+
     static public ImageMap createMap(UUID playerUUID, short mapID) throws MapManagerException
     {
         ImageMap newMap = new SingleMap(playerUUID, mapID);
@@ -139,9 +139,65 @@ abstract public class MapManager
         return getPlayerMapStore(playerUUID).getMapList();
     }
     
+    static public ImageMap[] getMaps(UUID playerUUID)
+    {
+        return getPlayerMapStore(playerUUID).getMaps();
+    }
+
+    /**
+     * Returns the number of minecraft maps used by the images rendered by the given player.
+     *
+     * @param playerUUID The player's UUID.
+     *
+     * @return The count.
+     */
+    static public int getMapPartCount(UUID playerUUID)
+    {
+        return getPlayerMapStore(playerUUID).getMapCount();
+    }
+    
     static public ImageMap getMap(UUID playerUUID, String mapId)
     {
         return getPlayerMapStore(playerUUID).getMap(mapId);
+    }
+
+    /**
+     * Returns the {@link ImageMap} this map belongs to.
+     *
+     * @param mapId The ID of the Minecraft map.
+     * @return The {@link ImageMap}.
+     */
+    static public ImageMap getMap(short mapId)
+    {
+        synchronized(playerMaps)
+        {
+            for(PlayerMapStore mapStore : playerMaps)
+            {
+                if(mapStore.managesMap(mapId))
+                {
+                    for(ImageMap map : mapStore.getMapList())
+                    {
+                        if(map.managesMap(mapId))
+                        {
+                            return map;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the {@link ImageMap} this map belongs to.
+     *
+     * @param item The map, as an {@link ItemStack}.
+     * @return The {@link ImageMap}.
+     */
+    static public ImageMap getMap(ItemStack item)
+    {
+        return getMap(item.getDurability());
     }
     
     static public void clear(Inventory inventory)
@@ -192,7 +248,12 @@ abstract public class MapManager
         }
         getPlayerMapStore(userUUID).checkMapLimit(newMapsCount);
     }
-    
+
+    /**
+     * Returns the total number of minecraft maps used by ImageOnMap images.
+     *
+     * @return The count.
+     */
     static public int getMapCount()
     {
         int mapCount = 0;
