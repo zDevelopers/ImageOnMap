@@ -32,10 +32,11 @@ public class DeleteConfirmCommand extends IoMCommand
     protected void run() throws CommandException
     {
         ImageMap map = getMapFromArgs();
-        tellRaw("{text:\"You are going to delete \",extra:[{text:\""+ map.getId() +"\",color:gold},{text:\". Are you sure ? \",color:white}," +
-            "{text:\"[Confirm]\", color:green, clickEvent:{action:run_command,value:\"/maptool delete-noconfirm "+ map.getId() +"\"}, " + 
-            "hoverEvent:{action:show_text,value:{text:\"This map will be deleted \",extra:[{text:\"forever\",color:red,bold:true,italic:true,underlined:true}, {text:\" !\", underlined:true}],underlined:true}}}]}");
-        
+        String msg ="{\"text\":\"You are going to delete \",\"extra\":[{\"text\":\""+ map.getId() +"\",\"color\":\"gold\"},{\"text\":\". Are you sure ? \",\"color\":\"white\"}," +
+            "{\"text\":\"[Confirm]\", \"color\":\"green\", \"clickEvent\":{\"action\":\"run_command\",\"value\":\"/maptool delete-noconfirm "+ map.getId() +"\"}, " + 
+            "\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"This map will be deleted \",\"extra\":[{\"text\":\"forever\",\"color\":\"red\",\"bold\":true,\"italic\":true,\"underlined\":true}, {\"text\":\" !\", \"underlined\":true}],\"underlined\":true}}}]}";
+
+        tellRaw(   msg);     
     }
     
     @Override
