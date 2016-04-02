@@ -29,7 +29,10 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -58,7 +61,20 @@ public class ImageRendererExecutor extends Worker
             @Override
             public ImageMap run() throws Throwable
             {
-                final BufferedImage image = ImageIO.read(url);
+                final URLConnection connection = url.openConnection();
+                connection.connect();
+                if(connection instanceof HttpURLConnection)
+                {
+                    final HttpURLConnection  httpConnection = (HttpURLConnection) connection;
+                    final int httpCode = httpConnection.getResponseCode();
+                    if((httpCode / 100) != 2)
+                    {
+                        throw new IOException("HTTP error : " + httpCode +  " " + httpConnection.getResponseMessage());
+                    }
+                }
+                final InputStream stream = connection.getInputStream();
+                final BufferedImage image = ImageIO.read(stream);
+                
                 if (image == null) throw new IOException("The given URL is not a valid image");
 
                 if (scaling) return RenderSingle(image, playerUUID);

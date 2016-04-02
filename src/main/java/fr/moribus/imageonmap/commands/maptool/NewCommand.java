@@ -75,7 +75,10 @@ public class NewCommand  extends IoMCommand
             public void errored(Throwable exception)
             {
                 player.sendMessage("§cMap rendering failed : " + exception.getMessage());
-                PluginLogger.warning("Rendering from '{0}' failed", exception, player.getName());
+                PluginLogger.warning("Rendering from {0} failed : {1} : {2}", 
+                        player.getName(),
+                        exception.getClass().getCanonicalName(),
+                        exception.getMessage());
             }
         });
     }
