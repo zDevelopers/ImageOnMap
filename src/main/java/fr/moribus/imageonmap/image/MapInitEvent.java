@@ -19,6 +19,7 @@
 package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.zcraft.zlib.core.ZLib;
 import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -34,13 +35,12 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
-import org.bukkit.plugin.Plugin;
 
 public class MapInitEvent implements Listener
 {
-    static public void init(Plugin plugin)
+    static public void init()
     {
-        plugin.getServer().getPluginManager().registerEvents(new MapInitEvent(), plugin);
+        ZLib.registerEvents(new MapInitEvent());
         
         for(World world : Bukkit.getWorlds())
         {

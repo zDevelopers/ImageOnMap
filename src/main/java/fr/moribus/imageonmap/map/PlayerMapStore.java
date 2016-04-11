@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.bukkit.Material;
 
 public class PlayerMapStore implements ConfigurationSerializable
 {
@@ -60,6 +61,9 @@ public class PlayerMapStore implements ConfigurationSerializable
     
     public synchronized boolean managesMap(ItemStack item)
     {
+        if(item == null) return false;
+        if(item.getType() != Material.MAP) return false;
+        
         for(ImageMap map : mapList)
         {
             if(map.managesMap(item)) return true;

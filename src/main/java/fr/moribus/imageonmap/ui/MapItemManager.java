@@ -19,9 +19,12 @@
 package fr.moribus.imageonmap.ui;
 
 import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.zlib.components.gui.GuiUtils;
+import fr.zcraft.zlib.core.ZLib;
+import fr.zcraft.zlib.tools.items.ItemUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -34,6 +37,10 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Queue;
 import java.util.UUID;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 public class MapItemManager implements Listener
 {
@@ -42,6 +49,7 @@ public class MapItemManager implements Listener
     static public void init()
     {
         mapItemCache = new HashMap();
+        ZLib.registerEvents(new MapItemManager());
     }
     
     static public void exit()
@@ -194,5 +202,60 @@ public class MapItemManager implements Listener
             mapItemCache.put(player.getUniqueId(), cache);
         }
         return cache;
+    }
+    
+    static private String getMapTitle(ItemStack item)
+    {
+        ImageMap map = MapManager.getMap(item);
+        if(map instanceof SingleMap)
+        {
+            return map.getName();
+        }
+        else
+        {
+            PosterMap poster = (PosterMap) map;
+            int index = poster.getIndex(item.getDurability());
+            return map.getName() + " (row " + (poster.getRowAt(index)) +
+                            ", column " + (poster.getColumnAt(index)) + ")";
+        }
+    }
+    
+    static private void onItemFramePlace(ItemFrame frame, Player player, PlayerInteractEntityEvent event)
+    {
+        if(frame.getItem().getType() != Material.AIR) return;
+        if(!MapManager.managesMap(player.getItemInHand())) return;
+        
+        
+        event.setCancelled(true);
+        ItemStack is = new ItemStack(Material.MAP, 1, player.getItemInHand().getDurability());
+        frame.setItem(is);
+        
+        ItemUtils.consumeItem(player);
+    }
+    
+    static private void onItemFrameRemove(ItemFrame frame, Player player)
+    {
+        ItemStack item = frame.getItem();
+        if(frame.getItem().getType() != Material.MAP) return;
+        if(!MapManager.managesMap(frame.getItem())) return;
+        
+        frame.setItem(ItemUtils.setDisplayName(item, getMapTitle(item)));
+    }
+    
+    @EventHandler
+    static public void onEntityDamage(EntityDamageByEntityEvent event)
+    {
+        if(!(event.getEntity() instanceof ItemFrame)) return;
+        if(!(event.getDamager() instanceof Player)) return;
+        
+        onItemFrameRemove((ItemFrame)event.getEntity(), (Player)event.getDamager());
+    }
+    
+    @EventHandler
+    static public void onEntityInteract(PlayerInteractEntityEvent event)
+    {
+        if(!(event.getRightClicked() instanceof ItemFrame)) return;
+        
+        onItemFramePlace((ItemFrame)event.getRightClicked(), event.getPlayer(), event);
     }
 }

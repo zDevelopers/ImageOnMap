@@ -22,8 +22,10 @@ import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.rawtext.RawText;
 
 import java.util.List;
+import org.bukkit.ChatColor;
 
 @CommandInfo (name =  "delete", usageParameters = "[tool name]")
 public class DeleteConfirmCommand extends IoMCommand
@@ -32,11 +34,26 @@ public class DeleteConfirmCommand extends IoMCommand
     protected void run() throws CommandException
     {
         ImageMap map = getMapFromArgs();
-        String msg ="{\"text\":\"You are going to delete \",\"extra\":[{\"text\":\""+ map.getId() +"\",\"color\":\"gold\"},{\"text\":\". Are you sure ? \",\"color\":\"white\"}," +
-            "{\"text\":\"[Confirm]\", \"color\":\"green\", \"clickEvent\":{\"action\":\"run_command\",\"value\":\"/maptool delete-noconfirm "+ map.getId() +"\"}, " + 
-            "\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"This map will be deleted \",\"extra\":[{\"text\":\"forever\",\"color\":\"red\",\"bold\":true,\"italic\":true,\"underlined\":true}, {\"text\":\" !\", \"underlined\":true}],\"underlined\":true}}}]}";
-
-        tellRaw(   msg);     
+        
+        RawText hoverText = new RawText("This map will be deleted ")
+                .style(ChatColor.UNDERLINE)
+            .then("forever")
+                .style(ChatColor.RED, ChatColor.UNDERLINE, ChatColor.ITALIC, ChatColor.BOLD)
+            .then(" !")
+            .build();
+        
+        RawText msg = new RawText("You are going to delete ")
+            .then(map.getId())
+                .color(ChatColor.GOLD)
+            .then(". Are you sure ? ")
+                .color(ChatColor.WHITE)
+            .then("[Confirm]")
+                .color(ChatColor.GREEN)
+                .hover(hoverText)
+                .command(DeleteNoConfirmCommand.class, map.getId())
+            .build();
+        
+        send(msg);
     }
     
     @Override

@@ -23,6 +23,8 @@ import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.PosterImage;
 import fr.moribus.imageonmap.map.MapManagerException.Reason;
+import fr.zcraft.zlib.tools.PluginLogger;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +34,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
-abstract public class MapManager 
+abstract public class MapManager
 {
     static private final long SAVE_DELAY = 200;
     static private final ArrayList<PlayerMapStore> playerMaps = new ArrayList<PlayerMapStore>();
@@ -40,7 +42,7 @@ abstract public class MapManager
     
     static public void init()
     {
-        
+        load();
     }
     
     static public void exit()
@@ -64,6 +66,9 @@ abstract public class MapManager
 
     static public boolean managesMap(ItemStack item)
     {
+        if(item == null) return false;
+        if(item.getType() != Material.MAP) return false;
+        
         synchronized(playerMaps)
         {
             for(PlayerMapStore mapStore : playerMaps)
@@ -220,6 +225,39 @@ abstract public class MapManager
                 inventory.setItem(i, new ItemStack(Material.AIR));
             }
         }
+    }
+    
+    static private UUID getUUIDFromFile(File file)
+    {
+        String fileName = file.getName();
+        int fileExtPos = fileName.lastIndexOf('.');
+        if(fileExtPos <= 0) return null;
+        
+        String fileExt = fileName.substring(fileExtPos + 1);
+        if(!fileExt.equals("yml")) return null;
+        
+        try
+        {
+            return UUID.fromString(fileName.substring(0, fileExtPos));
+        }
+        catch(IllegalArgumentException ex)
+        {
+            return null;
+        }
+    }
+    
+    static public void load()
+    {
+        int loadedFilesCount = 0;
+        for(File file : ImageOnMap.getPlugin().getMapsDirectory().listFiles())
+        {
+            UUID uuid = getUUIDFromFile(file);
+            if(uuid == null) continue;
+            getPlayerMapStore(uuid);
+            ++loadedFilesCount;
+        }
+        
+        PluginLogger.info("Loaded {0} player map files.", loadedFilesCount);
     }
     
     static public void save()

@@ -92,7 +92,7 @@ public final class ImageOnMap extends ZPlugin
         PluginConfiguration.init(this);
         MetricsLite.startMetrics();
         MapManager.init();
-        MapInitEvent.init(this);
+        MapInitEvent.init();
         MapItemManager.init();
 
         Commands.register(

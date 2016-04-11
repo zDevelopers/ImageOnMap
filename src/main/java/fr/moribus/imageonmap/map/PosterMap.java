@@ -141,5 +141,15 @@ public class PosterMap extends ImageMap
     {
         return mapsIDs.length;
     }
+    
+    public int getIndex(short mapID)
+    {
+        for(int i = 0; i < mapsIDs.length; i++)
+        {
+            if(mapsIDs[i] == mapID) return i;
+        }
+        
+        throw new IllegalArgumentException("Invalid map ID");
+    }
 
 }
