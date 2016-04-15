@@ -22,16 +22,14 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
-import fr.zcraft.zlib.components.gui.GuiUtils;
 import fr.zcraft.zlib.core.ZLib;
+import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.items.ItemUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -146,14 +144,11 @@ public class MapItemManager implements Listener
     
     static public ItemStack createMapItem(short mapID, String text)
     {
-        ItemStack itemMap = new ItemStack(Material.MAP, 1, mapID);
-        
-        ItemMeta meta = itemMap.getItemMeta();
-        meta.setDisplayName(ChatColor.RESET + text);
-        GuiUtils.hideItemAttributes(meta);
-        itemMap.setItemMeta(meta);
-        
-        return itemMap;
+        return new ItemStackBuilder(Material.MAP)
+                .data(mapID)
+                .title(text)
+                .hideAttributes()
+                .item();
     }
 
     /**
@@ -225,21 +220,37 @@ public class MapItemManager implements Listener
         if(frame.getItem().getType() != Material.AIR) return;
         if(!MapManager.managesMap(player.getItemInHand())) return;
         
+        if(SplatterMapManager.hasSplatterAttributes(player.getItemInHand()))
+        {
+            SplatterMapManager.placeSplatterMap(frame, player);
+        }
+        else
+        {
+            ItemStack is = new ItemStack(Material.MAP, 1, player.getItemInHand().getDurability());
+            frame.setItem(is);
+        }
         
         event.setCancelled(true);
-        ItemStack is = new ItemStack(Material.MAP, 1, player.getItemInHand().getDurability());
-        frame.setItem(is);
-        
         ItemUtils.consumeItem(player);
     }
     
-    static private void onItemFrameRemove(ItemFrame frame, Player player)
+    static private void onItemFrameRemove(ItemFrame frame, Player player, EntityDamageByEntityEvent event)
     {
         ItemStack item = frame.getItem();
         if(frame.getItem().getType() != Material.MAP) return;
-        if(!MapManager.managesMap(frame.getItem())) return;
         
+        if(player.isSneaking())
+        {
+            if(SplatterMapManager.removeSplatterMap(frame))
+            {
+                event.setCancelled(true);
+                return;
+            }
+        }
+        
+        if(!MapManager.managesMap(frame.getItem())) return;
         frame.setItem(ItemUtils.setDisplayName(item, getMapTitle(item)));
+        
     }
     
     @EventHandler
@@ -248,7 +259,7 @@ public class MapItemManager implements Listener
         if(!(event.getEntity() instanceof ItemFrame)) return;
         if(!(event.getDamager() instanceof Player)) return;
         
-        onItemFrameRemove((ItemFrame)event.getEntity(), (Player)event.getDamager());
+        onItemFrameRemove((ItemFrame)event.getEntity(), (Player)event.getDamager(), event);
     }
     
     @EventHandler

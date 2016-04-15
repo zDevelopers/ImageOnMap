@@ -202,6 +202,8 @@ abstract public class MapManager
      */
     static public ImageMap getMap(ItemStack item)
     {
+        if(item == null) return null;
+        if(item.getType() != Material.MAP) return null;
         return getMap(item.getDurability());
     }
     

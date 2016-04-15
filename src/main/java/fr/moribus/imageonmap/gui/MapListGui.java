@@ -24,9 +24,11 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.moribus.imageonmap.ui.MapItemManager;
+import fr.moribus.imageonmap.ui.SplatterMapManager;
 import fr.zcraft.zlib.components.gui.ExplorerGui;
 import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.gui.GuiUtils;
+import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -93,8 +95,12 @@ public class MapListGui extends ExplorerGui<ImageMap>
 	{
 		if (map instanceof SingleMap)
 		{
-			return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName());
+                    return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName());
 		}
+                else if(map instanceof PosterMap)
+                {
+                    return SplatterMapManager.makeSplatterMap((PosterMap) map);
+                }
 
 		MapItemManager.give(getPlayer(), map);
 		return null;
@@ -133,38 +139,27 @@ public class MapListGui extends ExplorerGui<ImageMap>
 
 		double percentageUsed = mapPartLeft < 0 ? 0 : ((double) mapPartCount) / ((double) (mapPartCount + mapPartLeft)) * 100;
 
+                ItemStackBuilder statistics = new ItemStackBuilder(Material.ENCHANTED_BOOK)
+                        .title(ChatColor.BLUE, "Usage statistics")
+                        .lore(  "",
+                                getStatisticText("Images rendered", imagesCount),
+                                getStatisticText("Minecraft maps used", mapPartCount));
+                
+                if(mapPartLeft >= 0)
+                {
+                    statistics.lore("", ChatColor.BLUE + "Minecraft maps limits");
+                    
+                    statistics.lore("", 
+                            getStatisticText("Server-wide limit", mapGlobalLimit, true),
+                            getStatisticText("Per-player limit", mapPersonalLimit, true))
+                            
+                            .lore("",
+                                getStatisticText("Current consumption", ((int) Math.rint(percentageUsed)) + " %"),
+                                getStatisticText("Maps left", mapPartLeft));
+                }
+                
+                statistics.hideAttributes();
 
-		ItemStack statistics = new ItemStack(Material.ENCHANTED_BOOK);
-		ItemMeta meta = statistics.getItemMeta();
-
-		meta.setDisplayName(ChatColor.BLUE + "Usage statistics");
-		meta.setLore(Arrays.asList(
-				"",
-				getStatisticText("Images rendered", imagesCount),
-				getStatisticText("Minecraft maps used", mapPartCount)
-		));
-
-		if (mapPartLeft >= 0)
-		{
-			List<String> lore = meta.getLore();
-
-			lore.add("");
-			lore.add(ChatColor.BLUE + "Minecraft maps limits");
-
-			lore.add("");
-			lore.add(getStatisticText("Server-wide limit", mapGlobalLimit, true));
-			lore.add(getStatisticText("Per-player limit", mapPersonalLimit, true));
-
-			lore.add("");
-			lore.add(getStatisticText("Current consumption", ((int) Math.rint(percentageUsed)) + " %"));
-			lore.add(getStatisticText("Maps left", mapPartLeft));
-
-			meta.setLore(lore);
-		}
-
-		GuiUtils.hideItemAttributes(meta);
-
-		statistics.setItemMeta(meta);
 		action("", getSize() - 5, statistics);
 	}
 

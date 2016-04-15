@@ -116,6 +116,11 @@ public class PosterMap extends ImageMap
         if(columnCount == 0) return 0;
         return (i / columnCount) + 1;
     }
+    
+    public int getIndexAt(int col, int row)
+    {
+        return columnCount * row + col;
+    }
 
     /**
      * Returns the map id at the given column and line.
@@ -128,7 +133,20 @@ public class PosterMap extends ImageMap
      */
     public short getMapIdAt(int col, int row)
     {
-        return mapsIDs[getColumnCount() * col + row];
+        return mapsIDs[getColumnCount() * row + col];
+    }
+    
+    public short getMapIdAtReverseY(int index)
+    {
+        int col = index % (columnCount);
+        int row = index / (rowCount - 1);
+        System.out.println(col + " : " + row + " (" + index);
+        return getMapIdAt(col, rowCount - row - 1);
+    }
+    
+    public short getMapIdAt(int index)
+    {
+        return mapsIDs[index];
     }
     
     public boolean hasColumnData()
