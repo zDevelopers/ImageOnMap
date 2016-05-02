@@ -114,11 +114,6 @@ public class PosterImage
         return cutImages[i];
     }
     
-    public BufferedImage getImageAt(int x, int y)
-    {
-        return cutImages[x * columns + y];
-    }
-    
     public int getColumnAt(int i)
     {
         return i % columns;

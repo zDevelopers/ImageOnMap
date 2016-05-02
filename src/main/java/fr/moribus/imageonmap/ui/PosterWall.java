@@ -88,11 +88,10 @@ public class PosterWall
             for(int x = 0; x < map.getColumnCount(); ++x)
             {
                 //Location newLocation = WorldUtils.addToLocation(topLeftLocation, x, -y, facing);
-                System.out.println("Checking : " + loc);
+                //System.out.println("Checking : " + loc);
                 int mapIndex = map.getIndexAt(x, y);
-                ItemFrame frame = getMapFrameAt(loc, map.getMapIdAt(mapIndex));
-                if(frame == null) return null;
-                frames[mapIndex] = frame;
+                ItemFrame frame = getMapFrameAt(loc, map);
+                if(frame != null) frames[mapIndex] = frame;
                 loc.add(1, 0);
             }
             loc.setX(location.getX());
@@ -103,7 +102,7 @@ public class PosterWall
         return frames;
     }
     
-    static public ItemFrame getMapFrameAt(FlatLocation location, short mapId)
+    static public ItemFrame getMapFrameAt(FlatLocation location, PosterMap map)
     {
         Entity entities[] = location.getChunk().getEntities();
         
@@ -115,7 +114,7 @@ public class PosterWall
             if(frame.getFacing() != location.getFacing()) continue;
             ItemStack item = frame.getItem();
             if(item.getType() != Material.MAP) continue;
-            if(item.getDurability() != mapId) continue;
+            if(!map.managesMap(item)) continue;
             return frame;
         }
         

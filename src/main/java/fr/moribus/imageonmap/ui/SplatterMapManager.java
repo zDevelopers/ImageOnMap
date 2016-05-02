@@ -28,6 +28,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 abstract public class SplatterMapManager 
@@ -53,6 +54,20 @@ abstract public class SplatterMapManager
     static public boolean isSplatterMap(ItemStack itemStack)
     {
         return hasSplatterAttributes(itemStack) && MapManager.managesMap(itemStack);
+    }
+    
+    static public boolean hasSplatterMap(Player player, PosterMap map)
+    {
+        Inventory playerInventory = player.getInventory();
+        
+        for(int i = 0; i < playerInventory.getSize(); ++i)
+        {
+            ItemStack item = playerInventory.getItem(i);
+            if(isSplatterMap(item) && map.managesMap(item))
+                return true;
+        }
+        
+        return false;
     }
     
     static public boolean placeSplatterMap(ItemFrame startFrame, Player player)
@@ -84,20 +99,20 @@ abstract public class SplatterMapManager
         return true;
     }
     
-    static public boolean removeSplatterMap(ItemFrame startFrame)
+    static public PosterMap removeSplatterMap(ItemFrame startFrame)
     {
         ImageMap map = MapManager.getMap(startFrame.getItem());
-        if(map == null || !(map instanceof PosterMap)) return false;
+        if(map == null || !(map instanceof PosterMap)) return null;
         PosterMap poster = (PosterMap) map;
         FlatLocation loc = new FlatLocation(startFrame.getLocation(), startFrame.getFacing());
         ItemFrame[] matchingFrames = PosterWall.getMatchingMapFrames(poster, loc, startFrame.getItem().getDurability());
-        if(matchingFrames == null) return false;
+        if(matchingFrames == null) return null;
         
         for(ItemFrame frame : matchingFrames)
         {
-            frame.setItem(null);
+            if(frame != null) frame.setItem(null);
         }
         
-        return true;
+        return poster;
     }
 }

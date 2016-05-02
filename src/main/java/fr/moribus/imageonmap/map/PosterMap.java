@@ -125,23 +125,23 @@ public class PosterMap extends ImageMap
     /**
      * Returns the map id at the given column and line.
      *
-     * @param col The column. Starts at 0.
-     * @param row The row. Starts at 0.
+     * @param x The x coordinate. Starts at 0.
+     * @param y The y coordinate. Starts at 0.
      * @return The Minecraft map ID.
      *
      * @throws ArrayIndexOutOfBoundsException if the given coordinates are too big (out of the poster).
      */
-    public short getMapIdAt(int col, int row)
+    public short getMapIdAt(int x, int y)
     {
-        return mapsIDs[getColumnCount() * row + col];
+        return mapsIDs[y * columnCount + x];
     }
     
     public short getMapIdAtReverseY(int index)
     {
-        int col = index % (columnCount);
-        int row = index / (rowCount - 1);
-        System.out.println(col + " : " + row + " (" + index);
-        return getMapIdAt(col, rowCount - row - 1);
+        int x = index % (columnCount);
+        int y = index / (columnCount);
+        System.out.println(x + " : " + (rowCount - y - 1) + " (" + index);
+        return getMapIdAt(x, rowCount - y - 1);
     }
     
     public short getMapIdAt(int index)

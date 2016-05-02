@@ -35,6 +35,7 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Queue;
 import java.util.UUID;
+import org.bukkit.GameMode;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -70,26 +71,7 @@ public class MapItemManager implements Listener
     
     static public boolean give(Player player, PosterMap map)
     {
-        short[] mapsIDs = map.getMapsIDs();
-        boolean inventoryFull = false;
-        
-        String mapName;
-        for(int i = 0, c = mapsIDs.length; i < c; i++)
-        {
-            if(map.hasColumnData())
-            {
-                mapName = map.getName() +
-                    " (row " + map.getRowAt(i) + 
-                    ", column " + map.getColumnAt(i) + ")";
-            }
-            else
-            {
-                mapName = map.getName();
-            }
-            inventoryFull = give(player, createMapItem(mapsIDs[i], mapName)) || inventoryFull;
-        }
-        
-        return inventoryFull;
+        return give(player, SplatterMapManager.makeSplatterMap(map));
     }
     
     static public int giveCache(Player player)
@@ -154,27 +136,28 @@ public class MapItemManager implements Listener
     /**
      * Returns the item to place to display the (col;row) part of the given poster.
      *
-     * @param col The column to display. Starts at 0.
-     * @param row The row to display. Starts at 0.
+     * @param map The map to take the part from.
+     * @param x The x coordinate of the part to display. Starts at 0.
+     * @param y The y coordinate of the part to display. Starts at 0.
      *
      * @return The map.
      *
-     * @throws ArrayIndexOutOfBoundsException If col;row is not inside the map.
+     * @throws ArrayIndexOutOfBoundsException If x;y is not inside the map.
      */
-    static public ItemStack createSubMapItem(ImageMap map, int col, int row)
+    static public ItemStack createSubMapItem(ImageMap map, int x, int y)
     {
         if(map instanceof PosterMap && ((PosterMap) map).hasColumnData())
         {
             return MapItemManager.createMapItem(
-                    ((PosterMap) map).getMapIdAt(row, col),
+                    ((PosterMap) map).getMapIdAt(x, y),
                     map.getName() +
-                            " (row " + (row + 1) +
-                            ", column " + (col + 1) + ")"
+                            " (row " + (y + 1) +
+                            ", column " + (x + 1) + ")"
             );
         }
         else
         {
-            if(row != 0 || col != 0)
+            if(x != 0 || y != 0)
             {
                 throw new ArrayIndexOutOfBoundsException(); // Coherence
             }
@@ -241,9 +224,15 @@ public class MapItemManager implements Listener
         
         if(player.isSneaking())
         {
-            if(SplatterMapManager.removeSplatterMap(frame))
+            PosterMap poster = SplatterMapManager.removeSplatterMap(frame);
+            if(poster != null)
             {
                 event.setCancelled(true);
+                if(player.getGameMode() == GameMode.CREATIVE)
+                {
+                    if(!SplatterMapManager.hasSplatterMap(player, poster))
+                        poster.give(player);
+                }
                 return;
             }
         }
