@@ -21,6 +21,7 @@ package fr.moribus.imageonmap.ui;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
+import fr.zcraft.zlib.components.gui.GuiUtils;
 import fr.zcraft.zlib.tools.items.GlowEffect;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.world.FlatLocation;
@@ -39,8 +40,16 @@ abstract public class SplatterMapManager
     {
         return new ItemStackBuilder(Material.MAP)
                 .data(map.getMapIdAt(0))
-                .title(ChatColor.GOLD, map.getName())
-                .loreLine(ChatColor.GOLD, "Splatter Map")
+                .title(ChatColor.GOLD, map.getName()).title(ChatColor.DARK_GRAY, " - ").title(ChatColor.GRAY, "Splatter Map")
+                .loreLine(ChatColor.GRAY, map.getId())
+                .loreLine()
+                .loreLine(ChatColor.BLUE, "Item frames needed")
+                .loreLine(ChatColor.GRAY, map.getColumnCount() + " × " + map.getRowCount())
+                .loreLine()
+                .loreLine(ChatColor.BLUE, "How to use this?")
+                .lore(GuiUtils.generateLore(ChatColor.GRAY + "Place empty item frames on a wall, enough to host the whole map. Then, right-click on the bottom-left frame with this map."))
+                .loreLine()
+                .lore(GuiUtils.generateLore(ChatColor.GRAY + "Shift-click one of the placed maps to remove the whole poster at a single time."))
                 .glow()
                 .hideAttributes()
                 .item();
