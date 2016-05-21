@@ -43,7 +43,7 @@ public class GetRemainingCommand extends IoMCommand
         
         if(givenMaps == 0)
         {
-            error(I.t("Your inventory is full ! Make some space before requesting the remaining maps."));
+            error(I.t("Your inventory is full! Make some space before requesting the remaining maps."));
         }
         else
         {

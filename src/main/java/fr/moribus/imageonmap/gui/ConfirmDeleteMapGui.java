@@ -113,7 +113,7 @@ public class ConfirmDeleteMapGui extends ActionGui
                 .loreLine()
                 .lore(I.t("{gray}Name: {white}{0}",mapToDelete.getName()))
                 .lore(I.t("{gray}Map ID: {white}{0}", mapToDelete.getId()))
-                .lore(I.t("{grayMaps inside: {white}{0}", mapToDelete.getMapsIDs().length))
+                .lore(I.t("{gray}Maps inside: {white}{0}", mapToDelete.getMapsIDs().length))
                 .hideAttributes()
         );
 

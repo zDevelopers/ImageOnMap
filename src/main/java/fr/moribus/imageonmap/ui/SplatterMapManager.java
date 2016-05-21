@@ -53,7 +53,7 @@ abstract public class SplatterMapManager
                 .loreLine(ChatColor.BLUE, I.t("How to use this?"))
                 .lore(GuiUtils.generateLore(ChatColor.GRAY + I.t("Place empty item frames on a wall, enough to host the whole map. Then, right-click on the bottom-left frame with this map.")))
                 .loreLine()
-                .lore(GuiUtils.generateLore(ChatColor.GRAY + I.t("Shift-click one of the placed maps to remove the whole poster at a single time.")))
+                .lore(GuiUtils.generateLore(ChatColor.GRAY + I.t("Shift-click one of the placed maps to remove the whole poster in one shot.")))
                 .glow()
                 .hideAttributes()
                 .item();

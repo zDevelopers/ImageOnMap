@@ -64,7 +64,7 @@ public class NewCommand  extends IoMCommand
             @Override
             public void finished(ImageMap result)
             {
-                player.sendMessage(I.t("{cst}Rendering finished !"));
+                player.sendMessage(I.t("{cst}Rendering finished!"));
                 if(result.give(player))
                 {
                     info(I.t("The rendered map was too big to fit in your inventory."));

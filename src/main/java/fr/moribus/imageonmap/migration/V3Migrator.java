@@ -241,7 +241,7 @@ public class V3Migrator implements Runnable
      */
     private void backupMapData() throws IOException
     {
-        PluginLogger.info("Backing up map data before migrating ...");
+        PluginLogger.info("Backing up map data before migrating...");
         
         if(!backupsPrev3Directory.exists()) backupsPrev3Directory.mkdirs();
         if(!backupsPostv3Directory.exists()) backupsPostv3Directory.mkdirs();
@@ -342,7 +342,7 @@ public class V3Migrator implements Runnable
      */
     private void fetchUUIDs() throws IOException, InterruptedException
     {
-        PluginLogger.info(I.t("Fetching UUIDs from Mojang ..."));
+        PluginLogger.info(I.t("Fetching UUIDs from Mojang..."));
         try
         {
             usersUUIDs = UUIDFetcher.fetch(new ArrayList<String>(userNamesToFetch));
@@ -415,7 +415,7 @@ public class V3Migrator implements Runnable
     
     private void mergeMapData()
     {
-        PluginLogger.info(I.t("Merging map data ..."));
+        PluginLogger.info(I.t("Merging map data..."));
         
         ArrayDeque<OldSavedMap> remainingMaps = new ArrayDeque<>();
         ArrayDeque<OldSavedPoster> remainingPosters = new ArrayDeque<>();
@@ -456,20 +456,20 @@ public class V3Migrator implements Runnable
     
     private void saveChanges()
     {
-        PluginLogger.info(I.t("Saving changes ..."));
+        PluginLogger.info(I.t("Saving changes..."));
         MapManager.save();
     }
     
     private void cleanup() throws IOException
     {
-        PluginLogger.info(I.t("Cleaning up old data files ..."));
+        PluginLogger.info(I.t("Cleaning up old data files..."));
         
         //Cleaning maps file
         if(oldMapsFile != null)
         {
             if(mapsToMigrate.isEmpty())
             {
-                PluginLogger.info(I.t("Deleting old map data file ..."));
+                PluginLogger.info(I.t("Deleting old map data file..."));
                 oldMapsFile.delete();
             }
             else
@@ -492,7 +492,7 @@ public class V3Migrator implements Runnable
         {
             if(postersToMigrate.isEmpty())
             {
-                PluginLogger.info(I.t("Deleting old poster data file ..."));
+                PluginLogger.info(I.t("Deleting old poster data file..."));
                 oldPostersFile.delete();
             }
             else
