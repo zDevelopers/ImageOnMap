@@ -38,7 +38,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 
 
@@ -121,8 +120,8 @@ public class MapListGui extends ExplorerGui<ImageMap>
 		int imagesCount = MapManager.getMapList(getPlayer().getUniqueId()).size();
 		int mapPartCount = MapManager.getMapPartCount(getPlayer().getUniqueId());
 
-		int mapGlobalLimit = PluginConfiguration.MAP_GLOBAL_LIMIT.getInteger();
-		int mapPersonalLimit = PluginConfiguration.MAP_PLAYER_LIMIT.getInteger();
+		int mapGlobalLimit = PluginConfiguration.MAP_GLOBAL_LIMIT.get();
+		int mapPersonalLimit = PluginConfiguration.MAP_PLAYER_LIMIT.get();
 
 		int mapPartGloballyLeft = mapGlobalLimit - MapManager.getMapCount();
 		int mapPartPersonallyLeft = mapPersonalLimit - mapPartCount;

@@ -113,7 +113,7 @@ public class ImageRendererExecutor extends Worker
         
         return MapManager.createMap(playerUUID, mapID);
     }
-    
+
     static private ImageMap RenderPoster(final BufferedImage image, final UUID playerUUID) throws Throwable
     {
         final PosterImage poster = new PosterImage(image);

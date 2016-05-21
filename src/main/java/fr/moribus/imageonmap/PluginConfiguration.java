@@ -18,108 +18,16 @@
 
 package fr.moribus.imageonmap;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.Plugin;
+import fr.zcraft.zlib.components.configuration.Configuration;
+import fr.zcraft.zlib.components.configuration.ConfigurationItem;
 
-public enum PluginConfiguration
+import static fr.zcraft.zlib.components.configuration.ConfigurationItem.item;
+
+
+public final class PluginConfiguration extends Configuration
 {
-    //Configuration field Names, with default values
-    COLLECT_DATA("collect-data", true),
-    MAP_GLOBAL_LIMIT("map-global-limit", 0, "Limit-map-by-server"),
-    MAP_PLAYER_LIMIT("map-player-limit", 0, "Limit-map-by-player");
-    
-    private final String fieldName;
-    private final Object defaultValue;
-    private final String[] deprecatedNames;
-    
-    private PluginConfiguration(String fieldName, Object defaultValue, String ... deprecatedNames)
-    {
-        this.fieldName = fieldName;
-        this.defaultValue = defaultValue;
-        this.deprecatedNames = deprecatedNames;
-    }
-    
-    public Object get()
-    {
-        return getConfig().get(fieldName, defaultValue);
-    }
-    
-    public Object getDefaultValue()
-    {
-        return defaultValue;
-    }
-    
-    public boolean isDefined()
-    {
-        return getConfig().contains(fieldName);
-    }
-    
-    @Override
-    public String toString()
-    {
-        return get().toString();
-    }
-    
-    public String getString()
-    {
-        return getConfig().getString(fieldName, (String)defaultValue);
-    }
-    
-    public int getInteger()
-    {
-        return getConfig().getInt(fieldName, (Integer)defaultValue);
-    }
-    
-    public boolean getBoolean()
-    {
-        return getConfig().getBoolean(fieldName, (Boolean)defaultValue);
-    }
-    
-    private boolean init()
-    {
-        boolean affected = false;
-        
-        if(!isDefined())
-        {
-            getConfig().set(fieldName, defaultValue);
-            affected = true;
-        }
-        
-        for(String deprecatedName : deprecatedNames)
-        {
-            if(getConfig().contains(deprecatedName))
-            {
-                getConfig().set(fieldName, getConfig().get(deprecatedName));
-                getConfig().set(deprecatedName, null);
-                affected = true;
-            }
-        }
-        return affected;
-    }
-    
-    /* ===== Static API ===== */
-    
-    static private Plugin plugin;
-    static public FileConfiguration getConfig()
-    {
-        return plugin.getConfig();
-    }
-    
-    static public void init(Plugin plugin)
-    {
-        PluginConfiguration.plugin = plugin;
-        loadDefaultValues();
-    }
-    
-    static private void loadDefaultValues()
-    {
-        boolean affected = false;
-        
-        for(PluginConfiguration configField : PluginConfiguration.values())
-        {
-            if(configField.init()) affected = true;
-        }
-        
-        if(affected) plugin.saveConfig();
-    }
+    static public ConfigurationItem<Boolean> COLLECT_DATA = item("collect-data", true);
+
+    static public ConfigurationItem<Integer> MAP_GLOBAL_LIMIT = item("map-global-limit", 0, "Limit-map-by-server");
+    static public ConfigurationItem<Integer> MAP_PLAYER_LIMIT = item("map-player-limit", 0, "Limit-map-by-player");
 }

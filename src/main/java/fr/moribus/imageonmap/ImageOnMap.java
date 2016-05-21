@@ -86,10 +86,11 @@ public final class ImageOnMap extends ZPlugin
             return;
         }
 
-        loadComponents(Gui.class, Commands.class, ImageIOExecutor.class, ImageRendererExecutor.class);
+        saveDefaultConfig();
+
+        loadComponents(Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class, ImageRendererExecutor.class);
         
         //Init all the things !
-        PluginConfiguration.init(this);
         MetricsLite.startMetrics();
         MapManager.init();
         MapInitEvent.init();

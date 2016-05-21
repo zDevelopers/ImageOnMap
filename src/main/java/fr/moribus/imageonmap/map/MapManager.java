@@ -24,15 +24,16 @@ import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.PosterImage;
 import fr.moribus.imageonmap.map.MapManagerException.Reason;
 import fr.zcraft.zlib.tools.PluginLogger;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 abstract public class MapManager
 {
@@ -280,12 +281,11 @@ abstract public class MapManager
     
     static public void checkMapLimit(int newMapsCount, UUID userUUID) throws MapManagerException
     {
-        int limit = PluginConfiguration.MAP_GLOBAL_LIMIT.getInteger();
-        if(limit > 0)
-        {
-            if(getMapCount() + newMapsCount > limit)
-                throw new MapManagerException(Reason.MAXIMUM_SERVER_MAPS_EXCEEDED);
-        }
+        int limit = PluginConfiguration.MAP_GLOBAL_LIMIT.get();
+
+        if (limit > 0 && getMapCount() + newMapsCount > limit)
+            throw new MapManagerException(Reason.MAXIMUM_SERVER_MAPS_EXCEEDED);
+
         getPlayerMapStore(userUUID).checkMapLimit(newMapsCount);
     }
 

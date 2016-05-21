@@ -22,6 +22,7 @@ import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.MapManagerException.Reason;
 import fr.zcraft.zlib.tools.PluginLogger;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -36,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.bukkit.Material;
 
 public class PlayerMapStore implements ConfigurationSerializable
 {
@@ -154,7 +154,7 @@ public class PlayerMapStore implements ConfigurationSerializable
     
     public void checkMapLimit(int newMapsCount) throws MapManagerException
     {
-        int limit = PluginConfiguration.MAP_PLAYER_LIMIT.getInteger();
+        int limit = PluginConfiguration.MAP_PLAYER_LIMIT.get();
         if(limit <= 0) return;
         
         if(getMapCount() + newMapsCount > limit)
