@@ -22,6 +22,7 @@ import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.migration.MigratorExecutor;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.command.CommandSender;
 
 @CommandInfo (name = "migrate")
@@ -32,11 +33,11 @@ public class MigrateCommand extends IoMCommand
     {
         if(MigratorExecutor.isRunning())
         {
-            error("A migration process is already running. Check console for details.");
+            error(I.t("A migration process is already running. Check console for details."));
         }
         else
         {
-            info("Migration started. See console for details.");
+            info(I.t("Migration started. See console for details."));
             MigratorExecutor.migrate();
         }
     }

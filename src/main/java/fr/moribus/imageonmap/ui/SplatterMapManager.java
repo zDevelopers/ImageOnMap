@@ -22,6 +22,7 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.zlib.components.gui.GuiUtils;
+import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.items.GlowEffect;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.world.FlatLocation;
@@ -40,16 +41,19 @@ abstract public class SplatterMapManager
     {
         return new ItemStackBuilder(Material.MAP)
                 .data(map.getMapIdAt(0))
-                .title(ChatColor.GOLD, map.getName()).title(ChatColor.DARK_GRAY, " - ").title(ChatColor.GRAY, "Splatter Map")
+                .title(ChatColor.GOLD, map.getName()).title(ChatColor.DARK_GRAY, " - ").title(ChatColor.GRAY, I.t("Splatter Map"))
                 .loreLine(ChatColor.GRAY, map.getId())
                 .loreLine()
-                .loreLine(ChatColor.BLUE, "Item frames needed")
-                .loreLine(ChatColor.GRAY, map.getColumnCount() + " × " + map.getRowCount())
+                 /// Title in a splatter map tooltip
+                .loreLine(ChatColor.BLUE, I.t("Item frames needed"))
+                 /// Size of a map stored in a splatter map
+                .loreLine(ChatColor.GRAY, I.t("{0} × {1}", map.getColumnCount(), map.getRowCount()))
                 .loreLine()
-                .loreLine(ChatColor.BLUE, "How to use this?")
-                .lore(GuiUtils.generateLore(ChatColor.GRAY + "Place empty item frames on a wall, enough to host the whole map. Then, right-click on the bottom-left frame with this map."))
+                 /// Title in a splatter map tooltip
+                .loreLine(ChatColor.BLUE, I.t("How to use this?"))
+                .lore(GuiUtils.generateLore(ChatColor.GRAY + I.t("Place empty item frames on a wall, enough to host the whole map. Then, right-click on the bottom-left frame with this map.")))
                 .loreLine()
-                .lore(GuiUtils.generateLore(ChatColor.GRAY + "Shift-click one of the placed maps to remove the whole poster at a single time."))
+                .lore(GuiUtils.generateLore(ChatColor.GRAY + I.t("Shift-click one of the placed maps to remove the whole poster in one shot.")))
                 .glow()
                 .hideAttributes()
                 .item();
@@ -94,7 +98,7 @@ abstract public class SplatterMapManager
         
         if(!wall.isValid())
         {
-            player.sendMessage(ChatColor.RED + "There is not enough space to place this map (" + poster.getColumnCount() + "x" + poster.getRowCount() + ")");
+            player.sendMessage(I.t("{ce}There is not enough space to place this map ({0} × {1}).", poster.getColumnCount(), poster.getRowCount()));
             return false;
         }
         

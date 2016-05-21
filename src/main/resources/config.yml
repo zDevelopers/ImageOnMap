@@ -1,6 +1,11 @@
 ###  ImageOnMap configuration file
 
 
+# Plugin language. Empty: system language.
+# Available: en_US (default, fallback) and fr_FR.
+lang:
+
+
 # Allows collection of anonymous statistics on plugin environment and usage
 # The statistics are publicly visible here: http://mcstats.org/plugin/ImageOnMap
 collect-data: true

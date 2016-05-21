@@ -21,11 +21,15 @@ package fr.moribus.imageonmap;
 import fr.zcraft.zlib.components.configuration.Configuration;
 import fr.zcraft.zlib.components.configuration.ConfigurationItem;
 
+import java.util.Locale;
+
 import static fr.zcraft.zlib.components.configuration.ConfigurationItem.item;
 
 
 public final class PluginConfiguration extends Configuration
 {
+    static public ConfigurationItem<Locale> LANG = item("lang", Locale.class);
+
     static public ConfigurationItem<Boolean> COLLECT_DATA = item("collect-data", true);
 
     static public ConfigurationItem<Integer> MAP_GLOBAL_LIMIT = item("map-global-limit", 0, "Limit-map-by-server");

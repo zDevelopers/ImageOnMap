@@ -22,12 +22,18 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
+import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.core.ZLib;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.items.ItemUtils;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -35,11 +41,6 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Queue;
 import java.util.UUID;
-import org.bukkit.GameMode;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 public class MapItemManager implements Listener
 {
@@ -113,9 +114,8 @@ public class MapItemManager implements Listener
         String mapName;
         if(map.hasColumnData())
         {
-            mapName = map.getName() +
-                " (row " + x + 
-                ", column " + y + ")";
+            /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
+            mapName = I.t("{0} (row {1}, column {2})", map.getName(), x, y);
         }
         else
         {
@@ -150,9 +150,7 @@ public class MapItemManager implements Listener
         {
             return MapItemManager.createMapItem(
                     ((PosterMap) map).getMapIdAt(x, y),
-                    map.getName() +
-                            " (row " + (y + 1) +
-                            ", column " + (x + 1) + ")"
+                    I.t("{0} (row {1}, column {2})", map.getName(), y + 1, x + 1)
             );
         }
         else
@@ -193,8 +191,7 @@ public class MapItemManager implements Listener
         {
             PosterMap poster = (PosterMap) map;
             int index = poster.getIndex(item.getDurability());
-            return map.getName() + " (row " + (poster.getRowAt(index)) +
-                            ", column " + (poster.getColumnAt(index)) + ")";
+            return I.t("{0} (row {1}, column {2})", map.getName(), poster.getRowAt(index), poster.getColumnAt(index));
         }
     }
     

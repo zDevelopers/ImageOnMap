@@ -24,6 +24,7 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.components.rawtext.RawText;
 import fr.zcraft.zlib.components.rawtext.RawTextPart;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
@@ -45,11 +46,11 @@ public class ListCommand extends IoMCommand
         
         if(mapList.isEmpty())
         {
-            info("No map found.");
+            info(I.t("No map found."));
             return;
         }
         
-        player.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + mapList.size() + " maps found.");
+        info(I.tn("{white}{bold}{0} map found.", "{white}{bold}{0} maps found.", mapList.size()));
 
         RawTextPart rawText = new RawText("");
         rawText = addMap(rawText, mapList.get(0));
@@ -65,7 +66,7 @@ public class ListCommand extends IoMCommand
 
     private RawTextPart<?> addMap(RawTextPart<?> rawText, ImageMap map)
     {
-        final String size = map.getType() == ImageMap.Type.SINGLE ? "1×1" : ((PosterMap) map).getColumnCount() + "×" + ((PosterMap) map).getRowCount();
+        final String size = map.getType() == ImageMap.Type.SINGLE ? "1 × 1" : ((PosterMap) map).getColumnCount() + " × " + ((PosterMap) map).getRowCount();
 
         return rawText
                 .then(map.getId())
@@ -75,7 +76,7 @@ public class ListCommand extends IoMCommand
                                 .title(ChatColor.GREEN + "" + ChatColor.BOLD + map.getName())
                                 .lore(ChatColor.GRAY + map.getId() + ", " + size)
                                 .lore("")
-                                .lore(ChatColor.WHITE + "Click" + ChatColor.GRAY + " to get this map")
+                                .lore(I.t("{white}Click{gray} to get this map"))
                                 .hideAttributes()
                                 .item()
                 );

@@ -21,6 +21,7 @@ package fr.moribus.imageonmap.commands.maptool;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -34,8 +35,8 @@ public class GetCommand extends IoMCommand
         Player player = playerSender();
         if(getMapFromArgs().give(player))
         {
-            info("The requested map was too big to fit in your inventory.");
-            info("Use '/maptool getremaining' to get the remaining maps.");
+            info(I.t("The requested map was too big to fit in your inventory."));
+            info(I.t("Use '/maptool getremaining' to get the remaining maps."));
         }
     }
     
