@@ -20,6 +20,7 @@ package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
+import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.components.worker.Worker;
 import fr.zcraft.zlib.components.worker.WorkerAttributes;
 import fr.zcraft.zlib.components.worker.WorkerCallback;
@@ -69,13 +70,13 @@ public class ImageRendererExecutor extends Worker
                     final int httpCode = httpConnection.getResponseCode();
                     if((httpCode / 100) != 2)
                     {
-                        throw new IOException("HTTP error : " + httpCode +  " " + httpConnection.getResponseMessage());
+                        throw new IOException(I.t("HTTP error : {0} {1}", httpCode, httpConnection.getResponseMessage()));
                     }
                 }
                 final InputStream stream = connection.getInputStream();
                 final BufferedImage image = ImageIO.read(stream);
                 
-                if (image == null) throw new IOException("The given URL is not a valid image");
+                if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
 
                 if (scaling) return RenderSingle(image, playerUUID);
                 else return RenderPoster(image, playerUUID);

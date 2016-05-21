@@ -24,7 +24,9 @@ import fr.moribus.imageonmap.map.MapManagerException;
 import fr.zcraft.zlib.components.gui.ActionGui;
 import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.gui.GuiAction;
+import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.PluginLogger;
+import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -96,26 +98,24 @@ public class ConfirmDeleteMapGui extends ActionGui
     @Override
     protected void onUpdate()
     {
-        setTitle(mapToDelete.getName() + " » " + ChatColor.BLACK + "Confirm deletion");
+        /// The title of the map deletion GUI. {0}: map name.
+        setTitle(I.t("{0} » {black}Confirm deletion", mapToDelete.getName()));
         setSize(6 * 9);
-        
+
+
         /* ** Item representation of the image being deleted ** */
 
-        ItemStack beingDeleted = new ItemStack(Material.EMPTY_MAP);
-        ItemMeta meta = beingDeleted.getItemMeta();
-
-        meta.setDisplayName(ChatColor.RED + "You're about to destroy this map...");
-        meta.setLore(Arrays.asList(
-                ChatColor.RED + "..." + ChatColor.ITALIC + "forever" + ChatColor.RED + ".",
-                "",
-                ChatColor.GRAY + "Name: " + ChatColor.WHITE + mapToDelete.getName(),
-                ChatColor.GRAY + "Map ID: " + ChatColor.WHITE + mapToDelete.getId(),
-                ChatColor.GRAY + "Maps inside: " + ChatColor.WHITE + mapToDelete.getMapsIDs().length
-        ));
-
-        beingDeleted.setItemMeta(meta);
-
-        action("", 13, beingDeleted);
+        action("", 13, new ItemStackBuilder(Material.EMPTY_MAP)
+                 /// The title of the map deletion item
+                .title(I.t("{red}You're about to destroy this map..."))
+                 /// The end, in the lore, of a title starting with “You're about to destroy this map...”.
+                .lore(I.t("{red}...{italic}forever{red}."))
+                .loreLine()
+                .lore(I.t("{gray}Name: {white}{0}",mapToDelete.getName()))
+                .lore(I.t("{gray}Map ID: {white}{0}", mapToDelete.getId()))
+                .lore(I.t("{grayMaps inside: {white}{0}", mapToDelete.getMapsIDs().length))
+                .hideAttributes()
+        );
 
 
         /* ** Buttons ** */
@@ -175,7 +175,7 @@ public class ConfirmDeleteMapGui extends ActionGui
         try
         {
             MapManager.deleteMap(mapToDelete);
-            getPlayer().sendMessage(ChatColor.GRAY + "Map successfully deleted.");
+            getPlayer().sendMessage(I.t("{gray}Map successfully deleted."));
         }
         catch (MapManagerException ex)
         {
@@ -185,7 +185,7 @@ public class ConfirmDeleteMapGui extends ActionGui
 
 
         // We try to open the map list GUI, if the map was deleted, before the details GUI
-        // (so the grandparent GUI)..
+        // (so the grandparent GUI).
         if (getParent() != null && getParent().getParent() != null)
             Gui.open(getPlayer(), getParent().getParent());
         else

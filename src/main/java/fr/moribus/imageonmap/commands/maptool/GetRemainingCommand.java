@@ -22,6 +22,7 @@ import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.entity.Player;
 
 @CommandInfo (name = "getremaining", aliases = {"getrest"})
@@ -34,7 +35,7 @@ public class GetRemainingCommand extends IoMCommand
         
         if(MapItemManager.getCacheSize(player) <= 0)
         {
-            info("You have no remaining map.");
+            info(I.t("You have no remaining map."));
             return;
         }
         
@@ -42,11 +43,11 @@ public class GetRemainingCommand extends IoMCommand
         
         if(givenMaps == 0)
         {
-            error("Your inventory is full ! Make some space before requesting the remaining maps.");
+            error(I.t("Your inventory is full ! Make some space before requesting the remaining maps."));
         }
         else
         {
-            info("There are " + MapItemManager.getCacheSize(player) + " maps remaining.");
+            info(I.tn("There is {0} map remaining.", "There are {0} maps remaining.", MapItemManager.getCacheSize(player)));
         }
     }
 }

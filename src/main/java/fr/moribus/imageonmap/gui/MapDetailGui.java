@@ -25,16 +25,12 @@ import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.zlib.components.gui.ExplorerGui;
 import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.gui.GuiAction;
-import fr.zcraft.zlib.components.gui.GuiUtils;
 import fr.zcraft.zlib.components.gui.PromptGui;
+import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.Callback;
-import org.bukkit.ChatColor;
+import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 
 public class MapDetailGui extends ExplorerGui
@@ -52,20 +48,14 @@ public class MapDetailGui extends ExplorerGui
         Material partMaterial = Material.PAPER;
         if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1))
             partMaterial = Material.EMPTY_MAP;
-        
-        ItemStack part = new ItemStack(partMaterial);
-        ItemMeta meta = part.getItemMeta();
 
-        meta.setDisplayName(ChatColor.GREEN + "Map part");
-        meta.setLore(Arrays.asList(
-                ChatColor.GRAY + "Column: " + ChatColor.WHITE + (y + 1),
-                ChatColor.GRAY + "Row: " + ChatColor.WHITE + (x + 1),
-                "",
-                ChatColor.GRAY + "» Click to get only this part"
-        ));
-
-        part.setItemMeta(meta);
-        return part;
+        return new ItemStackBuilder(partMaterial)
+                .title(I.t("{green}Map part"))
+                .lore(I.t("{gray}Column: {white}{0}", y + 1))
+                .lore(I.t("{gray}Row: {white}{0}", x + 1))
+                .loreLine()
+                .lore(I.t("{gray}» {white}Click{gray} to get only this part"))
+                .item();
     }
     
     @Override
@@ -80,7 +70,7 @@ public class MapDetailGui extends ExplorerGui
             return MapItemManager.createMapItem((PosterMap)map, x, y);
         }
         
-        throw new IllegalStateException("Unsupported map type : " + map.getType());
+        throw new IllegalStateException("Unsupported map type: " + map.getType());
     }
 
     @Override
@@ -96,7 +86,8 @@ public class MapDetailGui extends ExplorerGui
     @Override
     protected void onUpdate()
     {
-        setTitle("Your maps » " + ChatColor.BLACK + map.getName());
+        /// Title of the map details GUI
+        setTitle(I.t("Your maps » {black}{0}", map.getName()));
         setKeepHorizontalScrollingSpace(true);
 
         if(map instanceof PosterMap)
@@ -105,18 +96,17 @@ public class MapDetailGui extends ExplorerGui
             setData(null); // Fallback to the empty view item.
 
 
-        action("rename", getSize() - 7, GuiUtils.makeItem(Material.BOOK_AND_QUILL, ChatColor.BLUE + "Rename this image", Arrays.asList(
-                ChatColor.GRAY + "Click here to rename this image;",
-                ChatColor.GRAY + "this is used for your own organization."
-        )));
+        action("rename", getSize() - 7, new ItemStackBuilder(Material.BOOK_AND_QUILL)
+                .title(I.t("{blue}Rename this image"))
+                .longLore(I.t("{gray}Click here to rename this image; this is used for your own organization."))
+        );
 
-        action("delete", getSize() - 6, GuiUtils.makeItem(Material.BARRIER, ChatColor.RED + "Delete this image", Arrays.asList(
-                ChatColor.GRAY + "Deletes this map " + ChatColor.WHITE + "forever" + ChatColor.GRAY + ".",
-                ChatColor.GRAY + "This action cannot be undone!",
-                "",
-                ChatColor.GRAY + "You will be asked to confirm your",
-                ChatColor.GRAY + "choice if you click here."
-        )));
+        action("delete", getSize() - 6, new ItemStackBuilder(Material.BARRIER)
+                .title("{red}Delete this image")
+                .longLore(I.t("{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"))
+                .loreLine()
+                .longLore(I.t("{gray}You will be asked to confirm your choice if you click here."))
+        );
 
 
         // To keep the controls centered, the back button is shifted to the right when the
@@ -126,9 +116,10 @@ public class MapDetailGui extends ExplorerGui
         if(map instanceof PosterMap && ((PosterMap) map).getColumnCount() <= INVENTORY_ROW_SIZE)
             backSlot++;
 
-        action("back", backSlot, GuiUtils.makeItem(Material.EMERALD, ChatColor.GREEN + "« Back", Collections.singletonList(
-                ChatColor.GRAY + "Go back to the list."
-        )));
+        action("back", backSlot, new ItemStackBuilder(Material.EMERALD)
+                .title(I.t("{green}« Back"))
+                        .lore(I.t("{gray}Go back to the list."))
+        );
     }
 
 
@@ -142,12 +133,12 @@ public class MapDetailGui extends ExplorerGui
             {
                 if (newName == null || newName.isEmpty())
                 {
-                    getPlayer().sendMessage(ChatColor.RED + "Map names can't be empty.");
+                    getPlayer().sendMessage(I.t("{ce}Map names can't be empty."));
                     return;
                 }
 
                 map.rename(newName);
-                getPlayer().sendMessage(ChatColor.GRAY + "Map successfully renamed.");
+                getPlayer().sendMessage(I.t("{cs}Map successfully renamed."));
             }
         }, map.getName(), this);
     }

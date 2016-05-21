@@ -22,10 +22,11 @@ import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.components.rawtext.RawText;
+import org.bukkit.ChatColor;
 
 import java.util.List;
-import org.bukkit.ChatColor;
 
 @CommandInfo (name =  "delete", usageParameters = "[tool name]")
 public class DeleteConfirmCommand extends IoMCommand
@@ -34,22 +35,15 @@ public class DeleteConfirmCommand extends IoMCommand
     protected void run() throws CommandException
     {
         ImageMap map = getMapFromArgs();
-        
-        RawText hoverText = new RawText("This map will be deleted ")
-                .style(ChatColor.UNDERLINE)
-            .then("forever")
-                .style(ChatColor.RED, ChatColor.UNDERLINE, ChatColor.ITALIC, ChatColor.BOLD)
-            .then(" !")
-            .build();
-        
-        RawText msg = new RawText("You are going to delete ")
+
+        RawText msg = new RawText(I.t("You are going to delete") + " ")
             .then(map.getId())
                 .color(ChatColor.GOLD)
-            .then(". Are you sure ? ")
+            .then(". " + I.t("Are you sure ? "))
                 .color(ChatColor.WHITE)
-            .then("[Confirm]")
+            .then(I.t("[Confirm]"))
                 .color(ChatColor.GREEN)
-                .hover(hoverText)
+                .hover(new RawText(I.t("{red}This map will be deleted {bold}forever{red}!")))
                 .command(DeleteNoConfirmCommand.class, map.getId())
             .build();
         

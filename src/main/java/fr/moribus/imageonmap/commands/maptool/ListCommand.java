@@ -23,6 +23,7 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -38,11 +39,11 @@ public class ListCommand extends IoMCommand
         
         if(mapList.isEmpty())
         {
-            info("No map found.");
+            info(I.t("No map found."));
             return;
         }
         
-        info(mapList.size() + " maps found.");
+        info(I.tn("{0} map found.", "{0} maps found.", mapList.size()));
         
         String sMapList = mapList.get(0).getId();
         for(int i = 1, c = mapList.size(); i < c; i++)
