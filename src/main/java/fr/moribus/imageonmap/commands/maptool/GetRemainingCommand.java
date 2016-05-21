@@ -18,20 +18,16 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.commands.Command;
-import fr.moribus.imageonmap.commands.CommandException;
-import fr.moribus.imageonmap.commands.CommandInfo;
-import fr.moribus.imageonmap.commands.Commands;
+import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.ui.MapItemManager;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "getremaining", aliases = {"getrest"})
-public class GetRemainingCommand extends Command
+@CommandInfo (name = "getremaining", aliases = {"getrest"})
+public class GetRemainingCommand extends IoMCommand
 {
-    public GetRemainingCommand(Commands commandGroup) {
-        super(commandGroup);
-    }
-    
     @Override
     protected void run() throws CommandException
     {
@@ -39,7 +35,7 @@ public class GetRemainingCommand extends Command
         
         if(MapItemManager.getCacheSize(player) <= 0)
         {
-            info("You have no remaining map.");
+            info(I.t("You have no remaining map."));
             return;
         }
         
@@ -47,11 +43,11 @@ public class GetRemainingCommand extends Command
         
         if(givenMaps == 0)
         {
-            error("Your inventory is full ! Make some space before requesting the remaining maps.");
+            error(I.t("Your inventory is full ! Make some space before requesting the remaining maps."));
         }
         else
         {
-            info("There are " + MapItemManager.getCacheSize(player) + " maps remaining.");
+            info(I.tn("There is {0} map remaining.", "There are {0} maps remaining.", MapItemManager.getCacheSize(player)));
         }
     }
 }

@@ -18,25 +18,24 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.PluginLogger;
-import fr.moribus.imageonmap.commands.*;
+import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.MapManagerException;
-import java.util.List;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
+import fr.zcraft.zlib.tools.PluginLogger;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 
-@CommandInfo(name =  "delete-noconfirm", usageParameters = "[map name]")
-public class DeleteNoConfirmCommand extends Command
+
+@CommandInfo (name = "delete-noconfirm", usageParameters = "[map name]")
+public class DeleteNoConfirmCommand extends IoMCommand
 {
-
-    public DeleteNoConfirmCommand(Commands commandGroup) {
-        super(commandGroup);
-    }
-
     @Override
-    protected void run() throws CommandException 
+    protected void run() throws CommandException
     {
         Player player = playerSender();
         ImageMap map = getMapFromArgs();
@@ -44,12 +43,12 @@ public class DeleteNoConfirmCommand extends Command
         try
         {
             MapManager.deleteMap(map);
-            info("Map successfully deleted.");
+            info(I.t("Map successfully deleted."));
         }
         catch (MapManagerException ex)
         {
             PluginLogger.warning("A non-existent map was requested to be deleted", ex);
-            warning("This map does not exist.");
+            warning(I.t("This map does not exist."));
         }
     }
     
@@ -61,4 +60,3 @@ public class DeleteNoConfirmCommand extends Command
         return null;
     }
 }
-

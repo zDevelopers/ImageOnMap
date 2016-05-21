@@ -20,53 +20,36 @@ package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.ImageMap;
-import fr.moribus.imageonmap.worker.Worker;
-import fr.moribus.imageonmap.worker.WorkerCallback;
-import fr.moribus.imageonmap.worker.WorkerRunnable;
+import fr.zcraft.zlib.components.worker.Worker;
+import fr.zcraft.zlib.components.worker.WorkerAttributes;
+import fr.zcraft.zlib.components.worker.WorkerRunnable;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Files;
-import javax.imageio.ImageIO;
 
+
+@WorkerAttributes (name = "Image IO")
 public class ImageIOExecutor extends Worker
 {
-    static private ImageIOExecutor instance;
-    
-    static public void start()
-    {
-        if(instance != null) stop();
-        instance = new ImageIOExecutor();
-        instance.init();
-    }
-    
-    static public void stop()
-    {
-        instance.exit();
-        instance = null;
-    }
-    
-    private ImageIOExecutor()
-    {
-        super("Image IO");
-    }
-    
     static public void loadImage(final File file, final Renderer mapRenderer) 
     {
-        instance.submitQuery(new WorkerRunnable<Void>()
+        submitQuery(new WorkerRunnable<Void>()
+        {
+            @Override
+            public Void run() throws Exception
             {
-                @Override
-                public Void run() throws Exception
-                {
-                    BufferedImage image = ImageIO.read(file);
-                    mapRenderer.setImage(image);
-                    return null;
-                }
-            });
+                BufferedImage image = ImageIO.read(file);
+                mapRenderer.setImage(image);
+                return null;
+            }
+        });
     }
     
     static public void saveImage(final File file, final BufferedImage image)
     {
-        instance.submitQuery(new WorkerRunnable<Void>()
+        submitQuery(new WorkerRunnable<Void>()
         {
             @Override
             public Void run() throws Throwable
@@ -101,7 +84,7 @@ public class ImageIOExecutor extends Worker
     
     static public void deleteImage(final File file)
     {
-        instance.submitQuery(new WorkerRunnable<Void>()
+        submitQuery(new WorkerRunnable<Void>()
         {
             @Override
             public Void run() throws Throwable
@@ -109,7 +92,6 @@ public class ImageIOExecutor extends Worker
                 Files.delete(file.toPath());
                 return null;
             }
-            
         });
     }
 }

@@ -18,28 +18,26 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.commands.*;
+import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.migration.MigratorExecutor;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.command.CommandSender;
 
-@CommandInfo(name = "migrate")
-public class MigrateCommand extends Command
+@CommandInfo (name = "migrate")
+public class MigrateCommand extends IoMCommand
 {
-    public MigrateCommand(Commands commandGroup) {
-        super(commandGroup);
-    }
-    
     @Override
     protected void run() throws CommandException
     {
-        final CommandSender cmdSender = sender;
         if(MigratorExecutor.isRunning())
         {
-            error("A migration process is already running. Check console for details.");
+            error(I.t("A migration process is already running. Check console for details."));
         }
         else
         {
-            info("Migration started. See console for details.");
+            info(I.t("Migration started. See console for details."));
             MigratorExecutor.migrate();
         }
     }

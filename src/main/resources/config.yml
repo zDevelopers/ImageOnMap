@@ -1,0 +1,18 @@
+###  ImageOnMap configuration file
+
+
+# Plugin language. Empty: system language.
+# Available: en_US (default, fallback) and fr_FR.
+lang:
+
+
+# Allows collection of anonymous statistics on plugin environment and usage
+# The statistics are publicly visible here: http://mcstats.org/plugin/ImageOnMap
+collect-data: true
+
+
+# Images rendered on maps consume Minecraft maps ID, and there are only 32 767 of them.
+# You can limit the maximum number of maps a player, or the whole server, can use with ImageOnMap.
+# 0 means unlimited.
+map-global-limit: 0
+map-player-limit: 0

@@ -16,15 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.moribus.imageonmap.commands;
+package fr.moribus.imageonmap.commands.maptool;
 
-import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface CommandInfo
+import fr.moribus.imageonmap.commands.IoMCommand;
+import fr.moribus.imageonmap.gui.MapListGui;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.gui.Gui;
+
+
+@CommandInfo (name = "explore")
+public class ExploreCommand extends IoMCommand
 {
-    String name();
-    String usageParameters() default "";
-    String[] aliases() default {};
+	@Override
+	protected void run() throws CommandException
+	{
+            Gui.open(playerSender(), new MapListGui());
+	}
 }

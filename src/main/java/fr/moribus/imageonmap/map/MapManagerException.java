@@ -18,18 +18,21 @@
 
 package fr.moribus.imageonmap.map;
 
+import fr.zcraft.zlib.components.i18n.I;
+
 import java.text.MessageFormat;
 
 public class MapManagerException extends Exception
 {
     public enum Reason
     {
-        MAXIMUM_PLAYER_MAPS_EXCEEDED("You have too many maps (maximum : {0})."),
-        MAXIMUM_SERVER_MAPS_EXCEEDED("The server ImageOnMap limit has been reached."),
-        IMAGEMAP_DOES_NOT_EXIST("The given map does not exist.");
+        MAXIMUM_PLAYER_MAPS_EXCEEDED(I.t("You have too many maps (maximum : {0}).")),
+        MAXIMUM_SERVER_MAPS_EXCEEDED(I.t("The server ImageOnMap limit has been reached.")),
+        IMAGEMAP_DOES_NOT_EXIST(I.t("The given map does not exist."));
         
         private final String reasonString;
-        private Reason(String reasonString)
+
+        Reason(String reasonString)
         {
             this.reasonString = reasonString;
         }
@@ -39,7 +42,8 @@ public class MapManagerException extends Exception
             return MessageFormat.format(reasonString, arguments);
         }
     }
-    
+
+
     private final Reason reason;
     
     public MapManagerException(Reason reason, Object ...arguments)
@@ -49,5 +53,4 @@ public class MapManagerException extends Exception
     }
     
     public Reason getReason() { return reason; }
-    
 }

@@ -19,25 +19,29 @@
 package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ui.MapItemManager;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public abstract class ImageMap implements ConfigurationSerializable
 {
-    static public enum Type 
+    public enum Type
     {
-        SINGLE, POSTER;
-    };
+        SINGLE, POSTER
+    }
     
     static public final int WIDTH = 128;
     static public final int HEIGHT = 128;
-    static public final String DEFAULT_NAME = "Map";
+
+    /// The default display name of a map
+    static public final String DEFAULT_NAME = I.t("Map");
     
     private String id;
     private final UUID userUUID;
@@ -158,6 +162,11 @@ public abstract class ImageMap implements ConfigurationSerializable
     public synchronized String getId()
     {
         return id;
+    }
+
+    public synchronized Type getType()
+    {
+        return mapType;
     }
 
     public synchronized void rename(String id, String name)

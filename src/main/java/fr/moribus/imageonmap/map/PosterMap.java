@@ -18,10 +18,11 @@
 
 package fr.moribus.imageonmap.map;
 
+import org.bukkit.configuration.InvalidConfigurationException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.bukkit.configuration.InvalidConfigurationException;
 
 public class PosterMap extends ImageMap
 {
@@ -116,6 +117,38 @@ public class PosterMap extends ImageMap
         return (i / columnCount) + 1;
     }
     
+    public int getIndexAt(int col, int row)
+    {
+        return columnCount * row + col;
+    }
+
+    /**
+     * Returns the map id at the given column and line.
+     *
+     * @param x The x coordinate. Starts at 0.
+     * @param y The y coordinate. Starts at 0.
+     * @return The Minecraft map ID.
+     *
+     * @throws ArrayIndexOutOfBoundsException if the given coordinates are too big (out of the poster).
+     */
+    public short getMapIdAt(int x, int y)
+    {
+        return mapsIDs[y * columnCount + x];
+    }
+    
+    public short getMapIdAtReverseY(int index)
+    {
+        int x = index % (columnCount);
+        int y = index / (columnCount);
+        System.out.println(x + " : " + (rowCount - y - 1) + " (" + index);
+        return getMapIdAt(x, rowCount - y - 1);
+    }
+    
+    public short getMapIdAt(int index)
+    {
+        return mapsIDs[index];
+    }
+    
     public boolean hasColumnData()
     {
         return rowCount != 0 && columnCount != 0;
@@ -125,6 +158,16 @@ public class PosterMap extends ImageMap
     public int getMapCount()
     {
         return mapsIDs.length;
+    }
+    
+    public int getIndex(short mapID)
+    {
+        for(int i = 0; i < mapsIDs.length; i++)
+        {
+            if(mapsIDs[i] == mapID) return i;
+        }
+        
+        throw new IllegalArgumentException("Invalid map ID");
     }
 
 }

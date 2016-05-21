@@ -18,26 +18,36 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.commands.*;
+import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
+import fr.zcraft.zlib.components.rawtext.RawText;
+import org.bukkit.ChatColor;
+
 import java.util.List;
 
-@CommandInfo(name =  "delete", usageParameters = "[tool name]")
-public class DeleteConfirmCommand extends Command
+@CommandInfo (name =  "delete", usageParameters = "[tool name]")
+public class DeleteConfirmCommand extends IoMCommand
 {
-
-    public DeleteConfirmCommand(Commands commandGroup) {
-        super(commandGroup);
-    }
-
     @Override
-    protected void run() throws CommandException 
+    protected void run() throws CommandException
     {
         ImageMap map = getMapFromArgs();
-        tellRaw("{text:\"You are going to delete \",extra:[{text:\""+ map.getId() +"\",color:gold},{text:\". Are you sure ? \",color:white}," +
-            "{text:\"[Confirm]\", color:green, clickEvent:{action:run_command,value:\"/maptool delete-noconfirm "+ map.getId() +"\"}, " + 
-            "hoverEvent:{action:show_text,value:{text:\"This map will be deleted \",extra:[{text:\"forever\",color:red,bold:true,italic:true,underlined:true}, {text:\" !\", underlined:true}],underlined:true}}}]}");
+
+        RawText msg = new RawText(I.t("You are going to delete") + " ")
+            .then(map.getId())
+                .color(ChatColor.GOLD)
+            .then(". " + I.t("Are you sure ? "))
+                .color(ChatColor.WHITE)
+            .then(I.t("[Confirm]"))
+                .color(ChatColor.GREEN)
+                .hover(new RawText(I.t("{red}This map will be deleted {bold}forever{red}!")))
+                .command(DeleteNoConfirmCommand.class, map.getId())
+            .build();
         
+        send(msg);
     }
     
     @Override
@@ -45,8 +55,7 @@ public class DeleteConfirmCommand extends Command
     {
         if(args.length == 1) 
             return getMatchingMapNames(playerSender(), args[0]);
+
         return null;
     }
-
 }
-

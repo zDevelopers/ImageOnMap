@@ -18,25 +18,22 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.PluginLogger;
-import fr.moribus.imageonmap.commands.Command;
-import fr.moribus.imageonmap.commands.CommandException;
-import fr.moribus.imageonmap.commands.CommandInfo;
-import fr.moribus.imageonmap.commands.Commands;
+import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.map.ImageMap;
-import fr.moribus.imageonmap.worker.WorkerCallback;
-import java.net.MalformedURLException;
-import java.net.URL;
+import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
+import fr.zcraft.zlib.components.worker.WorkerCallback;
+import fr.zcraft.zlib.tools.PluginLogger;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "new", usageParameters = "<URL> [resize]")
-public class NewCommand  extends Command
+import java.net.MalformedURLException;
+import java.net.URL;
+
+@CommandInfo (name = "new", usageParameters = "<URL> [resize]")
+public class NewCommand  extends IoMCommand
 {
-    public NewCommand(Commands commandGroup) {
-        super(commandGroup);
-    }
-    
     @Override
     protected void run() throws CommandException
     {
@@ -44,7 +41,7 @@ public class NewCommand  extends Command
         boolean scaling = false;
         URL url;
         
-        if(args.length < 1) throwInvalidArgument("You must give an URL to take the image from.");
+        if(args.length < 1) throwInvalidArgument(I.t("You must give an URL to take the image from."));
         
         try
         {
@@ -52,7 +49,7 @@ public class NewCommand  extends Command
         }
         catch(MalformedURLException ex)
         {
-            throwInvalidArgument("Invalid URL.");
+            throwInvalidArgument(I.t("Invalid URL."));
             return;
         }
         
@@ -61,27 +58,30 @@ public class NewCommand  extends Command
             if(args[1].equals("resize")) scaling = true;
         }
         
-        info("Rendering ...");
+        info(I.t("Rendering..."));
         ImageRendererExecutor.Render(url, scaling, player.getUniqueId(), new WorkerCallback<ImageMap>()
         {
             @Override
             public void finished(ImageMap result)
             {
-                player.sendMessage("§7Rendering finished !");
+                player.sendMessage(I.t("{cst}Rendering finished !"));
                 if(result.give(player))
                 {
-                    info("The rendered map was too big to fit in your inventory.");
-                    info("Use '/maptool getremaining' to get the remaining maps.");
+                    info(I.t("The rendered map was too big to fit in your inventory."));
+                    info(I.t("Use '/maptool getremaining' to get the remaining maps."));
                 }
             }
 
             @Override
             public void errored(Throwable exception)
             {
-                player.sendMessage("§cMap rendering failed : " + exception.getMessage());
-                PluginLogger.warning("Rendering from '{0}' failed", exception, player.getName());
+                player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
+
+                PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
+                        player.getName(),
+                        exception.getClass().getCanonicalName(),
+                        exception.getMessage());
             }
         });
     }
-
 }

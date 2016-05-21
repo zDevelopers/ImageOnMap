@@ -20,8 +20,16 @@ package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.PluginConfiguration;
-import fr.moribus.imageonmap.PluginLogger;
 import fr.moribus.imageonmap.map.MapManagerException.Reason;
+import fr.zcraft.zlib.tools.PluginLogger;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.inventory.ItemStack;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,12 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.inventory.ItemStack;
 
 public class PlayerMapStore implements ConfigurationSerializable
 {
@@ -59,6 +61,9 @@ public class PlayerMapStore implements ConfigurationSerializable
     
     public synchronized boolean managesMap(ItemStack item)
     {
+        if(item == null) return false;
+        if(item.getType() != Material.MAP) return false;
+        
         for(ImageMap map : mapList)
         {
             if(map.managesMap(item)) return true;
@@ -127,6 +132,11 @@ public class PlayerMapStore implements ConfigurationSerializable
         return new ArrayList(mapList);
     }
     
+    public synchronized ImageMap[] getMaps()
+    {
+        return mapList.toArray(new ImageMap[mapList.size()]);
+    }
+    
     public synchronized ImageMap getMap(String mapId)
     {
         for(ImageMap map : mapList)
@@ -144,7 +154,7 @@ public class PlayerMapStore implements ConfigurationSerializable
     
     public void checkMapLimit(int newMapsCount) throws MapManagerException
     {
-        int limit = PluginConfiguration.MAP_PLAYER_LIMIT.getInteger();
+        int limit = PluginConfiguration.MAP_PLAYER_LIMIT.get();
         if(limit <= 0) return;
         
         if(getMapCount() + newMapsCount > limit)

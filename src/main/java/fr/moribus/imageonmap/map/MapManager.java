@@ -23,16 +23,19 @@ import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.PosterImage;
 import fr.moribus.imageonmap.map.MapManagerException.Reason;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import fr.zcraft.zlib.tools.PluginLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
-abstract public class MapManager 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+abstract public class MapManager
 {
     static private final long SAVE_DELAY = 200;
     static private final ArrayList<PlayerMapStore> playerMaps = new ArrayList<PlayerMapStore>();
@@ -40,7 +43,7 @@ abstract public class MapManager
     
     static public void init()
     {
-        
+        load();
     }
     
     static public void exit()
@@ -61,9 +64,12 @@ abstract public class MapManager
         }
         return false;
     }
-    
+
     static public boolean managesMap(ItemStack item)
     {
+        if(item == null) return false;
+        if(item.getType() != Material.MAP) return false;
+        
         synchronized(playerMaps)
         {
             for(PlayerMapStore mapStore : playerMaps)
@@ -73,7 +79,7 @@ abstract public class MapManager
         }
         return false;
     }
-    
+
     static public ImageMap createMap(UUID playerUUID, short mapID) throws MapManagerException
     {
         ImageMap newMap = new SingleMap(playerUUID, mapID);
@@ -139,9 +145,67 @@ abstract public class MapManager
         return getPlayerMapStore(playerUUID).getMapList();
     }
     
+    static public ImageMap[] getMaps(UUID playerUUID)
+    {
+        return getPlayerMapStore(playerUUID).getMaps();
+    }
+
+    /**
+     * Returns the number of minecraft maps used by the images rendered by the given player.
+     *
+     * @param playerUUID The player's UUID.
+     *
+     * @return The count.
+     */
+    static public int getMapPartCount(UUID playerUUID)
+    {
+        return getPlayerMapStore(playerUUID).getMapCount();
+    }
+    
     static public ImageMap getMap(UUID playerUUID, String mapId)
     {
         return getPlayerMapStore(playerUUID).getMap(mapId);
+    }
+
+    /**
+     * Returns the {@link ImageMap} this map belongs to.
+     *
+     * @param mapId The ID of the Minecraft map.
+     * @return The {@link ImageMap}.
+     */
+    static public ImageMap getMap(short mapId)
+    {
+        synchronized(playerMaps)
+        {
+            for(PlayerMapStore mapStore : playerMaps)
+            {
+                if(mapStore.managesMap(mapId))
+                {
+                    for(ImageMap map : mapStore.getMapList())
+                    {
+                        if(map.managesMap(mapId))
+                        {
+                            return map;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the {@link ImageMap} this map belongs to.
+     *
+     * @param item The map, as an {@link ItemStack}.
+     * @return The {@link ImageMap}.
+     */
+    static public ImageMap getMap(ItemStack item)
+    {
+        if(item == null) return null;
+        if(item.getType() != Material.MAP) return null;
+        return getMap(item.getDurability());
     }
     
     static public void clear(Inventory inventory)
@@ -166,6 +230,39 @@ abstract public class MapManager
         }
     }
     
+    static private UUID getUUIDFromFile(File file)
+    {
+        String fileName = file.getName();
+        int fileExtPos = fileName.lastIndexOf('.');
+        if(fileExtPos <= 0) return null;
+        
+        String fileExt = fileName.substring(fileExtPos + 1);
+        if(!fileExt.equals("yml")) return null;
+        
+        try
+        {
+            return UUID.fromString(fileName.substring(0, fileExtPos));
+        }
+        catch(IllegalArgumentException ex)
+        {
+            return null;
+        }
+    }
+    
+    static public void load()
+    {
+        int loadedFilesCount = 0;
+        for(File file : ImageOnMap.getPlugin().getMapsDirectory().listFiles())
+        {
+            UUID uuid = getUUIDFromFile(file);
+            if(uuid == null) continue;
+            getPlayerMapStore(uuid);
+            ++loadedFilesCount;
+        }
+        
+        PluginLogger.info("Loaded {0} player map files.", loadedFilesCount);
+    }
+    
     static public void save()
     {
         synchronized(playerMaps)
@@ -184,15 +281,19 @@ abstract public class MapManager
     
     static public void checkMapLimit(int newMapsCount, UUID userUUID) throws MapManagerException
     {
-        int limit = PluginConfiguration.MAP_GLOBAL_LIMIT.getInteger();
-        if(limit > 0)
-        {
-            if(getMapCount() + newMapsCount > limit)
-                throw new MapManagerException(Reason.MAXIMUM_SERVER_MAPS_EXCEEDED);
-        }
+        int limit = PluginConfiguration.MAP_GLOBAL_LIMIT.get();
+
+        if (limit > 0 && getMapCount() + newMapsCount > limit)
+            throw new MapManagerException(Reason.MAXIMUM_SERVER_MAPS_EXCEEDED);
+
         getPlayerMapStore(userUUID).checkMapLimit(newMapsCount);
     }
-    
+
+    /**
+     * Returns the total number of minecraft maps used by ImageOnMap images.
+     *
+     * @return The count.
+     */
     static public int getMapCount()
     {
         int mapCount = 0;
