@@ -55,10 +55,10 @@ public class MetricsLite
     /**
      * Starts MetricsLite, unless disabled in config
      */
-    
     static public void startMetrics()
     {
-        if(!PluginConfiguration.COLLECT_DATA.getBoolean()) return;
+        if(!PluginConfiguration.COLLECT_DATA.get()) return;
+
         try
         {
             MetricsLite metrics = new MetricsLite(ImageOnMap.getPlugin());

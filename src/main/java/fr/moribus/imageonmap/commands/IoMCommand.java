@@ -21,6 +21,7 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.zlib.components.commands.Command;
 import fr.zcraft.zlib.components.commands.CommandException;
+import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public abstract class IoMCommand extends Command
 
 	protected ImageMap getMapFromArgs(Player player, int index, boolean expand) throws CommandException
 	{
-		if(args.length <= index) throwInvalidArgument("You need to give a map name.");
+		if(args.length <= index) throwInvalidArgument(I.t("You need to give a map name."));
 
 		ImageMap map;
 		String mapName = args[index];
@@ -53,7 +54,7 @@ public abstract class IoMCommand extends Command
 
 		map = MapManager.getMap(player.getUniqueId(), mapName);
 
-		if(map == null) error("This map does not exist.");
+		if(map == null) error(I.t("This map does not exist."));
 
 		return map;
 	}

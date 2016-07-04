@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package fr.moribus.imageonmap.gui;
 
 import fr.moribus.imageonmap.PluginConfiguration;
@@ -27,154 +26,128 @@ import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.moribus.imageonmap.ui.SplatterMapManager;
 import fr.zcraft.zlib.components.gui.ExplorerGui;
 import fr.zcraft.zlib.components.gui.Gui;
-import fr.zcraft.zlib.components.gui.GuiUtils;
+import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 
 
 public class MapListGui extends ExplorerGui<ImageMap>
 {
-	private final NumberFormat bigNumbersFormatter = new DecimalFormat("###,###,###,###", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+    @Override
+    protected ItemStack getViewItem(ImageMap map)
+    {
+        String mapDescription;
+        if (map instanceof SingleMap)
+            /// Displayed subtitle description of a single map on the list GUI
+            mapDescription = I.t("{white}Single map");
+        else
+            /// Displayed subtitle description of a poster map on the list GUI (columns × rows in english)
+            mapDescription = I.t("{white}Poster map ({0} × {1})", ((PosterMap) map).getColumnCount(), ((PosterMap) map).getRowCount());
 
+        return new ItemStackBuilder(Material.MAP)
+                /// Displayed title of a map on the list GUI
+                .title(I.t("{green}{bold}{0}", map.getName()))
 
-	@Override
-	protected ItemStack getViewItem(ImageMap map)
-	{
-		String mapDescription;
-		if (map instanceof SingleMap)
-			mapDescription = "Single map";
-		else
-			mapDescription = "Poster map (" + ((PosterMap) map).getColumnCount() + "×" + ((PosterMap) map).getRowCount() + ")";
+                .lore(mapDescription)
+                .loreLine()
+                /// Map ID displayed in the tooltip of a map on the list GUI
+                .lore(I.t("{gray}Map ID: {0}", map.getId()))
+                .loreLine()
+                .lore(I.t("{gray}» {white}Left-click{gray} to get this map"))
+                .lore(I.t("{gray}» {white}Right-click{gray} for details and options"))
 
-		ItemStack icon = GuiUtils.makeItem(Material.MAP, ChatColor.GREEN + "" + ChatColor.BOLD + map.getName(), Arrays.asList(
-				ChatColor.WHITE + mapDescription,
-				"",
-				ChatColor.GRAY + "Map ID: " + map.getId(),
-				"",
-				ChatColor.GRAY + "» Left-click to get this map",
-				ChatColor.GRAY + "» Right-click for details and options"
-		));
+                .item();
+    }
 
-		return GuiUtils.hideItemAttributes(icon);
-	}
+    @Override
+    protected ItemStack getEmptyViewItem()
+    {
+        return new ItemStackBuilder(Material.BARRIER)
+                .title(I.t("{red}You don't have any map."))
+                .longLore(I.t("{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"))
+                .item();
+    }
 
-	@Override
-	protected ItemStack getEmptyViewItem()
-	{
-		ItemStack empty = new ItemStack(Material.BARRIER);
-		ItemMeta meta = empty.getItemMeta();
+    @Override
+    protected void onRightClick(ImageMap data)
+    {
+        Gui.open(getPlayer(), new MapDetailGui(data), this);
+    }
 
-		meta.setDisplayName(ChatColor.RED + "You don't have any map.");
-		meta.setLore(Arrays.asList(
-				ChatColor.GRAY + "Get started by creating a new one",
-				ChatColor.GRAY + "using " + ChatColor.WHITE + "/tomap <URL> [resize]" + ChatColor.GRAY + "!"
-		));
+    @Override
+    protected ItemStack getPickedUpItem(ImageMap map)
+    {
+        if (map instanceof SingleMap)
+        {
+            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName());
+        }
+        else if (map instanceof PosterMap)
+        {
+            return SplatterMapManager.makeSplatterMap((PosterMap) map);
+        }
 
-		empty.setItemMeta(meta);
-		return empty;
-	}
+        MapItemManager.give(getPlayer(), map);
+        return null;
+    }
 
-	@Override
-	protected void onRightClick(ImageMap data)
-	{
-		Gui.open(getPlayer(), new MapDetailGui(data), this);
-	}
+    @Override
+    protected void onUpdate()
+    {
+        ImageMap[] maps = MapManager.getMaps(getPlayer().getUniqueId());
+        setData(maps);
+        /// The maps list GUI title
+        setTitle(I.t("{black}Your maps {reset}({0})", maps.length));
 
-	@Override
-	protected ItemStack getPickedUpItem(ImageMap map)
-	{
-		if (map instanceof SingleMap)
-		{
-                    return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName());
-		}
-                else if(map instanceof PosterMap)
-                {
-                    return SplatterMapManager.makeSplatterMap((PosterMap) map);
-                }
-
-		MapItemManager.give(getPlayer(), map);
-		return null;
-	}
-
-	@Override
-	protected void onUpdate()
-	{
-		ImageMap[] maps = MapManager.getMaps(getPlayer().getUniqueId());
-		setData(maps);
-		setTitle(ChatColor.BLACK + "Your maps " + ChatColor.RESET + "(" + maps.length + ")");
-
-		setKeepHorizontalScrollingSpace(true);
+        setKeepHorizontalScrollingSpace(true);
 
 
         /* ** Statistics ** */
 
-		int imagesCount = MapManager.getMapList(getPlayer().getUniqueId()).size();
-		int mapPartCount = MapManager.getMapPartCount(getPlayer().getUniqueId());
+        int imagesCount = MapManager.getMapList(getPlayer().getUniqueId()).size();
+        int mapPartCount = MapManager.getMapPartCount(getPlayer().getUniqueId());
 
-		int mapGlobalLimit = PluginConfiguration.MAP_GLOBAL_LIMIT.getInteger();
-		int mapPersonalLimit = PluginConfiguration.MAP_PLAYER_LIMIT.getInteger();
+        int mapGlobalLimit = PluginConfiguration.MAP_GLOBAL_LIMIT.get();
+        int mapPersonalLimit = PluginConfiguration.MAP_PLAYER_LIMIT.get();
 
-		int mapPartGloballyLeft = mapGlobalLimit - MapManager.getMapCount();
-		int mapPartPersonallyLeft = mapPersonalLimit - mapPartCount;
+        int mapPartGloballyLeft = mapGlobalLimit - MapManager.getMapCount();
+        int mapPartPersonallyLeft = mapPersonalLimit - mapPartCount;
 
-		int mapPartLeft;
-		if (mapGlobalLimit <= 0 && mapPersonalLimit <= 0)
-			mapPartLeft = -1;
-		else if (mapGlobalLimit <= 0)
-			mapPartLeft = mapPartPersonallyLeft;
-		else if (mapPersonalLimit <= 0)
-			mapPartLeft = mapPartGloballyLeft;
-		else
-			mapPartLeft = Math.min(mapPartGloballyLeft, mapPartPersonallyLeft);
+        int mapPartLeft;
+        if (mapGlobalLimit <= 0 && mapPersonalLimit <= 0)
+            mapPartLeft = -1;
+        else if (mapGlobalLimit <= 0)
+            mapPartLeft = mapPartPersonallyLeft;
+        else if (mapPersonalLimit <= 0)
+            mapPartLeft = mapPartGloballyLeft;
+        else
+            mapPartLeft = Math.min(mapPartGloballyLeft, mapPartPersonallyLeft);
 
-		double percentageUsed = mapPartLeft < 0 ? 0 : ((double) mapPartCount) / ((double) (mapPartCount + mapPartLeft)) * 100;
+        double percentageUsed = mapPartLeft < 0 ? 0 : ((double) mapPartCount) / ((double) (mapPartCount + mapPartLeft)) * 100;
 
-                ItemStackBuilder statistics = new ItemStackBuilder(Material.ENCHANTED_BOOK)
-                        .title(ChatColor.BLUE, "Usage statistics")
-                        .lore(  "",
-                                getStatisticText("Images rendered", imagesCount),
-                                getStatisticText("Minecraft maps used", mapPartCount));
-                
-                if(mapPartLeft >= 0)
-                {
-                    statistics.lore("", ChatColor.BLUE + "Minecraft maps limits");
-                    
-                    statistics.lore("", 
-                            getStatisticText("Server-wide limit", mapGlobalLimit, true),
-                            getStatisticText("Per-player limit", mapPersonalLimit, true))
-                            
-                            .lore("",
-                                getStatisticText("Current consumption", ((int) Math.rint(percentageUsed)) + " %"),
-                                getStatisticText("Maps left", mapPartLeft));
-                }
-                
-                statistics.hideAttributes();
+        ItemStackBuilder statistics = new ItemStackBuilder(Material.ENCHANTED_BOOK)
+                .title(I.t("{blue}Usage statistics"))
+                .loreLine()
+                .lore(I.tn("{white}{0}{gray} image rendered", "{white}{0}{gray} images rendered", imagesCount))
+                .lore(I.tn("{white}{0}{gray} Minecraft map used", "{white}{0}{gray} Minecraft maps used", mapPartCount));
 
-		action("", getSize() - 5, statistics);
-	}
+        if(mapPartLeft >= 0)
+        {
+            statistics
+                    .lore("", I.t("{blue}Minecraft maps limits"), "")
+                    .lore(mapGlobalLimit == 0
+                            ? I.t("{gray}Server-wide limit: {white}unlimited")
+                            : I.t("{gray}Server-wide limit: {white}{0}", mapGlobalLimit))
+                    .lore(mapPersonalLimit == 0
+                            ? I.t("{gray}Per-player limit: {white}unlimited")
+                            : I.t("{gray}Per-player limit: {white}{0}", mapPersonalLimit))
+                    .loreLine()
+                    .lore(I.t("{white}{0} %{gray} of your quota used", (int) Math.rint(percentageUsed)))
+                    .lore(I.tn("{white}{0}{gray} map left", "{white}{0}{gray} maps left", mapPartLeft));
+        }
 
-	private String getStatisticText(String title, Integer value)
-	{
-		return getStatisticText(title, value, false);
-	}
+        statistics.hideAttributes();
 
-	private String getStatisticText(String title, Integer value, boolean zeroIsUnlimited)
-	{
-		return getStatisticText(title, zeroIsUnlimited && value <= 0 ? "unlimited" : bigNumbersFormatter.format(value));
-	}
-
-	private String getStatisticText(String title, String value)
-	{
-		return ChatColor.GRAY + title + ": " + ChatColor.WHITE + value;
-	}
+        action("", getSize() - 5, statistics);
+    }
 }

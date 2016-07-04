@@ -24,13 +24,14 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.MapManagerException;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.PluginLogger;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
 
-@CommandInfo (name =  "delete-noconfirm", usageParameters = "[map name]")
+@CommandInfo (name = "delete-noconfirm", usageParameters = "[map name]")
 public class DeleteNoConfirmCommand extends IoMCommand
 {
     @Override
@@ -42,12 +43,12 @@ public class DeleteNoConfirmCommand extends IoMCommand
         try
         {
             MapManager.deleteMap(map);
-            info("Map successfully deleted.");
+            info(I.t("Map successfully deleted."));
         }
         catch (MapManagerException ex)
         {
             PluginLogger.warning("A non-existent map was requested to be deleted", ex);
-            warning("This map does not exist.");
+            warning(I.t("This map does not exist."));
         }
     }
     
@@ -59,4 +60,3 @@ public class DeleteNoConfirmCommand extends IoMCommand
         return null;
     }
 }
-

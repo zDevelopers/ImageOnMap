@@ -35,6 +35,7 @@ import fr.moribus.imageonmap.migration.V3Migrator;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.zlib.components.commands.Commands;
 import fr.zcraft.zlib.components.gui.Gui;
+import fr.zcraft.zlib.components.i18n.I18n;
 import fr.zcraft.zlib.core.ZPlugin;
 import fr.zcraft.zlib.tools.PluginLogger;
 
@@ -81,16 +82,19 @@ public final class ImageOnMap extends ZPlugin
         }
         catch(IOException ex)
         {
-            PluginLogger.error("FATAL : " + ex.getMessage());
+            PluginLogger.error("FATAL: " + ex.getMessage());
             this.setEnabled(false);
             return;
         }
 
-        loadComponents(Gui.class, Commands.class, ImageIOExecutor.class, ImageRendererExecutor.class);
+        saveDefaultConfig();
+
+        loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class, ImageRendererExecutor.class);
         
         //Init all the things !
-        PluginConfiguration.init(this);
         MetricsLite.startMetrics();
+        I18n.setPrimaryLocale(PluginConfiguration.LANG.get());
+
         MapManager.init();
         MapInitEvent.init();
         MapItemManager.init();
