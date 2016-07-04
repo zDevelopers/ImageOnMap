@@ -304,8 +304,9 @@ public class V3Migrator implements Runnable
                 try
                 {
                     oldPoster = new OldSavedPoster(oldPosters.get(key), key);
-                    userNamesToFetch.add(oldPoster.getUserName());
                     postersToMigrate.add(oldPoster);
+                    if(!userNamesToFetch.contains(oldPoster.getUserName()))
+                        userNamesToFetch.add(oldPoster.getUserName());
                 }
                 catch(InvalidConfigurationException ex)
                 {
@@ -327,6 +328,9 @@ public class V3Migrator implements Runnable
                     oldMap = new OldSavedMap(oldMaps.get(key));
 
                     if(!posterContains(oldMap)) mapsToMigrate.add(oldMap);
+                    
+                    if(!userNamesToFetch.contains(oldMap.getUserName()))
+                        userNamesToFetch.add(oldMap.getUserName());
                 }
                 catch(InvalidConfigurationException ex)
                 {
