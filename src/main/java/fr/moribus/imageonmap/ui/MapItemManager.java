@@ -240,7 +240,7 @@ public class MapItemManager implements Listener
         
     }
     
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     static public void onEntityDamage(EntityDamageByEntityEvent event)
     {
         if(event.isCancelled()) return;
@@ -250,9 +250,10 @@ public class MapItemManager implements Listener
         onItemFrameRemove((ItemFrame)event.getEntity(), (Player)event.getDamager(), event);
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     static public void onEntityInteract(PlayerInteractEntityEvent event)
     {
+        if(event.isCancelled()) return;
         if(!(event.getRightClicked() instanceof ItemFrame)) return;
         
         onItemFramePlace((ItemFrame)event.getRightClicked(), event.getPlayer(), event);
