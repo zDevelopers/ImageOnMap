@@ -31,6 +31,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -239,9 +240,10 @@ public class MapItemManager implements Listener
         
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     static public void onEntityDamage(EntityDamageByEntityEvent event)
     {
+        if(event.isCancelled()) return;
         if(!(event.getEntity() instanceof ItemFrame)) return;
         if(!(event.getDamager() instanceof Player)) return;
         
