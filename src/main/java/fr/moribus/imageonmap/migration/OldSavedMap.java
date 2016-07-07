@@ -19,6 +19,7 @@
 package fr.moribus.imageonmap.migration;
 
 import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.SingleMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +72,11 @@ class OldSavedMap
         data.add(mapName);
         data.add(userName);
         configuration.set(mapName, data);
+    }
+    
+    public boolean isMapValid()
+    {
+        return MapManager.mapIdExists(mapId);
     }
     
     public short getMapId() {return mapId;}

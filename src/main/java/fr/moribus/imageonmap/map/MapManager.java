@@ -307,6 +307,23 @@ abstract public class MapManager
         return mapCount;
     }
     
+    /**
+     * Returns if the given map ID is valid and exists in the current save.
+     * @param mapId the map ID.
+     * @return true if the given map ID is valid and exists in the current save, false otherwise.
+     */
+    static public boolean mapIdExists(short mapId)
+    {
+        try
+        {
+            return Bukkit.getMap(mapId) != null;
+        }
+        catch(Throwable ex)
+        {
+            return false;
+        }
+    }
+    
     static private PlayerMapStore getPlayerMapStore(UUID playerUUID)
     {
         PlayerMapStore store;

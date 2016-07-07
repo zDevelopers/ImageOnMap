@@ -403,7 +403,7 @@ msgstr "Terminé."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:229
 msgid "Backup directories already exists."
-msgstr "Les répertoires de sauvegarde existe déjà."
+msgstr "Les répertoires de sauvegarde existent déjà."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:230
 msgid ""
@@ -441,7 +441,7 @@ msgstr "Le processus de migration a été interrompu."
 msgid "Fetching done. {0} UUID have been retrieved."
 msgid_plural "Fetching done. {0} UUIDs have been retrieved."
 msgstr[0] "Récupération achevée. {0} UUID a été retrouvé."
-msgstr[1] "Récupération achevée. {0} UUID ont été retrouvé."
+msgstr[1] "Récupération achevée. {0} UUIDs ont été retrouvés."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:371
 #, java-format
@@ -511,7 +511,7 @@ msgstr[1] "{0} posters n'ont pas pu être migrés."
 msgid "Data that has not been migrated will be kept in the old data files."
 msgstr ""
 "Les données qui n'ont pas été migrées seront conservées dans les vieux "
-"fichiers de donnée."
+"fichiers de données."
 
 #. The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
 #: src/main/java/fr/moribus/imageonmap/ui/MapItemManager.java:118
