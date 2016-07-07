@@ -237,7 +237,7 @@ msgstr "{gray}Identifiant : {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:57
 msgid "{gray}» {white}Left-click{gray} to get this map"
-msgstr "{gray}» {white}Cliquez droit{gray} pour récupérer cette carte"
+msgstr "{gray}» {white}Cliquez gauche{gray} pour récupérer cette carte"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:58
 msgid "{gray}» {white}Right-click{gray} for details and options"

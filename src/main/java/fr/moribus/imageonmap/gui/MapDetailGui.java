@@ -29,11 +29,12 @@ import fr.zcraft.zlib.components.gui.PromptGui;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.Callback;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 
-public class MapDetailGui extends ExplorerGui
+public class MapDetailGui extends ExplorerGui<Short>
 {
     private final ImageMap map;
 
@@ -59,6 +60,22 @@ public class MapDetailGui extends ExplorerGui
     }
     
     @Override
+    protected ItemStack getViewItem(Short mapId)
+    {
+        int index = ((PosterMap) map).getIndex(mapId);
+        Material partMaterial = Material.PAPER;
+        if(index % 2 == 0)
+            partMaterial = Material.EMPTY_MAP;
+
+        return new ItemStackBuilder(partMaterial)
+                .title(I.t("{green}Map part"))
+                .lore(I.t("{gray}Part: {white}{0}", index + 1))
+                .loreLine()
+                .lore(I.t("{gray}» {white}Click{gray} to get only this part"))
+                .item();
+    }
+    
+    @Override
     protected ItemStack getPickedUpItem(int x, int y)
     {
         if(map instanceof SingleMap)
@@ -73,6 +90,13 @@ public class MapDetailGui extends ExplorerGui
         throw new IllegalStateException("Unsupported map type: " + map.getType());
     }
 
+    @Override
+    protected ItemStack getPickedUpItem(Short mapId)
+    {
+        PosterMap poster = (PosterMap) map;
+        return MapItemManager.createMapItem(poster, poster.getIndex(mapId));
+    }
+    
     @Override
     protected ItemStack getEmptyViewItem()
     {
@@ -91,9 +115,21 @@ public class MapDetailGui extends ExplorerGui
         setKeepHorizontalScrollingSpace(true);
 
         if(map instanceof PosterMap)
-            setDataShape(((PosterMap) map).getColumnCount(), ((PosterMap) map).getRowCount());
+        {
+            PosterMap poster = (PosterMap) map;
+            if(poster.hasColumnData())
+            {
+                setDataShape(poster.getColumnCount(), poster.getRowCount());
+            }
+            else
+            {
+                setData(ArrayUtils.toObject(poster.getMapsIDs()));
+            }
+        }
         else
-            setData(null); // Fallback to the empty view item.
+        {
+            setDataShape(1,1); 
+        }
 
 
         action("rename", getSize() - 7, new ItemStackBuilder(Material.BOOK_AND_QUILL)

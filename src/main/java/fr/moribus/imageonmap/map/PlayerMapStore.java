@@ -223,7 +223,7 @@ public class PlayerMapStore implements ConfigurationSerializable
         try { checkMapLimit(0); }
         catch(MapManagerException ex)
         {
-            PluginLogger.warning("Map limit exceeded for player '{0}' ({1} maps loaded)",
+            PluginLogger.warning("Map limit exceeded for player {0} ({1} maps loaded)",
                     playerUUID.toString(),mapList.size());
         }
     }

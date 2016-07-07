@@ -39,12 +39,24 @@ public class MapListGui extends ExplorerGui<ImageMap>
     {
         String mapDescription;
         if (map instanceof SingleMap)
+        {
             /// Displayed subtitle description of a single map on the list GUI
             mapDescription = I.t("{white}Single map");
+        }
         else
-            /// Displayed subtitle description of a poster map on the list GUI (columns × rows in english)
-            mapDescription = I.t("{white}Poster map ({0} × {1})", ((PosterMap) map).getColumnCount(), ((PosterMap) map).getRowCount());
-
+        {
+            PosterMap poster = (PosterMap) map;
+            if(poster.hasColumnData())
+            {
+                /// Displayed subtitle description of a poster map on the list GUI (columns × rows in english)
+                mapDescription = I.t("{white}Poster map ({0} × {1})", poster.getColumnCount(), poster.getRowCount());
+            }
+            else
+            {
+                /// Displayed subtitle description of a poster map without column data on the list GUI
+                mapDescription = I.t("{white}Poster map ({0} parts)", poster.getMapCount());
+            }
+        }
         return new ItemStackBuilder(Material.MAP)
                 /// Displayed title of a map on the list GUI
                 .title(I.t("{green}{bold}{0}", map.getName()))
@@ -84,7 +96,13 @@ public class MapListGui extends ExplorerGui<ImageMap>
         }
         else if (map instanceof PosterMap)
         {
-            return SplatterMapManager.makeSplatterMap((PosterMap) map);
+            PosterMap poster = (PosterMap) map;
+            
+            if(poster.hasColumnData())
+                return SplatterMapManager.makeSplatterMap((PosterMap) map);
+            
+            MapItemManager.giveParts(getPlayer(), poster);
+            return null;
         }
 
         MapItemManager.give(getPlayer(), map);

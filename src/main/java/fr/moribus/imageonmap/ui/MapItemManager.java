@@ -73,7 +73,30 @@ public class MapItemManager implements Listener
     
     static public boolean give(Player player, PosterMap map)
     {
+        if(!map.hasColumnData())
+            return giveParts(player, map);
         return give(player, SplatterMapManager.makeSplatterMap(map));
+    }
+    
+    static public boolean giveParts(Player player, PosterMap map)
+    {
+        boolean inventoryFull = false;
+        
+        ItemStack mapPartItem;
+        for(int i = 0, c = map.getMapCount(); i < c; i++)
+        {
+            if(map.hasColumnData())
+            {
+                mapPartItem = createMapItem(map, map.getRowAt(i), map.getColumnAt(i));
+            }
+            else
+            {
+                mapPartItem = createMapItem(map, i);
+            }
+            inventoryFull = give(player, mapPartItem) || inventoryFull;
+        }
+        
+        return inventoryFull;
     }
     
     static public int giveCache(Player player)
@@ -110,19 +133,16 @@ public class MapItemManager implements Listener
         return createMapItem(map.getMapsIDs()[0], map.getName());
     }
     
+    static public ItemStack createMapItem(PosterMap map, int index)
+    {
+        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = index.
+        return createMapItem(map.getMapIdAt(index), I.t("{0} (part {1})", map.getName(), index + 1));
+    }
+    
     static public ItemStack createMapItem(PosterMap map, int x, int y)
     {
-        String mapName;
-        if(map.hasColumnData())
-        {
-            /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
-            mapName = I.t("{0} (row {1}, column {2})", map.getName(), x, y);
-        }
-        else
-        {
-            mapName = map.getName();
-        }
-        return createMapItem(map.getMapIdAt(x, y), mapName);
+        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
+        return createMapItem(map.getMapIdAt(x, y),  I.t("{0} (row {1}, column {2})", map.getName(), x + 1, y + 1));
     }
     
     static public ItemStack createMapItem(short mapID, String text)
@@ -192,7 +212,10 @@ public class MapItemManager implements Listener
         {
             PosterMap poster = (PosterMap) map;
             int index = poster.getIndex(item.getDurability());
-            return I.t("{0} (row {1}, column {2})", map.getName(), poster.getRowAt(index), poster.getColumnAt(index));
+            if(poster.hasColumnData())
+                return I.t("{0} (row {1}, column {2})", map.getName(), poster.getRowAt(index) + 1, poster.getColumnAt(index) + 1);
+            
+            return I.t("{0} (part {1})", map.getName(), index + 1);
         }
     }
     
