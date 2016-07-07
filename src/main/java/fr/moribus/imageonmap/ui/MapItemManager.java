@@ -249,11 +249,10 @@ public class MapItemManager implements Listener
             if(poster != null)
             {
                 event.setCancelled(true);
-                if(player.getGameMode() == GameMode.CREATIVE)
-                {
-                    if(!SplatterMapManager.hasSplatterMap(player, poster))
-                        poster.give(player);
-                }
+                
+                if(player.getGameMode() != GameMode.CREATIVE || !SplatterMapManager.hasSplatterMap(player, poster))
+                    poster.give(player);
+                
                 return;
             }
         }
