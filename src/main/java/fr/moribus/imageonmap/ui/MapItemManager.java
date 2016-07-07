@@ -223,10 +223,12 @@ public class MapItemManager implements Listener
     {
         if(frame.getItem().getType() != Material.AIR) return;
         if(!MapManager.managesMap(player.getItemInHand())) return;
+        event.setCancelled(true);
         
         if(SplatterMapManager.hasSplatterAttributes(player.getItemInHand()))
         {
-            SplatterMapManager.placeSplatterMap(frame, player);
+            if(!SplatterMapManager.placeSplatterMap(frame, player))
+                return;
         }
         else
         {
@@ -234,7 +236,6 @@ public class MapItemManager implements Listener
             frame.setItem(is);
         }
         
-        event.setCancelled(true);
         ItemUtils.consumeItem(player);
     }
     
