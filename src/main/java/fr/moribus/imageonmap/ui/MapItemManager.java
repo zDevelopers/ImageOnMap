@@ -169,10 +169,7 @@ public class MapItemManager implements Listener
     {
         if(map instanceof PosterMap && ((PosterMap) map).hasColumnData())
         {
-            return MapItemManager.createMapItem(
-                    ((PosterMap) map).getMapIdAt(x, y),
-                    I.t("{0} (row {1}, column {2})", map.getName(), y + 1, x + 1)
-            );
+            return MapItemManager.createMapItem((PosterMap) map, x, y);
         }
         else
         {
@@ -213,7 +210,7 @@ public class MapItemManager implements Listener
             PosterMap poster = (PosterMap) map;
             int index = poster.getIndex(item.getDurability());
             if(poster.hasColumnData())
-                return I.t("{0} (row {1}, column {2})", map.getName(), poster.getRowAt(index) + 1, poster.getColumnAt(index) + 1);
+                return I.t("{0} (row {1}, column {2})", map.getName(), poster.getRowAt(index), poster.getColumnAt(index));
             
             return I.t("{0} (part {1})", map.getName(), index + 1);
         }
