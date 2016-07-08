@@ -20,7 +20,7 @@ msgstr ""
 
 #: src/main/java/fr/moribus/imageonmap/commands/IoMCommand.java:40
 msgid "You need to give a map name."
-msgstr "Vous devez donner un nom à la carte."
+msgstr "Vous devez donner le nom d'une carte."
 
 #: src/main/java/fr/moribus/imageonmap/commands/IoMCommand.java:57
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteNoConfirmCommand.java:51

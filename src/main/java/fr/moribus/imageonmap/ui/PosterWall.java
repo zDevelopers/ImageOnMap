@@ -87,8 +87,6 @@ public class PosterWall
         {
             for(int x = 0; x < map.getColumnCount(); ++x)
             {
-                //Location newLocation = WorldUtils.addToLocation(topLeftLocation, x, -y, facing);
-                //System.out.println("Checking : " + loc);
                 int mapIndex = map.getIndexAt(x, y);
                 ItemFrame frame = getMapFrameAt(loc, map);
                 if(frame != null) frames[mapIndex] = frame;

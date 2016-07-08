@@ -28,7 +28,7 @@ import org.bukkit.ChatColor;
 
 import java.util.List;
 
-@CommandInfo (name =  "delete", usageParameters = "[tool name]")
+@CommandInfo (name =  "delete", usageParameters = "[map name]")
 public class DeleteConfirmCommand extends IoMCommand
 {
     @Override

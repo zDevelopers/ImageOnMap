@@ -106,6 +106,7 @@ public class MapInitEvent implements Listener
     
     static protected void initMap(MapView map)
     {
+        if(map == null) return;
         if(Renderer.isHandled(map)) return;
         
         File imageFile = ImageOnMap.getPlugin().getImageFile(map.getId());
