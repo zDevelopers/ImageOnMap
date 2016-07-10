@@ -7,230 +7,224 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-10 00:59+0200\n"
-"PO-Revision-Date: 2016-07-10 01:01+0200\n"
-"Last-Translator: Amaury Carrade\n"
+"POT-Creation-Date: 2016-07-10 03:07+0200\n"
+"PO-Revision-Date: 2016-07-10 03:08+0200\n"
+"Last-Translator: \n"
 "Language-Team: \n"
-"Language: fr_FR\n"
+"Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.7.1\n"
 
 #: src/main/java/fr/moribus/imageonmap/commands/IoMCommand.java:40
 msgid "You need to give a map name."
-msgstr "Vous devez donner le nom d'une carte."
+msgstr "You need to give a map name."
 
 #: src/main/java/fr/moribus/imageonmap/commands/IoMCommand.java:57
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteNoConfirmCommand.java:51
 msgid "This map does not exist."
-msgstr "Cette carte n'existe pas."
+msgstr "This map does not exist."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteConfirmCommand.java:39
 msgid "You are going to delete"
-msgstr "Vous êtes sur le point de supprimer"
+msgstr "You are going to delete"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteConfirmCommand.java:42
 msgid "Are you sure ? "
-msgstr "Êtes-vous sûr ?"
+msgstr "Are you sure ? "
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteConfirmCommand.java:44
 msgid "[Confirm]"
-msgstr "[Confirmer]"
+msgstr "[Confirm]"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteConfirmCommand.java:46
 msgid "{red}This map will be deleted {bold}forever{red}!"
-msgstr "{red}Cette carte sera supprimée {bold}définitivement{red} !"
+msgstr "{red}This map will be deleted {bold}forever{red}!"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteNoConfirmCommand.java:46
 msgid "Map successfully deleted."
-msgstr "Carte supprimée avec succès."
+msgstr "Map successfully deleted."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetCommand.java:38
 msgid "The requested map was too big to fit in your inventory."
-msgstr ""
-"La carte demandée est trop grosse et ne rentre pas dans votre inventaire."
+msgstr "The requested map was too big to fit in your inventory."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetCommand.java:39
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:71
 msgid "Use '/maptool getremaining' to get the remaining maps."
-msgstr "Utilisez “/maptool getremaining” pour récupérer les cartes restantes."
+msgstr "Use '/maptool getremaining' to get the remaining maps."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetRemainingCommand.java:38
 msgid "You have no remaining map."
-msgstr "Vous n'avez aucune carte restante."
+msgstr "You have no remaining map."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetRemainingCommand.java:46
 msgid ""
 "Your inventory is full! Make some space before requesting the remaining maps."
 msgstr ""
-"Votre inventaire est plein ! Faites de la place avant de demander les cartes "
-"supplémentaires."
+"Your inventory is full! Make some space before requesting the remaining maps."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetRemainingCommand.java:50
 #, java-format
 msgid "There is {0} map remaining."
 msgid_plural "There are {0} maps remaining."
-msgstr[0] "Il y a {0} carte restante."
-msgstr[1] "Il y a {0} cartes restantes."
+msgstr[0] "There is {0} map remaining."
+msgstr[1] "There are {0} maps remaining."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/ListCommand.java:49
 msgid "No map found."
-msgstr "Aucune carte."
+msgstr "No map found."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/ListCommand.java:53
 msgid "{white}{bold}{0} map found."
 msgid_plural "{white}{bold}{0} maps found."
-msgstr[0] "{white}{bold}{0} carte."
-msgstr[1] "{white}{bold}{0} cartes."
+msgstr[0] "{white}{bold}{0} map found."
+msgstr[1] "{white}{bold}{0} maps found."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/ListCommand.java:79
 msgid "{white}Click{gray} to get this map"
-msgstr "{white}Cliquez{gray} pour obtenir cette carte"
+msgstr "{white}Click{gray} to get this map"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/MigrateCommand.java:36
 msgid "A migration process is already running. Check console for details."
-msgstr ""
-"Un processus de migration est déjà en cours. Consultez la console pour plus "
-"de détails."
+msgstr "A migration process is already running. Check console for details."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/MigrateCommand.java:40
 msgid "Migration started. See console for details."
-msgstr "Migration démarrée. Consultez la console pour plus de détails."
+msgstr "Migration started. See console for details."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:44
 msgid "You must give an URL to take the image from."
-msgstr "Vous devez fournir l'URL de l'image."
+msgstr "You must give an URL to take the image from."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:52
 msgid "Invalid URL."
-msgstr "URL invalide."
+msgstr "Invalid URL."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:61
 msgid "Rendering..."
-msgstr "Rendu en cours..."
+msgstr "Rendering..."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:67
 msgid "{cst}Rendering finished!"
-msgstr "{cst}Rendu achevé !"
+msgstr "{cst}Rendering finished!"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:70
 msgid "The rendered map was too big to fit in your inventory."
-msgstr ""
-"La carte rendue est trop grosse et ne rentre pas dans votre inventaire."
+msgstr "The rendered map was too big to fit in your inventory."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:78
 msgid "{ce}Map rendering failed: {0}"
-msgstr "{ce}Impossible de faire le rendu de la carte : {0}"
+msgstr "{ce}Map rendering failed: {0}"
 
 #. The title of the map deletion GUI. {0}: map name.
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:102
 msgid "{0} » {black}Confirm deletion"
-msgstr "{0} » {black}Confirmation de suppression"
+msgstr "{0} » {black}Confirm deletion"
 
 #. The title of the map deletion item
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:110
 msgid "{red}You're about to destroy this map..."
-msgstr "{red}Vous êtes sur le point de supprimer cette carte..."
+msgstr "{red}You're about to destroy this map..."
 
 #. The end, in the lore, of a title starting with “You're about to destroy this map...”.
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:112
 msgid "{red}...{italic}forever{red}."
-msgstr "{red}...{italic}pour toujours{red}."
+msgstr "{red}...{italic}forever{red}."
 
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:114
 msgid "{gray}Name: {white}{0}"
-msgstr "{gray}Nom : {white}{0}"
+msgstr "{gray}Name: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:115
 msgid "{gray}Map ID: {white}{0}"
-msgstr "{gray}Identifiant : {white}{0}"
+msgstr "{gray}Map ID: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:116
 msgid "{gray}Maps inside: {white}{0}"
-msgstr "{gray}Cartes : {white}{0}"
+msgstr "{gray}Maps inside: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:178
 msgid "{gray}Map successfully deleted."
-msgstr "{gray}Carte supprimée avec succès."
+msgstr "{gray}Map successfully deleted."
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:54
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:71
 msgid "{green}Map part"
-msgstr "{green}Extrait de carte"
+msgstr "{green}Map part"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:55
 msgid "{gray}Column: {white}{0}"
-msgstr "{gray}Colonne : {white}{0}"
+msgstr "{gray}Column: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:56
 msgid "{gray}Row: {white}{0}"
-msgstr "{gray}Ligne : {white}{0}"
+msgstr "{gray}Row: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:58
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:74
 msgid "{gray}» {white}Click{gray} to get only this part"
-msgstr "{gray}» {white}Cliquez{gray} pour récupérer cette partie"
+msgstr "{gray}» {white}Click{gray} to get only this part"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:72
 msgid "{gray}Part: {white}{0}"
-msgstr "{gray}Partie: {white}{0}"
+msgstr "{gray}Part: {white}{0}"
 
 #. Title of the map details GUI
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:114
 msgid "Your maps » {black}{0}"
-msgstr "Vos cartes » {black}{0}"
+msgstr "Your maps » {black}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:136
 msgid "{blue}Rename this image"
-msgstr "{blue}Renommer cette image"
+msgstr "{blue}Rename this image"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:137
 msgid ""
 "{gray}Click here to rename this image; this is used for your own "
 "organization."
 msgstr ""
-"{gray}Cliquez ici pour renommer cette image ; ceci ne sert qu'à votre "
-"organisation personnelle."
+"{gray}Click here to rename this image; this is used for your own "
+"organization."
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:141
 msgid "{red}Delete this image"
-msgstr "{red}Supprimer cette carte"
+msgstr "{red}Delete this image"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:142
 msgid ""
 "{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"
 msgstr ""
-"{gray}Supprime cette carte {white}pour toujours{gray}. Cette action ne peut "
-"être annulée !"
+"{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:144
 msgid "{gray}You will be asked to confirm your choice if you click here."
-msgstr "{gray}Une confirmation sera demandée si vous cliquez ici."
+msgstr "{gray}You will be asked to confirm your choice if you click here."
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:156
 msgid "{green}« Back"
-msgstr "{green}« Retour"
+msgstr "{green}« Back"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:157
 msgid "{gray}Go back to the list."
-msgstr "{gray}Retourner à la liste."
+msgstr "{gray}Go back to the list."
 
 #. Displayed subtitle description of a single map on the list GUI
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:44
 msgid "{white}Single map"
-msgstr "{white}Carte unique"
+msgstr "{white}Single map"
 
 #. Displayed subtitle description of a poster map on the list GUI (columns × rows in english)
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:52
 msgid "{white}Poster map ({0} × {1})"
-msgstr "{white}Poster ({0} × {1})"
+msgstr "{white}Poster map ({0} × {1})"
 
 #. Displayed subtitle description of a poster map without column data on the list GUI
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:57
 msgid "{white}Poster map ({0} parts)"
-msgstr "{white}Poster ({0} parties)"
+msgstr "{white}Poster map ({0} parts)"
 
 #. Displayed title of a map on the list GUI
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:62
@@ -240,139 +234,137 @@ msgstr "{green}{bold}{0}"
 #. Map ID displayed in the tooltip of a map on the list GUI
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:67
 msgid "{gray}Map ID: {0}"
-msgstr "{gray}Identifiant : {white}{0}"
+msgstr "{gray}Map ID: {0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:69
 msgid "{gray}» {white}Left-click{gray} to get this map"
-msgstr "{gray}» {white}Cliquez gauche{gray} pour récupérer cette carte"
+msgstr "{gray}» {white}Left-click{gray} to get this map"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:70
 msgid "{gray}» {white}Right-click{gray} for details and options"
-msgstr "{gray}» {white}Cliquez droit{gray} pour détails et options"
+msgstr "{gray}» {white}Right-click{gray} for details and options"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:79
 msgid "{red}You don't have any map."
-msgstr "{red}Vous n'avez aucune carte."
+msgstr "{red}You don't have any map."
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:80
 msgid ""
 "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]"
 "{gray}!"
 msgstr ""
-"{gray}Commencez par en créer une nouvelle avec {white}/tomap <URL> [resize]"
-"{gray} !"
+"{gray}Get started by creating a new one using {white}/tomap <URL> [resize]"
+"{gray}!"
 
 #. The maps list GUI title
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:119
 msgid "{black}Your maps {reset}({0})"
-msgstr "{black}Vos cartes {reset}({0})"
+msgstr "{black}Your maps {reset}({0})"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:148
 msgid "{blue}Usage statistics"
-msgstr "{blue}Statistiques d'utilisation"
+msgstr "{blue}Usage statistics"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:150
 msgid "{white}{0}{gray} image rendered"
 msgid_plural "{white}{0}{gray} images rendered"
-msgstr[0] "{white}{0}{gray} image rendue"
-msgstr[1] "{white}{0}{gray} images rendues"
+msgstr[0] "{white}{0}{gray} image rendered"
+msgstr[1] "{white}{0}{gray} images rendered"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:151
 msgid "{white}{0}{gray} Minecraft map used"
 msgid_plural "{white}{0}{gray} Minecraft maps used"
-msgstr[0] "{white}{0}{gray} carte Minecraft utilisée"
-msgstr[1] "{white}{0}{gray} cartes Minecraft utilisées"
+msgstr[0] "{white}{0}{gray} Minecraft map used"
+msgstr[1] "{white}{0}{gray} Minecraft maps used"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:156
 msgid "{blue}Minecraft maps limits"
-msgstr "{blue}Limites de cartes Minecraft"
+msgstr "{blue}Minecraft maps limits"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:158
 msgid "{gray}Server-wide limit: {white}unlimited"
-msgstr "{gray}Limite du serveur : {white}illimité"
+msgstr "{gray}Server-wide limit: {white}unlimited"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:159
 msgid "{gray}Server-wide limit: {white}{0}"
-msgstr "{gray}Limite du serveur : {white}{0}"
+msgstr "{gray}Server-wide limit: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:161
 msgid "{gray}Per-player limit: {white}unlimited"
-msgstr "{gray}Limite individuelle : {white}illimité"
+msgstr "{gray}Per-player limit: {white}unlimited"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:162
 msgid "{gray}Per-player limit: {white}{0}"
-msgstr "{gray}Limite individuelle : {white}{0}"
+msgstr "{gray}Per-player limit: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:164
 msgid "{white}{0} %{gray} of your quota used"
-msgstr "{white}{0} %{gray} de votre quota utilisé"
+msgstr "{white}{0} %{gray} of your quota used"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:165
 msgid "{white}{0}{gray} map left"
 msgid_plural "{white}{0}{gray} maps left"
-msgstr[0] "{white}{0}{gray} carte restante"
-msgstr[1] "{white}{0}{gray} cartes restantes"
+msgstr[0] "{white}{0}{gray} map left"
+msgstr[1] "{white}{0}{gray} maps left"
 
 #: src/main/java/fr/moribus/imageonmap/image/ImageRendererExecutor.java:73
 #, java-format
 msgid "HTTP error : {0} {1}"
-msgstr "Erreur HTTP : {0} {1}"
+msgstr "HTTP error : {0} {1}"
 
 #: src/main/java/fr/moribus/imageonmap/image/ImageRendererExecutor.java:79
 msgid "The given URL is not a valid image"
-msgstr "L'URL donnée n'est pas une image valide."
+msgstr "The given URL is not a valid image"
 
 #. The default display name of a map
 #: src/main/java/fr/moribus/imageonmap/map/ImageMap.java:44
 msgid "Map"
-msgstr "Carte"
+msgstr "Map"
 
 #: src/main/java/fr/moribus/imageonmap/map/MapManagerException.java:29
 #, java-format
 msgid "You have too many maps (maximum : {0})."
-msgstr "Vous avez trop de cartes (maximum : {0})."
+msgstr "You have too many maps (maximum : {0})."
 
 #: src/main/java/fr/moribus/imageonmap/map/MapManagerException.java:30
 msgid "The server ImageOnMap limit has been reached."
-msgstr "La limite serveur de cartes a été atteinte."
+msgstr "The server ImageOnMap limit has been reached."
 
 #: src/main/java/fr/moribus/imageonmap/map/MapManagerException.java:31
 msgid "The given map does not exist."
-msgstr "La carte donnée n'existe pas."
+msgstr "The given map does not exist."
 
 #: src/main/java/fr/moribus/imageonmap/migration/MigratorExecutor.java:34
 msgid "Migration is already running."
-msgstr "La migration est déjà en cours."
+msgstr "Migration is already running."
 
 #: src/main/java/fr/moribus/imageonmap/migration/MigratorExecutor.java:50
 msgid "Waiting for migration to finish..."
-msgstr "Attente de la fin de la migration..."
+msgstr "Waiting for migration to finish..."
 
 #: src/main/java/fr/moribus/imageonmap/migration/MigratorExecutor.java:58
 msgid ""
 "Migration thread has been interrupted while waiting to finish. It may not "
 "have ended correctly."
 msgstr ""
-"Le thread a été interrompu durant l'attente de la fin de la migration. Cette "
-"dernière pourrait s'être achevée anormalement."
+"Migration thread has been interrupted while waiting to finish. It may not "
+"have ended correctly."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:176
 msgid "Error while preparing migration"
-msgstr "Une erreur est survenue lors de la préparation de la migration."
+msgstr "Error while preparing migration"
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:177
 msgid "Aborting migration. No change has been made."
-msgstr "La migration est annulée. Aucun changement n'a été effectué."
+msgstr "Aborting migration. No change has been made."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:189
 msgid "Error while migrating"
-msgstr "Erreur lors de la migration"
+msgstr "Error while migrating"
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:190
 msgid "Aborting migration. Some changes may already have been made."
-msgstr ""
-"La migration est annulée. Certains changements ont pu être effectués malgré "
-"tout."
+msgstr "Aborting migration. Some changes may already have been made."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:191
 msgid ""
@@ -380,98 +372,96 @@ msgid ""
 "backups, and then move the backups away from the plugin directory to avoid "
 "overwriting them."
 msgstr ""
-"Avant de re-tenter la migration, vous devez récupérer les fichiers des "
-"joueurs depuis la sauvegarde qu'a été effectuée automatiquement, puis "
-"déplacer les sauvegardes hors du dossier du plugin afin d'éviter de les "
-"écraser."
+"Before trying to migrate again, you must recover player files from the "
+"backups, and then move the backups away from the plugin directory to avoid "
+"overwriting them."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:203
 msgid "Looking for configuration files to migrate..."
-msgstr "Recherche de fichiers de configuration à migrer..."
+msgstr "Looking for configuration files to migrate..."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:206
 #, java-format
 msgid "Detected former posters file {0}"
-msgstr "Vieux fichier de posters détecté : {0}"
+msgstr "Detected former posters file {0}"
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:209
 #, java-format
 msgid "Detected former maps file {0}"
-msgstr "Vieux fichier de carte détecté : {0}"
+msgstr "Detected former maps file {0}"
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:213
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:416
 msgid "There is nothing to migrate. Stopping."
-msgstr "Il n'y a rien à migrer. Le processus est arrêté."
+msgstr "There is nothing to migrate. Stopping."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:218
 msgid "Done."
-msgstr "Terminé."
+msgstr "Done."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:232
 msgid "Backup directories already exists."
-msgstr "Les répertoires de sauvegarde existent déjà."
+msgstr "Backup directories already exists."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:233
 msgid ""
 "This means that a migration has already been done, or may not have ended "
 "well."
 msgstr ""
-"Cela signifie qu'une migration a déjà été faite, ou qu'elle n'a possiblement "
-"pas terminé correctement."
+"This means that a migration has already been done, or may not have ended "
+"well."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:234
 msgid ""
 "To start a new migration, you must move away the backup directories so they "
 "are not overwritten."
 msgstr ""
-"Pour démarrer une nouvelle migration, vous devez déplacer les répertoires de "
-"sauvegarde afin qu'ils ne soit pas écrasés."
+"To start a new migration, you must move away the backup directories so they "
+"are not overwritten."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:247
 msgid "Backing up map data before migrating..."
-msgstr "Sauvegarde des données des cartes avant la migration…"
+msgstr "Backing up map data before migrating..."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:271
 msgid "Backup complete."
-msgstr "Sauvegarde terminée."
+msgstr "Backup complete."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:352
 msgid "Fetching UUIDs from Mojang..."
-msgstr "Récupération des UUID depuis Mojang..."
+msgstr "Fetching UUIDs from Mojang..."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:359
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:387
 msgid "An error occurred while fetching the UUIDs from Mojang"
-msgstr ""
-"Une erreur est survenue lors de la récupération des UUIDs depuis Mojang."
+msgstr "An error occurred while fetching the UUIDs from Mojang"
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:364
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:392
 msgid "The migration worker has been interrupted"
-msgstr "Le processus de migration a été interrompu."
+msgstr "The migration worker has been interrupted"
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:367
 #, java-format
 msgid "Fetching done. {0} UUID have been retrieved."
 msgid_plural "Fetching done. {0} UUIDs have been retrieved."
-msgstr[0] "Récupération achevée. {0} UUID a été retrouvé."
-msgstr[1] "Récupération achevée. {0} UUIDs ont été retrouvés."
+msgstr[0] "Fetching done. {0} UUID have been retrieved."
+msgstr[1] "Fetching done. {0} UUIDs have been retrieved."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:378
 #, java-format
 msgid "Mojang did not find UUIDs for {0} player at the current time."
 msgid_plural "Mojang did not find UUIDs for {0} players at the current time."
-msgstr[0] "Mojang n'a pas trouvé d'UUID pour {0} joueur à l'heure actuelle."
-msgstr[1] "Mojang n'a pas trouvé d'UUID pour {0} joueurs à l'heure actuelle."
+msgstr[0] "Mojang did not find UUIDs for {0} player at the current time."
+msgstr[1] "Mojang did not find UUIDs for {0} players at the current time."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:379
 msgid ""
 "The Mojang servers limit requests rate at one per second, this may take some "
 "time..."
 msgstr ""
-"Les serveurs de Mojang limitent les requêtes à une par seconde, cette étape "
-"risque de durer un petit moment..."
+"The Mojang servers limit requests rate at one per second, this may take some "
+"time..."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:398
 #, java-format
@@ -482,97 +472,92 @@ msgstr[1] "Mojang did not find player data for {0} players"
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:400
 msgid "The following players do not exist or do not have paid accounts :"
-msgstr "Les joueurs suivant n'existent pas ou n'ont pas de compte payant :"
+msgstr "The following players do not exist or do not have paid accounts :"
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:415
 msgid "Mojang could not find any of the registered players."
-msgstr "Mojang n'a pu trouver aucun des joueurs enregistrés."
+msgstr "Mojang could not find any of the registered players."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:425
 msgid "Merging map data..."
-msgstr "Fusion des données des cartes..."
+msgstr "Merging map data..."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:475
 #, java-format
 msgid "{0} registered minecraft map is missing from the save."
 msgid_plural "{0} registered minecraft maps are missing from the save."
-msgstr[0] ""
-"{0} carte Minecraft enregistrée n'a pas été retrouvée dans la sauvegarde."
-msgstr[1] ""
-"{0} cartes Minecraft enregistrées n'ont pas été retrouvées dans la "
-"sauvegarde."
+msgstr[0] "{0} registered minecraft map is missing from the save."
+msgstr[1] "{0} registered minecraft maps are missing from the save."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:476
 msgid ""
 "These maps will not be migrated, but this could mean the save has been "
 "altered or corrupted."
 msgstr ""
-"Ces cartes ne seront pas migrées, mais cela peut signifier que votre "
-"sauvegarde a été modifiée ou corrompue."
+"These maps will not be migrated, but this could mean the save has been "
+"altered or corrupted."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:477
 #, java-format
 msgid "The following maps are missing : {0} "
-msgstr "Les cartes suivantes sont manquantes : {0} "
+msgstr "The following maps are missing : {0} "
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:483
 msgid "Saving changes..."
-msgstr "Sauvegarde des changements..."
+msgstr "Saving changes..."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:489
 msgid "Cleaning up old data files..."
-msgstr "Nettoyage des vieux fichiers de données..."
+msgstr "Cleaning up old data files..."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:496
 msgid "Deleting old map data file..."
-msgstr "Suppression du vieux fichier de données des cartes..."
+msgstr "Deleting old map data file..."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:501
 #, java-format
 msgid "{0} map could not be migrated."
 msgid_plural "{0} maps could not be migrated."
-msgstr[0] "{0} carte n'a pas pu être migrée."
-msgstr[1] "{0} cartes n'ont pas pu être migrées."
+msgstr[0] "{0} map could not be migrated."
+msgstr[1] "{0} maps could not be migrated."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:519
 msgid "Deleting old poster data file..."
-msgstr "Suppression du vieux fichier de données des posters..."
+msgstr "Deleting old poster data file..."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:524
 #, java-format
 msgid "{0} poster could not be migrated."
 msgid_plural "{0} posters could not be migrated."
-msgstr[0] "{0} poster n'a pas pu être migré."
-msgstr[1] "{0} posters n'ont pas pu être migrés."
+msgstr[0] "{0} poster could not be migrated."
+msgstr[1] "{0} posters could not be migrated."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:537
 msgid "Data that has not been migrated will be kept in the old data files."
-msgstr ""
-"Les données qui n'ont pas été migrées seront conservées dans les vieux "
-"fichiers de données."
+msgstr "Data that has not been migrated will be kept in the old data files."
 
 #. The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = index.
 #: src/main/java/fr/moribus/imageonmap/ui/MapItemManager.java:139
 #: src/main/java/fr/moribus/imageonmap/ui/MapItemManager.java:215
 #, java-format
 msgid "{0} (part {1})"
-msgstr "{0} (partie {1})"
+msgstr "{0} (part {1})"
 
 #. The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
 #: src/main/java/fr/moribus/imageonmap/ui/MapItemManager.java:145
 #: src/main/java/fr/moribus/imageonmap/ui/MapItemManager.java:213
 #, java-format
 msgid "{0} (row {1}, column {2})"
-msgstr "{0} (ligne {1}, colonne {2})"
+msgstr "{0} (row {1}, column {2})"
 
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:44
 msgid "Splatter Map"
-msgstr "Poster auto-dépliant"
+msgstr "Splatter Map"
 
 #. Title in a splatter map tooltip
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:48
 msgid "Item frames needed"
-msgstr "Cadres requis"
+msgstr "Item frames needed"
 
 #. Size of a map stored in a splatter map
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:50
@@ -583,28 +568,22 @@ msgstr "{0} × {1}"
 #. Title in a splatter map tooltip
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:53
 msgid "How to use this?"
-msgstr "Comment l'utiliser ?"
+msgstr "How to use this?"
 
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:54
 msgid ""
 "Place empty item frames on a wall, enough to host the whole map. Then, right-"
 "click on the bottom-left frame with this map."
 msgstr ""
-"Placez des cadres vides sur un mur, en quantité suffisante pour accueillir "
-"la carte entière. Ensuite, cliquez-droit sur le cadre en bas à gauche avec "
-"cette carte."
+"Place empty item frames on a wall, enough to host the whole map. Then, right-"
+"click on the bottom-left frame with this map."
 
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:56
 msgid ""
 "Shift-click one of the placed maps to remove the whole poster in one shot."
-msgstr "Cliquez accroupi l'une des cartes du poster pour le retirer d'un coup."
+msgstr ""
+"Shift-click one of the placed maps to remove the whole poster in one shot."
 
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:101
 msgid "{ce}There is not enough space to place this map ({0} × {1})."
-msgstr "{ce}Il n'y a pas assez d'espace pour accueillir ce poster ({0} × {1})."
-
-#~ msgid "{ce}Map names can't be empty."
-#~ msgstr "{ce}Les noms de cartes ne peuvent être vide."
-
-#~ msgid "{cs}Map successfully renamed."
-#~ msgstr "{cs}Carte renommée avec succès."
+msgstr "{ce}There is not enough space to place this map ({0} × {1})."
