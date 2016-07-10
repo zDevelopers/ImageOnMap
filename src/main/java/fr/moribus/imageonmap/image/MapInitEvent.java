@@ -28,8 +28,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
@@ -95,16 +97,20 @@ public class MapInitEvent implements Listener
         }
     }
     
-    static protected void initMap(ItemStack item)
+    static public void initMap(ItemStack item)
     {
         if (item != null && item.getType() == Material.MAP)
         {
-            MapView map = Bukkit.getMap(item.getDurability());
-            initMap(map);
+            initMap(item.getDurability());
         }
     }
     
-    static protected void initMap(MapView map)
+    static public void initMap(short id)
+    {
+        initMap(Bukkit.getMap(id));
+    }
+    
+    static public void initMap(MapView map)
     {
         if(map == null) return;
         if(Renderer.isHandled(map)) return;
