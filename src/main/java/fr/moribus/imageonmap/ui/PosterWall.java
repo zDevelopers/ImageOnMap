@@ -75,7 +75,7 @@ public class PosterWall
         int mapIndex = map.getIndex(mapId);
         int x = map.getColumnAt(mapIndex), y = map.getRowAt(mapIndex);
         
-        return getMatchingMapFrames(map, location.clone().add(-x + 1, y - 1));
+        return getMatchingMapFrames(map, location.clone().add(-x, y));
     }
     
     static public ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location)

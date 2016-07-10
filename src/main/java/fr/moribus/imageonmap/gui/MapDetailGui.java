@@ -52,8 +52,8 @@ public class MapDetailGui extends ExplorerGui<Short>
 
         return new ItemStackBuilder(partMaterial)
                 .title(I.t(getPlayerLocale(), "{green}Map part"))
-                .lore(I.t(getPlayerLocale(), "{gray}Column: {white}{0}", y + 1))
-                .lore(I.t(getPlayerLocale(), "{gray}Row: {white}{0}", x + 1))
+                .lore(I.t(getPlayerLocale(), "{gray}Row: {white}{0}", y + 1))
+                .lore(I.t(getPlayerLocale(), "{gray}Column: {white}{0}", x + 1))
                 .loreLine()
                 .lore(I.t(getPlayerLocale(), "{gray}» {white}Click{gray} to get only this part"))
                 .item();

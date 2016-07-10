@@ -87,7 +87,7 @@ public class MapItemManager implements Listener
         {
             if(map.hasColumnData())
             {
-                mapPartItem = createMapItem(map, map.getRowAt(i), map.getColumnAt(i));
+                mapPartItem = createMapItem(map, map.getColumnAt(i), map.getRowAt(i));
             }
             else
             {
@@ -136,13 +136,23 @@ public class MapItemManager implements Listener
     static public ItemStack createMapItem(PosterMap map, int index)
     {
         /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = index.
-        return createMapItem(map.getMapIdAt(index), I.t("{0} (part {1})", map.getName(), index + 1));
+        return createMapItem(map.getMapIdAt(index), getMapTitle(map, index));
     }
     
     static public ItemStack createMapItem(PosterMap map, int x, int y)
     {
         /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
-        return createMapItem(map.getMapIdAt(x, y),  I.t("{0} (row {1}, column {2})", map.getName(), x + 1, y + 1));
+        return createMapItem(map.getMapIdAt(x, y),  getMapTitle(map, y, x));
+    }
+    
+    static public String getMapTitle(PosterMap map, int row, int column)
+    {
+        return I.t("{0} (row {1}, column {2})", map.getName(), row + 1, column + 1);
+    }
+    
+    static public String getMapTitle(PosterMap map, int index)
+    {
+        return I.t("{0} (part {1})", map.getName(), index + 1);
     }
     
     static public ItemStack createMapItem(short mapID, String text)
@@ -210,9 +220,9 @@ public class MapItemManager implements Listener
             PosterMap poster = (PosterMap) map;
             int index = poster.getIndex(item.getDurability());
             if(poster.hasColumnData())
-                return I.t("{0} (row {1}, column {2})", map.getName(), poster.getRowAt(index), poster.getColumnAt(index));
+                return getMapTitle(poster, poster.getRowAt(index), poster.getColumnAt(index));
             
-            return I.t("{0} (part {1})", map.getName(), index + 1);
+            return getMapTitle(poster, index);
         }
     }
     
@@ -256,7 +266,11 @@ public class MapItemManager implements Listener
         }
         
         if(!MapManager.managesMap(frame.getItem())) return;
-        frame.setItem(ItemUtils.setDisplayName(item, getMapTitle(item)));
+        
+        frame.setItem(new ItemStackBuilder(item)
+                .title(getMapTitle(item))
+                .hideAttributes()
+                .item());
         
     }
     

@@ -108,13 +108,13 @@ public class PosterMap extends ImageMap
     public int getColumnAt(int i)
     {
         if(columnCount == 0) return 0;
-        return (i % columnCount) + 1;
+        return (i % columnCount);
     }
     
     public int getRowAt(int i)
     {
         if(columnCount == 0) return 0;
-        return (i / columnCount) + 1;
+        return (i / columnCount);
     }
     
     public int getIndexAt(int col, int row)
