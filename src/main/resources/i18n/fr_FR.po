@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-07-10 00:59+0200\n"
-"PO-Revision-Date: 2016-07-10 01:01+0200\n"
+"PO-Revision-Date: 2016-07-19 16:15+0200\n"
 "Last-Translator: Amaury Carrade\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 1.8.7.1\n"
+"X-Generator: Poedit 1.8.8\n"
 
 #: src/main/java/fr/moribus/imageonmap/commands/IoMCommand.java:40
 msgid "You need to give a map name."
@@ -33,7 +33,7 @@ msgstr "Vous êtes sur le point de supprimer"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteConfirmCommand.java:42
 msgid "Are you sure ? "
-msgstr "Êtes-vous sûr ?"
+msgstr "Êtes-vous sûr(e) ?"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteConfirmCommand.java:44
 msgid "[Confirm]"
@@ -50,7 +50,7 @@ msgstr "Carte supprimée avec succès."
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetCommand.java:38
 msgid "The requested map was too big to fit in your inventory."
 msgstr ""
-"La carte demandée est trop grosse et ne rentre pas dans votre inventaire."
+"La carte demandée est trop grande et ne rentre pas dans votre inventaire."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetCommand.java:39
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:71
@@ -77,13 +77,13 @@ msgstr[1] "Il y a {0} cartes restantes."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/ListCommand.java:49
 msgid "No map found."
-msgstr "Aucune carte."
+msgstr "Aucune carte trouvée."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/ListCommand.java:53
 msgid "{white}{bold}{0} map found."
 msgid_plural "{white}{bold}{0} maps found."
-msgstr[0] "{white}{bold}{0} carte."
-msgstr[1] "{white}{bold}{0} cartes."
+msgstr[0] "{white}{bold}{0} carte trouvée."
+msgstr[1] "{white}{bold}{0} cartes trouvées."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/ListCommand.java:79
 msgid "{white}Click{gray} to get this map"
@@ -127,7 +127,7 @@ msgstr "{ce}Impossible de faire le rendu de la carte : {0}"
 #. The title of the map deletion GUI. {0}: map name.
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:102
 msgid "{0} » {black}Confirm deletion"
-msgstr "{0} » {black}Confirmation de suppression"
+msgstr "{0} » {black}Confirmez la suppression"
 
 #. The title of the map deletion item
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:110
@@ -175,7 +175,7 @@ msgstr "{gray}» {white}Cliquez{gray} pour récupérer cette partie"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:72
 msgid "{gray}Part: {white}{0}"
-msgstr "{gray}Partie: {white}{0}"
+msgstr "{gray}Partie : {white}{0}"
 
 #. Title of the map details GUI
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:114
@@ -207,7 +207,7 @@ msgstr ""
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:144
 msgid "{gray}You will be asked to confirm your choice if you click here."
-msgstr "{gray}Une confirmation sera demandée si vous cliquez ici."
+msgstr "{gray}Une confirmation vous sera demandée si vous cliquez ici."
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:156
 msgid "{green}« Back"
@@ -248,7 +248,7 @@ msgstr "{gray}» {white}Cliquez gauche{gray} pour récupérer cette carte"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:70
 msgid "{gray}» {white}Right-click{gray} for details and options"
-msgstr "{gray}» {white}Cliquez droit{gray} pour détails et options"
+msgstr "{gray}» {white}Cliquez droit{gray} pour des détails et options"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:79
 msgid "{red}You don't have any map."
@@ -353,8 +353,8 @@ msgid ""
 "Migration thread has been interrupted while waiting to finish. It may not "
 "have ended correctly."
 msgstr ""
-"Le thread a été interrompu durant l'attente de la fin de la migration. Cette "
-"dernière pourrait s'être achevée anormalement."
+"Le fil d'exécution (thread) a été interrompu durant l'attente de la fin de "
+"la migration. Cette dernière pourrait ne pas s'être terminée correctement."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:176
 msgid "Error while preparing migration"
@@ -381,7 +381,7 @@ msgid ""
 "overwriting them."
 msgstr ""
 "Avant de re-tenter la migration, vous devez récupérer les fichiers des "
-"joueurs depuis la sauvegarde qu'a été effectuée automatiquement, puis "
+"joueurs depuis la sauvegarde qui a été effectuée automatiquement, puis "
 "déplacer les sauvegardes hors du dossier du plugin afin d'éviter de les "
 "écraser."
 
@@ -402,7 +402,7 @@ msgstr "Vieux fichier de carte détecté : {0}"
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:213
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:416
 msgid "There is nothing to migrate. Stopping."
-msgstr "Il n'y a rien à migrer. Le processus est arrêté."
+msgstr "Il n'y a rien à migrer. Arrêt."
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:218
 msgid "Done."
@@ -482,7 +482,7 @@ msgstr[1] "Mojang did not find player data for {0} players"
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:400
 msgid "The following players do not exist or do not have paid accounts :"
-msgstr "Les joueurs suivant n'existent pas ou n'ont pas de compte payant :"
+msgstr "Les joueurs suivants n'existent pas ou n'ont pas de compte payant :"
 
 #: src/main/java/fr/moribus/imageonmap/migration/V3Migrator.java:415
 msgid "Mojang could not find any of the registered players."
