@@ -99,7 +99,7 @@ public class ConfirmDeleteMapGui extends ActionGui
     protected void onUpdate()
     {
         /// The title of the map deletion GUI. {0}: map name.
-        setTitle(I.t("{0} » {black}Confirm deletion", mapToDelete.getName()));
+        setTitle(I.t(getPlayerLocale(), "{0} » {black}Confirm deletion", mapToDelete.getName()));
         setSize(6 * 9);
 
 
@@ -107,13 +107,13 @@ public class ConfirmDeleteMapGui extends ActionGui
 
         action("", 13, new ItemStackBuilder(Material.EMPTY_MAP)
                  /// The title of the map deletion item
-                .title(I.t("{red}You're about to destroy this map..."))
+                .title(I.t(getPlayerLocale(), "{red}You're about to destroy this map..."))
                  /// The end, in the lore, of a title starting with “You're about to destroy this map...”.
-                .lore(I.t("{red}...{italic}forever{red}."))
+                .lore(I.t(getPlayerLocale(), "{red}...{italic}forever{red}."))
                 .loreLine()
-                .lore(I.t("{gray}Name: {white}{0}",mapToDelete.getName()))
-                .lore(I.t("{gray}Map ID: {white}{0}", mapToDelete.getId()))
-                .lore(I.t("{gray}Maps inside: {white}{0}", mapToDelete.getMapsIDs().length))
+                .lore(I.t(getPlayerLocale(), "{gray}Name: {white}{0}",mapToDelete.getName()))
+                .lore(I.t(getPlayerLocale(), "{gray}Map ID: {white}{0}", mapToDelete.getId()))
+                .lore(I.t(getPlayerLocale(), "{gray}Maps inside: {white}{0}", mapToDelete.getMapsIDs().length))
                 .hideAttributes()
         );
 

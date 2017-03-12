@@ -39,23 +39,35 @@ public class MapListGui extends ExplorerGui<ImageMap>
     {
         String mapDescription;
         if (map instanceof SingleMap)
+        {
             /// Displayed subtitle description of a single map on the list GUI
-            mapDescription = I.t("{white}Single map");
+            mapDescription = I.t(getPlayerLocale(), "{white}Single map");
+        }
         else
-            /// Displayed subtitle description of a poster map on the list GUI (columns × rows in english)
-            mapDescription = I.t("{white}Poster map ({0} × {1})", ((PosterMap) map).getColumnCount(), ((PosterMap) map).getRowCount());
-
+        {
+            PosterMap poster = (PosterMap) map;
+            if(poster.hasColumnData())
+            {
+                /// Displayed subtitle description of a poster map on the list GUI (columns × rows in english)
+                mapDescription = I.t(getPlayerLocale(), "{white}Poster map ({0} × {1})", poster.getColumnCount(), poster.getRowCount());
+            }
+            else
+            {
+                /// Displayed subtitle description of a poster map without column data on the list GUI
+                mapDescription = I.t(getPlayerLocale(), "{white}Poster map ({0} parts)", poster.getMapCount());
+            }
+        }
         return new ItemStackBuilder(Material.MAP)
                 /// Displayed title of a map on the list GUI
-                .title(I.t("{green}{bold}{0}", map.getName()))
+                .title(I.t(getPlayerLocale(), "{green}{bold}{0}", map.getName()))
 
                 .lore(mapDescription)
                 .loreLine()
                 /// Map ID displayed in the tooltip of a map on the list GUI
-                .lore(I.t("{gray}Map ID: {0}", map.getId()))
+                .lore(I.t(getPlayerLocale(), "{gray}Map ID: {0}", map.getId()))
                 .loreLine()
-                .lore(I.t("{gray}» {white}Left-click{gray} to get this map"))
-                .lore(I.t("{gray}» {white}Right-click{gray} for details and options"))
+                .lore(I.t(getPlayerLocale(), "{gray}» {white}Left-click{gray} to get this map"))
+                .lore(I.t(getPlayerLocale(), "{gray}» {white}Right-click{gray} for details and options"))
 
                 .item();
     }
@@ -64,8 +76,8 @@ public class MapListGui extends ExplorerGui<ImageMap>
     protected ItemStack getEmptyViewItem()
     {
         return new ItemStackBuilder(Material.BARRIER)
-                .title(I.t("{red}You don't have any map."))
-                .longLore(I.t("{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"))
+                .title(I.t(getPlayerLocale(), "{red}You don't have any map."))
+                .longLore(I.t(getPlayerLocale(), "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"))
                 .item();
     }
 
@@ -84,7 +96,13 @@ public class MapListGui extends ExplorerGui<ImageMap>
         }
         else if (map instanceof PosterMap)
         {
-            return SplatterMapManager.makeSplatterMap((PosterMap) map);
+            PosterMap poster = (PosterMap) map;
+            
+            if(poster.hasColumnData())
+                return SplatterMapManager.makeSplatterMap((PosterMap) map);
+            
+            MapItemManager.giveParts(getPlayer(), poster);
+            return null;
         }
 
         MapItemManager.give(getPlayer(), map);
@@ -97,7 +115,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
         ImageMap[] maps = MapManager.getMaps(getPlayer().getUniqueId());
         setData(maps);
         /// The maps list GUI title
-        setTitle(I.t("{black}Your maps {reset}({0})", maps.length));
+        setTitle(I.t(getPlayerLocale(), "{black}Your maps {reset}({0})", maps.length));
 
         setKeepHorizontalScrollingSpace(true);
 
@@ -126,24 +144,24 @@ public class MapListGui extends ExplorerGui<ImageMap>
         double percentageUsed = mapPartLeft < 0 ? 0 : ((double) mapPartCount) / ((double) (mapPartCount + mapPartLeft)) * 100;
 
         ItemStackBuilder statistics = new ItemStackBuilder(Material.ENCHANTED_BOOK)
-                .title(I.t("{blue}Usage statistics"))
+                .title(I.t(getPlayerLocale(), "{blue}Usage statistics"))
                 .loreLine()
-                .lore(I.tn("{white}{0}{gray} image rendered", "{white}{0}{gray} images rendered", imagesCount))
-                .lore(I.tn("{white}{0}{gray} Minecraft map used", "{white}{0}{gray} Minecraft maps used", mapPartCount));
+                .lore(I.tn(getPlayerLocale(), "{white}{0}{gray} image rendered", "{white}{0}{gray} images rendered", imagesCount))
+                .lore(I.tn(getPlayerLocale(), "{white}{0}{gray} Minecraft map used", "{white}{0}{gray} Minecraft maps used", mapPartCount));
 
         if(mapPartLeft >= 0)
         {
             statistics
-                    .lore("", I.t("{blue}Minecraft maps limits"), "")
+                    .lore("", I.t(getPlayerLocale(), "{blue}Minecraft maps limits"), "")
                     .lore(mapGlobalLimit == 0
-                            ? I.t("{gray}Server-wide limit: {white}unlimited")
-                            : I.t("{gray}Server-wide limit: {white}{0}", mapGlobalLimit))
+                            ? I.t(getPlayerLocale(), "{gray}Server-wide limit: {white}unlimited")
+                            : I.t(getPlayerLocale(), "{gray}Server-wide limit: {white}{0}", mapGlobalLimit))
                     .lore(mapPersonalLimit == 0
-                            ? I.t("{gray}Per-player limit: {white}unlimited")
-                            : I.t("{gray}Per-player limit: {white}{0}", mapPersonalLimit))
+                            ? I.t(getPlayerLocale(), "{gray}Per-player limit: {white}unlimited")
+                            : I.t(getPlayerLocale(), "{gray}Per-player limit: {white}{0}", mapPersonalLimit))
                     .loreLine()
-                    .lore(I.t("{white}{0} %{gray} of your quota used", (int) Math.rint(percentageUsed)))
-                    .lore(I.tn("{white}{0}{gray} map left", "{white}{0}{gray} maps left", mapPartLeft));
+                    .lore(I.t(getPlayerLocale(), "{white}{0} %{gray} of your quota used", (int) Math.rint(percentageUsed)))
+                    .lore(I.tn(getPlayerLocale(), "{white}{0}{gray} map left", "{white}{0}{gray} maps left", mapPartLeft));
         }
 
         statistics.hideAttributes();

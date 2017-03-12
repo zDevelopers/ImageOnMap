@@ -31,6 +31,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -72,7 +73,30 @@ public class MapItemManager implements Listener
     
     static public boolean give(Player player, PosterMap map)
     {
+        if(!map.hasColumnData())
+            return giveParts(player, map);
         return give(player, SplatterMapManager.makeSplatterMap(map));
+    }
+    
+    static public boolean giveParts(Player player, PosterMap map)
+    {
+        boolean inventoryFull = false;
+        
+        ItemStack mapPartItem;
+        for(int i = 0, c = map.getMapCount(); i < c; i++)
+        {
+            if(map.hasColumnData())
+            {
+                mapPartItem = createMapItem(map, map.getColumnAt(i), map.getRowAt(i));
+            }
+            else
+            {
+                mapPartItem = createMapItem(map, i);
+            }
+            inventoryFull = give(player, mapPartItem) || inventoryFull;
+        }
+        
+        return inventoryFull;
     }
     
     static public int giveCache(Player player)
@@ -109,19 +133,26 @@ public class MapItemManager implements Listener
         return createMapItem(map.getMapsIDs()[0], map.getName());
     }
     
+    static public ItemStack createMapItem(PosterMap map, int index)
+    {
+        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = index.
+        return createMapItem(map.getMapIdAt(index), getMapTitle(map, index));
+    }
+    
     static public ItemStack createMapItem(PosterMap map, int x, int y)
     {
-        String mapName;
-        if(map.hasColumnData())
-        {
-            /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
-            mapName = I.t("{0} (row {1}, column {2})", map.getName(), x, y);
-        }
-        else
-        {
-            mapName = map.getName();
-        }
-        return createMapItem(map.getMapIdAt(x, y), mapName);
+        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
+        return createMapItem(map.getMapIdAt(x, y),  getMapTitle(map, y, x));
+    }
+    
+    static public String getMapTitle(PosterMap map, int row, int column)
+    {
+        return I.t("{0} (row {1}, column {2})", map.getName(), row + 1, column + 1);
+    }
+    
+    static public String getMapTitle(PosterMap map, int index)
+    {
+        return I.t("{0} (part {1})", map.getName(), index + 1);
     }
     
     static public ItemStack createMapItem(short mapID, String text)
@@ -148,10 +179,7 @@ public class MapItemManager implements Listener
     {
         if(map instanceof PosterMap && ((PosterMap) map).hasColumnData())
         {
-            return MapItemManager.createMapItem(
-                    ((PosterMap) map).getMapIdAt(x, y),
-                    I.t("{0} (row {1}, column {2})", map.getName(), y + 1, x + 1)
-            );
+            return MapItemManager.createMapItem((PosterMap) map, x, y);
         }
         else
         {
@@ -191,7 +219,10 @@ public class MapItemManager implements Listener
         {
             PosterMap poster = (PosterMap) map;
             int index = poster.getIndex(item.getDurability());
-            return I.t("{0} (row {1}, column {2})", map.getName(), poster.getRowAt(index), poster.getColumnAt(index));
+            if(poster.hasColumnData())
+                return getMapTitle(poster, poster.getRowAt(index), poster.getColumnAt(index));
+            
+            return getMapTitle(poster, index);
         }
     }
     
@@ -199,10 +230,12 @@ public class MapItemManager implements Listener
     {
         if(frame.getItem().getType() != Material.AIR) return;
         if(!MapManager.managesMap(player.getItemInHand())) return;
+        event.setCancelled(true);
         
         if(SplatterMapManager.hasSplatterAttributes(player.getItemInHand()))
         {
-            SplatterMapManager.placeSplatterMap(frame, player);
+            if(!SplatterMapManager.placeSplatterMap(frame, player))
+                return;
         }
         else
         {
@@ -210,7 +243,6 @@ public class MapItemManager implements Listener
             frame.setItem(is);
         }
         
-        event.setCancelled(true);
         ItemUtils.consumeItem(player);
     }
     
@@ -225,32 +257,37 @@ public class MapItemManager implements Listener
             if(poster != null)
             {
                 event.setCancelled(true);
-                if(player.getGameMode() == GameMode.CREATIVE)
-                {
-                    if(!SplatterMapManager.hasSplatterMap(player, poster))
-                        poster.give(player);
-                }
+                
+                if(player.getGameMode() != GameMode.CREATIVE || !SplatterMapManager.hasSplatterMap(player, poster))
+                    poster.give(player);
+                
                 return;
             }
         }
         
         if(!MapManager.managesMap(frame.getItem())) return;
-        frame.setItem(ItemUtils.setDisplayName(item, getMapTitle(item)));
+        
+        frame.setItem(new ItemStackBuilder(item)
+                .title(getMapTitle(item))
+                .hideAttributes()
+                .item());
         
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     static public void onEntityDamage(EntityDamageByEntityEvent event)
     {
+        if(event.isCancelled()) return;
         if(!(event.getEntity() instanceof ItemFrame)) return;
         if(!(event.getDamager() instanceof Player)) return;
         
         onItemFrameRemove((ItemFrame)event.getEntity(), (Player)event.getDamager(), event);
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     static public void onEntityInteract(PlayerInteractEntityEvent event)
     {
+        if(event.isCancelled()) return;
         if(!(event.getRightClicked() instanceof ItemFrame)) return;
         
         onItemFramePlace((ItemFrame)event.getRightClicked(), event.getPlayer(), event);

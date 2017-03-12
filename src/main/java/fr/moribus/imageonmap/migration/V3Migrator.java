@@ -39,9 +39,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * This class represents and executes the ImageOnMap v3.x migration process
@@ -241,7 +244,7 @@ public class V3Migrator implements Runnable
      */
     private void backupMapData() throws IOException
     {
-        PluginLogger.info("Backing up map data before migrating...");
+        PluginLogger.info(I.t("Backing up map data before migrating..."));
         
         if(!backupsPrev3Directory.exists()) backupsPrev3Directory.mkdirs();
         if(!backupsPostv3Directory.exists()) backupsPostv3Directory.mkdirs();
@@ -265,7 +268,7 @@ public class V3Migrator implements Runnable
             verifiedBackupCopy(mapFile, backupFile);
         }
         
-        PluginLogger.info("Backup complete.");
+        PluginLogger.info(I.t("Backup complete."));
     }
     
     /**
@@ -301,12 +304,13 @@ public class V3Migrator implements Runnable
                 try
                 {
                     oldPoster = new OldSavedPoster(oldPosters.get(key), key);
-                    userNamesToFetch.add(oldPoster.getUserName());
                     postersToMigrate.add(oldPoster);
+                    if(!userNamesToFetch.contains(oldPoster.getUserName()))
+                        userNamesToFetch.add(oldPoster.getUserName());
                 }
                 catch(InvalidConfigurationException ex)
                 {
-                    PluginLogger.warning("Could not read poster data for key '{0}'", ex, key);
+                    PluginLogger.warning("Could not read poster data for key {0}", ex, key);
                 }
             }
         }
@@ -324,6 +328,9 @@ public class V3Migrator implements Runnable
                     oldMap = new OldSavedMap(oldMaps.get(key));
 
                     if(!posterContains(oldMap)) mapsToMigrate.add(oldMap);
+                    
+                    if(!userNamesToFetch.contains(oldMap.getUserName()))
+                        userNamesToFetch.add(oldMap.getUserName());
                 }
                 catch(InvalidConfigurationException ex)
                 {
@@ -420,6 +427,8 @@ public class V3Migrator implements Runnable
         ArrayDeque<OldSavedMap> remainingMaps = new ArrayDeque<>();
         ArrayDeque<OldSavedPoster> remainingPosters = new ArrayDeque<>();
         
+        ArrayDeque<Short> missingMapIds = new ArrayDeque<>();
+        
         UUID playerUUID;
         OldSavedMap map;
         while(!mapsToMigrate.isEmpty())
@@ -429,6 +438,10 @@ public class V3Migrator implements Runnable
             if(playerUUID == null)
             {
                 remainingMaps.add(map);
+            }
+            else if(!map.isMapValid())
+            {
+                missingMapIds.add(map.getMapId());
             }
             else
             {
@@ -446,12 +459,23 @@ public class V3Migrator implements Runnable
             {
                 remainingPosters.add(poster);
             }
+            else if(!poster.isMapValid())
+            {
+                missingMapIds.addAll(Arrays.asList(ArrayUtils.toObject(poster.getMapsIds())));
+            }
             else
             {
                 MapManager.insertMap(poster.toImageMap(playerUUID));
             }
         }
         postersToMigrate.addAll(remainingPosters);
+        
+        if(!missingMapIds.isEmpty())
+        {
+            PluginLogger.warning(I.tn("{0} registered minecraft map is missing from the save.", "{0} registered minecraft maps are missing from the save.", missingMapIds.size()));
+            PluginLogger.warning(I.t("These maps will not be migrated, but this could mean the save has been altered or corrupted."));
+            PluginLogger.warning(I.t("The following maps are missing : {0} ", StringUtils.join(missingMapIds, ',')));
+        }
     }
     
     private void saveChanges()

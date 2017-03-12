@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.ui;
 
+import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
@@ -105,7 +106,9 @@ abstract public class SplatterMapManager
         int i = 0;
         for(ItemFrame frame : wall.frames)
         {
-            frame.setItem(new ItemStack(Material.MAP, 1, poster.getMapIdAtReverseY(i)));
+            short id = poster.getMapIdAtReverseY(i);
+            frame.setItem(new ItemStack(Material.MAP, 1, id));
+            MapInitEvent.initMap(id);
             ++i;
         }
         
@@ -117,6 +120,7 @@ abstract public class SplatterMapManager
         ImageMap map = MapManager.getMap(startFrame.getItem());
         if(map == null || !(map instanceof PosterMap)) return null;
         PosterMap poster = (PosterMap) map;
+        if(!poster.hasColumnData()) return null;
         FlatLocation loc = new FlatLocation(startFrame.getLocation(), startFrame.getFacing());
         ItemFrame[] matchingFrames = PosterWall.getMatchingMapFrames(poster, loc, startFrame.getItem().getDurability());
         if(matchingFrames == null) return null;

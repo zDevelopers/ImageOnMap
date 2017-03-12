@@ -29,11 +29,12 @@ import fr.zcraft.zlib.components.gui.PromptGui;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.Callback;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 
-public class MapDetailGui extends ExplorerGui
+public class MapDetailGui extends ExplorerGui<Short>
 {
     private final ImageMap map;
 
@@ -50,11 +51,27 @@ public class MapDetailGui extends ExplorerGui
             partMaterial = Material.EMPTY_MAP;
 
         return new ItemStackBuilder(partMaterial)
-                .title(I.t("{green}Map part"))
-                .lore(I.t("{gray}Column: {white}{0}", y + 1))
-                .lore(I.t("{gray}Row: {white}{0}", x + 1))
+                .title(I.t(getPlayerLocale(), "{green}Map part"))
+                .lore(I.t(getPlayerLocale(), "{gray}Row: {white}{0}", y + 1))
+                .lore(I.t(getPlayerLocale(), "{gray}Column: {white}{0}", x + 1))
                 .loreLine()
-                .lore(I.t("{gray}» {white}Click{gray} to get only this part"))
+                .lore(I.t(getPlayerLocale(), "{gray}» {white}Click{gray} to get only this part"))
+                .item();
+    }
+    
+    @Override
+    protected ItemStack getViewItem(Short mapId)
+    {
+        int index = ((PosterMap) map).getIndex(mapId);
+        Material partMaterial = Material.PAPER;
+        if(index % 2 == 0)
+            partMaterial = Material.EMPTY_MAP;
+
+        return new ItemStackBuilder(partMaterial)
+                .title(I.t(getPlayerLocale(), "{green}Map part"))
+                .lore(I.t(getPlayerLocale(), "{gray}Part: {white}{0}", index + 1))
+                .loreLine()
+                .lore(I.t(getPlayerLocale(), "{gray}» {white}Click{gray} to get only this part"))
                 .item();
     }
     
@@ -74,6 +91,13 @@ public class MapDetailGui extends ExplorerGui
     }
 
     @Override
+    protected ItemStack getPickedUpItem(Short mapId)
+    {
+        PosterMap poster = (PosterMap) map;
+        return MapItemManager.createMapItem(poster, poster.getIndex(mapId));
+    }
+    
+    @Override
     protected ItemStack getEmptyViewItem()
     {
         if(map instanceof SingleMap)
@@ -87,25 +111,37 @@ public class MapDetailGui extends ExplorerGui
     protected void onUpdate()
     {
         /// Title of the map details GUI
-        setTitle(I.t("Your maps » {black}{0}", map.getName()));
+        setTitle(I.t(getPlayerLocale(), "Your maps » {black}{0}", map.getName()));
         setKeepHorizontalScrollingSpace(true);
 
         if(map instanceof PosterMap)
-            setDataShape(((PosterMap) map).getColumnCount(), ((PosterMap) map).getRowCount());
+        {
+            PosterMap poster = (PosterMap) map;
+            if(poster.hasColumnData())
+            {
+                setDataShape(poster.getColumnCount(), poster.getRowCount());
+            }
+            else
+            {
+                setData(ArrayUtils.toObject(poster.getMapsIDs()));
+            }
+        }
         else
-            setData(null); // Fallback to the empty view item.
+        {
+            setDataShape(1,1); 
+        }
 
 
         action("rename", getSize() - 7, new ItemStackBuilder(Material.BOOK_AND_QUILL)
-                .title(I.t("{blue}Rename this image"))
-                .longLore(I.t("{gray}Click here to rename this image; this is used for your own organization."))
+                .title(I.t(getPlayerLocale(), "{blue}Rename this image"))
+                .longLore(I.t(getPlayerLocale(), "{gray}Click here to rename this image; this is used for your own organization."))
         );
 
         action("delete", getSize() - 6, new ItemStackBuilder(Material.BARRIER)
-                .title(I.t("{red}Delete this image"))
-                .longLore(I.t("{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"))
+                .title(I.t(getPlayerLocale(), "{red}Delete this image"))
+                .longLore(I.t(getPlayerLocale(), "{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"))
                 .loreLine()
-                .longLore(I.t("{gray}You will be asked to confirm your choice if you click here."))
+                .longLore(I.t(getPlayerLocale(), "{gray}You will be asked to confirm your choice if you click here."))
         );
 
 
@@ -117,8 +153,8 @@ public class MapDetailGui extends ExplorerGui
             backSlot++;
 
         action("back", backSlot, new ItemStackBuilder(Material.EMERALD)
-                .title(I.t("{green}« Back"))
-                .lore(I.t("{gray}Go back to the list."))
+                .title(I.t(getPlayerLocale(), "{green}« Back"))
+                .lore(I.t(getPlayerLocale(), "{gray}Go back to the list."))
         );
     }
 
@@ -133,12 +169,12 @@ public class MapDetailGui extends ExplorerGui
             {
                 if (newName == null || newName.isEmpty())
                 {
-                    getPlayer().sendMessage(I.t("{ce}Map names can't be empty."));
+                    I.sendT(getPlayer(), "{ce}Map names can't be empty.");
                     return;
                 }
 
                 map.rename(newName);
-                getPlayer().sendMessage(I.t("{cs}Map successfully renamed."));
+                I.sendT(getPlayer(), "{cs}Map successfully renamed.");
             }
         }, map.getName(), this);
     }

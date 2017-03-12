@@ -19,6 +19,7 @@
 package fr.moribus.imageonmap.migration;
 
 import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,5 +95,16 @@ class OldSavedPoster
         
     }
     
+    public boolean isMapValid()
+    {
+        for(short mapId : mapsIds)
+        {
+            if(!MapManager.mapIdExists(mapId))
+                return false;
+        }
+        return true;
+    }
+    
     public String getUserName() {return userName;}
+    public short[] getMapsIds() {return mapsIds;}
 }
