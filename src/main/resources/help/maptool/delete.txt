@@ -1,5 +1,8 @@
-Deletes a map, and removes all parts and copies from your inventory.
-As deletion is permanent, a confirmation message will be shown 
-to the sending player.
+Deletes a map, and removes all parts and copies
+from your inventory. As deletion is permanent,
+a confirmation message will be shown to the player.
 
-[map name] : The name of the map you want to delete.
+§6<map name>  §rThe name of the map you want to delete.
+
+§6--confirm  §rDeletes directly. §cWARNING§r - THERE WILL BE
+NO CONFIRMATION. MAP DELETION IS §lPERMANENT§r.

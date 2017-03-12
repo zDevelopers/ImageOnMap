@@ -42,19 +42,6 @@ import java.util.concurrent.Future;
 @WorkerAttributes (name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker
 {
-    static public void Test(WorkerCallback callback)
-    {
-        submitQuery(new WorkerRunnable<Void>()
-        {
-            @Override
-            public Void run() throws Throwable
-            {
-                Thread.sleep(5000);
-                return null;
-            }
-        }, callback);
-    }
-    
     static public void Render(final URL url, final boolean scaling, final UUID playerUUID, WorkerCallback<ImageMap> callback)
     {
         submitQuery(new WorkerRunnable<ImageMap>()
@@ -70,7 +57,7 @@ public class ImageRendererExecutor extends Worker
                     final int httpCode = httpConnection.getResponseCode();
                     if((httpCode / 100) != 2)
                     {
-                        throw new IOException(I.t("HTTP error : {0} {1}", httpCode, httpConnection.getResponseMessage()));
+                        throw new IOException(I.t("HTTP error: {0} {1}", httpCode, httpConnection.getResponseMessage()));
                     }
                 }
                 final InputStream stream = connection.getInputStream();

@@ -1,5 +1,7 @@
-Gives you the remaining maps that could not fit in your inventory.
+Gives you the remaining maps that could not fit in
+your inventory.
 
-If you requested a multi-part (poster) map, and all the parts can't fit in
-your inventory, then only first ones are given to you, and the remaining
-ones are saved. You can then use this command to retreive them.
+If you requested a multi-part (poster) map, and all
+the parts can't fit in your inventory, then only first
+ones are given to you, and the remaining ones are saved.
+You can then use this command to retrieve them.

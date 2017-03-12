@@ -102,7 +102,7 @@ public class MapDetailGui extends ExplorerGui
         );
 
         action("delete", getSize() - 6, new ItemStackBuilder(Material.BARRIER)
-                .title("{red}Delete this image")
+                .title(I.t("{red}Delete this image"))
                 .longLore(I.t("{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"))
                 .loreLine()
                 .longLore(I.t("{gray}You will be asked to confirm your choice if you click here."))
@@ -118,7 +118,7 @@ public class MapDetailGui extends ExplorerGui
 
         action("back", backSlot, new ItemStackBuilder(Material.EMERALD)
                 .title(I.t("{green}« Back"))
-                        .lore(I.t("{gray}Go back to the list."))
+                .lore(I.t("{gray}Go back to the list."))
         );
     }
 

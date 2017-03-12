@@ -24,31 +24,54 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.MapManagerException;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.commands.WithFlags;
 import fr.zcraft.zlib.components.i18n.I;
+import fr.zcraft.zlib.components.rawtext.RawText;
 import fr.zcraft.zlib.tools.PluginLogger;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
-
-@CommandInfo (name = "delete-noconfirm", usageParameters = "[map name]")
-public class DeleteNoConfirmCommand extends IoMCommand
+@CommandInfo (name =  "delete", usageParameters = "<map name> [--confirm]")
+@WithFlags ({"confirm"})
+public class DeleteCommand extends IoMCommand
 {
     @Override
     protected void run() throws CommandException
     {
-        Player player = playerSender();
         ImageMap map = getMapFromArgs();
-        MapManager.clear(player.getInventory(), map);
-        try
+
+        if (!hasFlag("confirm"))
         {
-            MapManager.deleteMap(map);
-            info(I.t("Map successfully deleted."));
+            RawText msg = new RawText(I.t("You are going to delete") + " ")
+                .then(map.getId())
+                    .color(ChatColor.GOLD)
+                .then(". " + I.t("Are you sure ? "))
+                    .color(ChatColor.WHITE)
+                .then(I.t("[Confirm]"))
+                    .color(ChatColor.GREEN)
+                    .hover(new RawText(I.t("{red}This map will be deleted {bold}forever{red}!")))
+                    .command(getClass(), map.getId(), "--confirm")
+                .build();
+
+            send(msg);
         }
-        catch (MapManagerException ex)
+        else
         {
-            PluginLogger.warning("A non-existent map was requested to be deleted", ex);
-            warning(I.t("This map does not exist."));
+            Player player = playerSender();
+            MapManager.clear(player.getInventory(), map);
+
+            try
+            {
+                MapManager.deleteMap(map);
+                info(I.t("Map successfully deleted."));
+            }
+            catch (MapManagerException ex)
+            {
+                PluginLogger.warning("A non-existent map was requested to be deleted", ex);
+                warning(I.t("This map does not exist."));
+            }
         }
     }
     
@@ -57,6 +80,7 @@ public class DeleteNoConfirmCommand extends IoMCommand
     {
         if(args.length == 1) 
             return getMatchingMapNames(playerSender(), args[0]);
+
         return null;
     }
 }

@@ -188,6 +188,10 @@ msgstr ""
 "{gray}Cliquez ici pour renommer cette image ; ceci ne sert qu'à votre "
 "organisation personnelle."
 
+#: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:105
+msgid "{red}Delete this image"
+msgstr "{red}Supprimer cette image"
+
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:106
 msgid ""
 "{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"
@@ -308,7 +312,7 @@ msgstr[1] "{white}{0}{gray} cartes restantes"
 
 #: src/main/java/fr/moribus/imageonmap/image/ImageRendererExecutor.java:73
 #, java-format
-msgid "HTTP error : {0} {1}"
+msgid "HTTP error: {0} {1}"
 msgstr "Erreur HTTP : {0} {1}"
 
 #: src/main/java/fr/moribus/imageonmap/image/ImageRendererExecutor.java:79

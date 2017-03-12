@@ -1,1 +1,6 @@
 Creates a new ImageOnMap.
+
+The URL must point to an image.
+If resize is appended, the image will be fit into
+one map only. Else, multiple maps will be used as
+needed.

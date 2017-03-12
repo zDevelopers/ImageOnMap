@@ -18,8 +18,7 @@
 
 package fr.moribus.imageonmap;
 
-import fr.moribus.imageonmap.commands.maptool.DeleteConfirmCommand;
-import fr.moribus.imageonmap.commands.maptool.DeleteNoConfirmCommand;
+import fr.moribus.imageonmap.commands.maptool.DeleteCommand;
 import fr.moribus.imageonmap.commands.maptool.ExploreCommand;
 import fr.moribus.imageonmap.commands.maptool.GetCommand;
 import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
@@ -104,8 +103,7 @@ public final class ImageOnMap extends ZPlugin
                 NewCommand.class,
                 ListCommand.class,
                 GetCommand.class,
-                DeleteConfirmCommand.class,
-                DeleteNoConfirmCommand.class,
+                DeleteCommand.class,
                 GetRemainingCommand.class,
                 ExploreCommand.class,
                 MigrateCommand.class

@@ -1,0 +1,8 @@
+Opens a GUI to list and manage your maps.
+
+From there, you can:
+- list all the maps you rendered on this server;
+- get copies of maps you rendered;
+- get parts of posters in case of need;
+- delete or rename your maps (organization!);
+- see your statistics (maps rendered, left...).
