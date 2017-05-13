@@ -59,7 +59,7 @@ Main command to manage the maps. The less used in everyday usage, too.
 
 
 
-##Configuration
+## Configuration
 
 ```yaml
 # Plugin language. Empty: system language.
