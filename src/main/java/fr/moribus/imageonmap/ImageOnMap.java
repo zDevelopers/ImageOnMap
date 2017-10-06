@@ -18,13 +18,7 @@
 
 package fr.moribus.imageonmap;
 
-import fr.moribus.imageonmap.commands.maptool.DeleteCommand;
-import fr.moribus.imageonmap.commands.maptool.ExploreCommand;
-import fr.moribus.imageonmap.commands.maptool.GetCommand;
-import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
-import fr.moribus.imageonmap.commands.maptool.ListCommand;
-import fr.moribus.imageonmap.commands.maptool.MigrateCommand;
-import fr.moribus.imageonmap.commands.maptool.NewCommand;
+import fr.moribus.imageonmap.commands.maptool.*;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
@@ -106,7 +100,8 @@ public final class ImageOnMap extends ZPlugin
                 DeleteCommand.class,
                 GetRemainingCommand.class,
                 ExploreCommand.class,
-                MigrateCommand.class
+                MigrateCommand.class,
+                RenameCommand.class
         );
 
         Commands.registerShortcut("maptool", NewCommand.class, "tomap");
