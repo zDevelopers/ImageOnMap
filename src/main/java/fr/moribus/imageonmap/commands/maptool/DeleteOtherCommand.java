@@ -26,11 +26,9 @@ import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.commands.WithFlags;
 import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.components.rawtext.RawText;
 import fr.zcraft.zlib.tools.PluginLogger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 

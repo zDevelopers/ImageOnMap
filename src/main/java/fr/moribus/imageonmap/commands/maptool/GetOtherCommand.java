@@ -26,13 +26,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import fr.moribus.imageonmap.commands.IoMCommand;
-import fr.moribus.imageonmap.gui.MapListGui;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.moribus.imageonmap.map.MapManagerException;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
-import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.i18n.I;
 
 
