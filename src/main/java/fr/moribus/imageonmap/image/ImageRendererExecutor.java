@@ -18,6 +18,8 @@
 
 package fr.moribus.imageonmap.image;
 
+import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.zlib.components.i18n.I;
@@ -27,8 +29,13 @@ import fr.zcraft.zlib.components.worker.WorkerCallback;
 import fr.zcraft.zlib.components.worker.WorkerRunnable;
 
 import javax.imageio.ImageIO;
+import javax.security.auth.login.Configuration;
+
+import org.bukkit.Bukkit;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -64,7 +71,18 @@ public class ImageRendererExecutor extends Worker
                 final BufferedImage image = ImageIO.read(stream);
                 
                 if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
-
+                
+                //Limits are in place and the player does NOT have rights to avoid them.
+                if((PluginConfiguration.LIMIT_SIZE_X > 0 || PluginConfiguration.LIMIT_SIZE_Y > 0) && !Bukkit.getPlayer(playerUUID).hasPermission("imageonmap.bypasssize")) {
+                	if(PluginConfiguration.LIMIT_SIZE_X > 0) {
+                		if(image.getWidth() > PluginConfiguration.LIMIT_SIZE_X) throw new IOException(I.t("The image is too wide!"));
+                	}
+                	if(PluginConfiguration.LIMIT_SIZE_Y > 0) {
+                		if(image.getHeight() > PluginConfiguration.LIMIT_SIZE_Y) throw new IOException(I.t("The image is too tall!"));
+                	}
+                }
+                
+                
                 if (scaling) return RenderSingle(image, playerUUID);
                 else return RenderPoster(image, playerUUID);
             }
@@ -122,6 +140,11 @@ public class ImageRendererExecutor extends Worker
         final short[] mapsIDs = futureMapsIds.get();
         
         ImageIOExecutor.saveImage(mapsIDs, poster);
+        
+        if(PluginConfiguration.SAVE_FULL_IMAGE) {
+        	ImageIOExecutor.saveImage(ImageOnMap.getPlugin().getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
+     
+        }
         
         submitToMainThread(new Callable<Void>()
         {

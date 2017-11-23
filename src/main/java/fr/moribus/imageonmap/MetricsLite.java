@@ -57,7 +57,7 @@ public class MetricsLite
      */
     static public void startMetrics()
     {
-        if(!PluginConfiguration.COLLECT_DATA.get()) return;
+        if(!PluginConfiguration.COLLECT_DATA) return;
 
         try
         {

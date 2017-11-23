@@ -125,8 +125,8 @@ public class MapListGui extends ExplorerGui<ImageMap>
         int imagesCount = MapManager.getMapList(getPlayer().getUniqueId()).size();
         int mapPartCount = MapManager.getMapPartCount(getPlayer().getUniqueId());
 
-        int mapGlobalLimit = PluginConfiguration.MAP_GLOBAL_LIMIT.get();
-        int mapPersonalLimit = PluginConfiguration.MAP_PLAYER_LIMIT.get();
+        int mapGlobalLimit = PluginConfiguration.MAP_GLOBAL_LIMIT;
+        int mapPersonalLimit = PluginConfiguration.MAP_PLAYER_LIMIT;
 
         int mapPartGloballyLeft = mapGlobalLimit - MapManager.getMapCount();
         int mapPartPersonallyLeft = mapPersonalLimit - mapPartCount;
