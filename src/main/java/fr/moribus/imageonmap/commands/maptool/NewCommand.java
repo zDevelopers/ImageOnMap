@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.map.ImageMap;
@@ -26,6 +27,7 @@ import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.components.worker.WorkerCallback;
 import fr.zcraft.zlib.tools.PluginLogger;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.net.MalformedURLException;
@@ -83,5 +85,11 @@ public class NewCommand  extends IoMCommand
                         exception.getMessage());
             }
         });
+    }
+
+    @Override
+    public boolean canExecute(CommandSender sender)
+    {
+        return Permissions.NEW.grantedTo(sender);
     }
 }

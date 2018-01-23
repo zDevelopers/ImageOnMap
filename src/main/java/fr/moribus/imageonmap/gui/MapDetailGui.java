@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.gui;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
@@ -46,43 +47,46 @@ public class MapDetailGui extends ExplorerGui<Short>
     @Override
     protected ItemStack getViewItem(int x, int y)
     {
-        Material partMaterial = Material.PAPER;
-        if((y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1))
-            partMaterial = Material.EMPTY_MAP;
+        final Material partMaterial = y % 2 == x % 2 ? Material.EMPTY_MAP : Material.PAPER;
 
-        return new ItemStackBuilder(partMaterial)
+        final ItemStackBuilder builder = new ItemStackBuilder(partMaterial)
                 .title(I.t(getPlayerLocale(), "{green}Map part"))
                 .lore(I.t(getPlayerLocale(), "{gray}Row: {white}{0}", y + 1))
-                .lore(I.t(getPlayerLocale(), "{gray}Column: {white}{0}", x + 1))
-                .loreLine()
-                .lore(I.t(getPlayerLocale(), "{gray}» {white}Click{gray} to get only this part"))
-                .item();
+                .lore(I.t(getPlayerLocale(), "{gray}Column: {white}{0}", x + 1));
+
+        if (Permissions.GET.grantedTo(getPlayer()))
+            builder.loreLine().lore(I.t(getPlayerLocale(), "{gray}» {white}Click{gray} to get only this part"));
+
+        return builder.item();
     }
     
     @Override
     protected ItemStack getViewItem(Short mapId)
     {
-        int index = ((PosterMap) map).getIndex(mapId);
-        Material partMaterial = Material.PAPER;
-        if(index % 2 == 0)
-            partMaterial = Material.EMPTY_MAP;
+        final int index = ((PosterMap) map).getIndex(mapId);
+        final Material partMaterial = index % 2 == 0 ? Material.EMPTY_MAP : Material.PAPER;
 
-        return new ItemStackBuilder(partMaterial)
+        final ItemStackBuilder builder = new ItemStackBuilder(partMaterial)
                 .title(I.t(getPlayerLocale(), "{green}Map part"))
-                .lore(I.t(getPlayerLocale(), "{gray}Part: {white}{0}", index + 1))
-                .loreLine()
-                .lore(I.t(getPlayerLocale(), "{gray}» {white}Click{gray} to get only this part"))
-                .item();
+                .lore(I.t(getPlayerLocale(), "{gray}Part: {white}{0}", index + 1));
+
+        if (Permissions.GET.grantedTo(getPlayer()))
+            builder.loreLine().lore(I.t(getPlayerLocale(), "{gray}» {white}Click{gray} to get only this part"));
+
+        return builder.item();
     }
     
     @Override
     protected ItemStack getPickedUpItem(int x, int y)
     {
-        if(map instanceof SingleMap)
+        if (!Permissions.GET.grantedTo(getPlayer()))
+            return null;
+
+        if (map instanceof SingleMap)
         {
             return MapItemManager.createMapItem((SingleMap)map);
         }
-        else if(map instanceof PosterMap)
+        else if (map instanceof PosterMap)
         {
             return MapItemManager.createMapItem((PosterMap)map, x, y);
         }
@@ -93,14 +97,17 @@ public class MapDetailGui extends ExplorerGui<Short>
     @Override
     protected ItemStack getPickedUpItem(Short mapId)
     {
-        PosterMap poster = (PosterMap) map;
+        if (!Permissions.GET.grantedTo(getPlayer()))
+            return null;
+
+        final PosterMap poster = (PosterMap) map;
         return MapItemManager.createMapItem(poster, poster.getIndex(mapId));
     }
     
     @Override
     protected ItemStack getEmptyViewItem()
     {
-        if(map instanceof SingleMap)
+        if (map instanceof SingleMap)
         {
             return getViewItem(0, 0);
         }
@@ -114,7 +121,7 @@ public class MapDetailGui extends ExplorerGui<Short>
         setTitle(I.t(getPlayerLocale(), "Your maps » {black}{0}", map.getName()));
         setKeepHorizontalScrollingSpace(true);
 
-        if(map instanceof PosterMap)
+        if (map instanceof PosterMap)
         {
             PosterMap poster = (PosterMap) map;
             if(poster.hasColumnData())
@@ -131,25 +138,41 @@ public class MapDetailGui extends ExplorerGui<Short>
             setDataShape(1,1); 
         }
 
+        final boolean canRename = Permissions.RENAME.grantedTo(getPlayer());
+        final boolean canDelete = Permissions.DELETE.grantedTo(getPlayer());
 
-        action("rename", getSize() - 7, new ItemStackBuilder(Material.BOOK_AND_QUILL)
-                .title(I.t(getPlayerLocale(), "{blue}Rename this image"))
-                .longLore(I.t(getPlayerLocale(), "{gray}Click here to rename this image; this is used for your own organization."))
-        );
+        int renameSlot = getSize() - 7;
+        int deleteSlot = getSize() - 6;
 
-        action("delete", getSize() - 6, new ItemStackBuilder(Material.BARRIER)
-                .title(I.t(getPlayerLocale(), "{red}Delete this image"))
-                .longLore(I.t(getPlayerLocale(), "{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"))
-                .loreLine()
-                .longLore(I.t(getPlayerLocale(), "{gray}You will be asked to confirm your choice if you click here."))
-        );
+        if (!canRename)
+            deleteSlot--;
+
+        if (canRename)
+        {
+            action("rename", renameSlot, new ItemStackBuilder(Material.BOOK_AND_QUILL)
+                    .title(I.t(getPlayerLocale(), "{blue}Rename this image"))
+                    .longLore(I.t(getPlayerLocale(), "{gray}Click here to rename this image; this is used for your own organization."))
+            );
+        }
+
+        if (canDelete)
+        {
+            action("delete", deleteSlot, new ItemStackBuilder(Material.BARRIER)
+                    .title(I.t(getPlayerLocale(), "{red}Delete this image"))
+                    .longLore(I.t(getPlayerLocale(), "{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"))
+                    .loreLine()
+                    .longLore(I.t(getPlayerLocale(), "{gray}You will be asked to confirm your choice if you click here."))
+            );
+        }
 
 
         // To keep the controls centered, the back button is shifted to the right when the
         // arrow isn't displayed, so when the map fit on the grid without sliders.
         int backSlot = getSize() - 4;
 
-        if(map instanceof PosterMap && ((PosterMap) map).getColumnCount() <= INVENTORY_ROW_SIZE)
+        if (!canRename && !canDelete)
+            backSlot = getSize() - 5;
+        else if (map instanceof PosterMap && ((PosterMap) map).getColumnCount() <= INVENTORY_ROW_SIZE)
             backSlot++;
 
         action("back", backSlot, new ItemStackBuilder(Material.EMERALD)
@@ -162,11 +185,24 @@ public class MapDetailGui extends ExplorerGui<Short>
     @GuiAction ("rename")
     public void rename()
     {
+        if (!Permissions.RENAME.grantedTo(getPlayer()))
+        {
+            I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
+            update();
+            return;
+        }
+
         PromptGui.prompt(getPlayer(), new Callback<String>()
         {
             @Override
             public void call(String newName)
             {
+                if (!Permissions.RENAME.grantedTo(getPlayer()))
+                {
+                    I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
+                    return;
+                }
+
                 if (newName == null || newName.isEmpty())
                 {
                     I.sendT(getPlayer(), "{ce}Map names can't be empty.");
@@ -182,6 +218,13 @@ public class MapDetailGui extends ExplorerGui<Short>
     @GuiAction ("delete")
     public void delete()
     {
+        if (!Permissions.DELETE.grantedTo(getPlayer()))
+        {
+            I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
+            update();
+            return;
+        }
+
         Gui.open(getPlayer(), new ConfirmDeleteMapGui(map), this);
     }
 

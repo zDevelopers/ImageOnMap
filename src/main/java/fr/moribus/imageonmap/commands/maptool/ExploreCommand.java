@@ -19,11 +19,13 @@
 package fr.moribus.imageonmap.commands.maptool;
 
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.gui.MapListGui;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.gui.Gui;
+import org.bukkit.command.CommandSender;
 
 
 @CommandInfo (name = "explore")
@@ -32,6 +34,12 @@ public class ExploreCommand extends IoMCommand
 	@Override
 	protected void run() throws CommandException
 	{
-            Gui.open(playerSender(), new MapListGui());
+		Gui.open(playerSender(), new MapListGui());
+	}
+
+	@Override
+	public boolean canExecute(CommandSender sender)
+	{
+		return Permissions.LIST.grantedTo(sender);
 	}
 }
