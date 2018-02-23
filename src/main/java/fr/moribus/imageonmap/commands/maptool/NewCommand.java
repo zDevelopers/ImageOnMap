@@ -42,6 +42,7 @@ public class NewCommand  extends IoMCommand
         final Player player = playerSender();
         boolean scaling = false;
         URL url;
+        int width = 0, height = 0;
         
         if(args.length < 1) throwInvalidArgument(I.t("You must give an URL to take the image from."));
         
@@ -57,11 +58,17 @@ public class NewCommand  extends IoMCommand
         
         if(args.length >= 2)
         {
-            if(args[1].equals("resize")) scaling = true;
+            if(args[1].equals("resize")) {
+                scaling = true;
+                if(args.length >= 4) {
+                    width = Integer.parseInt(args[2]);
+                    height = Integer.parseInt(args[3]);
+                }
+            }
         }
         
         info(I.t("Rendering..."));
-        ImageRendererExecutor.Render(url, scaling, player.getUniqueId(), new WorkerCallback<ImageMap>()
+        ImageRendererExecutor.Render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>()
         {
             @Override
             public void finished(ImageMap result)

@@ -42,7 +42,7 @@ import java.util.concurrent.Future;
 @WorkerAttributes (name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker
 {
-    static public void Render(final URL url, final boolean scaling, final UUID playerUUID, WorkerCallback<ImageMap> callback)
+    static public void Render(final URL url, final boolean scaling, final UUID playerUUID, final int width, final int height, WorkerCallback<ImageMap> callback)
     {
         submitQuery(new WorkerRunnable<ImageMap>()
         {
@@ -65,10 +65,18 @@ public class ImageRendererExecutor extends Worker
                 
                 if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
 
-                if (scaling) return RenderSingle(image, playerUUID);
+                if (scaling) return RenderScaled(image, playerUUID, width, height);
                 else return RenderPoster(image, playerUUID);
             }
         }, callback);
+    }
+
+    static private ImageMap RenderScaled(final BufferedImage image, final UUID playerUUID, final int width, final int height) throws Throwable {
+        if(height <= 1 && width <= 1) {
+            return RenderSingle(image, playerUUID);
+        }
+        final BufferedImage finalImage = ResizeImage(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
+        return RenderPoster(finalImage, playerUUID);
     }
     
     static private ImageMap RenderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable
