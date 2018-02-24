@@ -27,7 +27,6 @@ import fr.zcraft.zlib.components.worker.WorkerCallback;
 import fr.zcraft.zlib.components.worker.WorkerRunnable;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +41,7 @@ import java.util.concurrent.Future;
 @WorkerAttributes (name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker
 {
-    static public void Render(final URL url, final boolean scaling, final UUID playerUUID, final int width, final int height, WorkerCallback<ImageMap> callback)
+    static public void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID, final int width, final int height, WorkerCallback<ImageMap> callback)
     {
         submitQuery(new WorkerRunnable<ImageMap>()
         {
@@ -65,24 +64,20 @@ public class ImageRendererExecutor extends Worker
                 
                 if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
 
-                if (scaling) return RenderScaled(image, playerUUID, width, height);
-                else return RenderPoster(image, playerUUID);
+                if(scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1) {
+                    return renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
+                }
+
+                final BufferedImage resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
+                return renderPoster(resizedImage, playerUUID);
             }
         }, callback);
     }
 
-    static private ImageMap RenderScaled(final BufferedImage image, final UUID playerUUID, final int width, final int height) throws Throwable {
-        if(height <= 1 && width <= 1) {
-            return RenderSingle(image, playerUUID);
-        }
-        final BufferedImage finalImage = ResizeImage(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
-        return RenderPoster(finalImage, playerUUID);
-    }
-    
-    static private ImageMap RenderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable
+    static private ImageMap renderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable
     {
         MapManager.checkMapLimit(1, playerUUID);
-        Future<Short> futureMapID = submitToMainThread(new Callable<Short>()
+        final Future<Short> futureMapID = submitToMainThread(new Callable<Short>()
         {
             @Override
             public Short call() throws Exception
@@ -90,27 +85,24 @@ public class ImageRendererExecutor extends Worker
                 return MapManager.getNewMapsIds(1)[0];
             }
         });
-        
-        final BufferedImage finalImage = ResizeImage(image, ImageMap.WIDTH, ImageMap.HEIGHT);
-        
+
         final short mapID = futureMapID.get();
-        ImageIOExecutor.saveImage(mapID, finalImage);
+        ImageIOExecutor.saveImage(mapID, image);
         
         submitToMainThread(new Callable<Void>()
         {
             @Override
             public Void call() throws Exception
             {
-                Renderer.installRenderer(finalImage, mapID);
+                Renderer.installRenderer(image, mapID);
                 return null;
             }
-
         });
         
         return MapManager.createMap(playerUUID, mapID);
     }
 
-    static private ImageMap RenderPoster(final BufferedImage image, final UUID playerUUID) throws Throwable
+    static private ImageMap renderPoster(final BufferedImage image, final UUID playerUUID) throws Throwable
     {
         final PosterImage poster = new PosterImage(image);
         final int mapCount = poster.getImagesCount();
@@ -143,34 +135,5 @@ public class ImageRendererExecutor extends Worker
         });
         
         return MapManager.createMap(poster, playerUUID, mapsIDs);
-    }
-    
-    static private BufferedImage ResizeImage(BufferedImage source, int destinationW, int destinationH)
-    {
-        float ratioW = (float)destinationW / (float)source.getWidth();
-        float ratioH = (float)destinationH / (float)source.getHeight();
-        int finalW, finalH;
-        
-        if(ratioW < ratioH)
-        {
-            finalW = destinationW;
-            finalH = (int)(source.getHeight() * ratioW);
-        }
-        else
-        {
-            finalW = (int)(source.getWidth() * ratioH);
-            finalH = destinationH;
-        }
-        
-        int x, y;
-        x = (destinationW - finalW) / 2;
-        y = (destinationH - finalH) / 2;
-        
-        BufferedImage newImage = new BufferedImage(destinationW, destinationH, BufferedImage.TYPE_INT_ARGB);
-        
-        Graphics graphics = newImage.getGraphics();
-        graphics.drawImage(source, x, y, finalW, finalH, null);
-        graphics.dispose();
-        return newImage;
     }
 }
