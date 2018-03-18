@@ -18,14 +18,17 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
+import fr.moribus.imageonmap.image.ImageUtils;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.components.worker.WorkerCallback;
 import fr.zcraft.zlib.tools.PluginLogger;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.net.MalformedURLException;
@@ -38,8 +41,9 @@ public class NewCommand  extends IoMCommand
     protected void run() throws CommandException
     {
         final Player player = playerSender();
-        boolean scaling = false;
+        ImageUtils.ScalingType scaling = ImageUtils.ScalingType.NONE;
         URL url;
+        int width = 0, height = 0;
         
         if(args.length < 1) throwInvalidArgument(I.t("You must give an URL to take the image from."));
         
@@ -55,11 +59,21 @@ public class NewCommand  extends IoMCommand
         
         if(args.length >= 2)
         {
-            if(args[1].equals("resize")) scaling = true;
+            if(args.length >= 4) {
+                width = Integer.parseInt(args[2]);
+                height = Integer.parseInt(args[3]);
+            }
+
+            switch(args[1]) {
+                case "resize": scaling = ImageUtils.ScalingType.CONTAINED; break;
+                case "resize-stretched": scaling = ImageUtils.ScalingType.STRETCHED; break;
+                case "resize-covered": scaling = ImageUtils.ScalingType.COVERED; break;
+                default: throwInvalidArgument(I.t("Invalid Stretching mode.")); break;
+            }
         }
         
         info(I.t("Rendering..."));
-        ImageRendererExecutor.Render(url, scaling, player.getUniqueId(), new WorkerCallback<ImageMap>()
+        ImageRendererExecutor.render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>()
         {
             @Override
             public void finished(ImageMap result)
@@ -83,5 +97,11 @@ public class NewCommand  extends IoMCommand
                         exception.getMessage());
             }
         });
+    }
+
+    @Override
+    public boolean canExecute(CommandSender sender)
+    {
+        return Permissions.NEW.grantedTo(sender);
     }
 }
