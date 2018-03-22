@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.migration.MigratorExecutor;
 import fr.zcraft.zlib.components.commands.CommandException;
@@ -45,6 +46,6 @@ public class MigrateCommand extends IoMCommand
     @Override
     public boolean canExecute(CommandSender sender)
     {
-        return sender.isOp();
+        return sender.isOp() || Permissions.ADMINISTRATIVE.grantedTo(sender);
     }
 }

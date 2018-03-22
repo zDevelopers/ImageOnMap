@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.gui;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.MapManagerException;
@@ -170,6 +171,14 @@ public class ConfirmDeleteMapGui extends ActionGui
     @GuiAction ("delete")
     protected void delete()
     {
+        // Does the player still have the permission to delete a map?
+        if (!Permissions.DELETE.grantedTo(getPlayer()))
+        {
+            I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
+            close();
+            return;
+        }
+
         MapManager.clear(getPlayer().getInventory(), mapToDelete);
 
         try

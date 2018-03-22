@@ -17,6 +17,7 @@
  */
 package fr.moribus.imageonmap.gui;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
@@ -57,7 +58,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
                 mapDescription = I.t(getPlayerLocale(), "{white}Poster map ({0} parts)", poster.getMapCount());
             }
         }
-        return new ItemStackBuilder(Material.MAP)
+        ItemStackBuilder builder = new ItemStackBuilder(Material.MAP)
                 /// Displayed title of a map on the list GUI
                 .title(I.t(getPlayerLocale(), "{green}{bold}{0}", map.getName()))
 
@@ -65,20 +66,28 @@ public class MapListGui extends ExplorerGui<ImageMap>
                 .loreLine()
                 /// Map ID displayed in the tooltip of a map on the list GUI
                 .lore(I.t(getPlayerLocale(), "{gray}Map ID: {0}", map.getId()))
-                .loreLine()
-                .lore(I.t(getPlayerLocale(), "{gray}» {white}Left-click{gray} to get this map"))
-                .lore(I.t(getPlayerLocale(), "{gray}» {white}Right-click{gray} for details and options"))
+                .loreLine();
 
-                .item();
+        if (Permissions.GET.grantedTo(getPlayer()))
+            builder.lore(I.t(getPlayerLocale(), "{gray}» {white}Left-click{gray} to get this map"));
+
+        builder.lore(I.t(getPlayerLocale(), "{gray}» {white}Right-click{gray} for details and options"));
+
+        return builder.item();
     }
 
     @Override
     protected ItemStack getEmptyViewItem()
     {
-        return new ItemStackBuilder(Material.BARRIER)
-                .title(I.t(getPlayerLocale(), "{red}You don't have any map."))
-                .longLore(I.t(getPlayerLocale(), "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"))
-                .item();
+        ItemStackBuilder builder = new ItemStackBuilder(Material.BARRIER)
+                .title(I.t(getPlayerLocale(), "{red}You don't have any map."));
+
+        if (Permissions.NEW.grantedTo(getPlayer()))
+            builder.longLore(I.t(getPlayerLocale(), "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"));
+        else
+            builder.longLore(I.t(getPlayerLocale(), "{gray}Unfortunately, you are not allowed to create one."));
+
+        return builder.item();
     }
 
     @Override
@@ -90,6 +99,9 @@ public class MapListGui extends ExplorerGui<ImageMap>
     @Override
     protected ItemStack getPickedUpItem(ImageMap map)
     {
+        if (!Permissions.GET.grantedTo(getPlayer()))
+            return null;
+
         if (map instanceof SingleMap)
         {
             return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName());
@@ -114,6 +126,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
     {
         ImageMap[] maps = MapManager.getMaps(getPlayer().getUniqueId());
         setData(maps);
+
         /// The maps list GUI title
         setTitle(I.t(getPlayerLocale(), "{black}Your maps {reset}({0})", maps.length));
 
