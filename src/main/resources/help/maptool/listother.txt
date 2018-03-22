@@ -1,0 +1,1 @@
+Lists another player's maps.

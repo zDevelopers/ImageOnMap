@@ -18,13 +18,7 @@
 
 package fr.moribus.imageonmap;
 
-import fr.moribus.imageonmap.commands.maptool.DeleteCommand;
-import fr.moribus.imageonmap.commands.maptool.ExploreCommand;
-import fr.moribus.imageonmap.commands.maptool.GetCommand;
-import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
-import fr.moribus.imageonmap.commands.maptool.ListCommand;
-import fr.moribus.imageonmap.commands.maptool.MigrateCommand;
-import fr.moribus.imageonmap.commands.maptool.NewCommand;
+import fr.moribus.imageonmap.commands.maptool.*;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
@@ -41,12 +35,12 @@ import fr.zcraft.zlib.tools.PluginLogger;
 import java.io.File;
 import java.io.IOException;
 
+
 public final class ImageOnMap extends ZPlugin
 {
     static private final String IMAGES_DIRECTORY_NAME = "images";
     static private final String MAPS_DIRECTORY_NAME = "maps";
     static private ImageOnMap plugin;
-    
     private File imagesDirectory;
     private final File mapsDirectory;
 
@@ -69,6 +63,11 @@ public final class ImageOnMap extends ZPlugin
         return new File(imagesDirectory, "map"+mapID+".png");
     }
     
+    public File getFullImageFile(short mapIDstart, short mapIDend)
+    {
+        return new File(imagesDirectory, "_"+mapIDstart+"-"+mapIDend+".png");
+    }
+    
     @SuppressWarnings ("unchecked")
     @Override
     public void onEnable()
@@ -85,14 +84,17 @@ public final class ImageOnMap extends ZPlugin
             this.setEnabled(false);
             return;
         }
-
+        
+        
         saveDefaultConfig();
 
         loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class, ImageRendererExecutor.class);
         
+        PluginConfiguration.initialize();
+       
         //Init all the things !
         MetricsLite.startMetrics();
-        I18n.setPrimaryLocale(PluginConfiguration.LANG.get());
+        I18n.setPrimaryLocale(PluginConfiguration.LANG);
 
         MapManager.init();
         MapInitEvent.init();
@@ -103,6 +105,9 @@ public final class ImageOnMap extends ZPlugin
                 NewCommand.class,
                 ListCommand.class,
                 GetCommand.class,
+                GetOtherCommand.class,
+                ListOtherCommand.class,
+                DeleteOtherCommand.class,
                 DeleteCommand.class,
                 GetRemainingCommand.class,
                 ExploreCommand.class,
