@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
@@ -31,6 +32,7 @@ import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.text.RawMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -80,5 +82,11 @@ public class ListCommand extends IoMCommand
                                 .hideAttributes()
                                 .item()
                 );
+    }
+
+    @Override
+    public boolean canExecute(CommandSender sender)
+    {
+        return Permissions.LIST.grantedTo(sender);
     }
 }

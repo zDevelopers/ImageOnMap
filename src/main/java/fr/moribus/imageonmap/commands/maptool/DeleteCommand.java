@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
@@ -29,6 +30,7 @@ import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.components.rawtext.RawText;
 import fr.zcraft.zlib.tools.PluginLogger;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -82,5 +84,11 @@ public class DeleteCommand extends IoMCommand
             return getMatchingMapNames(playerSender(), args[0]);
 
         return null;
+    }
+
+    @Override
+    public boolean canExecute(CommandSender sender)
+    {
+        return Permissions.DELETE.grantedTo(sender);
     }
 }

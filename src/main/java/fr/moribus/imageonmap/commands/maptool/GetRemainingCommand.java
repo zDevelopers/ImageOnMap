@@ -18,11 +18,13 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.i18n.I;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @CommandInfo (name = "getremaining", aliases = {"getrest"})
@@ -49,5 +51,11 @@ public class GetRemainingCommand extends IoMCommand
         {
             info(I.tn("There is {0} map remaining.", "There are {0} maps remaining.", MapItemManager.getCacheSize(player)));
         }
+    }
+
+    @Override
+    public boolean canExecute(CommandSender sender)
+    {
+        return Permissions.NEW.grantedTo(sender) || Permissions.GET.grantedTo(sender);
     }
 }

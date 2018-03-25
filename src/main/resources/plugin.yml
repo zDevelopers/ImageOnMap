@@ -1,6 +1,6 @@
 name: ImageOnMap
 main: fr.moribus.imageonmap.ImageOnMap
-version: 3.0
+version: 3.1
 
 commands:
    tomap:
@@ -12,6 +12,47 @@ commands:
       description: manage maps through a GUI
 
 permissions:
+    imageonmap.*:
+        description: "Grants all the user permissions (excluding administrative ones)."
+        default: true
+        children:
+            imageonmap.userender: true
+            imageonmap.new: true
+            imageonmap.list: true
+            imageonmap.get: true
+            imageonmap.explore: true
+            imageonmap.rename: true
+            imageonmap.delete: true
+            imageonmap.administrative: false
+
     imageonmap.userender:
-        description: Allows you to use /tomap
+        description: "Allows you to use /tomap and related commands (/maptool getremaing). Alias of imageonmap.new."
+        default: true
+
+    imageonmap.new:
+        description: "Allows you to use /tomap and related commands (/maptool getremaing)."
+        default: true
+
+    imageonmap.list:
+        description: "Allows you to list the images you rendered."
+        default: true
+
+    imageonmap.get:
+        description: "Allows you to get a new map among the ones you already rendered, and related commands (/maptool getremaing)."
+        default: true
+
+    imageonmap.explore:
+        description: "Allows you to open a GUI with all your maps."
+        default: true
+
+    imageonmap.rename:
+        description: "Allows you to rename a map you rendered in the past."
+        default: true
+
+    imageonmap.delete:
+        description: "Allows you to delete a map you rendered in the past."
+        default: true
+
+    imageonmap.administrative:
+        description: "Allows you to perform administrative tasks (like /maptool migrate)."
         default: op
