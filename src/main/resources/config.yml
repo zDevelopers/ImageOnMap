@@ -16,12 +16,3 @@ collect-data: true
 # 0 means unlimited.
 map-global-limit: 0
 map-player-limit: 0
-
-
-#Maximum size in pixels for an image to be. 0 is unlimited.
-limit-map-size-x: 0
-limit-map-size-y: 0
-
-
-#Should the full image be saved when a map is rendered?
-save-full-image: false
