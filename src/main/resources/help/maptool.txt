@@ -3,7 +3,6 @@ new: Creates a new ImageOnMap
 delete: Deletes a map.
 delete-noconfirm: Deletes a map. Deletion is permanent and made without confirmation
 get: Gives you a map.
-getother: Gets another player's map.
 getremaining: Gives you the remaining maps that could not fit in your inventory
 list: Lists all the map you currently have.
 explore: Opens a GUI to see and manage your maps.
