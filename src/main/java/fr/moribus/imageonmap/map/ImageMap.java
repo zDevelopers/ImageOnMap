@@ -18,6 +18,7 @@
 
 package fr.moribus.imageonmap.map;
 
+import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.Material;
@@ -26,6 +27,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -47,7 +49,6 @@ public abstract class ImageMap implements ConfigurationSerializable
     private final UUID userUUID;
     private final Type mapType;
     private String name;
-    
     protected ImageMap(UUID userUUID, Type mapType)
     {
         this(userUUID, mapType, null, null);
@@ -82,6 +83,11 @@ public abstract class ImageMap implements ConfigurationSerializable
     public boolean give(Player player)
     {
         return MapItemManager.give(player, this);
+    }
+    
+    public static File getFullImageFile(short mapIDstart, short mapIDend)
+    {
+        return new File(ImageOnMap.getPlugin().getImagesDirectory(), "_"+mapIDstart+"-"+mapIDend+".png");
     }
     
     /* ====== Serialization methods ====== */

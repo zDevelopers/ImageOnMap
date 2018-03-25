@@ -1,5 +1,5 @@
 /*
- * Copyright or Â© or Copr. AmauryCarrade (2015)
+ * Copyright or © or Copr. AmauryCarrade (2015)
  *
  * http://amaury.carrade.eu
  *
@@ -38,9 +38,12 @@ public enum Permissions
 {
     NEW("imageonmap.new", "imageonmap.userender"),
     LIST("imageonmap.list"),
+    LISTOTHER("imageonmap.listother"),
     GET("imageonmap.get"),
+    GETOTHER("imageonmap.getother"),
     RENAME("imageonmap.rename"),
     DELETE("imageonmap.delete"),
+    DELETEOTHER("imageonmap.deleteother"),
     ADMINISTRATIVE("imageonmap.administrative")
 
     ;

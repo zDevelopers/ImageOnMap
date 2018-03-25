@@ -18,12 +18,13 @@
 
 package fr.moribus.imageonmap.map;
 
-import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.PosterImage;
 import fr.moribus.imageonmap.map.MapManagerException.Reason;
 import fr.zcraft.zlib.tools.PluginLogger;
+import fr.moribus.imageonmap.ImageOnMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
