@@ -18,7 +18,6 @@
 
 package fr.moribus.imageonmap;
 
-import fr.moribus.imageonmap.commands.maptool.DebugCommand;
 import fr.moribus.imageonmap.commands.maptool.DeleteCommand;
 import fr.moribus.imageonmap.commands.maptool.DeleteOtherCommand;
 import fr.moribus.imageonmap.commands.maptool.ListCommand;
@@ -107,7 +106,6 @@ public final class ImageOnMap extends ZPlugin
         Commands.register(
                 "maptool",
                 NewCommand.class,
-                DebugCommand.class,
                 ListCommand.class,
                 GetCommand.class,
                 GetOtherCommand.class,
