@@ -18,6 +18,8 @@
 
 package fr.moribus.imageonmap.image;
 
+import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.zlib.components.i18n.I;
@@ -27,6 +29,7 @@ import fr.zcraft.zlib.components.worker.WorkerCallback;
 import fr.zcraft.zlib.components.worker.WorkerRunnable;
 
 import javax.imageio.ImageIO;
+import org.bukkit.Bukkit;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,13 +66,25 @@ public class ImageRendererExecutor extends Worker
                 final BufferedImage image = ImageIO.read(stream);
                 
                 if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
-
+                
+                
+                //Limits are in place and the player does NOT have rights to avoid them.
+                if((PluginConfiguration.LIMIT_SIZE_X.get() > 0 || PluginConfiguration.LIMIT_SIZE_Y.get() > 0) && !Bukkit.getPlayer(playerUUID).hasPermission("imageonmap.bypasssize")) {
+                	if(PluginConfiguration.LIMIT_SIZE_X.get() > 0) {
+                		if(image.getWidth() > PluginConfiguration.LIMIT_SIZE_X.get()) throw new IOException(I.t("The image is too wide!"));
+                	}
+                	if(PluginConfiguration.LIMIT_SIZE_Y.get() > 0) {
+                		if(image.getHeight() > PluginConfiguration.LIMIT_SIZE_Y.get()) throw new IOException(I.t("The image is too tall!"));
+                	}
+                }
+                
                 if(scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1) {
                     return renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
                 }
 
                 final BufferedImage resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
                 return renderPoster(resizedImage, playerUUID);
+                //return RenderPoster(image, playerUUID);
             }
         }, callback);
     }
@@ -122,6 +137,11 @@ public class ImageRendererExecutor extends Worker
         final int[] mapsIDs = futureMapsIds.get();
         
         ImageIOExecutor.saveImage(mapsIDs, poster);
+        
+        if(PluginConfiguration.SAVE_FULL_IMAGE.get()) {
+        	ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
+     
+        }
         
         submitToMainThread(new Callable<Void>()
         {
