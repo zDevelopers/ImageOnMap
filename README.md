@@ -5,6 +5,8 @@ Repo for ImageOnMap, a bukkit plugin.
 
 
 ## Features
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FzDevelopers%2FImageOnMap.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FzDevelopers%2FImageOnMap?ref=badge_shield)
+
 
 ImageOnMap allows you to load a picture from the Internet to a Minecraft map.
 
@@ -118,3 +120,7 @@ You will find amongst the new features:
 ## Data collection
 
 We use metrics to collect basic information about the usage of this plugin. This can be disabled by setting `collect-data` to false in `config.yml`.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FzDevelopers%2FImageOnMap.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FzDevelopers%2FImageOnMap?ref=badge_large)
