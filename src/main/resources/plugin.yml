@@ -1,6 +1,7 @@
 name: ImageOnMap
 main: fr.moribus.imageonmap.ImageOnMap
-version: 3.1
+version: 3.2
+api-version: 1.13
 
 commands:
    tomap:

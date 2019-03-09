@@ -70,9 +70,9 @@ public class PosterWall
         
     }
     
-    static public ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, short mapId)
+    static public ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, int i)
     {
-        int mapIndex = map.getIndex(mapId);
+        int mapIndex = map.getIndex(i);
         int x = map.getColumnAt(mapIndex), y = map.getRowAt(mapIndex);
         
         return getMatchingMapFrames(map, location.clone().add(-x, y));
@@ -111,7 +111,7 @@ public class PosterWall
             ItemFrame frame = (ItemFrame) entity;
             if(frame.getFacing() != location.getFacing()) continue;
             ItemStack item = frame.getItem();
-            if(item.getType() != Material.MAP) continue;
+            if(item.getType() != Material.FILLED_MAP) continue;
             if(!map.managesMap(item)) continue;
             return frame;
         }

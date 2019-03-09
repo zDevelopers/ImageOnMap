@@ -427,7 +427,7 @@ public class V3Migrator implements Runnable
         ArrayDeque<OldSavedMap> remainingMaps = new ArrayDeque<>();
         ArrayDeque<OldSavedPoster> remainingPosters = new ArrayDeque<>();
         
-        ArrayDeque<Short> missingMapIds = new ArrayDeque<>();
+        ArrayDeque<Integer> missingMapIds = new ArrayDeque<>();
         
         UUID playerUUID;
         OldSavedMap map;
@@ -609,10 +609,12 @@ public class V3Migrator implements Runnable
             throw new IOException("Could not check file integrity because of NoSuchAlgorithmException : " + ex.getMessage());
         }
         
-        FileInputStream inputStream = new FileInputStream(file);
+        @SuppressWarnings("resource")
+		FileInputStream inputStream = new FileInputStream(file);
         
         byte[] data = new byte[1024];
-        int read = 0;
+        @SuppressWarnings("unused")
+		int read = 0;
         
         while((read = inputStream.read(data)) != -1)
         {

@@ -38,7 +38,7 @@ public class Renderer extends MapRenderer
         return false;
     }
     
-    static public void installRenderer(PosterImage image, short[] mapsIds)
+    static public void installRenderer(PosterImage image, int[] mapsIds)
     {
         for(int i = 0; i < mapsIds.length; i++)
         {
@@ -46,9 +46,10 @@ public class Renderer extends MapRenderer
         }
     }
     
-    static public void installRenderer(BufferedImage image, short mapID)
+    static public void installRenderer(BufferedImage image, int mapID)
     {
-        MapView map = Bukkit.getMap(mapID);
+        @SuppressWarnings("deprecation")
+		MapView map = Bukkit.getMap(mapID > Short.MAX_VALUE ? Short.MAX_VALUE : mapID < Short.MIN_VALUE ? Short.MIN_VALUE : (short)mapID);
         if(map == null)
         {
             PluginLogger.warning("Could not install renderer for map {0} : the Minecraft map does not exist", mapID);

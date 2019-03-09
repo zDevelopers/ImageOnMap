@@ -46,7 +46,8 @@ public class DeleteCommand extends IoMCommand
 
         if (!hasFlag("confirm"))
         {
-            RawText msg = new RawText(I.t("You are going to delete") + " ")
+            @SuppressWarnings("unchecked")
+			RawText msg = new RawText(I.t("You are going to delete") + " ")
                 .then(map.getId())
                     .color(ChatColor.GOLD)
                 .then(". " + I.t("Are you sure ? "))

@@ -31,9 +31,10 @@ class OldSavedPoster
 {
     private final String userName;
     private final String posterName;
-    private final short[] mapsIds;
+    private final int[] mapsIds;
     
-    public OldSavedPoster(Object rawData, String key) throws InvalidConfigurationException
+    @SuppressWarnings("unchecked")
+	public OldSavedPoster(Object rawData, String key) throws InvalidConfigurationException
     {
         posterName = key;
         List<String> data;
@@ -49,13 +50,13 @@ class OldSavedPoster
         if(data.size() < 2) 
             throw new InvalidConfigurationException("Poster data too short (given : " + data.size() + ", expected at least 2)");
         userName = data.get(0);
-        mapsIds = new short[data.size() - 1];
+        mapsIds = new int[data.size() - 1];
         
         for(int i = 1, c = data.size(); i < c; i++)
         {
             try
             {
-                mapsIds[i - 1] = Short.parseShort(data.get(i));
+                mapsIds[i - 1] = Integer.parseInt(data.get(i));
             }
             catch(NumberFormatException ex)
             {
@@ -66,7 +67,7 @@ class OldSavedPoster
     
     public boolean contains(OldSavedMap map)
     {
-        short mapId = map.getMapId();
+        int mapId = map.getMapId();
         
         for(int i = 0, c = mapsIds.length; i < c; i++)
         {
@@ -86,9 +87,9 @@ class OldSavedPoster
         ArrayList<String> data = new ArrayList<String>();
         data.add(userName);
         
-        for(short mapId : mapsIds)
+        for(int mapId : mapsIds)
         {
-            data.add(Short.toString(mapId));
+            data.add(mapId + "");
         }
         
         configuration.set(posterName, data);
@@ -97,7 +98,7 @@ class OldSavedPoster
     
     public boolean isMapValid()
     {
-        for(short mapId : mapsIds)
+        for(int mapId : mapsIds)
         {
             if(!MapManager.mapIdExists(mapId))
                 return false;
@@ -106,5 +107,5 @@ class OldSavedPoster
     }
     
     public String getUserName() {return userName;}
-    public short[] getMapsIds() {return mapsIds;}
+    public int[] getMapsIds() {return mapsIds;}
 }

@@ -26,11 +26,11 @@ import java.util.UUID;
 
 public class PosterMap extends ImageMap
 {
-    protected final short[] mapsIDs;
+    protected final int[] mapsIDs;
     protected final int columnCount;
     protected final int rowCount;
     
-    public PosterMap(UUID userUUID, short[] mapsIDs, String id, String name, int columnCount, int rowCount)
+    public PosterMap(UUID userUUID, int[] mapsIDs, String id, String name, int columnCount, int rowCount)
     {
         super(userUUID, Type.POSTER, id, name);
         this.mapsIDs = mapsIDs;
@@ -38,19 +38,19 @@ public class PosterMap extends ImageMap
         this.rowCount = Math.max(rowCount, 0);
     }
     
-    public PosterMap(UUID userUUID, short[] mapsIDs, int columnCount, int rowCount)
+    public PosterMap(UUID userUUID, int[] mapsIDs, int columnCount, int rowCount)
     {
         this(userUUID, mapsIDs, null, null, columnCount, rowCount);
     }
     
     @Override
-    public short[] getMapsIDs()
+    public int[] getMapsIDs()
     {
         return mapsIDs;
     }
 
     @Override
-    public boolean managesMap(short mapID)
+    public boolean managesMap(int mapID)
     {
         for(int i = 0; i < mapsIDs.length; i++)
         {
@@ -70,7 +70,7 @@ public class PosterMap extends ImageMap
         rowCount = getFieldValue(map, "rows");
         
         List<Integer> idList = getFieldValue(map, "mapsIDs");
-        mapsIDs = new short[idList.size()];
+        mapsIDs = new int[idList.size()];
         for(int i = 0, c = idList.size(); i < c; i++)
         {
             mapsIDs[i] = (short) ((int) idList.get(i));
@@ -131,19 +131,19 @@ public class PosterMap extends ImageMap
      *
      * @throws ArrayIndexOutOfBoundsException if the given coordinates are too big (out of the poster).
      */
-    public short getMapIdAt(int x, int y)
+    public int getMapIdAt(int x, int y)
     {
         return mapsIDs[y * columnCount + x];
     }
     
-    public short getMapIdAtReverseY(int index)
+    public int getMapIdAtReverseY(int index)
     {
         int x = index % (columnCount);
         int y = index / (columnCount);
         return getMapIdAt(x, rowCount - y - 1);
     }
     
-    public short getMapIdAt(int index)
+    public int getMapIdAt(int index)
     {
         return mapsIDs[index];
     }
@@ -159,7 +159,7 @@ public class PosterMap extends ImageMap
         return mapsIDs.length;
     }
     
-    public int getIndex(short mapID)
+    public int getIndex(int mapID)
     {
         for(int i = 0; i < mapsIDs.length; i++)
         {

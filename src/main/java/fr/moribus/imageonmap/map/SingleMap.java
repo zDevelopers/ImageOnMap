@@ -24,27 +24,27 @@ import org.bukkit.configuration.InvalidConfigurationException;
 
 public class SingleMap extends ImageMap
 {
-    protected final short mapID;
+    protected final int mapID;
     
-    public SingleMap(UUID ownerUUID, short mapID, String id, String name)
+    public SingleMap(UUID ownerUUID, int mapID, String id, String name)
     {
         super(ownerUUID, Type.SINGLE, id, name);
         this.mapID = mapID;
     }
     
-    public SingleMap(UUID ownerUUID, short mapID)
+    public SingleMap(UUID ownerUUID, int mapID)
     {
         this(ownerUUID, mapID, null, null);
     }
     
     @Override
-    public short[] getMapsIDs()
+    public int[] getMapsIDs()
     {
-        return new short[]{mapID};
+        return new int[]{mapID};
     }
 
     @Override
-    public boolean managesMap(short mapID)
+    public boolean managesMap(int mapID)
     {
         return this.mapID == mapID;
     }

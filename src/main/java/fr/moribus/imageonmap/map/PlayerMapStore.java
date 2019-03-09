@@ -50,7 +50,7 @@ public class PlayerMapStore implements ConfigurationSerializable
         this.playerUUID = playerUUID;
     }
     
-    public synchronized boolean managesMap(short mapID)
+    public synchronized boolean managesMap(int mapID)
     {
         for(ImageMap map : mapList)
         {
@@ -62,7 +62,7 @@ public class PlayerMapStore implements ConfigurationSerializable
     public synchronized boolean managesMap(ItemStack item)
     {
         if(item == null) return false;
-        if(item.getType() != Material.MAP) return false;
+        if(item.getType() != Material.FILLED_MAP) return false;
         
         for(ImageMap map : mapList)
         {
@@ -129,7 +129,7 @@ public class PlayerMapStore implements ConfigurationSerializable
     
     public synchronized List<ImageMap> getMapList()
     {
-        return new ArrayList(mapList);
+        return new ArrayList<ImageMap>(mapList);
     }
     
     public synchronized ImageMap[] getMaps()
@@ -189,7 +189,8 @@ public class PlayerMapStore implements ConfigurationSerializable
     public Map<String, Object> serialize() 
     {
         Map<String, Object> map = new HashMap<String, Object>();
-        ArrayList<Map> list = new ArrayList<Map>();
+        @SuppressWarnings("rawtypes")
+		ArrayList<Map> list = new ArrayList<Map>();
         synchronized(this)
         {
             for(ImageMap tMap : mapList)
@@ -204,7 +205,8 @@ public class PlayerMapStore implements ConfigurationSerializable
     private void loadFromConfig(ConfigurationSection section)
     {
         if(section == null) return;
-        List<Map<String, Object>> list = (List<Map<String, Object>>) section.getList("mapList");
+        @SuppressWarnings("unchecked")
+		List<Map<String, Object>> list = (List<Map<String, Object>>) section.getList("mapList");
         if(list == null) return;
         
         for(Map<String, Object> tMap : list)

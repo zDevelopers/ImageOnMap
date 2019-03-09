@@ -32,7 +32,7 @@ import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-
+@SuppressWarnings("deprecation")
 public class MapListGui extends ExplorerGui<ImageMap>
 {
     @Override

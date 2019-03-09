@@ -77,16 +77,16 @@ public class ImageRendererExecutor extends Worker
     static private ImageMap renderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable
     {
         MapManager.checkMapLimit(1, playerUUID);
-        final Future<Short> futureMapID = submitToMainThread(new Callable<Short>()
+        final Future<Integer> futureMapID = submitToMainThread(new Callable<Integer>()
         {
             @Override
-            public Short call() throws Exception
+            public Integer call() throws Exception
             {
                 return MapManager.getNewMapsIds(1)[0];
             }
         });
 
-        final short mapID = futureMapID.get();
+        final int mapID = futureMapID.get();
         ImageIOExecutor.saveImage(mapID, image);
         
         submitToMainThread(new Callable<Void>()
@@ -108,10 +108,10 @@ public class ImageRendererExecutor extends Worker
         final int mapCount = poster.getImagesCount();
         
         MapManager.checkMapLimit(mapCount, playerUUID);
-        final Future<short[]> futureMapsIds = submitToMainThread(new Callable<short[]>()
+        final Future<int[]> futureMapsIds = submitToMainThread(new Callable<int[]>()
         {
             @Override
-            public short[] call() throws Exception
+            public int[] call() throws Exception
             {
                 return MapManager.getNewMapsIds(mapCount);
             }
@@ -119,7 +119,7 @@ public class ImageRendererExecutor extends Worker
 
         poster.splitImages();
 
-        final short[] mapsIDs = futureMapsIds.get();
+        final int[] mapsIDs = futureMapsIds.get();
         
         ImageIOExecutor.saveImage(mapsIDs, poster);
         

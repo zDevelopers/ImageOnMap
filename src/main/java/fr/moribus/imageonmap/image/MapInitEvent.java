@@ -25,17 +25,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
 
 public class MapInitEvent implements Listener
@@ -54,7 +54,7 @@ public class MapInitEvent implements Listener
         
         for(Player player : Bukkit.getOnlinePlayers())
         {
-            initMap(player.getItemInHand());
+            initMap(player.getInventory().getItemInMainHand());
         }
     }
     
@@ -78,8 +78,10 @@ public class MapInitEvent implements Listener
     }
     
     @EventHandler
-    public void onPlayerPickup(PlayerPickupItemEvent event)
+    public void onPlayerPickup(EntityPickupItemEvent event)
     {
+    	if(!event.getEntityType().equals(EntityType.PLAYER))
+    		return;
         ItemStack item = event.getItem().getItemStack();
         initMap(item);
     }
@@ -94,20 +96,26 @@ public class MapInitEvent implements Listener
             case PLACE_SOME:
             case SWAP_WITH_CURSOR:
                 initMap(event.getCursor());
+                break;
+           default: return;
+            
         }
     }
     
     static public void initMap(ItemStack item)
     {
-        if (item != null && item.getType() == Material.MAP)
+        if (item != null && item.getType() == Material.FILLED_MAP)
         {
-            initMap(item.getDurability());
+        	
+            initMap(((MapMeta)item.getItemMeta()).getMapView());
         }
     }
     
-    static public void initMap(short id)
+    @SuppressWarnings("deprecation")
+	static public void initMap(int id)
     {
-        initMap(Bukkit.getMap(id));
+        initMap(Bukkit.getMap((id > Short.MAX_VALUE ? Short.MAX_VALUE : id < Short.MIN_VALUE ? Short.MIN_VALUE : (short)id)));
+        
     }
     
     static public void initMap(MapView map)

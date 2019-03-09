@@ -24,7 +24,12 @@ import java.text.MessageFormat;
 
 public class MapManagerException extends Exception
 {
-    public enum Reason
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 361594945031622687L;
+
+	public enum Reason
     {
         MAXIMUM_PLAYER_MAPS_EXCEEDED(I.t("You have too many maps (maximum : {0}).")),
         MAXIMUM_SERVER_MAPS_EXCEEDED(I.t("The server ImageOnMap limit has been reached.")),

@@ -25,11 +25,13 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("deprecation")
 public abstract class ImageMap implements ConfigurationSerializable
 {
     public enum Type
@@ -68,15 +70,15 @@ public abstract class ImageMap implements ConfigurationSerializable
     }
     
     
-    public abstract short[] getMapsIDs();
-    public abstract boolean managesMap(short mapID);
+    public abstract int[] getMapsIDs();
+    public abstract boolean managesMap(int mapID);
     public abstract int getMapCount();
     
     public boolean managesMap(ItemStack item)
     {
         if(item == null) return false;
-        if(item.getType() != Material.MAP) return false;
-        return managesMap(item.getDurability());
+        if(item.getType() != Material.FILLED_MAP) return false;
+        return managesMap(((MapMeta)item.getItemMeta()).getMapId());
     }
     
     public boolean give(Player player)
@@ -134,7 +136,8 @@ public abstract class ImageMap implements ConfigurationSerializable
         return value;
     }
     
-    static protected <T> T getNullableFieldValue(Map<String, Object> map, String fieldName) throws InvalidConfigurationException
+    @SuppressWarnings("unchecked")
+	static protected <T> T getNullableFieldValue(Map<String, Object> map, String fieldName) throws InvalidConfigurationException
     {
         try
         {

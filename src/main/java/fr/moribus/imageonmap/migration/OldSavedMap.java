@@ -33,7 +33,8 @@ class OldSavedMap
     private final String mapName;
     private final String userName;
     
-    public OldSavedMap(Object rawData) throws InvalidConfigurationException
+    @SuppressWarnings("unchecked")
+	public OldSavedMap(Object rawData) throws InvalidConfigurationException
     {
         List<String> data;
         try
@@ -79,6 +80,6 @@ class OldSavedMap
         return MapManager.mapIdExists(mapId);
     }
     
-    public short getMapId() {return mapId;}
+    public int getMapId() {return mapId;}
     public String getUserName() {return userName;}
 }

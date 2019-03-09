@@ -19,18 +19,14 @@
 package fr.moribus.imageonmap;
 
 import fr.moribus.imageonmap.commands.maptool.DeleteCommand;
-import fr.moribus.imageonmap.commands.maptool.ExploreCommand;
 import fr.moribus.imageonmap.commands.maptool.GetCommand;
 import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
 import fr.moribus.imageonmap.commands.maptool.ListCommand;
-import fr.moribus.imageonmap.commands.maptool.MigrateCommand;
 import fr.moribus.imageonmap.commands.maptool.NewCommand;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.moribus.imageonmap.migration.MigratorExecutor;
-import fr.moribus.imageonmap.migration.V3Migrator;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.zlib.components.commands.Commands;
 import fr.zcraft.zlib.components.gui.Gui;
@@ -64,9 +60,9 @@ public final class ImageOnMap extends ZPlugin
     
     public File getImagesDirectory() {return imagesDirectory;}
     public File getMapsDirectory() {return mapsDirectory;}
-    public File getImageFile(short mapID)
+    public File getImageFile(int i)
     {
-        return new File(imagesDirectory, "map"+mapID+".png");
+        return new File(imagesDirectory, "map"+i+".png");
     }
     
     @SuppressWarnings ("unchecked")
@@ -76,7 +72,7 @@ public final class ImageOnMap extends ZPlugin
         // Creating the images and maps directories if necessary
         try
         {
-            imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
+            imagesDirectory = checkPluginDirectory(imagesDirectory);
             checkPluginDirectory(mapsDirectory);
         }
         catch(IOException ex)
@@ -104,13 +100,13 @@ public final class ImageOnMap extends ZPlugin
                 ListCommand.class,
                 GetCommand.class,
                 DeleteCommand.class,
-                GetRemainingCommand.class,
-                ExploreCommand.class,
-                MigrateCommand.class
+                GetRemainingCommand.class
+               
+                
         );
 
         Commands.registerShortcut("maptool", NewCommand.class, "tomap");
-        Commands.registerShortcut("maptool", ExploreCommand.class, "maps");
+       
     }
 
     @Override
@@ -118,7 +114,7 @@ public final class ImageOnMap extends ZPlugin
     {
         MapManager.exit();
         MapItemManager.exit();
-        MigratorExecutor.waitForMigration();
+        
 
         super.onDisable();
     }

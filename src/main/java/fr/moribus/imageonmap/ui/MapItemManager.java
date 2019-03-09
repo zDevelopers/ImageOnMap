@@ -24,8 +24,8 @@ import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.core.ZLib;
-import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.items.ItemUtils;
+
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
@@ -36,20 +36,24 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.MapMeta;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Queue;
 import java.util.UUID;
 
+@SuppressWarnings("deprecation")
 public class MapItemManager implements Listener
 {
     static private HashMap<UUID, Queue<ItemStack>> mapItemCache;
     
     static public void init()
     {
-        mapItemCache = new HashMap();
+        mapItemCache = new HashMap<UUID, Queue<ItemStack>>();
         ZLib.registerEvents(new MapItemManager());
     }
     
@@ -155,13 +159,15 @@ public class MapItemManager implements Listener
         return I.t("{0} (part {1})", map.getName(), index + 1);
     }
     
-    static public ItemStack createMapItem(short mapID, String text)
+    static public ItemStack createMapItem(int mapID, String text)
     {
-        return new ItemStackBuilder(Material.MAP)
-                .data(mapID)
-                .title(text)
-                .hideAttributes()
-                .item();
+    	
+    	ItemStack r = new ItemStack(Material.FILLED_MAP);
+    	MapMeta mr = (MapMeta)r.getItemMeta();
+    	mr.setMapId(mapID);
+    	mr.setDisplayName(text);
+    	r.setItemMeta(mr);
+        return r;
     }
 
     /**
@@ -218,7 +224,7 @@ public class MapItemManager implements Listener
         else
         {
             PosterMap poster = (PosterMap) map;
-            int index = poster.getIndex(item.getDurability());
+            int index = poster.getIndex(((MapMeta)item.getItemMeta()).getMapId());
             if(poster.hasColumnData())
                 return getMapTitle(poster, poster.getRowAt(index), poster.getColumnAt(index));
             
@@ -229,17 +235,19 @@ public class MapItemManager implements Listener
     static private void onItemFramePlace(ItemFrame frame, Player player, PlayerInteractEntityEvent event)
     {
         if(frame.getItem().getType() != Material.AIR) return;
-        if(!MapManager.managesMap(player.getItemInHand())) return;
+        if(!MapManager.managesMap(player.getInventory().getItemInMainHand())) return;
         event.setCancelled(true);
         
-        if(SplatterMapManager.hasSplatterAttributes(player.getItemInHand()))
+        if(SplatterMapManager.hasSplatterAttributes(player.getInventory().getItemInMainHand() ))
         {
             if(!SplatterMapManager.placeSplatterMap(frame, player))
                 return;
         }
         else
         {
-            ItemStack is = new ItemStack(Material.MAP, 1, player.getItemInHand().getDurability());
+            ItemStack is = new ItemStack(Material.FILLED_MAP, 1);
+            MapMeta mr = (MapMeta) is.getItemMeta();
+            mr.setMapId(((MapMeta)player.getInventory().getItemInMainHand().getItemMeta()).getMapId());
             frame.setItem(is);
         }
         
@@ -249,7 +257,7 @@ public class MapItemManager implements Listener
     static private void onItemFrameRemove(ItemFrame frame, Player player, EntityDamageByEntityEvent event)
     {
         ItemStack item = frame.getItem();
-        if(frame.getItem().getType() != Material.MAP) return;
+        if(frame.getItem().getType() != Material.FILLED_MAP) return;
         
         if(player.isSneaking())
         {
@@ -267,10 +275,12 @@ public class MapItemManager implements Listener
         
         if(!MapManager.managesMap(frame.getItem())) return;
         
-        frame.setItem(new ItemStackBuilder(item)
-                .title(getMapTitle(item))
-                .hideAttributes()
-                .item());
+        ItemStack r = new ItemStack(item);
+        ItemMeta m = r.getItemMeta();
+        m.setDisplayName(getMapTitle(item));
+        m.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS);
+        r.setItemMeta(m);
+        frame.setItem(r);
         
     }
     

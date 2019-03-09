@@ -38,7 +38,7 @@ import org.bukkit.material.Dye;
 import java.util.Arrays;
 import java.util.Random;
 
-
+@SuppressWarnings("deprecation")
 public class ConfirmDeleteMapGui extends ActionGui
 {
     static private final int BUTTONS_WIDTH  = 4;
@@ -106,7 +106,7 @@ public class ConfirmDeleteMapGui extends ActionGui
 
         /* ** Item representation of the image being deleted ** */
 
-        action("", 13, new ItemStackBuilder(Material.EMPTY_MAP)
+        action("", 13, new ItemStackBuilder(Material.MAP)
                  /// The title of the map deletion item
                 .title(I.t(getPlayerLocale(), "{red}You're about to destroy this map..."))
                  /// The end, in the lore, of a title starting with “You're about to destroy this map...”.
@@ -146,7 +146,7 @@ public class ConfirmDeleteMapGui extends ActionGui
 
     private ItemStack createSubButton(DyeColor color, String title, String[] messages)
     {
-        Dye pane = new Dye(Material.STAINED_GLASS_PANE);
+        Dye pane = new Dye(Material.WHITE_STAINED_GLASS_PANE);
         pane.setColor(color);
 
         ItemStack subButton = pane.toItemStack(1);
