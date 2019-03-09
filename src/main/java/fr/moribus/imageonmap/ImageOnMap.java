@@ -19,14 +19,18 @@
 package fr.moribus.imageonmap;
 
 import fr.moribus.imageonmap.commands.maptool.DeleteCommand;
+import fr.moribus.imageonmap.commands.maptool.ExploreCommand;
 import fr.moribus.imageonmap.commands.maptool.GetCommand;
 import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
 import fr.moribus.imageonmap.commands.maptool.ListCommand;
+import fr.moribus.imageonmap.commands.maptool.MigrateCommand;
 import fr.moribus.imageonmap.commands.maptool.NewCommand;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.migration.MigratorExecutor;
+import fr.moribus.imageonmap.migration.V3Migrator;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.zlib.components.commands.Commands;
 import fr.zcraft.zlib.components.gui.Gui;
@@ -72,7 +76,7 @@ public final class ImageOnMap extends ZPlugin
         // Creating the images and maps directories if necessary
         try
         {
-            imagesDirectory = checkPluginDirectory(imagesDirectory);
+        	imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
             checkPluginDirectory(mapsDirectory);
         }
         catch(IOException ex)
@@ -100,6 +104,9 @@ public final class ImageOnMap extends ZPlugin
                 ListCommand.class,
                 GetCommand.class,
                 DeleteCommand.class,
+                GetRemainingCommand.class,
+                ExploreCommand.class,
+                MigrateCommand.class,
                 GetRemainingCommand.class
                
                 
@@ -114,7 +121,7 @@ public final class ImageOnMap extends ZPlugin
     {
         MapManager.exit();
         MapItemManager.exit();
-        
+        MigratorExecutor.waitForMigration();
 
         super.onDisable();
     }

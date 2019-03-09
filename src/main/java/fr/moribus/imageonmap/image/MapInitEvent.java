@@ -38,6 +38,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
 
+@SuppressWarnings("deprecation")
 public class MapInitEvent implements Listener
 {
     static public void init()
@@ -102,16 +103,16 @@ public class MapInitEvent implements Listener
         }
     }
     
-    static public void initMap(ItemStack item)
+    
+	static public void initMap(ItemStack item)
     {
         if (item != null && item.getType() == Material.FILLED_MAP)
         {
         	
-            initMap(((MapMeta)item.getItemMeta()).getMapView());
+            initMap(((MapMeta)item.getItemMeta()).getMapId());
         }
     }
     
-    @SuppressWarnings("deprecation")
 	static public void initMap(int id)
     {
         initMap(Bukkit.getMap((id > Short.MAX_VALUE ? Short.MAX_VALUE : id < Short.MIN_VALUE ? Short.MIN_VALUE : (short)id)));
