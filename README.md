@@ -1,3 +1,4 @@
+## Download the latest release from https://github.com/OTGEngineering/OTG-ImageOnMap-Updated/releases
 ImageOnMap
 ==========
 
