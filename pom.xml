@@ -17,7 +17,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.3.1</version>
                 <configuration>
                     <artifactSet>
                         <includes>
@@ -50,7 +50,7 @@
         </repository>
         <repository>
             <id>zDevelopers</id>
-            <url>http://maven.carrade.eu/artifactory/snapshots</url>
+            <url>https://otgengineering.github.io/OTG-Repository/maven</url>
         </repository>
     </repositories>
 
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>fr.zcraft</groupId>
             <artifactId>zlib</artifactId>
-            <version>0.99-SNAPSHOT</version>
+            <version>1.01-1.13New-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
