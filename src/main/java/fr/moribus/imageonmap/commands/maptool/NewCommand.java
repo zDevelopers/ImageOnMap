@@ -23,11 +23,15 @@ import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.ImageUtils;
 import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.components.worker.WorkerCallback;
 import fr.zcraft.zlib.tools.PluginLogger;
+import fr.zcraft.zlib.tools.text.ActionBar;
+import fr.zcraft.zlib.tools.text.MessageSender;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -72,14 +76,16 @@ public class NewCommand  extends IoMCommand
             }
         }
         
-        info(I.t("Rendering..."));
+        ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));
         ImageRendererExecutor.render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>()
         {
             @Override
             public void finished(ImageMap result)
             {
-                player.sendMessage(I.t("{cst}Rendering finished!"));
-                if(result.give(player))
+                ActionBar.removeMessage(player);
+                MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Rendering finished!"));
+
+                if (result.give(player) && (result instanceof PosterMap && !((PosterMap) result).hasColumnData()))
                 {
                     info(I.t("The rendered map was too big to fit in your inventory."));
                     info(I.t("Use '/maptool getremaining' to get the remaining maps."));

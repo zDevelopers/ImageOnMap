@@ -371,8 +371,8 @@ msgid "Rendering..."
 msgstr "Rendu en cours..."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:69
-msgid "{cst}Rendering finished!"
-msgstr "{cst}Rendu achevé !"
+msgid "Rendering finished!"
+msgstr "Rendu achevé !"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:72
 msgid "The rendered map was too big to fit in your inventory."
