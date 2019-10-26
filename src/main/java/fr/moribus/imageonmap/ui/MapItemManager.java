@@ -24,7 +24,6 @@ import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.core.ZLib;
-import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.items.ItemUtils;
 import org.bukkit.*;
@@ -37,6 +36,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 
 import java.util.ArrayDeque;
@@ -238,7 +238,20 @@ public class MapItemManager implements Listener
         }
         else
         {
-            frame.setItem(mapItem);
+            // If the item has a display name, bot not one from an anvil by the player, we remove it
+            // si it is not displayed on hover on the wall.
+            if (mapItem.hasItemMeta() && mapItem.getItemMeta().hasDisplayName() && mapItem.getItemMeta().getDisplayName().startsWith("§r"))
+            {
+                final ItemStack frameItem = mapItem.clone();
+                final ItemMeta meta = frameItem.getItemMeta();
+
+                meta.setDisplayName(null);
+                frameItem.setItemMeta(meta);
+
+                frame.setItem(frameItem);
+            }
+
+            else frame.setItem(mapItem);
         }
 
         ItemUtils.consumeItem(player);
