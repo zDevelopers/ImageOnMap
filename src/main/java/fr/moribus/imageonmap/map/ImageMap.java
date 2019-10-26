@@ -68,15 +68,15 @@ public abstract class ImageMap implements ConfigurationSerializable
     }
     
     
-    public abstract short[] getMapsIDs();
-    public abstract boolean managesMap(short mapID);
+    public abstract int[] getMapsIDs();
+    public abstract boolean managesMap(int mapID);
     public abstract int getMapCount();
     
     public boolean managesMap(ItemStack item)
     {
         if(item == null) return false;
-        if(item.getType() != Material.MAP) return false;
-        return managesMap(item.getDurability());
+        if(item.getType() != Material.FILLED_MAP) return false;
+        return managesMap(MapManager.getMapIdFromItemStack(item));
     }
     
     public boolean give(Player player)

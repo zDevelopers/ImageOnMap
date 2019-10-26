@@ -19,12 +19,13 @@
 package fr.moribus.imageonmap.image;
 
 import fr.zcraft.zlib.tools.PluginLogger;
-import java.awt.image.BufferedImage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+
+import java.awt.image.BufferedImage;
 
 public class Renderer extends MapRenderer
 {
@@ -38,7 +39,7 @@ public class Renderer extends MapRenderer
         return false;
     }
     
-    static public void installRenderer(PosterImage image, short[] mapsIds)
+    static public void installRenderer(PosterImage image, int[] mapsIds)
     {
         for(int i = 0; i < mapsIds.length; i++)
         {
@@ -46,12 +47,12 @@ public class Renderer extends MapRenderer
         }
     }
     
-    static public void installRenderer(BufferedImage image, short mapID)
+    static public void installRenderer(BufferedImage image, int mapID)
     {
         MapView map = Bukkit.getMap(mapID);
         if(map == null)
         {
-            PluginLogger.warning("Could not install renderer for map {0} : the Minecraft map does not exist", mapID);
+            PluginLogger.warning("Could not install renderer for map {0}: the Minecraft map does not exist", mapID);
         }
         else
         {

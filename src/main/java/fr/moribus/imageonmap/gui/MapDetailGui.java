@@ -35,7 +35,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 
-public class MapDetailGui extends ExplorerGui<Short>
+public class MapDetailGui extends ExplorerGui<Integer>
 {
     private final ImageMap map;
 
@@ -47,7 +47,7 @@ public class MapDetailGui extends ExplorerGui<Short>
     @Override
     protected ItemStack getViewItem(int x, int y)
     {
-        final Material partMaterial = y % 2 == x % 2 ? Material.EMPTY_MAP : Material.PAPER;
+        final Material partMaterial = y % 2 == x % 2 ? Material.MAP : Material.PAPER;
 
         final ItemStackBuilder builder = new ItemStackBuilder(partMaterial)
                 .title(I.t(getPlayerLocale(), "{green}Map part"))
@@ -61,10 +61,10 @@ public class MapDetailGui extends ExplorerGui<Short>
     }
     
     @Override
-    protected ItemStack getViewItem(Short mapId)
+    protected ItemStack getViewItem(Integer mapId)
     {
         final int index = ((PosterMap) map).getIndex(mapId);
-        final Material partMaterial = index % 2 == 0 ? Material.EMPTY_MAP : Material.PAPER;
+        final Material partMaterial = index % 2 == 0 ? Material.MAP : Material.PAPER;
 
         final ItemStackBuilder builder = new ItemStackBuilder(partMaterial)
                 .title(I.t(getPlayerLocale(), "{green}Map part"))
@@ -95,7 +95,7 @@ public class MapDetailGui extends ExplorerGui<Short>
     }
 
     @Override
-    protected ItemStack getPickedUpItem(Short mapId)
+    protected ItemStack getPickedUpItem(Integer mapId)
     {
         if (!Permissions.GET.grantedTo(getPlayer()))
             return null;
@@ -149,7 +149,7 @@ public class MapDetailGui extends ExplorerGui<Short>
 
         if (canRename)
         {
-            action("rename", renameSlot, new ItemStackBuilder(Material.BOOK_AND_QUILL)
+            action("rename", renameSlot, new ItemStackBuilder(Material.WRITABLE_BOOK)
                     .title(I.t(getPlayerLocale(), "{blue}Rename this image"))
                     .longLore(I.t(getPlayerLocale(), "{gray}Click here to rename this image; this is used for your own organization."))
             );

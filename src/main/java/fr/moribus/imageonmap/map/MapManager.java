@@ -28,6 +28,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
@@ -53,7 +55,7 @@ abstract public class MapManager
         if(autosaveTask != null) autosaveTask.cancel();
     }
     
-    static public boolean managesMap(short mapID)
+    static public boolean managesMap(int mapID)
     {
         synchronized(playerMaps)
         {
@@ -68,7 +70,7 @@ abstract public class MapManager
     static public boolean managesMap(ItemStack item)
     {
         if(item == null) return false;
-        if(item.getType() != Material.MAP) return false;
+        if(item.getType() != Material.FILLED_MAP) return false;
         
         synchronized(playerMaps)
         {
@@ -80,14 +82,14 @@ abstract public class MapManager
         return false;
     }
 
-    static public ImageMap createMap(UUID playerUUID, short mapID) throws MapManagerException
+    static public ImageMap createMap(UUID playerUUID, int mapID) throws MapManagerException
     {
         ImageMap newMap = new SingleMap(playerUUID, mapID);
         addMap(newMap);
         return newMap;
     }
     
-    static public ImageMap createMap(PosterImage image, UUID playerUUID, short[] mapsIDs) throws MapManagerException
+    static public ImageMap createMap(PosterImage image, UUID playerUUID, int[] mapsIDs) throws MapManagerException
     {
         ImageMap newMap;
         if(image.getImagesCount() == 1)
@@ -102,14 +104,27 @@ abstract public class MapManager
         return newMap;
     }
     
-    static public short[] getNewMapsIds(int amount)
+    static public int[] getNewMapsIds(int amount)
     {
-        short[] mapsIds = new short[amount];
+        int[] mapsIds = new int[amount];
         for(int i = 0; i < amount; i++)
         {
             mapsIds[i] = Bukkit.createMap(Bukkit.getWorlds().get(0)).getId();
         }
         return mapsIds;
+    }
+
+    /**
+     * Returns the map ID from an ItemStack
+     * @param item The item stack
+     * @return The map ID, or 0 if invalid.
+     */
+    static public int getMapIdFromItemStack(final ItemStack item)
+    {
+        final ItemMeta meta = item.getItemMeta();
+        if (!(meta instanceof MapMeta)) return 0;
+
+        return ((MapMeta) meta).hasMapId() ? ((MapMeta) meta).getMapId() : 0;
     }
     
     static public void addMap(ImageMap map) throws MapManagerException
@@ -173,7 +188,7 @@ abstract public class MapManager
      * @param mapId The ID of the Minecraft map.
      * @return The {@link ImageMap}.
      */
-    static public ImageMap getMap(short mapId)
+    static public ImageMap getMap(int mapId)
     {
         synchronized(playerMaps)
         {
@@ -204,8 +219,8 @@ abstract public class MapManager
     static public ImageMap getMap(ItemStack item)
     {
         if(item == null) return null;
-        if(item.getType() != Material.MAP) return null;
-        return getMap(item.getDurability());
+        if(item.getType() != Material.FILLED_MAP) return null;
+        return getMap(getMapIdFromItemStack(item));
     }
     
     static public void clear(Inventory inventory)
@@ -312,7 +327,7 @@ abstract public class MapManager
      * @param mapId the map ID.
      * @return true if the given map ID is valid and exists in the current save, false otherwise.
      */
-    static public boolean mapIdExists(short mapId)
+    static public boolean mapIdExists(int mapId)
     {
         try
         {

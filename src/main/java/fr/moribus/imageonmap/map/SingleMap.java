@@ -18,33 +18,34 @@
 
 package fr.moribus.imageonmap.map;
 
+import org.bukkit.configuration.InvalidConfigurationException;
+
 import java.util.Map;
 import java.util.UUID;
-import org.bukkit.configuration.InvalidConfigurationException;
 
 public class SingleMap extends ImageMap
 {
-    protected final short mapID;
+    protected final int mapID;
     
-    public SingleMap(UUID ownerUUID, short mapID, String id, String name)
+    public SingleMap(UUID ownerUUID, int mapID, String id, String name)
     {
         super(ownerUUID, Type.SINGLE, id, name);
         this.mapID = mapID;
     }
     
-    public SingleMap(UUID ownerUUID, short mapID)
+    public SingleMap(UUID ownerUUID, int mapID)
     {
         this(ownerUUID, mapID, null, null);
     }
     
     @Override
-    public short[] getMapsIDs()
+    public int[] getMapsIDs()
     {
-        return new short[]{mapID};
+        return new int[]{mapID};
     }
 
     @Override
-    public boolean managesMap(short mapID)
+    public boolean managesMap(int mapID)
     {
         return this.mapID == mapID;
     }
@@ -60,8 +61,7 @@ public class SingleMap extends ImageMap
     public SingleMap(Map<String, Object> map, UUID userUUID) throws InvalidConfigurationException
     {
         super(map, userUUID, Type.SINGLE);
-        int _mapID = getFieldValue(map, "mapID");
-        mapID = (short) _mapID;//Meh
+        mapID = getFieldValue(map, "mapID");
     }
     
     @Override

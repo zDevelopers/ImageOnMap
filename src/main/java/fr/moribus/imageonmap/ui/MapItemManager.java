@@ -22,10 +22,14 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
+import fr.zcraft.zlib.components.attributes.Attributes;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.core.ZLib;
+import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.items.ItemUtils;
+import fr.zcraft.zlib.tools.reflection.NMSException;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
@@ -37,6 +41,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -114,54 +119,77 @@ public class MapItemManager implements Listener
         return givenItemsCount;
     }
     
-    static private boolean give(Player player, ItemStack item)
+    static private boolean give(final Player player, final ItemStack item)
     {
-        if(player.getInventory().firstEmpty() <= -1)
+        final int freeSlot = player.getInventory().firstEmpty();
+        if (freeSlot != -1)
         {
-            getCache(player).add(item);
-            return true;
+            player.getInventory().setItem(freeSlot, item);
+
+            // If this is a splatter map, we have to re-add the splatter attribute, because
+            // for some reason, the `addItem` or `setItem` methods removes the attribute in
+            // Minecraft 1.14+, breaking the auto-deploy feature.
+            if (SplatterMapManager.hasSplatterAttributes(item))
+            {
+                try
+                {
+                    Attributes.set(player.getInventory().getItem(freeSlot), new SplatterMapManager.Attribute());
+                }
+                catch (NMSException e)
+                {
+                    PluginLogger.error("Unable to add back attribute to splatter map");
+                }
+            }
+
+            return false;
         }
         else
         {
-            player.getInventory().addItem(item);
-            return false;
+            ItemUtils.drop(player.getLocation(), item);
+            return true;
         }
     }
     
     static public ItemStack createMapItem(SingleMap map)
     {
-        return createMapItem(map.getMapsIDs()[0], map.getName());
+        return createMapItem(map.getMapsIDs()[0], map.getName(), false);
     }
     
     static public ItemStack createMapItem(PosterMap map, int index)
     {
-        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = index.
-        return createMapItem(map.getMapIdAt(index), getMapTitle(map, index));
+        return createMapItem(map.getMapIdAt(index), getMapTitle(map, index), true);
     }
     
     static public ItemStack createMapItem(PosterMap map, int x, int y)
     {
-        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
-        return createMapItem(map.getMapIdAt(x, y),  getMapTitle(map, y, x));
+        return createMapItem(map.getMapIdAt(x, y),  getMapTitle(map, y, x), true);
     }
     
     static public String getMapTitle(PosterMap map, int row, int column)
     {
+        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
         return I.t("{0} (row {1}, column {2})", map.getName(), row + 1, column + 1);
     }
     
     static public String getMapTitle(PosterMap map, int index)
     {
+        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = index.
         return I.t("{0} (part {1})", map.getName(), index + 1);
     }
     
-    static public ItemStack createMapItem(short mapID, String text)
+    static public ItemStack createMapItem(int mapID, String text, boolean isMapPart)
     {
-        return new ItemStackBuilder(Material.MAP)
-                .data(mapID)
+        final ItemStack mapItem = new ItemStackBuilder(Material.FILLED_MAP)
                 .title(text)
                 .hideAttributes()
                 .item();
+
+        final MapMeta meta = (MapMeta) mapItem.getItemMeta();
+        meta.setMapId(mapID);
+        meta.setColor(isMapPart ? Color.LIME : Color.GREEN);
+        mapItem.setItemMeta(meta);
+
+        return mapItem;
     }
 
     /**
@@ -188,7 +216,7 @@ public class MapItemManager implements Listener
                 throw new ArrayIndexOutOfBoundsException(); // Coherence
             }
 
-            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName());
+            return createMapItem(map.getMapsIDs()[0], map.getName(), false);
         }
     }
     
@@ -218,7 +246,7 @@ public class MapItemManager implements Listener
         else
         {
             PosterMap poster = (PosterMap) map;
-            int index = poster.getIndex(item.getDurability());
+            int index = poster.getIndex(MapManager.getMapIdFromItemStack(item));
             if(poster.hasColumnData())
                 return getMapTitle(poster, poster.getRowAt(index), poster.getColumnAt(index));
             
@@ -228,19 +256,20 @@ public class MapItemManager implements Listener
     
     static private void onItemFramePlace(ItemFrame frame, Player player, PlayerInteractEntityEvent event)
     {
+        final ItemStack mapItem = player.getInventory().getItemInMainHand();
+
         if(frame.getItem().getType() != Material.AIR) return;
-        if(!MapManager.managesMap(player.getItemInHand())) return;
+        if(!MapManager.managesMap(mapItem)) return;
         event.setCancelled(true);
-        
-        if(SplatterMapManager.hasSplatterAttributes(player.getItemInHand()))
+
+        if(SplatterMapManager.hasSplatterAttributes(mapItem))
         {
             if(!SplatterMapManager.placeSplatterMap(frame, player))
                 return;
         }
         else
         {
-            ItemStack is = new ItemStack(Material.MAP, 1, player.getItemInHand().getDurability());
-            frame.setItem(is);
+            frame.setItem(player.getInventory().getItemInMainHand());
         }
         
         ItemUtils.consumeItem(player);
@@ -249,7 +278,7 @@ public class MapItemManager implements Listener
     static private void onItemFrameRemove(ItemFrame frame, Player player, EntityDamageByEntityEvent event)
     {
         ItemStack item = frame.getItem();
-        if(frame.getItem().getType() != Material.MAP) return;
+        if(frame.getItem().getType() != Material.FILLED_MAP) return;
         
         if(player.isSneaking())
         {
@@ -274,22 +303,19 @@ public class MapItemManager implements Listener
         
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     static public void onEntityDamage(EntityDamageByEntityEvent event)
     {
-        if(event.isCancelled()) return;
         if(!(event.getEntity() instanceof ItemFrame)) return;
         if(!(event.getDamager() instanceof Player)) return;
         
         onItemFrameRemove((ItemFrame)event.getEntity(), (Player)event.getDamager(), event);
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     static public void onEntityInteract(PlayerInteractEntityEvent event)
     {
-        if(event.isCancelled()) return;
         if(!(event.getRightClicked() instanceof ItemFrame)) return;
-        
         onItemFramePlace((ItemFrame)event.getRightClicked(), event.getPlayer(), event);
     }
 }

@@ -60,12 +60,12 @@ public class ImageIOExecutor extends Worker
         });
     }
     
-    static public void saveImage(short mapID, BufferedImage image)
+    static public void saveImage(int mapID, BufferedImage image)
     {
         saveImage(ImageOnMap.getPlugin().getImageFile(mapID), image);
     }
     
-    static public void saveImage(short[] mapsIDs, PosterImage image)
+    static public void saveImage(int[] mapsIDs, PosterImage image)
     {
         for(int i = 0, c = mapsIDs.length; i < c; i++)
         {
@@ -75,7 +75,7 @@ public class ImageIOExecutor extends Worker
     
     static public void deleteImage(ImageMap map)
     {
-        short[] mapsIDs = map.getMapsIDs();
+        int[] mapsIDs = map.getMapsIDs();
         for(int i = 0, c = mapsIDs.length; i < c; i++)
         {
             deleteImage(ImageOnMap.getPlugin().getImageFile(mapsIDs[i]));

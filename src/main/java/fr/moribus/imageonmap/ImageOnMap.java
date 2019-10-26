@@ -18,13 +18,7 @@
 
 package fr.moribus.imageonmap;
 
-import fr.moribus.imageonmap.commands.maptool.DeleteCommand;
-import fr.moribus.imageonmap.commands.maptool.ExploreCommand;
-import fr.moribus.imageonmap.commands.maptool.GetCommand;
-import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
-import fr.moribus.imageonmap.commands.maptool.ListCommand;
-import fr.moribus.imageonmap.commands.maptool.MigrateCommand;
-import fr.moribus.imageonmap.commands.maptool.NewCommand;
+import fr.moribus.imageonmap.commands.maptool.*;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
@@ -64,7 +58,7 @@ public final class ImageOnMap extends ZPlugin
     
     public File getImagesDirectory() {return imagesDirectory;}
     public File getMapsDirectory() {return mapsDirectory;}
-    public File getImageFile(short mapID)
+    public File getImageFile(int mapID)
     {
         return new File(imagesDirectory, "map"+mapID+".png");
     }
@@ -79,7 +73,7 @@ public final class ImageOnMap extends ZPlugin
             imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
             checkPluginDirectory(mapsDirectory);
         }
-        catch(IOException ex)
+        catch(final IOException ex)
         {
             PluginLogger.error("FATAL: " + ex.getMessage());
             this.setEnabled(false);

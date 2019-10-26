@@ -18,21 +18,28 @@
 
 package fr.moribus.imageonmap.ui;
 
+import com.google.common.collect.ImmutableMap;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
-import fr.zcraft.zlib.components.gui.GuiUtils;
+import fr.zcraft.zlib.components.attributes.Attributes;
 import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.tools.items.GlowEffect;
+import fr.zcraft.zlib.components.nbt.NBTException;
+import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
+import fr.zcraft.zlib.tools.reflection.NMSException;
 import fr.zcraft.zlib.tools.world.FlatLocation;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
+
+import java.util.UUID;
 
 abstract public class SplatterMapManager 
 {
@@ -40,8 +47,7 @@ abstract public class SplatterMapManager
     
     static public ItemStack makeSplatterMap(PosterMap map)
     {
-        return new ItemStackBuilder(Material.MAP)
-                .data(map.getMapIdAt(0))
+        final ItemStack splatter = new ItemStackBuilder(Material.FILLED_MAP)
                 .title(ChatColor.GOLD, map.getName()).title(ChatColor.DARK_GRAY, " - ").title(ChatColor.GRAY, I.t("Splatter Map"))
                 .loreLine(ChatColor.GRAY, map.getId())
                 .loreLine()
@@ -52,17 +58,32 @@ abstract public class SplatterMapManager
                 .loreLine()
                  /// Title in a splatter map tooltip
                 .loreLine(ChatColor.BLUE, I.t("How to use this?"))
-                .lore(GuiUtils.generateLore(ChatColor.GRAY + I.t("Place empty item frames on a wall, enough to host the whole map. Then, right-click on the bottom-left frame with this map.")))
+                .longLore(ChatColor.GRAY + I.t("Place empty item frames on a wall, enough to host the whole map. Then, right-click on the bottom-left frame with this map."))
                 .loreLine()
-                .lore(GuiUtils.generateLore(ChatColor.GRAY + I.t("Shift-click one of the placed maps to remove the whole poster in one shot.")))
-                .glow()
+                .longLore(ChatColor.GRAY + I.t("Shift-click one of the placed maps to remove the whole poster in one shot."))
                 .hideAttributes()
-                .item();
+                .craftItem();
+
+        final MapMeta meta = (MapMeta) splatter.getItemMeta();
+        meta.setMapId(map.getMapIdAt(0));
+        meta.setColor(Color.GREEN);
+        splatter.setItemMeta(meta);
+
+        try
+        {
+            Attributes.set(splatter, new Attribute());
+        }
+        catch (NBTException | NMSException e)
+        {
+            PluginLogger.error("Unable to set Splatter Map attribute on item", e);
+        }
+
+        return splatter;
     }
     
     static public boolean hasSplatterAttributes(ItemStack itemStack)
     {
-        return GlowEffect.hasGlow(itemStack);
+        return Attribute.hasAttribute(itemStack);
     }
     
     static public boolean isSplatterMap(ItemStack itemStack)
@@ -86,10 +107,11 @@ abstract public class SplatterMapManager
     
     static public boolean placeSplatterMap(ItemFrame startFrame, Player player)
     {
-        ImageMap map = MapManager.getMap(player.getItemInHand());
-        if(map == null || !(map instanceof PosterMap)) return false;
+        ImageMap map = MapManager.getMap(player.getInventory().getItemInMainHand());
+
+        if(!(map instanceof PosterMap)) return false;
         PosterMap poster = (PosterMap) map;
-        
+
         FlatLocation startLocation = new FlatLocation(startFrame.getLocation(), startFrame.getFacing());
         FlatLocation endLocation = startLocation.clone().add(poster.getColumnCount(), poster.getRowCount());
         PosterWall wall = new PosterWall();
@@ -106,8 +128,8 @@ abstract public class SplatterMapManager
         int i = 0;
         for(ItemFrame frame : wall.frames)
         {
-            short id = poster.getMapIdAtReverseY(i);
-            frame.setItem(new ItemStack(Material.MAP, 1, id));
+            int id = poster.getMapIdAtReverseY(i);
+            frame.setItem(new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
             MapInitEvent.initMap(id);
             ++i;
         }
@@ -117,12 +139,12 @@ abstract public class SplatterMapManager
     
     static public PosterMap removeSplatterMap(ItemFrame startFrame)
     {
-        ImageMap map = MapManager.getMap(startFrame.getItem());
-        if(map == null || !(map instanceof PosterMap)) return null;
+        final ImageMap map = MapManager.getMap(startFrame.getItem());
+        if(!(map instanceof PosterMap)) return null;
         PosterMap poster = (PosterMap) map;
         if(!poster.hasColumnData()) return null;
         FlatLocation loc = new FlatLocation(startFrame.getLocation(), startFrame.getFacing());
-        ItemFrame[] matchingFrames = PosterWall.getMatchingMapFrames(poster, loc, startFrame.getItem().getDurability());
+        ItemFrame[] matchingFrames = PosterWall.getMatchingMapFrames(poster, loc, MapManager.getMapIdFromItemStack(startFrame.getItem()));
         if(matchingFrames == null) return null;
         
         for(ItemFrame frame : matchingFrames)
@@ -131,5 +153,30 @@ abstract public class SplatterMapManager
         }
         
         return poster;
+    }
+
+
+    static public class Attribute extends fr.zcraft.zlib.components.attributes.Attribute
+    {
+        static public final UUID SPLATTER_MAP_UUID = UUID.fromString("260ae1b3-4b24-40a0-a30d-67ad84b7bdb2");
+
+        Attribute()
+        {
+            setUUID(SPLATTER_MAP_UUID);
+            setCustomData("splatter-map");
+        }
+
+        static boolean hasAttribute(final ItemStack item)
+        {
+            try
+            {
+                return Attributes.get(item, SPLATTER_MAP_UUID) != null;
+            }
+            catch (NMSException | NBTException ex)
+            {
+                PluginLogger.warning("Error while retrieving SplatterMap Attribute data", ex);
+                return false;
+            }
+        }
     }
 }

@@ -19,24 +19,25 @@
 package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.zlib.core.ZLib;
-import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
+
+import java.io.File;
 
 public class MapInitEvent implements Listener
 {
@@ -54,7 +55,7 @@ public class MapInitEvent implements Listener
         
         for(Player player : Bukkit.getOnlinePlayers())
         {
-            initMap(player.getItemInHand());
+            initMap(player.getInventory().getItemInMainHand());
         }
     }
     
@@ -78,10 +79,10 @@ public class MapInitEvent implements Listener
     }
     
     @EventHandler
-    public void onPlayerPickup(PlayerPickupItemEvent event)
+    public void onPlayerPickup(EntityPickupItemEvent event)
     {
-        ItemStack item = event.getItem().getItemStack();
-        initMap(item);
+        if (!(event.getEntity() instanceof HumanEntity)) return;
+        initMap(event.getItem().getItemStack());
     }
     
     @EventHandler
@@ -99,15 +100,15 @@ public class MapInitEvent implements Listener
     
     static public void initMap(ItemStack item)
     {
-        if (item != null && item.getType() == Material.MAP)
+        if (item != null && item.getType() == Material.FILLED_MAP)
         {
-            initMap(item.getDurability());
+            initMap(MapManager.getMapIdFromItemStack(item));
         }
     }
     
-    static public void initMap(short id)
+    static public void initMap(int id)
     {
-        initMap(Bukkit.getMap(id));
+        initMap(Bukkit.getServer().getMap(id));
     }
     
     static public void initMap(MapView map)

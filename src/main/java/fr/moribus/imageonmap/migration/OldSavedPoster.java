@@ -21,11 +21,13 @@ package fr.moribus.imageonmap.migration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.InvalidConfigurationException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 class OldSavedPoster 
 {
@@ -78,7 +80,11 @@ class OldSavedPoster
     
     public ImageMap toImageMap(UUID userUUID)
     {
-        return new PosterMap(userUUID, mapsIds, null, "poster", 0, 0);
+        // Converts the maps IDs to int as MC 1.13.2+ uses integer ids
+        final int[] mapsIdsInt = new int[mapsIds.length];
+        Arrays.setAll(mapsIdsInt, i -> mapsIds[i]);
+
+        return new PosterMap(userUUID, mapsIdsInt, null, "poster", 0, 0);
     }
     
     public void serialize(Configuration configuration)

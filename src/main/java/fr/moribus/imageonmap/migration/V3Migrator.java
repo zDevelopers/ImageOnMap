@@ -23,6 +23,8 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.mojang.UUIDFetcher;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -37,14 +39,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.UUID;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class represents and executes the ImageOnMap v3.x migration process
@@ -427,7 +423,7 @@ public class V3Migrator implements Runnable
         ArrayDeque<OldSavedMap> remainingMaps = new ArrayDeque<>();
         ArrayDeque<OldSavedPoster> remainingPosters = new ArrayDeque<>();
         
-        ArrayDeque<Short> missingMapIds = new ArrayDeque<>();
+        ArrayDeque<Integer> missingMapIds = new ArrayDeque<>();
         
         UUID playerUUID;
         OldSavedMap map;
@@ -441,7 +437,7 @@ public class V3Migrator implements Runnable
             }
             else if(!map.isMapValid())
             {
-                missingMapIds.add(map.getMapId());
+                missingMapIds.add((int) map.getMapId());
             }
             else
             {
@@ -461,7 +457,7 @@ public class V3Migrator implements Runnable
             }
             else if(!poster.isMapValid())
             {
-                missingMapIds.addAll(Arrays.asList(ArrayUtils.toObject(poster.getMapsIds())));
+                missingMapIds.addAll(Arrays.stream(ArrayUtils.toObject(poster.getMapsIds())).map(id -> (int) id).collect(Collectors.toList()));
             }
             else
             {

@@ -29,8 +29,10 @@ import fr.zcraft.zlib.components.gui.ExplorerGui;
 import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
 
 
 public class MapListGui extends ExplorerGui<ImageMap>
@@ -58,34 +60,41 @@ public class MapListGui extends ExplorerGui<ImageMap>
                 mapDescription = I.t(getPlayerLocale(), "{white}Poster map ({0} parts)", poster.getMapCount());
             }
         }
-        ItemStackBuilder builder = new ItemStackBuilder(Material.MAP)
+
+        ItemStackBuilder builder = new ItemStackBuilder(Material.FILLED_MAP)
                 /// Displayed title of a map on the list GUI
-                .title(I.t(getPlayerLocale(), "{green}{bold}{0}", map.getName()))
+                .title(I.tl(getPlayerLocale(), "{green}{bold}{0}", map.getName()))
 
                 .lore(mapDescription)
                 .loreLine()
                 /// Map ID displayed in the tooltip of a map on the list GUI
-                .lore(I.t(getPlayerLocale(), "{gray}Map ID: {0}", map.getId()))
+                .lore(I.tl(getPlayerLocale(), "{gray}Map ID: {0}", map.getId()))
                 .loreLine();
 
         if (Permissions.GET.grantedTo(getPlayer()))
-            builder.lore(I.t(getPlayerLocale(), "{gray}» {white}Left-click{gray} to get this map"));
+            builder.lore(I.tl(getPlayerLocale(), "{gray}» {white}Left-click{gray} to get this map"));
 
-        builder.lore(I.t(getPlayerLocale(), "{gray}» {white}Right-click{gray} for details and options"));
+        builder.lore(I.tl(getPlayerLocale(), "{gray}» {white}Right-click{gray} for details and options"));
 
-        return builder.item();
+        final ItemStack mapItem = builder.item();
+
+        final MapMeta meta = (MapMeta) mapItem.getItemMeta();
+        meta.setColor(Color.GREEN);
+        mapItem.setItemMeta(meta);
+
+        return mapItem;
     }
 
     @Override
     protected ItemStack getEmptyViewItem()
     {
         ItemStackBuilder builder = new ItemStackBuilder(Material.BARRIER)
-                .title(I.t(getPlayerLocale(), "{red}You don't have any map."));
+                .title(I.tl(getPlayerLocale(), "{red}You don't have any map."));
 
         if (Permissions.NEW.grantedTo(getPlayer()))
-            builder.longLore(I.t(getPlayerLocale(), "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"));
+            builder.longLore(I.tl(getPlayerLocale(), "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"));
         else
-            builder.longLore(I.t(getPlayerLocale(), "{gray}Unfortunately, you are not allowed to create one."));
+            builder.longLore(I.tl(getPlayerLocale(), "{gray}Unfortunately, you are not allowed to create one."));
 
         return builder.item();
     }
@@ -104,7 +113,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
 
         if (map instanceof SingleMap)
         {
-            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName());
+            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName(), false);
         }
         else if (map instanceof PosterMap)
         {
@@ -128,7 +137,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
         setData(maps);
 
         /// The maps list GUI title
-        setTitle(I.t(getPlayerLocale(), "{black}Your maps {reset}({0})", maps.length));
+        setTitle(I.tl(getPlayerLocale(), "{black}Your maps {reset}({0})", maps.length));
 
         setKeepHorizontalScrollingSpace(true);
 
