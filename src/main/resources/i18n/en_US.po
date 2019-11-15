@@ -560,10 +560,16 @@ msgid "Item frames needed"
 msgstr "Item frames needed"
 
 #. Size of a map stored in a splatter map
-#: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:50
+#: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:56
 #, java-format
 msgid "{0} × {1}"
 msgstr "{0} × {1}"
+
+#. Size of a map stored in a splatter map, including the total frames count
+#: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:62
+#, java-format
+msgid "{0} × {1} (total {2} frames)"
+msgstr "{0} × {1} (total {2} frames)"
 
 #. Title in a splatter map tooltip
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:53

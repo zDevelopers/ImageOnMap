@@ -31,6 +31,7 @@ import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.i18n.I18n;
 import fr.zcraft.zlib.core.ZPlugin;
 import fr.zcraft.zlib.tools.PluginLogger;
+import fr.zcraft.zlib.tools.UpdateChecker;
 
 import java.io.File;
 import java.io.IOException;
@@ -105,6 +106,8 @@ public final class ImageOnMap extends ZPlugin
 
         Commands.registerShortcut("maptool", NewCommand.class, "tomap");
         Commands.registerShortcut("maptool", ExploreCommand.class, "maps");
+
+        UpdateChecker.boot("imageonmap.26585");
     }
 
     @Override

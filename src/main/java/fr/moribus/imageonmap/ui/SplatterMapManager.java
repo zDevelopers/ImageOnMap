@@ -49,19 +49,23 @@ abstract public class SplatterMapManager
     static public ItemStack makeSplatterMap(PosterMap map)
     {
         final ItemStack splatter = new ItemStackBuilder(Material.FILLED_MAP)
-                .title(ChatColor.GOLD, map.getName()).title(ChatColor.DARK_GRAY, " - ").title(ChatColor.GRAY, I.t("Splatter Map"))
+                .title(ChatColor.GOLD, map.getName())
+                    .title(ChatColor.DARK_GRAY, " - ")
+                    .title(ChatColor.GRAY, I.t("Splatter Map"))
+                    .title(ChatColor.DARK_GRAY, " - ")
+                    .title(ChatColor.GRAY, I.t("{0} × {1}", map.getColumnCount(), map.getRowCount()))
                 .loreLine(ChatColor.GRAY, map.getId())
                 .loreLine()
                  /// Title in a splatter map tooltip
                 .loreLine(ChatColor.BLUE, I.t("Item frames needed"))
                  /// Size of a map stored in a splatter map
-                .loreLine(ChatColor.GRAY, I.t("{0} × {1}", map.getColumnCount(), map.getRowCount()))
+                .loreLine(ChatColor.GRAY, I.t("{0} × {1} (total {2} frames)", map.getColumnCount(), map.getRowCount(), map.getColumnCount() * map.getRowCount()))
                 .loreLine()
                  /// Title in a splatter map tooltip
                 .loreLine(ChatColor.BLUE, I.t("How to use this?"))
-                .longLore(ChatColor.GRAY + I.t("Place empty item frames on a wall, enough to host the whole map. Then, right-click on the bottom-left frame with this map."))
+                .longLore(ChatColor.GRAY + I.t("Place empty item frames on a wall, enough to host the whole map. Then, right-click on the bottom-left frame with this map."), 40)
                 .loreLine()
-                .longLore(ChatColor.GRAY + I.t("Shift-click one of the placed maps to remove the whole poster in one shot."))
+                .longLore(ChatColor.GRAY + I.t("Shift-click one of the placed maps to remove the whole poster in one shot."), 40)
                 .hideAttributes()
                 .craftItem();
 
