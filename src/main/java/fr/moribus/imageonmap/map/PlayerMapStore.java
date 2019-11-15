@@ -182,6 +182,11 @@ public class PlayerMapStore implements ConfigurationSerializable
     {
         return this.mapCount;
     }
+
+    public synchronized int getImagesCount()
+    {
+        return this.mapList.size();
+    }
     
     /* ****** Serializing ***** */
     

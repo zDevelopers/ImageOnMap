@@ -32,6 +32,7 @@ import fr.zcraft.zlib.components.i18n.I18n;
 import fr.zcraft.zlib.core.ZPlugin;
 import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.UpdateChecker;
+import org.bstats.bukkit.Metrics;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public final class ImageOnMap extends ZPlugin
     static private final String IMAGES_DIRECTORY_NAME = "images";
     static private final String MAPS_DIRECTORY_NAME = "maps";
     static private ImageOnMap plugin;
-    
+
     private File imagesDirectory;
     private final File mapsDirectory;
 
@@ -86,7 +87,6 @@ public final class ImageOnMap extends ZPlugin
         loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class, ImageRendererExecutor.class);
         
         //Init all the things !
-        MetricsLite.startMetrics();
         I18n.setPrimaryLocale(PluginConfiguration.LANG.get());
 
         MapManager.init();
@@ -108,6 +108,11 @@ public final class ImageOnMap extends ZPlugin
         Commands.registerShortcut("maptool", ExploreCommand.class, "maps");
 
         UpdateChecker.boot("imageonmap.26585");
+
+        final Metrics metrics = new Metrics(this);
+
+        metrics.addCustomChart(new Metrics.SingleLineChart("rendered-images", MapManager::getImagesCount));
+        metrics.addCustomChart(new Metrics.SingleLineChart("used-minecraft-maps", MapManager::getMapCount));
     }
 
     @Override

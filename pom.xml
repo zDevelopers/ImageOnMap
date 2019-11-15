@@ -17,11 +17,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.4</version>
                 <configuration>
                     <artifactSet>
                         <includes>
                             <include>fr.zcraft:zlib</include>
+                            <include>org.bstats:bstats-bukkit</include>
                         </includes>
                     </artifactSet>
                     <relocations>
@@ -29,7 +30,12 @@
                             <pattern>fr.zcraft.zlib</pattern>
                             <shadedPattern>fr.moribus.imageonmap</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>fr.moribus.imageonmap</shadedPattern>
+                        </relocation>
                     </relocations>
+                    <minimizeJar>true</minimizeJar>
                 </configuration>
                 <executions>
                     <execution>
@@ -52,6 +58,12 @@
             <id>zDevelopers</id>
             <url>http://maven.carrade.eu/artifactory/snapshots</url>
         </repository>
+
+        <!-- bStats -->
+        <repository>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -67,9 +79,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>fr.zcraft</groupId>
-            <artifactId>zlib</artifactId>
-            <version>0.99-SNAPSHOT</version>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>1.5</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

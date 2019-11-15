@@ -321,6 +321,24 @@ abstract public class MapManager
         }
         return mapCount;
     }
+
+    /**
+     * Returns the total number of images rendered by ImageOnMap.
+     *
+     * @return The count.
+     */
+    static public int getImagesCount()
+    {
+        int imagesCount = 0;
+        synchronized(playerMaps)
+        {
+            for(PlayerMapStore tStore : playerMaps)
+            {
+                imagesCount += tStore.getImagesCount();
+            }
+        }
+        return imagesCount;
+    }
     
     /**
      * Returns if the given map ID is valid and exists in the current save.
