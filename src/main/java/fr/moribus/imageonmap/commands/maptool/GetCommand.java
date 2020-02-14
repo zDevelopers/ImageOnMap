@@ -18,15 +18,16 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import java.util.List;
+
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.i18n.I;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import java.util.List;
 
 @CommandInfo (name = "get")
 public class GetCommand extends IoMCommand
