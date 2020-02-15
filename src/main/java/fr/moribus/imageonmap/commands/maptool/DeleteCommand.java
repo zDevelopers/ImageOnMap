@@ -43,6 +43,7 @@ public class DeleteCommand extends IoMCommand
     protected void run() throws CommandException
     {
         ImageMap map = getMapFromArgs();
+        Player player = playerSender();
 
         if (!hasFlag("confirm"))
         {
@@ -61,7 +62,6 @@ public class DeleteCommand extends IoMCommand
         }
         else
         {
-            Player player = playerSender();
             MapManager.clear(player.getInventory(), map);
 
             try
