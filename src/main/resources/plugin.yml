@@ -24,7 +24,6 @@ permissions:
             imageonmap.explore: true
             imageonmap.rename: true
             imageonmap.delete: true
-            imageonmap.administrative: false
 
     imageonmap.userender:
         description: "Allows you to use /tomap and related commands (/maptool getremaing). Alias of imageonmap.new."
