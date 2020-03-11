@@ -113,6 +113,15 @@ You will find amongst the new features:
 
 - Fixed permissions support by adding a full set of permissions for every action of the plugin.
 
+### 4.0 (Upcoming)
+Compatibility with 1.15, backcompatibility dropped for a moment, (use 4.0 pre1 for now).
+
+You can now place a map on the ground or on a ceilling.
+Fixed various bugs
+Added a GUI for easy map editing (old command still working)
+Added permissions:
+- SizeLimit
+- Admin/moderator command
 
 
 ## Data collection
