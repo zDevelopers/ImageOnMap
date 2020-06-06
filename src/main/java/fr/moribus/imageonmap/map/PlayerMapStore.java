@@ -263,6 +263,7 @@ public class PlayerMapStore implements ConfigurationSerializable
         try 
         {
             getToolConfig().save(mapsFile);
+
         } 
         catch (IOException ex) 
         {

@@ -229,19 +229,20 @@ public class MapItemManager implements Listener
         if (frame.getItem().getType() != Material.AIR) return;
         if (!MapManager.managesMap(mapItem)) return;
 
-        event.setCancelled(true);
 
         if (SplatterMapManager.hasSplatterAttributes(mapItem))
         {
-            if (!SplatterMapManager.placeSplatterMap(frame, player))
-                return;
+            if (!SplatterMapManager.placeSplatterMap(frame, player,event)){
+                event.setCancelled(true); //In case of an error allow to cancel map placement
+                return;}
         }
         else
         {
             // If the item has a display name, bot not one from an anvil by the player, we remove it
-            // si it is not displayed on hover on the wall.
+            // If it is not displayed on hover on the wall.
             if (mapItem.hasItemMeta() && mapItem.getItemMeta().hasDisplayName() && mapItem.getItemMeta().getDisplayName().startsWith("§r"))
             {
+
                 final ItemStack frameItem = mapItem.clone();
                 final ItemMeta meta = frameItem.getItemMeta();
 
@@ -251,8 +252,12 @@ public class MapItemManager implements Listener
                 frame.setItem(frameItem);
             }
 
-            else frame.setItem(mapItem);
+            else{
+                frame.setItem(mapItem);
+            }
+
         }
+
 
         ItemUtils.consumeItem(player);
     }
@@ -264,7 +269,7 @@ public class MapItemManager implements Listener
 
         if (player.isSneaking())
         {
-            PosterMap poster = SplatterMapManager.removeSplatterMap(frame);
+            PosterMap poster = SplatterMapManager.removeSplatterMap(frame,player);
             if (poster != null)
             {
                 event.setCancelled(true);

@@ -19,7 +19,6 @@
 package fr.moribus.imageonmap.ui;
 
 import fr.moribus.imageonmap.map.PosterMap;
-import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.world.FlatLocation;
 import fr.zcraft.zlib.tools.world.WorldUtils;
 import org.bukkit.Location;
@@ -45,9 +44,7 @@ public class PosterWall
         
         int distX = FlatLocation.flatBlockDistanceX(loc1, loc2);
         int distY = FlatLocation.flatBlockDistanceY(loc1, loc2);
-        
-        PluginLogger.info("dist X "+distX);
-        PluginLogger.info("dist Y "+distY);
+
         frames = new ItemFrame[distX * distY];
         
         for(int x = 0; x < distX; x++)
@@ -68,9 +65,7 @@ public class PosterWall
     
     public void expand()
     {
-        
-        
-        
+
     }
     
     static public ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, int mapId)

@@ -93,7 +93,6 @@ public class Renderer extends MapRenderer
     {
         //Render only once to avoid overloading the server
         if (image == null) return;
-        
         canvas.drawImage(0, 0, image);
         image = null;
     }

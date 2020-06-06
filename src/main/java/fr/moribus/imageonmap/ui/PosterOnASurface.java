@@ -39,33 +39,29 @@ public class PosterOnASurface {
 
 	public boolean isValid(Player p) {
 		ItemFrame curFrame;
-		PluginLogger.info("Test");
+
 
 		FlatLocation l = loc1.clone();
 
 		BlockFace bf = WorldUtils.get4thOrientation(p.getLocation());
 
 		l.subtract(loc2);
-		;
+
 
 		int distX = Math.abs(l.getBlockX());
 		int distZ = Math.abs(l.getBlockZ());
-		PluginLogger.info("dist X " + distX);
-		PluginLogger.info("dist Z " + distZ);
+
 		frames = new ItemFrame[distX * distZ];
 		l = loc1.clone();
 		for (int x = 0; x < distX; x++) {
 			for (int z = 0; z < distZ; z++) {
-				PluginLogger.info("X=" + l.getBlockX() + " Z= " + l.getBlockZ());
 
-				PluginLogger.info(l.toString() + "  " + l.getFacing().name());
 				curFrame = getEmptyFrameAt(l, l.getFacing());
 
 				if (curFrame == null)
 					return false;
-				PluginLogger.info("x " + x + " | z " + z);
+
 				frames[z * distX + x] = curFrame;
-				PluginLogger.info("ind frame " + z * distX + x);
 
 				switch (bf) {
 				case NORTH:
@@ -74,12 +70,12 @@ public class PosterOnASurface {
 					break;
 				case EAST:
 				case WEST:
-					l.addH(-1, 0, bf);
+					l.addH(1, 0, bf);
 					break;
-
 				}
 
 			}
+
 			switch (bf) {
 			case NORTH:
 			case SOUTH:
@@ -87,13 +83,10 @@ public class PosterOnASurface {
 				break;
 			case EAST:
 			case WEST:
-				l.addH(distX, -1, bf);
+				l.addH(-distZ, 1, bf);
 				break;
-
 			}
-
 		}
-
 		return true;
 	}
 
@@ -101,28 +94,76 @@ public class PosterOnASurface {
 
 	}
 
+	/**
+	 * Return the list of map Frames associated with a specific map
+	 * */
 	static public ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, int mapId, BlockFace bf) {
 		int mapIndex = map.getIndex(mapId);
 		int x = map.getColumnAt(mapIndex), y = map.getRowAt(mapIndex);
 
-		return getMatchingMapFrames(map, location.clone().addH(-x, y,bf),bf);
+		PluginLogger.info("x = "+x+" y = "+y);
+		return getMatchingMapFrames(map, location.clone().addH(x, y,bf),bf);
 	}
 
 	static public ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, BlockFace bf) {
 		ItemFrame[] frames = new ItemFrame[map.getMapCount()];
 		FlatLocation loc = location.clone();
 
-		for (int y = 0; y < map.getRowCount(); ++y) {
-			for (int x = 0; x < map.getColumnCount(); ++x) {
+		PluginLogger.info("loc = "+location+ " bf = "+bf);
+
+		int X=0;
+		int Y=0;
+		switch (bf){
+			case EAST:
+			case WEST:
+				/* X=map.getRowCount();
+				 Y=map.getColumnCount();
+				break;*/
+			case NORTH:
+			case SOUTH:
+
+				 Y=map.getRowCount();
+				 X=map.getColumnCount();
+				break;
+
+		}
+		PluginLogger.info("max: X: "+X+" Y:"+Y);
+		for (int y = 0; y < Y; ++y) {
+			for (int x = 0; x < X; ++x) {
+				PluginLogger.info("x: "+x+" y:"+y);
 				int mapIndex = map.getIndexAt(x, y);
+				PluginLogger.info("map index "+mapIndex);
+				//PluginLogger.info("loc= "+loc);
 				ItemFrame frame = getMapFrameAt(loc, map);
+				PluginLogger.info("frame= "+frame.getLocation());
 				if (frame != null)
 					frames[mapIndex] = frame;
-				loc.add(1, 0);
+				switch (bf){
+					case EAST:
+					case WEST:
+						loc.addH( 0,1,bf);
+						break;
+					case NORTH:
+					case SOUTH:
+						loc.addH( 1,0,bf);
+						break;
+				}
+
+
 			}
-			loc.setX(location.getX());
-			loc.setZ(location.getZ());
-			loc.addH(0, -1,bf);
+
+			switch (bf){
+				case EAST:
+				case WEST:
+					loc.addH( -1,-map.getRowCount(),bf);//test
+					//loc.addH( -map.getRowCount(),-1,bf);
+					break;
+				case NORTH:
+				case SOUTH:
+					loc.addH(-map.getColumnCount(), -1,bf);
+					break;
+			}
+
 		}
 
 		return frames;

@@ -21,8 +21,6 @@ package fr.moribus.imageonmap.map;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.InvalidConfigurationException;
 
-import fr.zcraft.zlib.tools.PluginLogger;
-
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -132,26 +130,24 @@ public class PosterMap extends ImageMap {
 		return mapsIDs[y * columnCount + x];
 	}
 
+
 	public int getMapIdAtReverseY(int index) {
 		int x = index % (columnCount);
 		int y = index / (columnCount);
 		return getMapIdAt(x, rowCount - y - 1);
 	}
 
+
 	public int getMapIdAtReverseZ(int index, BlockFace orientation, BlockFace bf) {
 		int x = 0, y = 0;
 		switch (bf) {
 		case UP:
-
 			x = index % (columnCount);
 			y = index / (columnCount);
-
 			break;
 		case DOWN:
-
 			x = (columnCount - 1) - index % (columnCount);
 			y = index / (columnCount);
-
 			break;
 		}
 

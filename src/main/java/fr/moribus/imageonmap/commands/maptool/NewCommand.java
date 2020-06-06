@@ -75,34 +75,37 @@ public class NewCommand  extends IoMCommand
                 default: throwInvalidArgument(I.t("Invalid Stretching mode.")); break;
             }
         }
-        
-        ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));
-        ImageRendererExecutor.render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>()
-        {
-            @Override
-            public void finished(ImageMap result)
-            {
-                ActionBar.removeMessage(player);
-                MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Rendering finished!"));
+        try {
 
-                if (result.give(player) && (result instanceof PosterMap && !((PosterMap) result).hasColumnData()))
-                {
-                    info(I.t("The rendered map was too big to fit in your inventory."));
-                    info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+
+            ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));
+            ImageRendererExecutor.render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>() {
+                @Override
+                public void finished(ImageMap result) {
+                    ActionBar.removeMessage(player);
+                    MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Rendering finished!"));
+
+                    if (result.give(player) && (result instanceof PosterMap && !((PosterMap) result).hasColumnData())) {
+                        info(I.t("The rendered map was too big to fit in your inventory."));
+                        info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+                    }
                 }
-            }
 
-            @Override
-            public void errored(Throwable exception)
-            {
-                player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
+                @Override
+                public void errored(Throwable exception) {
+                    player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
 
-                PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
-                        player.getName(),
-                        exception.getClass().getCanonicalName(),
-                        exception.getMessage());
-            }
-        });
+                    PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
+                            player.getName(),
+                            exception.getClass().getCanonicalName(),
+                            exception.getMessage());
+                }
+            });
+        }
+        //Added to fix bug with rendering displaying after error
+        finally {
+            ActionBar.removeMessage(player);
+        }
     }
 
     @Override

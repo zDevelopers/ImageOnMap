@@ -34,7 +34,6 @@ import fr.zcraft.zlib.tools.reflection.NMSException;
 import fr.zcraft.zlib.tools.text.MessageSender;
 import fr.zcraft.zlib.tools.world.FlatLocation;
 import fr.zcraft.zlib.tools.world.WorldUtils;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -42,6 +41,7 @@ import org.bukkit.Rotation;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
@@ -51,6 +51,12 @@ abstract public class SplatterMapManager {
 	}
 
 	static public ItemStack makeSplatterMap(PosterMap map) {
+		String s="";
+		for(Byte b:I.t("Splatter Map").getBytes()){
+			s+=b+" ";
+		}
+		PluginLogger.info(""+s);
+
 		final ItemStack splatter = new ItemStackBuilder(Material.FILLED_MAP).title(ChatColor.GOLD, map.getName())
 				.title(ChatColor.DARK_GRAY, " - ").title(ChatColor.GRAY, I.t("Splatter Map"))
 				.title(ChatColor.DARK_GRAY, " - ")
@@ -145,10 +151,19 @@ abstract public class SplatterMapManager {
 		}
 	}
 
+	/**
+	 * Return true if it is a platter map
+	 *
+	 * @param itemStack
+	 *            The item to check.
+	 * @return True if is a splatter map
+	 */
 	static public boolean isSplatterMap(ItemStack itemStack) {
 		return hasSplatterAttributes(itemStack) && MapManager.managesMap(itemStack);
 	}
 
+
+	//TODO doc a faire
 	static public boolean hasSplatterMap(Player player, PosterMap map) {
 		Inventory playerInventory = player.getInventory();
 
@@ -161,90 +176,93 @@ abstract public class SplatterMapManager {
 		return false;
 	}
 
-	static public boolean placeSplatterMap(ItemFrame startFrame, Player player) {
+	/**
+	 *  Place a splatter map
+	 *
+	 * @param startFrame
+	 * 			Frame clicked by the player
+	 * @param player
+	 * 			Player placing map
+	 * @return true if the map was correctly placed
+	 */
+	static public boolean placeSplatterMap(ItemFrame startFrame, Player player, PlayerInteractEntityEvent event) {
 		ImageMap map = MapManager.getMap(player.getInventory().getItemInMainHand());
 
 		if (!(map instanceof PosterMap))
 			return false;
 		PosterMap poster = (PosterMap) map;
 		PosterWall wall = new PosterWall();
-		// NEW
-		if (startFrame.getFacing().equals(BlockFace.DOWN) || startFrame.getFacing().equals(BlockFace.UP)) {
-			PluginLogger.info("UP or DOWN ");
 
+		if (startFrame.getFacing().equals(BlockFace.DOWN) || startFrame.getFacing().equals(BlockFace.UP)) {
+			// If it is on floor or ceiling
 			PosterOnASurface surface = new PosterOnASurface();
 			FlatLocation startLocation = new FlatLocation(startFrame.getLocation(), startFrame.getFacing());
 			FlatLocation endLocation = startLocation.clone().addH(poster.getColumnCount(), poster.getRowCount(),
 					WorldUtils.get4thOrientation(player.getLocation()));
-			PluginLogger.info("Before loc asign  ");
+
 			surface.loc1 = startLocation;
 			surface.loc2 = endLocation;
-			PluginLogger.info("After loc asign  ");
 
-			// todo impletation
 			if (!surface.isValid(player)) {
 				MessageSender.sendActionBarMessage(player,
 						I.t("{ce}There is not enough space to place this map ({0} × {1}).", poster.getColumnCount(),
 								poster.getRowCount()));
+
+
 				return false;
 			}
 
 			int i = 0;
 			for (ItemFrame frame : surface.frames) {
-				PluginLogger.info("Test  " + frame.getName());
 				BlockFace bf = WorldUtils.get4thOrientation(player.getLocation());
 				int id = poster.getMapIdAtReverseZ(i, bf, startFrame.getFacing());
-
-				Rotation rot = frame.getRotation();
-
-				// NESW
-				//PluginLogger.info("ordinal " + rot.ordinal() );
-				/*switch(bf){
-				case NORTH:
-					frame.setRotation(Rotation.NONE);
-					break;
-				case EAST:
-					frame.setRotation(Rotation.CLOCKWISE);
-					break;
-				case SOUTH:
-					frame.setRotation(Rotation.FLIPPED);
-					break;
-				case WEST:
-					frame.setRotation(Rotation.COUNTER_CLOCKWISE);
-					break;
-				}*/
-				PluginLogger.info("bf ordinal "+ bf.ordinal());
-				while (rot.ordinal() != 2*bf.ordinal()) {
-					rot = rot.rotateClockwise();
-					//PluginLogger.info("Rotation ordinal " + rot.ordinal() + "  bf ordinal " + bf.ordinal());
-					frame.setRotation(rot);
+				Rotation rot = Rotation.NONE;
+				switch(frame.getFacing()){
+					case UP:
+						break;
+					case DOWN:
+						rot = Rotation.FLIPPED;
+						break;
 				}
-				switch (bf) {
-				case UP:
-					
-					frame.setRotation(rot);
-					break;
-				case DOWN:
-					rot=rot.rotateClockwise().rotateClockwise();
-					frame.setRotation(rot);
-					break;
-				}
-				
-				rot = frame.getRotation();
-
-				
-				//PluginLogger.info("ordinal " + rot.ordinal() );
+				//Rotation management relative to player rotation the default position is North, when on ceiling we flipped the rotation
 				frame.setItem(new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+				frame.setRotation(Rotation.CLOCKWISE);
+				switch(bf) {
+					case NORTH:
+						if(frame.getFacing()==BlockFace.DOWN){
+							rot = rot.rotateClockwise();
+							rot = rot.rotateClockwise();
+						}
+						frame.setRotation(rot);
+						break;
+					case EAST:
+						rot = rot.rotateClockwise();
+						frame.setRotation(rot);
+						break;
+					case SOUTH:
+						if(frame.getFacing()==BlockFace.UP){
+							rot = rot.rotateClockwise();
+							rot = rot.rotateClockwise();
+						}
+						frame.setRotation(rot);
+						break;
+					case WEST:
+						rot = rot.rotateCounterClockwise();
+						frame.setRotation(rot);
+						break;
+				}
+
 				MapInitEvent.initMap(id);
-				++i;
+				i++;
 			}
 		} else {
+			// If it is on a wall NSEW
 			FlatLocation startLocation = new FlatLocation(startFrame.getLocation(), startFrame.getFacing());
 			FlatLocation endLocation = startLocation.clone().add(poster.getColumnCount(), poster.getRowCount());
 
 			wall.loc1 = startLocation;
 			wall.loc2 = endLocation;
-			PluginLogger.info("startLocation " + startLocation + " | endLocation " + endLocation);
+
 			if (!wall.isValid()) {
 				MessageSender.sendActionBarMessage(player,
 						I.t("{ce}There is not enough space to place this map ({0} × {1}).", poster.getColumnCount(),
@@ -254,8 +272,15 @@ abstract public class SplatterMapManager {
 
 			int i = 0;
 			for (ItemFrame frame : wall.frames) {
+
 				int id = poster.getMapIdAtReverseY(i);
 				frame.setItem(new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+
+				//Force reset of rotation
+				if(i==0){//First map need to be rotate one time Clockwise
+					frame.setRotation(Rotation.NONE.rotateCounterClockwise());
+				}
+				else{frame.setRotation(Rotation.NONE);}
 				MapInitEvent.initMap(id);
 				++i;
 			}
@@ -263,7 +288,16 @@ abstract public class SplatterMapManager {
 		return true;
 	}
 
-	static public PosterMap removeSplatterMap(ItemFrame startFrame) {
+	/**
+	 * Remove splattermap
+	 *
+	 * @param startFrame
+	 * 			Frame clicked by the player
+	 * @param player
+	 * 			The player removing the map
+	 * @return
+	 */
+	static public PosterMap removeSplatterMap(ItemFrame startFrame, Player player) {
 		final ImageMap map = MapManager.getMap(startFrame.getItem());
 		if (!(map instanceof PosterMap))
 			return null;
@@ -272,21 +306,21 @@ abstract public class SplatterMapManager {
 			return null;
 		FlatLocation loc = new FlatLocation(startFrame.getLocation(), startFrame.getFacing());
 		ItemFrame[] matchingFrames=null;
+
 		switch(startFrame.getFacing()){
-		case UP:
-		case DOWN:
-			 matchingFrames = PosterOnASurface.getMatchingMapFrames(poster, loc,
-					MapManager.getMapIdFromItemStack(startFrame.getItem()),startFrame.getFacing());
-			break;
-		case NORTH:
-		case SOUTH:
-		case EAST:
-		case WEST:
-			 matchingFrames = PosterWall.getMatchingMapFrames(poster, loc,
+			case UP:
+			case DOWN:
+                matchingFrames = PosterOnASurface.getMatchingMapFrames(poster, loc,
+                        MapManager.getMapIdFromItemStack(startFrame.getItem()),WorldUtils.get4thOrientation(player.getLocation()));//startFrame.getFacing());
+                break;
+
+			case NORTH:
+			case SOUTH:
+			case EAST:
+			case WEST:
+			 	matchingFrames = PosterWall.getMatchingMapFrames(poster, loc,
 					MapManager.getMapIdFromItemStack(startFrame.getItem()));
-			
 		}
-		
 
 		if (matchingFrames == null)
 			return null;
