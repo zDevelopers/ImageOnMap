@@ -107,12 +107,18 @@ public final class ImageOnMap extends ZPlugin
         Commands.registerShortcut("maptool", NewCommand.class, "tomap");
         Commands.registerShortcut("maptool", ExploreCommand.class, "maps");
 
-        UpdateChecker.boot("imageonmap.26585");
+        if (PluginConfiguration.CHECK_FOR_UPDATES.get())
+        {
+            UpdateChecker.boot("imageonmap.26585");
+        }
 
-        final Metrics metrics = new Metrics(this);
+        if (PluginConfiguration.COLLECT_DATA.get())
+        {
+            final Metrics metrics = new Metrics(this);
 
-        metrics.addCustomChart(new Metrics.SingleLineChart("rendered-images", MapManager::getImagesCount));
-        metrics.addCustomChart(new Metrics.SingleLineChart("used-minecraft-maps", MapManager::getMapCount));
+            metrics.addCustomChart(new Metrics.SingleLineChart("rendered-images", MapManager::getImagesCount));
+            metrics.addCustomChart(new Metrics.SingleLineChart("used-minecraft-maps", MapManager::getMapCount));
+        }
     }
 
     @Override

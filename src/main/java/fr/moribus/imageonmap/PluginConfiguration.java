@@ -31,6 +31,7 @@ public final class PluginConfiguration extends Configuration
     static public ConfigurationItem<Locale> LANG = item("lang", Locale.class);
 
     static public ConfigurationItem<Boolean> COLLECT_DATA = item("collect-data", true);
+    static public ConfigurationItem<Boolean> CHECK_FOR_UPDATES = item("check-for-updates", true);
 
     static public ConfigurationItem<Integer> MAP_GLOBAL_LIMIT = item("map-global-limit", 0, "Limit-map-by-server");
     static public ConfigurationItem<Integer> MAP_PLAYER_LIMIT = item("map-player-limit", 0, "Limit-map-by-player");
