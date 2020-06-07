@@ -121,9 +121,8 @@ Backcompatibility is dropped for now but in the future we will try to bring it b
 The new features added to ImageOnMap for the 4.0 are:
 - You can now place a map on the ground or on a ceilling.
 - Fixed bug with splattermap that throw an exception
-- Fixed another bug that allow to get from a vanilla map a splatter map that will have issues in rendering
 - Fixed renderer issues when putting a map other player don't see the bottom left corner
-
+- Added Russian and German (thx to Danechek and to ...)
 ## Data collection
 
 We use metrics to collect basic information about the usage of this plugin. This can be disabled by setting `collect-data` to false in `config.yml`.
