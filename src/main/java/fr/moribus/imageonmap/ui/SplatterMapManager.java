@@ -226,31 +226,38 @@ abstract public class SplatterMapManager {
 				}
 				//Rotation management relative to player rotation the default position is North, when on ceiling we flipped the rotation
 				frame.setItem(new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
-				frame.setRotation(Rotation.CLOCKWISE);
-				switch(bf) {
-					case NORTH:
-						if(frame.getFacing()==BlockFace.DOWN){
-							rot = rot.rotateClockwise();
-							rot = rot.rotateClockwise();
-						}
-						frame.setRotation(rot);
-						break;
-					case EAST:
-						rot = rot.rotateClockwise();
-						frame.setRotation(rot);
-						break;
-					case SOUTH:
-						if(frame.getFacing()==BlockFace.UP){
-							rot = rot.rotateClockwise();
-							rot = rot.rotateClockwise();
-						}
-						frame.setRotation(rot);
-						break;
-					case WEST:
-						rot = rot.rotateCounterClockwise();
-						frame.setRotation(rot);
-						break;
+				if(i==0){//First map need to be rotate one time CounterClockwise
+					rot=rot.rotateCounterClockwise();
 				}
+
+					switch (bf) {
+						case NORTH:
+							if (frame.getFacing() == BlockFace.DOWN) {
+								rot = rot.rotateClockwise();
+								rot = rot.rotateClockwise();
+							}
+							frame.setRotation(rot);
+							break;
+						case EAST:
+							rot = rot.rotateClockwise();
+							frame.setRotation(rot);
+							break;
+						case SOUTH:
+							if (frame.getFacing() == BlockFace.UP) {
+								rot = rot.rotateClockwise();
+								rot = rot.rotateClockwise();
+							}
+							frame.setRotation(rot);
+							break;
+						case WEST:
+							rot = rot.rotateCounterClockwise();
+							frame.setRotation(rot);
+							break;
+					}
+
+
+
+
 
 				MapInitEvent.initMap(id);
 				i++;
