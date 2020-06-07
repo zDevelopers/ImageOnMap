@@ -122,10 +122,7 @@ The new features added to ImageOnMap for the 4.0 are:
 - You can now place a map on the ground or on a ceilling.
 - Fixed bug with splattermap that throw an exception
 - Fixed another bug that allow to get from a vanilla map a splatter map that will have issues in rendering
-- Added a GUI for easy map editing (old command still working)
-- Added permissions:
-  - SizeLimit
-  - Admin/moderator command
+- Fixed renderer issues when putting a map other player don't see the bottom left corner
 
 ## Data collection
 
