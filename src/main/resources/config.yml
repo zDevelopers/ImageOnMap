@@ -2,7 +2,7 @@
 
 
 # Plugin language. Empty: system language.
-# Available: en_US (default, fallback) and fr_FR.
+# Available: en-US (default, fallback) and fr-FR.
 lang:
 
 
