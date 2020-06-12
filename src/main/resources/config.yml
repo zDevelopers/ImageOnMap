@@ -25,3 +25,4 @@ limit-map-size-y: 0
 
 #Should the full image be saved when a map is rendered?
 save-full-image: false
+
