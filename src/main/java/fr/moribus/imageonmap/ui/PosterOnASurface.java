@@ -99,10 +99,19 @@ public class PosterOnASurface {
 	 * */
 	static public ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, int mapId, BlockFace bf) {
 		int mapIndex = map.getIndex(mapId);
-		int x = map.getColumnAt(mapIndex), y = map.getRowAt(mapIndex);
-
-		PluginLogger.info("x = "+x+" y = "+y);
-		return getMatchingMapFrames(map, location.clone().addH(x, y,bf),bf);
+		//int x = map.getColumnAt(mapIndex), y = map.getRowAt(mapIndex);
+		int x=0,y=0;
+		switch(bf){
+			case EAST:
+			case WEST:
+				y=map.getColumnCount()-1;
+				break;
+			case NORTH:
+			case SOUTH:
+				y=map.getRowCount()-1;
+				break;
+		}
+		return getMatchingMapFrames(map, location.clone().addH(x, y,bf),bf).clone();
 	}
 
 	static public ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, BlockFace bf) {
@@ -116,24 +125,25 @@ public class PosterOnASurface {
 		switch (bf){
 			case EAST:
 			case WEST:
-				/* X=map.getRowCount();
-				 Y=map.getColumnCount();
+				/*X=map.getRowCount();
+				Y=map.getColumnCount();
 				break;*/
 			case NORTH:
 			case SOUTH:
 
-				 Y=map.getRowCount();
-				 X=map.getColumnCount();
+				Y=map.getRowCount();
+				X=map.getColumnCount();
 				break;
 
 		}
+
 		PluginLogger.info("max: X: "+X+" Y:"+Y);
 		for (int y = 0; y < Y; ++y) {
 			for (int x = 0; x < X; ++x) {
 				PluginLogger.info("x: "+x+" y:"+y);
 				int mapIndex = map.getIndexAt(x, y);
 				PluginLogger.info("map index "+mapIndex);
-				//PluginLogger.info("loc= "+loc);
+
 				ItemFrame frame = getMapFrameAt(loc, map);
 				PluginLogger.info("frame= "+frame.getLocation());
 				if (frame != null)
@@ -141,7 +151,7 @@ public class PosterOnASurface {
 				switch (bf){
 					case EAST:
 					case WEST:
-						loc.addH( 0,1,bf);
+						loc.addH( 0,-1,bf);
 						break;
 					case NORTH:
 					case SOUTH:
@@ -155,8 +165,8 @@ public class PosterOnASurface {
 			switch (bf){
 				case EAST:
 				case WEST:
-					loc.addH( -1,-map.getRowCount(),bf);//test
-					//loc.addH( -map.getRowCount(),-1,bf);
+					loc.addH( 1,map.getColumnCount(),bf);//test
+
 					break;
 				case NORTH:
 				case SOUTH:

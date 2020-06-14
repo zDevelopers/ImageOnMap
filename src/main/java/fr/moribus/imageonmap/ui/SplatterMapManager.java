@@ -139,11 +139,9 @@ abstract public class SplatterMapManager {
 			final NBTCompound nbt = NBT.fromItemStack(itemStack);
 			if (!nbt.containsKey("Enchantments"))
 				return false;
-
 			final Object enchantments = nbt.get("Enchantments");
 			if (!(enchantments instanceof NBTList))
 				return false;
-
 			return !((NBTList) enchantments).isEmpty();
 		} catch (NMSException e) {
 			PluginLogger.error("Unable to get Splatter Map attribute on item", e);
@@ -159,6 +157,7 @@ abstract public class SplatterMapManager {
 	 * @return True if is a splatter map
 	 */
 	static public boolean isSplatterMap(ItemStack itemStack) {
+		if(itemStack==null) return false;
 		return hasSplatterAttributes(itemStack) && MapManager.managesMap(itemStack);
 	}
 
