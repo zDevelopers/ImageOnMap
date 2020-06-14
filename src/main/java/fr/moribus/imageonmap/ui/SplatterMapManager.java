@@ -51,11 +51,8 @@ abstract public class SplatterMapManager {
 	}
 
 	static public ItemStack makeSplatterMap(PosterMap map) {
-		String s="";
-		for(Byte b:I.t("Splatter Map").getBytes()){
-			s+=b+" ";
-		}
-		PluginLogger.info(""+s);
+
+
 
 		final ItemStack splatter = new ItemStackBuilder(Material.FILLED_MAP).title(ChatColor.GOLD, map.getName())
 				.title(ChatColor.DARK_GRAY, " - ").title(ChatColor.GRAY, I.t("Splatter Map"))

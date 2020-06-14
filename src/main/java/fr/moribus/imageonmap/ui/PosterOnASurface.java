@@ -19,7 +19,6 @@
 package fr.moribus.imageonmap.ui;
 
 import fr.moribus.imageonmap.map.PosterMap;
-import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.world.FlatLocation;
 import fr.zcraft.zlib.tools.world.WorldUtils;
 import org.bukkit.Location;
@@ -118,7 +117,7 @@ public class PosterOnASurface {
 		ItemFrame[] frames = new ItemFrame[map.getMapCount()];
 		FlatLocation loc = location.clone();
 
-		PluginLogger.info("loc = "+location+ " bf = "+bf);
+
 
 		int X=0;
 		int Y=0;
@@ -137,15 +136,11 @@ public class PosterOnASurface {
 
 		}
 
-		PluginLogger.info("max: X: "+X+" Y:"+Y);
 		for (int y = 0; y < Y; ++y) {
 			for (int x = 0; x < X; ++x) {
-				PluginLogger.info("x: "+x+" y:"+y);
 				int mapIndex = map.getIndexAt(x, y);
-				PluginLogger.info("map index "+mapIndex);
 
 				ItemFrame frame = getMapFrameAt(loc, map);
-				PluginLogger.info("frame= "+frame.getLocation());
 				if (frame != null)
 					frames[mapIndex] = frame;
 				switch (bf){
