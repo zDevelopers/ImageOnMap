@@ -1,10 +1,10 @@
 <#if licenseFirst??>
 ${licenseFirst}
 </#if>
-${licensePrefix}Copyright (C) 2013 Moribus
-${licensePrefix}Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
-${licensePrefix}Copyright (C) 2016-2020 Amaury Carrade <amaury@carrade.eu>
-${licensePrefix}Copyright (C) 2019-2020 Vlammar
+${licensePrefix}Copyright or © or Copr. Moribus (2013)
+${licensePrefix}Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
+${licensePrefix}Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2020)
+${licensePrefix}Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2020)
 ${licensePrefix?replace(" +$", "", "r")}
 ${licensePrefix}This software is a computer program whose purpose is to allow insertion of
 ${licensePrefix}custom images in a Minecraft word.
