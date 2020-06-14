@@ -18,11 +18,6 @@ map-global-limit: 0
 map-player-limit: 0
 
 
-#Limit to the size of map non operator can render
-#The value is the number of map used for the image for instance if you make a map 10 X 12 you will get 120 maps
-map-size-notop-limit: 256
-
-
 #Maximum size in pixels for an image to be. 0 is unlimited.
 limit-map-size-x: 0
 limit-map-size-y: 0

@@ -85,7 +85,7 @@ public abstract class ImageMap implements ConfigurationSerializable
         return MapItemManager.give(player, this);
     }
     
-    public static File getFullImageFile(short mapIDstart, short mapIDend)
+    public static File getFullImageFile(int mapIDstart, int mapIDend)
     {
         return new File(ImageOnMap.getPlugin().getImagesDirectory(), "_"+mapIDstart+"-"+mapIDend+".png");
     }

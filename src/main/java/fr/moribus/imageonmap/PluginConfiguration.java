@@ -36,8 +36,6 @@ public final class PluginConfiguration extends Configuration
 
     static public ConfigurationItem<Integer> MAP_GLOBAL_LIMIT = item("map-global-limit", 0, "Limit-map-by-server");
     static public ConfigurationItem<Integer> MAP_PLAYER_LIMIT = item("map-player-limit", 0, "Limit-map-by-player");
-    
-    static public ConfigurationItem<Integer> MAP_SIZE_NOTOP_LIMIT = item("map-size-notop-limit", 0, "Size-limit-map-notop");
 
     static public ConfigurationItem<Boolean> SAVE_FULL_IMAGE = item("save-full-image", true);
 

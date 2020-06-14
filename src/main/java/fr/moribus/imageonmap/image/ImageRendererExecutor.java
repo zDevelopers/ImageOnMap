@@ -18,7 +18,6 @@
 
 package fr.moribus.imageonmap.image;
 
-import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
@@ -27,9 +26,9 @@ import fr.zcraft.zlib.components.worker.Worker;
 import fr.zcraft.zlib.components.worker.WorkerAttributes;
 import fr.zcraft.zlib.components.worker.WorkerCallback;
 import fr.zcraft.zlib.components.worker.WorkerRunnable;
+import org.bukkit.Bukkit;
 
 import javax.imageio.ImageIO;
-import org.bukkit.Bukkit;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -139,7 +138,6 @@ public class ImageRendererExecutor extends Worker
         
         if(PluginConfiguration.SAVE_FULL_IMAGE.get()) {
         	ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
-     
         }
         
         submitToMainThread(new Callable<Void>()
