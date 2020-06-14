@@ -20,18 +20,13 @@ package fr.moribus.imageonmap.commands.maptool;
 
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
+import fr.moribus.imageonmap.gui.RenderGui;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.ImageUtils;
-import fr.moribus.imageonmap.map.ImageMap;
-import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.components.worker.WorkerCallback;
-import fr.zcraft.zlib.tools.PluginLogger;
-import fr.zcraft.zlib.tools.text.ActionBar;
-import fr.zcraft.zlib.tools.text.MessageSender;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -61,48 +56,30 @@ public class NewCommand  extends IoMCommand
             return;
         }
         
-        if(args.length >= 2)
+        if (args.length >= 2)
         {
-            if(args.length >= 4) {
+            if (args.length >= 4) {
                 width = Integer.parseInt(args[2]);
                 height = Integer.parseInt(args[3]);
             }
 
-            switch(args[1]) {
+            switch (args[1]) {
                 case "resize": scaling = ImageUtils.ScalingType.CONTAINED; break;
                 case "resize-stretched": scaling = ImageUtils.ScalingType.STRETCHED; break;
                 case "resize-covered": scaling = ImageUtils.ScalingType.COVERED; break;
                 default: throwInvalidArgument(I.t("Invalid Stretching mode.")); break;
             }
         }
-        
-        ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));
-        ImageRendererExecutor.render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>()
+
+        // TODO Add a per-player toggle for the GUI.
+        if (args.length >= 2)
         {
-            @Override
-            public void finished(ImageMap result)
-            {
-                ActionBar.removeMessage(player);
-                MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Rendering finished!"));
-
-                if (result.give(player) && (result instanceof PosterMap && !((PosterMap) result).hasColumnData()))
-                {
-                    info(I.t("The rendered map was too big to fit in your inventory."));
-                    info(I.t("Use '/maptool getremaining' to get the remaining maps."));
-                }
-            }
-
-            @Override
-            public void errored(Throwable exception)
-            {
-                player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
-
-                PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
-                        player.getName(),
-                        exception.getClass().getCanonicalName(),
-                        exception.getMessage());
-            }
-        });
+            ImageRendererExecutor.renderAndNotify(url, scaling, player.getUniqueId(), width, height);
+        }
+        else
+        {
+            Gui.open(player, new RenderGui(url));
+        }
     }
 
     @Override

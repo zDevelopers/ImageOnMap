@@ -20,11 +20,18 @@ package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.components.worker.Worker;
 import fr.zcraft.zlib.components.worker.WorkerAttributes;
 import fr.zcraft.zlib.components.worker.WorkerCallback;
 import fr.zcraft.zlib.components.worker.WorkerRunnable;
+import fr.zcraft.zlib.tools.PluginLogger;
+import fr.zcraft.zlib.tools.text.ActionBar;
+import fr.zcraft.zlib.tools.text.MessageSender;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -41,6 +48,42 @@ import java.util.concurrent.Future;
 @WorkerAttributes (name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker
 {
+    static public void renderAndNotify(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID, final int width, final int height)
+    {
+        final Player player = Bukkit.getPlayer(playerUUID);
+        if (player == null) return;
+
+        ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));
+
+        render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>()
+        {
+            @Override
+            public void finished(ImageMap result)
+            {
+                ActionBar.removeMessage(player);
+                MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Rendering finished!"));
+
+                if (result.give(player) && (result instanceof PosterMap && !((PosterMap) result).hasColumnData()))
+                {
+                    player.sendMessage(ChatColor.GRAY + I.t("The rendered map was too big to fit in your inventory."));
+                    player.sendMessage(ChatColor.GRAY + I.t("Use '/maptool getremaining' to get the remaining maps."));
+                }
+            }
+
+            @Override
+            public void errored(Throwable exception)
+            {
+                ActionBar.removeMessage(player);
+                player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
+
+                PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
+                        player.getName(),
+                        exception.getClass().getCanonicalName(),
+                        exception.getMessage());
+            }
+        });
+    }
+
     static public void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID, final int width, final int height, WorkerCallback<ImageMap> callback)
     {
         submitQuery(new WorkerRunnable<ImageMap>()
