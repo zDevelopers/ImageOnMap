@@ -1,7 +1,11 @@
 /*
- * Copyright or © or Copr. AmauryCarrade (2015)
+ * Copyright or © or Copr. Moribus (2013)
+ * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2020)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2020)
  *
- * http://amaury.carrade.eu
+ * This software is a computer program whose purpose is to allow insertion of
+ * custom images in a Minecraft world.
  *
  * This software is governed by the CeCILL-B license under French law and
  * abiding by the rules of distribution of free software.  You can  use,

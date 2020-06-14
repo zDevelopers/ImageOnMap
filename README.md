@@ -14,7 +14,7 @@ ImageOnMap allows you to load a picture from the Internet to a Minecraft map.
 - Your image will be centered.
 - You can put your map in an item frame.
 
-This plugin is a free software licenced under the GNU General Public License (version 3 or above). You can also get unstable development builds here.
+This plugin is a free software licenced under the [CeCILL-B licence](https://cecill.info/licences/Licence_CeCILL-B_V1-en.html) (BSD-style in French law).
 
 
 ## Quick guide
@@ -113,8 +113,19 @@ You will find amongst the new features:
 
 - Fixed permissions support by adding a full set of permissions for every action of the plugin.
 
+### 4.0 (Upcoming)
+The 4.0 is a bit light in content but we have unified part of the plugin (splatter map) and we have make various change to zLib, next update should be bigger and will add more stuff (thumbnail, optimization, possibility to deploy and place item frame in creative, creating interactive map that can run a command if you click on a specific frame...).
+Despite the changes to zLib we have a lot of things to refactor in order to keep version older than 1.15 working.
+Backcompatibility is dropped for now but in the future we will try to bring it back, (use 4.0 pre1 for now :( ).
 
+The new features added to ImageOnMap for the 4.0 are:
+- You can now place a map on the ground or on a ceilling.
+- Fixed a bug where UTf8 char got bugged
+- Fixed bug with splattermap that throw an exception
+- Fixed renderer issues when putting a map other player don't see the bottom left corner
+- Added Russian and German (thx to Danechek and to ...)
 
+- Compatible with 1.15 (pre2)
 ## Data collection
 
 We use metrics to collect basic information about the usage of this plugin. This can be disabled by setting `collect-data` to false in `config.yml`.

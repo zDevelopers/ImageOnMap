@@ -1,19 +1,37 @@
 /*
- * Copyright (C) 2013 Moribus
- * Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
+ * Copyright or © or Copr. Moribus (2013)
+ * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2020)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2020)
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This software is a computer program whose purpose is to allow insertion of
+ * custom images in a Minecraft world.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
  */
 
 package fr.moribus.imageonmap.gui;
@@ -29,13 +47,9 @@ import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Dye;
 
-import java.util.Arrays;
 import java.util.Random;
 
 
@@ -106,7 +120,7 @@ public class ConfirmDeleteMapGui extends ActionGui
 
         /* ** Item representation of the image being deleted ** */
 
-        action("", 13, new ItemStackBuilder(Material.EMPTY_MAP)
+        action("", 13, new ItemStackBuilder(Material.FILLED_MAP)
                  /// The title of the map deletion item
                 .title(I.t(getPlayerLocale(), "{red}You're about to destroy this map..."))
                  /// The end, in the lore, of a title starting with “You're about to destroy this map...”.
@@ -134,32 +148,21 @@ public class ConfirmDeleteMapGui extends ActionGui
 
     private ItemStack createDeleteSubButton()
     {
-        // Orange? Nooo. In the real world this is red. True story.
-        return createSubButton(DyeColor.ORANGE, ChatColor.RED + "Delete the map", DELETE_MESSAGES);
+        return createSubButton(Material.RED_STAINED_GLASS_PANE, ChatColor.RED + "Delete the map", DELETE_MESSAGES);
     }
 
     private ItemStack createCancelSubButton()
     {
-        // YES. Purple = lime. BECAUSE. Just accept it.
-        return createSubButton(DyeColor.PURPLE, ChatColor.GREEN + "Cancel", CANCEL_MESSAGES);
+        return createSubButton(Material.LIME_STAINED_GLASS_PANE, ChatColor.GREEN + "Cancel", CANCEL_MESSAGES);
     }
 
-    private ItemStack createSubButton(DyeColor color, String title, String[] messages)
+    private ItemStack createSubButton(Material color, String title, String[] messages)
     {
-        Dye pane = new Dye(Material.STAINED_GLASS_PANE);
-        pane.setColor(color);
-
-        ItemStack subButton = pane.toItemStack(1);
-        ItemMeta meta = subButton.getItemMeta();
-
-        meta.setDisplayName(title);
-        meta.setLore(Arrays.asList(
-                "",
-                ChatColor.GRAY + messages[random.nextInt(messages.length)]
-        ));
-
-        subButton.setItemMeta(meta);
-        return subButton;
+        return new ItemStackBuilder(color)
+                .title(title)
+                .loreSeparator()
+                .longLore(ChatColor.GRAY + messages[random.nextInt(messages.length)])
+                .item();
     }
 
     @GuiAction ("cancel")

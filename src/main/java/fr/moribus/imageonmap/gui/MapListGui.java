@@ -1,19 +1,37 @@
 /*
- * Copyright (C) 2013 Moribus
- * Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
+ * Copyright or © or Copr. Moribus (2013)
+ * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2020)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2020)
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This software is a computer program whose purpose is to allow insertion of
+ * custom images in a Minecraft world.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
  */
 package fr.moribus.imageonmap.gui;
 
@@ -29,8 +47,10 @@ import fr.zcraft.zlib.components.gui.ExplorerGui;
 import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.MapMeta;
 
 
 public class MapListGui extends ExplorerGui<ImageMap>
@@ -58,34 +78,41 @@ public class MapListGui extends ExplorerGui<ImageMap>
                 mapDescription = I.t(getPlayerLocale(), "{white}Poster map ({0} parts)", poster.getMapCount());
             }
         }
-        ItemStackBuilder builder = new ItemStackBuilder(Material.MAP)
+
+        ItemStackBuilder builder = new ItemStackBuilder(Material.FILLED_MAP)
                 /// Displayed title of a map on the list GUI
-                .title(I.t(getPlayerLocale(), "{green}{bold}{0}", map.getName()))
+                .title(I.tl(getPlayerLocale(), "{green}{bold}{0}", map.getName()))
 
                 .lore(mapDescription)
                 .loreLine()
                 /// Map ID displayed in the tooltip of a map on the list GUI
-                .lore(I.t(getPlayerLocale(), "{gray}Map ID: {0}", map.getId()))
+                .lore(I.tl(getPlayerLocale(), "{gray}Map ID: {0}", map.getId()))
                 .loreLine();
 
         if (Permissions.GET.grantedTo(getPlayer()))
-            builder.lore(I.t(getPlayerLocale(), "{gray}» {white}Left-click{gray} to get this map"));
+            builder.lore(I.tl(getPlayerLocale(), "{gray}» {white}Left-click{gray} to get this map"));
 
-        builder.lore(I.t(getPlayerLocale(), "{gray}» {white}Right-click{gray} for details and options"));
+        builder.lore(I.tl(getPlayerLocale(), "{gray}» {white}Right-click{gray} for details and options"));
 
-        return builder.item();
+        final ItemStack mapItem = builder.item();
+
+        final MapMeta meta = (MapMeta) mapItem.getItemMeta();
+        meta.setColor(Color.GREEN);
+        mapItem.setItemMeta(meta);
+
+        return mapItem;
     }
 
     @Override
     protected ItemStack getEmptyViewItem()
     {
         ItemStackBuilder builder = new ItemStackBuilder(Material.BARRIER)
-                .title(I.t(getPlayerLocale(), "{red}You don't have any map."));
+                .title(I.tl(getPlayerLocale(), "{red}You don't have any map."));
 
         if (Permissions.NEW.grantedTo(getPlayer()))
-            builder.longLore(I.t(getPlayerLocale(), "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"));
+            builder.longLore(I.tl(getPlayerLocale(), "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"));
         else
-            builder.longLore(I.t(getPlayerLocale(), "{gray}Unfortunately, you are not allowed to create one."));
+            builder.longLore(I.tl(getPlayerLocale(), "{gray}Unfortunately, you are not allowed to create one."));
 
         return builder.item();
     }
@@ -104,7 +131,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
 
         if (map instanceof SingleMap)
         {
-            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName());
+            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName(), false);
         }
         else if (map instanceof PosterMap)
         {
@@ -128,7 +155,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
         setData(maps);
 
         /// The maps list GUI title
-        setTitle(I.t(getPlayerLocale(), "{black}Your maps {reset}({0})", maps.length));
+        setTitle(I.tl(getPlayerLocale(), "{black}Your maps {reset}({0})", maps.length));
 
         setKeepHorizontalScrollingSpace(true);
 
