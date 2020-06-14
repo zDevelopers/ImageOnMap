@@ -35,6 +35,7 @@ public class ImageIOExecutor extends Worker
 {
     static public void loadImage(final File file, final Renderer mapRenderer) 
     {
+
         submitQuery(new WorkerRunnable<Void>()
         {
             @Override

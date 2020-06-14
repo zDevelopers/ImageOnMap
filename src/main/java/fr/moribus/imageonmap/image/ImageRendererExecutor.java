@@ -40,7 +40,6 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-
 @WorkerAttributes (name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker
 {

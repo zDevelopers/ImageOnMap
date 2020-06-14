@@ -92,6 +92,7 @@ abstract public class MapManager
     static public ImageMap createMap(PosterImage image, UUID playerUUID, int[] mapsIDs) throws MapManagerException
     {
         ImageMap newMap;
+
         if(image.getImagesCount() == 1)
         {
             newMap = new SingleMap(playerUUID, mapsIDs[0]);

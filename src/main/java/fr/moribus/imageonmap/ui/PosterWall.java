@@ -44,7 +44,7 @@ public class PosterWall
         
         int distX = FlatLocation.flatBlockDistanceX(loc1, loc2);
         int distY = FlatLocation.flatBlockDistanceY(loc1, loc2);
-        
+
         frames = new ItemFrame[distX * distY];
         
         for(int x = 0; x < distX; x++)
@@ -65,9 +65,7 @@ public class PosterWall
     
     public void expand()
     {
-        
-        
-        
+
     }
     
     static public ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, int mapId)

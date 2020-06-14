@@ -38,7 +38,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 
 import java.io.File;
-
 public class MapInitEvent implements Listener
 {
     static public void init()
@@ -113,8 +112,10 @@ public class MapInitEvent implements Listener
     
     static public void initMap(MapView map)
     {
-        if(map == null) return;
-        if(Renderer.isHandled(map)) return;
+        if(map == null) {
+            return;}
+        if(Renderer.isHandled(map)) {
+            return;}
         
         File imageFile = ImageOnMap.getPlugin().getImageFile(map.getId());
         if(imageFile.isFile())
