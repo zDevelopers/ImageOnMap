@@ -31,10 +31,18 @@ public final class PluginConfiguration extends Configuration
     static public ConfigurationItem<Locale> LANG = item("lang", Locale.class);
 
     static public ConfigurationItem<Boolean> COLLECT_DATA = item("collect-data", true);
+
     static public ConfigurationItem<Boolean> CHECK_FOR_UPDATES = item("check-for-updates", true);
 
     static public ConfigurationItem<Integer> MAP_GLOBAL_LIMIT = item("map-global-limit", 0, "Limit-map-by-server");
     static public ConfigurationItem<Integer> MAP_PLAYER_LIMIT = item("map-player-limit", 0, "Limit-map-by-player");
     
     static public ConfigurationItem<Integer> MAP_SIZE_NOTOP_LIMIT = item("map-size-notop-limit", 0, "Size-limit-map-notop");
+
+    static public ConfigurationItem<Boolean> SAVE_FULL_IMAGE = item("save-full-image", true);
+
+
+    static public ConfigurationItem<Integer> LIMIT_SIZE_X = item("limit-map-size-x", 0);
+    static public ConfigurationItem<Integer> LIMIT_SIZE_Y = item("limit-map-size-y", 0);
+
 }
