@@ -15,7 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.3.1\n"
-"Last-Translator: \n"
+"Last-Translator: squeezer\n"
 "Language: de_DE\n"
 
 #. / The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
