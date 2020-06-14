@@ -1,6 +1,6 @@
 name: ImageOnMap
 main: fr.moribus.imageonmap.ImageOnMap
-version: "4.0-pre2"
+version: "4.0"
 api-version: "1.13"
 
 commands:
