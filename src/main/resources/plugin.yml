@@ -8,9 +8,9 @@ commands:
       description: render an image in a map
       usage: /<command> [URL]
    maptool:
-      description: manage maps
+      description: Manage maps
    maps:
-      description: manage maps through a GUI
+      description: Manage maps through a GUI
 
 permissions:
     imageonmap.*:
@@ -24,6 +24,7 @@ permissions:
             imageonmap.explore: true
             imageonmap.rename: true
             imageonmap.delete: true
+            imageonmap.bypasssize: false
 
     imageonmap.userender:
         description: "Allows you to use /tomap and related commands (/maptool getremaing). Alias of imageonmap.new."
@@ -55,4 +56,8 @@ permissions:
 
     imageonmap.administrative:
         description: "Allows you to perform administrative tasks (like /maptool migrate)."
+        default: op
+
+    imageonmap.bypasssize:
+        description: "Allows you to create maps larger than the configured limit."
         default: op

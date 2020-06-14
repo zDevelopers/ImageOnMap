@@ -36,6 +36,7 @@
 
 package fr.moribus.imageonmap.image;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
@@ -57,7 +58,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-@WorkerAttributes (name = "Image Renderer", queriesMainThread = true)
+@WorkerAttributes(name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker
 {
     static public void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID, final int width, final int height, WorkerCallback<ImageMap> callback)
@@ -69,38 +70,44 @@ public class ImageRendererExecutor extends Worker
             {
                 final URLConnection connection = url.openConnection();
                 connection.connect();
-                if(connection instanceof HttpURLConnection)
+
+                if (connection instanceof HttpURLConnection)
                 {
-                    final HttpURLConnection  httpConnection = (HttpURLConnection) connection;
+                    final HttpURLConnection httpConnection = (HttpURLConnection) connection;
                     final int httpCode = httpConnection.getResponseCode();
-                    if((httpCode / 100) != 2)
+                    if ((httpCode / 100) != 2)
                     {
                         throw new IOException(I.t("HTTP error: {0} {1}", httpCode, httpConnection.getResponseMessage()));
                     }
                 }
+
                 final InputStream stream = connection.getInputStream();
                 final BufferedImage image = ImageIO.read(stream);
-                
+
                 if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
-                
-                
-                //Limits are in place and the player does NOT have rights to avoid them.
-                if((PluginConfiguration.LIMIT_SIZE_X.get() > 0 || PluginConfiguration.LIMIT_SIZE_Y.get() > 0) && !Bukkit.getPlayer(playerUUID).hasPermission("imageonmap.bypasssize")) {
-                	if(PluginConfiguration.LIMIT_SIZE_X.get() > 0) {
-                		if(image.getWidth() > PluginConfiguration.LIMIT_SIZE_X.get()) throw new IOException(I.t("The image is too wide!"));
-                	}
-                	if(PluginConfiguration.LIMIT_SIZE_Y.get() > 0) {
-                		if(image.getHeight() > PluginConfiguration.LIMIT_SIZE_Y.get()) throw new IOException(I.t("The image is too tall!"));
-                	}
+
+                // Limits are in place and the player does NOT have rights to avoid them.
+                if ((PluginConfiguration.LIMIT_SIZE_X.get() > 0 || PluginConfiguration.LIMIT_SIZE_Y.get() > 0) && !Permissions.BYPASS_SIZE.grantedTo(Bukkit.getPlayer(playerUUID)))
+                {
+                    if (PluginConfiguration.LIMIT_SIZE_X.get() > 0)
+                    {
+                        if (image.getWidth() > PluginConfiguration.LIMIT_SIZE_X.get())
+                            throw new IOException(I.t("The image is too wide!"));
+                    }
+                    if (PluginConfiguration.LIMIT_SIZE_Y.get() > 0)
+                    {
+                        if (image.getHeight() > PluginConfiguration.LIMIT_SIZE_Y.get())
+                            throw new IOException(I.t("The image is too tall!"));
+                    }
                 }
-                
-                if(scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1) {
+
+                if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1)
+                {
                     return renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
                 }
 
                 final BufferedImage resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
                 return renderPoster(resizedImage, playerUUID);
-                //return RenderPoster(image, playerUUID);
             }
         }, callback);
     }
@@ -119,7 +126,7 @@ public class ImageRendererExecutor extends Worker
 
         final int mapID = futureMapID.get();
         ImageIOExecutor.saveImage(mapID, image);
-        
+
         submitToMainThread(new Callable<Void>()
         {
             @Override
@@ -129,7 +136,7 @@ public class ImageRendererExecutor extends Worker
                 return null;
             }
         });
-        
+
         return MapManager.createMap(playerUUID, mapID);
     }
 
@@ -137,7 +144,7 @@ public class ImageRendererExecutor extends Worker
     {
         final PosterImage poster = new PosterImage(image);
         final int mapCount = poster.getImagesCount();
-        
+
         MapManager.checkMapLimit(mapCount, playerUUID);
         final Future<int[]> futureMapsIds = submitToMainThread(new Callable<int[]>()
         {
@@ -151,13 +158,14 @@ public class ImageRendererExecutor extends Worker
         poster.splitImages();
 
         final int[] mapsIDs = futureMapsIds.get();
-        
+
         ImageIOExecutor.saveImage(mapsIDs, poster);
-        
-        if(PluginConfiguration.SAVE_FULL_IMAGE.get()) {
-        	ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
+
+        if (PluginConfiguration.SAVE_FULL_IMAGE.get())
+        {
+            ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
         }
-        
+
         submitToMainThread(new Callable<Void>()
         {
             @Override
@@ -168,7 +176,7 @@ public class ImageRendererExecutor extends Worker
             }
 
         });
-        
+
         return MapManager.createMap(poster, playerUUID, mapsIDs);
     }
 }
