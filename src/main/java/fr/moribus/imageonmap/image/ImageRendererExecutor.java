@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2022)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -36,15 +36,20 @@
 
 package fr.moribus.imageonmap.image;
 
+
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.components.worker.Worker;
 import fr.zcraft.quartzlib.components.worker.WorkerAttributes;
 import fr.zcraft.quartzlib.components.worker.WorkerCallback;
 import fr.zcraft.quartzlib.components.worker.WorkerRunnable;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.text.ActionBar;
+import fr.zcraft.quartzlib.tools.text.MessageSender;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,9 +61,47 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import javax.imageio.ImageIO;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+
+
 
 @WorkerAttributes(name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker {
+    public static void renderAndNotify(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID,
+                                       final int width, final int height) {
+        final Player player = Bukkit.getPlayer(playerUUID);
+        if (player == null) {
+            return;
+        }
+
+        ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));
+
+        render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>() {
+            @Override
+            public void finished(ImageMap result) {
+                ActionBar.removeMessage(player);
+                MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Rendering finished!"));
+
+                if (result.give(player) && (result instanceof PosterMap && !((PosterMap) result).hasColumnData())) {
+                    player.sendMessage(ChatColor.GRAY + I.t("The rendered map was too big to fit in your inventory."));
+                    player.sendMessage(ChatColor.GRAY + I.t("Use '/maptool getremaining' to get the remaining maps."));
+                }
+            }
+
+            @Override
+            public void errored(Throwable exception) {
+                ActionBar.removeMessage(player);
+                player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
+
+                PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
+                        player.getName(),
+                        exception.getClass().getCanonicalName(),
+                        exception.getMessage());
+            }
+        });
+    }
+
     private static URLConnection connecting(URL url) throws IOException {
         final URLConnection connection = url.openConnection();
         connection.addRequestProperty("User-Agent",
@@ -94,6 +137,7 @@ public class ImageRendererExecutor extends Worker {
     public static void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID,
                               final int width, final int height, WorkerCallback<ImageMap> callback) {
         submitQuery(new WorkerRunnable<ImageMap>() {
+
             @Override
             public ImageMap run() throws Throwable {
 
@@ -144,12 +188,13 @@ public class ImageRendererExecutor extends Worker {
                 }
                 // Limits are in place and the player does NOT have rights to avoid them.
                 checkSizeLimit(playerUUID, image);
+                final BufferedImage resizedImage;
                 if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1) {
-                    ImageMap ret = renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
+                    resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
                     image.flush();//Safe to free
-                    return ret;
+                    return renderSingle(resizedImage, playerUUID);
                 }
-                final BufferedImage resizedImage =
+                resizedImage =
                         scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
                 image.flush();//Safe to free
                 return renderPoster(resizedImage, playerUUID);

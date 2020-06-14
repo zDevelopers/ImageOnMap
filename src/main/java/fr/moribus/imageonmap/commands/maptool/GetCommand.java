@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2022)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -36,7 +36,6 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
@@ -46,6 +45,8 @@ import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -59,7 +60,7 @@ public class GetCommand extends IoMCommand {
             throwInvalidArgument(I.t("Too many parameters!"));
             return;
         }
-        if (arguments.size() < 1) {
+        if (arguments.isEmpty()) {
             throwInvalidArgument(I.t("Too few parameters!"));
             return;
         }
@@ -79,28 +80,23 @@ public class GetCommand extends IoMCommand {
             mapName = arguments.get(1);
         }
 
+        UUID uuid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        if (!sender.isOnline()) {
+            return;
+        }
 
+        ImageMap map = MapManager.getMap(uuid, mapName);
 
+        if (map == null) {
+            warning(sender, I.t("This map does not exist."));
+            return;
+        }
 
+        if (map.give(sender)) {
+            info(I.t("The requested map was too big to fit in your inventory."));
+            info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+        }
 
-        retrieveUUID(playerName, uuid -> {
-
-            if (!sender.isOnline()) {
-                return;
-            }
-
-            ImageMap map = MapManager.getMap(uuid, mapName);
-
-            if (map == null) {
-                warning(sender, I.t("This map does not exist."));
-                return;
-            }
-
-            if (map.give(sender)) {
-                info(I.t("The requested map was too big to fit in your inventory."));
-                info(I.t("Use '/maptool getremaining' to get the remaining maps."));
-            }
-        });
     }
 
     @Override

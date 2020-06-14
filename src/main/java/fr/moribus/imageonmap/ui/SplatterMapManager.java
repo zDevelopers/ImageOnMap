@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2022)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -43,13 +43,9 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.components.nbt.NBT;
-import fr.zcraft.quartzlib.components.nbt.NBTCompound;
-import fr.zcraft.quartzlib.components.nbt.NBTList;
 import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.GlowEffect;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
-import fr.zcraft.quartzlib.tools.reflection.NMSException;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
 import fr.zcraft.quartzlib.tools.text.MessageSender;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
@@ -59,12 +55,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Rotation;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 
 //TODO rework splatter effect, using ID is far more stable than nbt tags.
@@ -140,7 +138,8 @@ public abstract class SplatterMapManager {
      * @return True if the attribute was detected.
      */
     public static boolean hasSplatterAttributes(ItemStack itemStack) {
-
+        return MapManager.managesMap(itemStack); //TODO only test if bottom left corner
+        /*
         try {
             final NBTCompound nbt = NBT.fromItemStack(itemStack);
             if (!nbt.containsKey("Enchantments")) {
@@ -154,7 +153,7 @@ public abstract class SplatterMapManager {
         } catch (NMSException e) {
             PluginLogger.error("Unable to get Splatter Map attribute on item", e);
             return false;
-        }
+        }*/
     }
 
     /**
@@ -198,6 +197,7 @@ public abstract class SplatterMapManager {
      * @param player     Player placing map
      * @return true if the map was correctly placed
      */
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     public static boolean placeSplatterMap(ItemFrame startFrame, Player player, PlayerInteractEntityEvent event) {
         ImageMap map = MapManager.getMap(player.getInventory().getItemInMainHand());
 
@@ -229,8 +229,6 @@ public abstract class SplatterMapManager {
 
             int i = 0;
             for (ItemFrame frame : surface.frames) {
-                BlockFace bf = WorldUtils.get4thOrientation(player.getLocation());
-                int id = poster.getMapIdAtReverseZ(i, bf, startFrame.getFacing());
                 Rotation rot = Rotation.NONE;
                 switch (frame.getFacing()) {
                     case UP:
@@ -241,12 +239,25 @@ public abstract class SplatterMapManager {
                     default:
                         //throw new IllegalStateException("Unexpected value: " + frame.getFacing());
                 }
+                BlockFace bf = WorldUtils.get4thOrientation(player.getLocation());
+                int id = poster.getMapIdAtReverseZ(i, bf, startFrame.getFacing());
                 //Rotation management relative to player rotation the default position is North,
                 // when on ceiling we flipped the rotation
                 RunTask.later(() -> {
                     addPropertiesToFrames(player, frame);
-                    frame.setItem(
-                            new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+
+                    ItemStack item = new ItemStack(Material.MAP, 1);
+                    ItemMeta meta = item.getItemMeta();
+                    PluginLogger.info(meta.getAttributeModifiers().toString());
+
+                    for (AttributeModifier value : meta.getAttributeModifiers().values()) {
+                        PluginLogger.info("blabla");
+                        PluginLogger.info("" + value);
+                    }
+                    item.setItemMeta(meta);
+                    frame.setItem(item);
+
+                    //new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
                 }, 5L);
 
                 if (i == 0) {

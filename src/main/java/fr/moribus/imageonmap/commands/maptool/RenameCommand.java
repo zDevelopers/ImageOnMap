@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2022)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -88,7 +88,6 @@ public class RenameCommand extends IoMCommand {
 
     @Override
     protected List<String> complete() throws CommandException {
-
         if (args.length == 1) {
             return getMatchingMapNames(playerSender(), args[0]);
         }

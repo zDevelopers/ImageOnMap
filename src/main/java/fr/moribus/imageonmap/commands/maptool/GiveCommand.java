@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2022)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -44,6 +44,7 @@ import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
 import java.util.ArrayList;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -66,7 +67,7 @@ public class GiveCommand extends IoMCommand {
             throwInvalidArgument(I.t("Too many parameters!"));
             return;
         }
-        if (arguments.size() < 1) {
+        if (arguments.isEmpty()) {
             throwInvalidArgument(I.t("Too few parameters!"));
             return;
         }
@@ -101,23 +102,22 @@ public class GiveCommand extends IoMCommand {
         }
 
         final Player sender = playerSender();
+        UUID uuid = Bukkit.getOfflinePlayer(from).getUniqueId();
+        UUID uuid2 = Bukkit.getOfflinePlayer(playerName).getUniqueId();
 
-        retrieveUUID(from, uuid -> {
-            final ImageMap map = MapManager.getMap(uuid, mapName);
+        final ImageMap map = MapManager.getMap(uuid, mapName);
 
-            if (map == null) {
-                warning(sender, I.t("This map does not exist."));
-                return;
-            }
+        if (map == null) {
+            warning(sender, I.t("This map does not exist."));
+            return;
+        }
 
-            retrieveUUID(playerName, uuid2 -> {
-                if (Bukkit.getPlayer((uuid2)) != null && Bukkit.getPlayer((uuid2)).isOnline()
-                        && map.give(Bukkit.getPlayer(uuid2))) {
-                    info(I.t("The requested map was too big to fit in your inventory."));
-                    info(I.t("Use '/maptool getremaining' to get the remaining maps."));
-                }
-            });
-        });
+
+        if (Bukkit.getPlayer((uuid2)) != null && Bukkit.getPlayer((uuid2)).isOnline()
+                && map.give(Bukkit.getPlayer(uuid2))) {
+            info(I.t("The requested map was too big to fit in your inventory."));
+            info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+        }
 
     }
 

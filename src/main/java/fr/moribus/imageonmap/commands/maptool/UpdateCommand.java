@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2022)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -52,6 +52,8 @@ import fr.zcraft.quartzlib.tools.text.MessageSender;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -153,73 +155,81 @@ public class UpdateCommand extends IoMCommand {
                 scaling = ImageUtils.ScalingType.CONTAINED;
         }
 
-        //TODO passer en static
-        //ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
-        retrieveUUID(playerName, uuid -> {
 
-            ImageMap map = MapManager.getMap(uuid, mapName);
+        UUID uuid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        ImageMap map = MapManager.getMap(uuid, mapName);
 
-            if (map == null) {
-                warning(sender, I.t("This map does not exist."));
+        if (map == null) {
+            warning(sender, I.t("This map does not exist."));
+            return;
+        }
+
+        URL url1;
+        try {
+            url1 = new URL(url);
+            if (!Permissions.BYPASS_WHITELIST.grantedTo(playerSender) && !checkHostnameWhitelist(url1)) {
+                throwInvalidArgument(I.t("This hosting website is not trusted, if you think that this is an error "
+                        + " contact your server administrator"));
                 return;
             }
 
-            URL url1;
-            try {
-                url1 = new URL(url);
-                if (!Permissions.BYPASS_WHITELIST.grantedTo(playerSender) && !checkHostnameWhitelist(url1)) {
-                    throwInvalidArgument(I.t("This hosting website is not trusted, if you think that this is an error "
-                            + " contact your server administrator"));
-                    return;
-                }
+            //TODO replace by a check of the load status.(if not loaded load the mapmanager)
+            MapManager.load(false);//we don't want to spam the console each time we reload the mapManager
 
-                //TODO replace by a check of the load status.(if not loaded load the mapmanager)
-                MapManager.load(false);//we don't want to spam the console each time we reload the mapManager
-
-                Integer[] size = {1, 1};
-                if (map.getType() == ImageMap.Type.POSTER) {
-                    size = map.getSize(map.getUserUUID(), map.getId());
-                }
-
-                int width = size[0];
-                int height = size[1];
-                try {
-                    if (playerSender != null) {
-                        ActionBar.sendPermanentMessage(playerSender, ChatColor.DARK_GREEN + I.t("Updating..."));
-                    }
-                    ImageRendererExecutor
-                            .update(url1, scaling, uuid, map, width, height, new WorkerCallback<ImageMap>() {
-                                @Override
-                                public void finished(ImageMap result) {
-                                    if (playerSender != null) {
-                                        ActionBar.removeMessage(playerSender);
-                                        MessageSender.sendActionBarMessage(playerSender,
-                                                ChatColor.DARK_GREEN + I.t("The map was updated using the new image!"));
-                                    }
-                                }
-
-                                @Override
-                                public void errored(Throwable exception) {
-                                    if (playerSender != null) {
-                                        playerSender
-                                                .sendMessage(
-                                                        I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
-                                    }
-                                    PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
-                                            playerSender.getName(),
-                                            exception.getClass().getCanonicalName(),
-                                            exception.getMessage());
-                                }
-                            });
-                } finally {
-                    if (playerSender != null) {
-                        ActionBar.removeMessage(playerSender);
-                    }
-                }
-            } catch (MalformedURLException | CommandException ex) {
-                warning(sender, I.t("Invalid URL."));
+            Integer[] size = {1, 1};
+            if (map.getType() == ImageMap.Type.POSTER) {
+                size = map.getSize(map.getUserUUID(), map.getId());
             }
-        });
+
+            if (size.length == 0) {
+                size = new Integer[] {1, 1};
+            }
+            int width = size[0];
+            int height = size[1];
+            try {
+                String msg = I.t("Updating...");
+                if (playerSender != null) {
+                    //TODO tester si player humain
+                    ActionBar.sendPermanentMessage(playerSender, ChatColor.DARK_GREEN + msg);
+                } else {
+                    PluginLogger.info(msg);
+                }
+                ImageRendererExecutor
+                        .update(url1, scaling, uuid, map, width, height, new WorkerCallback<ImageMap>() {
+                            @Override
+                            public void finished(ImageMap result) {
+                                String msg = I.t("The map was updated using the new image!");
+                                if (playerSender != null) {
+                                    //TODO tester si player humain
+                                    ActionBar.removeMessage(playerSender);
+                                    MessageSender.sendActionBarMessage(playerSender,
+                                            ChatColor.DARK_GREEN + msg);
+                                } else {
+                                    PluginLogger.info(msg);
+                                }
+                            }
+
+                            @Override
+                            public void errored(Throwable exception) {
+                                if (playerSender != null) {
+                                    playerSender
+                                            .sendMessage(
+                                                    I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
+                                }
+                                PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
+                                        playerSender.getName(),
+                                        exception.getClass().getCanonicalName(),
+                                        exception.getMessage());
+                            }
+                        });
+            } finally {
+                if (playerSender != null) {
+                    ActionBar.removeMessage(playerSender);
+                }
+            }
+        } catch (MalformedURLException | CommandException ex) {
+            warning(sender, I.t("Invalid URL."));
+        }
 
 
     }

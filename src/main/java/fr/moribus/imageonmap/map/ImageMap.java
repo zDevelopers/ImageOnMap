@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2022)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -114,11 +114,11 @@ public abstract class ImageMap implements ConfigurationSerializable {
                 MapManager.getPlayerMapStore(playerUUID).getToolConfig().getConfigurationSection("PlayerMapStore");
 
         if (section == null) {
-            return null;
+            return new Integer[0];
         }
         List<Map<String, Object>> list = (List<Map<String, Object>>) section.getList("mapList");
         if (list == null) {
-            return null;
+            return new Integer[0];
         }
 
         for (Map<String, Object> tmpMap : list) {
@@ -126,7 +126,7 @@ public abstract class ImageMap implements ConfigurationSerializable {
                 return new Integer[] {(Integer) tmpMap.get("columns"), (Integer) tmpMap.get("rows")};
             }
         }
-        return null;
+        return new Integer[0];
     }
 
     protected static <T> T getFieldValue(Map<String, Object> map, String fieldName)

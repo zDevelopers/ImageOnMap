@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2022)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -44,7 +44,6 @@ import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.gui.Gui;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -74,14 +73,10 @@ public class ExploreCommand extends IoMCommand {
             playerName = sender.getName();
         }
 
-        retrieveUUID(playerName, uuid -> {
-
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-            if (sender.isOnline()) {
-                Gui.open(sender, new MapListGui(offlinePlayer, playerName));
-            }
-
-        });
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+        if (sender.isOnline()) {
+            Gui.open(sender, new MapListGui(offlinePlayer, playerName));
+        }
 
     }
 

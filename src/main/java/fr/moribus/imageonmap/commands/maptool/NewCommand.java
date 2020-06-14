@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2022)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -38,6 +38,7 @@ package fr.moribus.imageonmap.commands.maptool;
 
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
+import fr.moribus.imageonmap.gui.RenderGui;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.ImageUtils;
 import fr.moribus.imageonmap.map.ImageMap;
@@ -45,6 +46,7 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
+import fr.zcraft.quartzlib.components.gui.Gui;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.components.worker.WorkerCallback;
 import fr.zcraft.quartzlib.tools.PluginLogger;
@@ -122,6 +124,16 @@ public class NewCommand extends IoMCommand {
             return;
         }
 
+        // TODO Add a per-player toggle for the GUI.
+        if (args.length >= 2) {
+            ImageRendererExecutor.renderAndNotify(url, scaling, player.getUniqueId(), width, height);
+        } else {
+            Gui.open(player, new RenderGui(url));
+        }
+        //I try to test if the gui is run correctly
+        //keep the following as a fallback and for cmd made by console
+
+        /*
         if (args.length >= 2) {
             if (args.length >= 3) {
                 try {
@@ -182,6 +194,8 @@ public class NewCommand extends IoMCommand {
         } finally {
             ActionBar.removeMessage(player);
         }
+        */
+
     }
 
     @Override

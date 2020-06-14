@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2022)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -158,6 +158,7 @@ public class PosterMap extends ImageMap {
 
 
     public int getMapIdAtReverseZ(int index, BlockFace orientation, BlockFace bf) {
+        //TODO maybe a bug there why don't use orientation?
         int x = 0;
         int y = 0;
         switch (bf) {
@@ -193,7 +194,6 @@ public class PosterMap extends ImageMap {
                 return i;
             }
         }
-
         throw new IllegalArgumentException("Invalid map ID");
     }
 
