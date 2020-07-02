@@ -68,7 +68,19 @@ public class ImageRendererExecutor extends Worker
             @Override
             public ImageMap run() throws Throwable
             {
-                final URLConnection connection = url.openConnection();
+                URL url2=null;
+                if(url.toString().contains("https://imgur.com/")){
+                    if(url.toString().contains("gallery/")){
+                        throw new IOException("We do not support imgur gallery yet, please use direct link to image instead (right click on the picture you want to use then select copy link:) ");
+
+                    }
+                    String newLink="https://i.imgur.com/"+url.toString().split("https://imgur.com/")[1]+".jpg";
+                    url2=new URL(newLink);
+                }
+
+                if(url2==null)
+                    url2=url;
+                final URLConnection connection = url2.openConnection();
                 connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
                 connection.connect();
 
@@ -76,6 +88,7 @@ public class ImageRendererExecutor extends Worker
                 {
                     final HttpURLConnection httpConnection = (HttpURLConnection) connection;
                     final int httpCode = httpConnection.getResponseCode();
+
                     if ((httpCode / 100) != 2)
                     {
                         throw new IOException(I.t("HTTP error: {0} {1}", httpCode, httpConnection.getResponseMessage()));
@@ -83,10 +96,10 @@ public class ImageRendererExecutor extends Worker
                 }
 
                 final InputStream stream = connection.getInputStream();
+
                 final BufferedImage image = ImageIO.read(stream);
 
                 if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
-
                 // Limits are in place and the player does NOT have rights to avoid them.
                 if ((PluginConfiguration.LIMIT_SIZE_X.get() > 0 || PluginConfiguration.LIMIT_SIZE_Y.get() > 0) && !Permissions.BYPASS_SIZE.grantedTo(Bukkit.getPlayer(playerUUID)))
                 {
@@ -102,12 +115,13 @@ public class ImageRendererExecutor extends Worker
                     }
                 }
 
+
                 if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1)
                 {
                     return renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
                 }
-
                 final BufferedImage resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
+                //image.flush();
                 return renderPoster(resizedImage, playerUUID);
             }
         }, callback);
@@ -126,7 +140,7 @@ public class ImageRendererExecutor extends Worker
         });
 
         final int mapID = futureMapID.get();
-        ImageIOExecutor.saveImage(mapID, image);
+        //ImageIOExecutor.saveImage(mapID, image);
 
         submitToMainThread(new Callable<Void>()
         {
@@ -134,10 +148,11 @@ public class ImageRendererExecutor extends Worker
             public Void call() throws Exception
             {
                 Renderer.installRenderer(image, mapID);
+                //image.flush();
                 return null;
             }
         });
-
+        //image.flush();
         return MapManager.createMap(playerUUID, mapID);
     }
 
@@ -145,7 +160,6 @@ public class ImageRendererExecutor extends Worker
     {
         final PosterImage poster = new PosterImage(image);
         final int mapCount = poster.getImagesCount();
-
         MapManager.checkMapLimit(mapCount, playerUUID);
         final Future<int[]> futureMapsIds = submitToMainThread(new Callable<int[]>()
         {
@@ -155,12 +169,10 @@ public class ImageRendererExecutor extends Worker
                 return MapManager.getNewMapsIds(mapCount);
             }
         });
-
         poster.splitImages();
-
         final int[] mapsIDs = futureMapsIds.get();
+       // ImageIOExecutor.saveImage(mapsIDs, poster);
 
-        ImageIOExecutor.saveImage(mapsIDs, poster);
 
         if (PluginConfiguration.SAVE_FULL_IMAGE.get())
         {
@@ -177,6 +189,8 @@ public class ImageRendererExecutor extends Worker
             }
 
         });
+
+       // image.flush();
 
         return MapManager.createMap(poster, playerUUID, mapsIDs);
     }
