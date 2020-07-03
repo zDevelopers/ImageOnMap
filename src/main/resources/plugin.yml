@@ -23,15 +23,16 @@ permissions:
             imageonmap.get: true
             imageonmap.explore: true
             imageonmap.rename: true
+            imageonmap.removesplattermap: true
             imageonmap.delete: true
             imageonmap.bypasssize: false
 
     imageonmap.userender:
-        description: "Allows you to use /tomap and related commands (/maptool getremaing). Alias of imageonmap.new."
+        description: "Allows you to use /tomap and related commands (/maptool getremaining). Alias of imageonmap.new."
         default: true
 
     imageonmap.new:
-        description: "Allows you to use /tomap and related commands (/maptool getremaing)."
+        description: "Allows you to use /tomap and related commands (/maptool getremaining)."
         default: true
 
     imageonmap.list:
@@ -39,7 +40,7 @@ permissions:
         default: true
 
     imageonmap.get:
-        description: "Allows you to get a new map among the ones you already rendered, and related commands (/maptool getremaing)."
+        description: "Allows you to get a new map among the ones you already rendered, and related commands (/maptool getremaining)."
         default: true
 
     imageonmap.explore:
@@ -52,6 +53,10 @@ permissions:
 
     imageonmap.delete:
         description: "Allows you to delete a map you rendered in the past."
+        default: true
+
+    imageonmap.removesplattermap:
+        description: "Allows you to remove a splatter map from a wall by sneaking and breaking a map."
         default: true
 
     imageonmap.administrative:

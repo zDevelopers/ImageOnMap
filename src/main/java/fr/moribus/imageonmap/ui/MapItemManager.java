@@ -36,6 +36,7 @@
 
 package fr.moribus.imageonmap.ui;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
@@ -285,17 +286,20 @@ public class MapItemManager implements Listener
         ItemStack item = frame.getItem();
         if (frame.getItem().getType() != Material.FILLED_MAP) return;
 
-        if (player.isSneaking())
+        if (Permissions.REMOVE_SPLATTER_MAP.grantedTo(player))
         {
-            PosterMap poster = SplatterMapManager.removeSplatterMap(frame,player);
-            if (poster != null)
+            if (player.isSneaking())
             {
-                event.setCancelled(true);
+                PosterMap poster = SplatterMapManager.removeSplatterMap(frame,player);
+                if (poster != null)
+                {
+                    event.setCancelled(true);
 
-                if (player.getGameMode() != GameMode.CREATIVE || !SplatterMapManager.hasSplatterMap(player, poster))
-                    poster.give(player);
+                    if (player.getGameMode() != GameMode.CREATIVE || !SplatterMapManager.hasSplatterMap(player, poster))
+                        poster.give(player);
 
-                return;
+                    return;
+                }
             }
         }
 
