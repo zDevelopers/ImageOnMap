@@ -35,14 +35,20 @@ public class RenameCommand extends IoMCommand {
             ImageMap map = getMapFromArgs();
             map.rename(args[1]);
         } else {
-            info("Not Enough Or To Many Arguments");
+            info(I.t("Not enough or too many arguments"));
         }
     }
     @Override
     protected List<String> complete() throws CommandException
     {
+
         if(args.length == 1)
             return getMatchingMapNames(playerSender(), args[0]);
         return null;
+    }
+    @Override
+    public boolean canExecute(CommandSender sender)
+    {
+        return Permissions.RENAME.grantedTo(sender);
     }
 }
