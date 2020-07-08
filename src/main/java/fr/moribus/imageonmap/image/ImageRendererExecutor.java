@@ -151,7 +151,7 @@ public class ImageRendererExecutor extends Worker
                     return renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
                 }
                 final BufferedImage resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
-                //image.flush();
+                image.flush();
                 return renderPoster(resizedImage, playerUUID);
             }
         }, callback);
@@ -171,7 +171,7 @@ public class ImageRendererExecutor extends Worker
         });
 
         final int mapID = futureMapID.get();
-        //ImageIOExecutor.saveImage(mapID, image);
+        ImageIOExecutor.saveImage(mapID, image);
 
         submitToMainThread(new Callable<Void>()
         {
@@ -179,11 +179,11 @@ public class ImageRendererExecutor extends Worker
             public Void call() throws Exception
             {
                 Renderer.installRenderer(image, mapID);
-                //image.flush();
+                image.flush();
                 return null;
             }
         });
-        //image.flush();
+        image.flush();
         return MapManager.createMap(playerUUID, mapID);
     }
 
@@ -202,7 +202,7 @@ public class ImageRendererExecutor extends Worker
         });
         poster.splitImages();
         final int[] mapsIDs = futureMapsIds.get();
-       // ImageIOExecutor.saveImage(mapsIDs, poster);
+        ImageIOExecutor.saveImage(mapsIDs, poster);
 
 
         if (PluginConfiguration.SAVE_FULL_IMAGE.get())
@@ -221,7 +221,7 @@ public class ImageRendererExecutor extends Worker
 
         });
 
-       // image.flush();
+        image.flush();
 
         return MapManager.createMap(poster, playerUUID, mapsIDs);
     }
