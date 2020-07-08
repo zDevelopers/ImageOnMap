@@ -36,7 +36,7 @@
 
 package fr.moribus.imageonmap.image;
 
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -83,6 +83,7 @@ public class PosterImage
     
     public void splitImages()
     {
+        try{
         cutImages = new BufferedImage[cutImagesCount];
         
         int imageX;
@@ -97,8 +98,16 @@ public class PosterImage
             }
             imageY += HEIGHT;
         }
-        
-        originalImage = null;
+        }
+        catch(final Throwable e){
+            if(cutImages!=null)
+                for(BufferedImage bi: cutImages){
+                    if(bi!=null){
+                        bi.flush();//Safe to free
+                    }
+                }
+            throw e;}
+
     }
     
     /**
@@ -109,12 +118,12 @@ public class PosterImage
      */
     private BufferedImage makeSubImage(BufferedImage originalImage, int x, int y)
     {
+
         BufferedImage newImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
-        
+
         Graphics graphics = newImage.getGraphics();
-        
+
         graphics.drawImage(originalImage, -x, -y, null);
-        graphics.dispose();
         return newImage;
     }
     
@@ -130,6 +139,10 @@ public class PosterImage
     public BufferedImage getImageAt(int i)
     {
         return cutImages[i];
+    }
+    public BufferedImage getImage()
+    {
+        return originalImage;
     }
     
     public int getColumnAt(int i)

@@ -92,7 +92,7 @@ public class ImageRendererExecutor extends Worker
 
                 BufferedImage image=null;
                 //If the link is an imgur one
-                if (url.toString().contains("https://imgur.com/")) {
+                if (url.toString().startsWith("https://imgur.com/")) {
 
                     //Not handled, can't with the hash only access the image in i.imgur.com/<hash>.<extension>
 
@@ -148,10 +148,13 @@ public class ImageRendererExecutor extends Worker
 
 
                 if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1) {
-                    return renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
+                    ImageMap ret=renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
+                    image.flush();//Safe to free
+                    return ret;
                 }
                 final BufferedImage resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
-                //image.flush();
+                image.flush();//Safe to free
+
                 return renderPoster(resizedImage, playerUUID);
             }
         }, callback);
@@ -171,19 +174,16 @@ public class ImageRendererExecutor extends Worker
         });
 
         final int mapID = futureMapID.get();
-        //ImageIOExecutor.saveImage(mapID, image);
-
+        ImageIOExecutor.saveImage(mapID,image);
         submitToMainThread(new Callable<Void>()
         {
             @Override
             public Void call() throws Exception
             {
                 Renderer.installRenderer(image, mapID);
-                //image.flush();
                 return null;
             }
         });
-        //image.flush();
         return MapManager.createMap(playerUUID, mapID);
     }
 
@@ -201,10 +201,10 @@ public class ImageRendererExecutor extends Worker
             }
         });
         poster.splitImages();
+
         final int[] mapsIDs = futureMapsIds.get();
-       // ImageIOExecutor.saveImage(mapsIDs, poster);
 
-
+        ImageIOExecutor.saveImage(mapsIDs,poster);
         if (PluginConfiguration.SAVE_FULL_IMAGE.get())
         {
             ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
@@ -220,9 +220,7 @@ public class ImageRendererExecutor extends Worker
             }
 
         });
-
-       // image.flush();
-
+        poster.getImage().flush();//Safe?
         return MapManager.createMap(poster, playerUUID, mapsIDs);
     }
 }

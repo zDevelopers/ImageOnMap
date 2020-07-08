@@ -36,9 +36,12 @@
 
 package fr.moribus.imageonmap.image;
 
+import fr.zcraft.zlib.tools.PluginLogger;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+//import java.awt.*;
 /**
  * Various image-related utilities
  */
@@ -57,6 +60,7 @@ public class ImageUtils {
                 case COVERED: return ImageUtils.resize(source, destinationW, destinationH, true);
                 case STRETCHED: return resizeStretched(source, destinationW, destinationH);
                 default: return source;
+
             }
         }
     }
@@ -70,28 +74,31 @@ public class ImageUtils {
      */
     static private BufferedImage resize(BufferedImage source, int destinationW, int destinationH, boolean covered)
     {
-        float ratioW = (float)destinationW / (float)source.getWidth();
-        float ratioH = (float)destinationH / (float)source.getHeight();
-        int finalW, finalH;
-        int x, y;
+        try {
+            float ratioW = (float) destinationW / (float) source.getWidth();
+            float ratioH = (float) destinationH / (float) source.getHeight();
+            int finalW, finalH;
+            int x, y;
 
-        if(covered ? ratioW > ratioH : ratioW < ratioH)
-        {
-            finalW = destinationW;
-            finalH = (int)(source.getHeight() * ratioW);
+            if (covered ? ratioW > ratioH : ratioW < ratioH) {
+                finalW = destinationW;
+                finalH = (int) (source.getHeight() * ratioW);
+            } else {
+                finalW = (int) (source.getWidth() * ratioH);
+                finalH = destinationH;
+            }
+
+            x = (destinationW - finalW) / 2;
+            y = (destinationH - finalH) / 2;
+
+            return drawImage(source,
+                    destinationW, destinationH,
+                    x, y, finalW, finalH);
         }
-        else
-        {
-            finalW = (int)(source.getWidth() * ratioH);
-            finalH = destinationH;
+        catch(final Throwable e){
+            throw e;
         }
 
-        x = (destinationW - finalW) / 2;
-        y = (destinationH - finalH) / 2;
-
-        return drawImage(source,
-                destinationW, destinationH,
-                x, y, finalW, finalH);
     }
 
     /**
@@ -123,11 +130,22 @@ public class ImageUtils {
                                           int bufferW, int bufferH,
                                           int posX, int posY,
                                           int sourceW, int sourceH) {
-        BufferedImage newImage = new BufferedImage(bufferW, bufferH, BufferedImage.TYPE_INT_ARGB);
+        Graphics graphics=null;
+        BufferedImage newImage= null;
+       try{
+         newImage = new BufferedImage(bufferW, bufferH, BufferedImage.TYPE_INT_ARGB);
 
-        Graphics graphics = newImage.getGraphics();
+        graphics = newImage.getGraphics();
         graphics.drawImage(source, posX, posY, sourceW, sourceH, null);
-        graphics.dispose();
+
         return newImage;
+       }
+       catch(final Throwable e) {
+           PluginLogger.warning("Exception/error at drawImage");
+           if(newImage!=null )
+               newImage.flush();//Safe to free
+           throw e;
+       }
+
     }
 }

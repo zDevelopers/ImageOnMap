@@ -61,6 +61,7 @@ public class ImageIOExecutor extends Worker
             {
                 BufferedImage image = ImageIO.read(file);
                 mapRenderer.setImage(image);
+                image.flush();//Safe to free
                 return null;
             }
         });
@@ -88,7 +89,9 @@ public class ImageIOExecutor extends Worker
     {
         for(int i = 0, c = mapsIDs.length; i < c; i++)
         {
-            ImageIOExecutor.saveImage(ImageOnMap.getPlugin().getImageFile(mapsIDs[i]), image.getImageAt(i));
+            BufferedImage img=image.getImageAt(i);
+            ImageIOExecutor.saveImage(ImageOnMap.getPlugin().getImageFile(mapsIDs[i]), img);
+            img.flush();//Safe to free
         }
     }
     
