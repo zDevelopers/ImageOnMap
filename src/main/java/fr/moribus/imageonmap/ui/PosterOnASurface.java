@@ -107,6 +107,7 @@ public class PosterOnASurface {
 		return true;
 	}
 
+	//If in creative expand item frames in order to auto deploy
 	public void expand() {
 
 	}

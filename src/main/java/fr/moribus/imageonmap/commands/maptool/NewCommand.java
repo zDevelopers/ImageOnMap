@@ -120,6 +120,9 @@ public class NewCommand  extends IoMCommand
                 }
             });
         }
+        catch(final Throwable e){
+            throw e;
+        }
         //Added to fix bug with rendering displaying after error
         finally {
             ActionBar.removeMessage(player);

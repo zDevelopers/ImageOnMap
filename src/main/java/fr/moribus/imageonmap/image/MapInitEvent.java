@@ -38,6 +38,7 @@ package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.ui.SplatterMapManager;
 import fr.zcraft.zlib.core.ZLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -47,9 +48,11 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -114,7 +117,56 @@ public class MapInitEvent implements Listener
                 initMap(event.getCursor());
         }
     }
-    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onInventoryClick(InventoryClickEvent event) {
+
+        //Checks if they have clicked anywhere else on the screen while an inventory is open
+        if(event.getClickedInventory() == null) return;
+
+        //Checks if the clicked slot is empty
+        if(event.getClickedInventory().getItem(event.getSlot()) == null) return;
+
+
+        //Forbid deposit of map in unwanted block
+        if(event.getInventory().getType().name().equals("GRINDSTONE") & SplatterMapManager.isSplatterMap(event.getCurrentItem())){
+            event.setCancelled(true);
+            return;
+        }
+
+
+        //To cancel removing of glowing effect
+        if(event.getClickedInventory().getSize()==3) {
+
+            String inventoryClickedTitle=event.getClickedInventory().getType().name();
+            //Ignore those blocks
+            if(event.getClickedInventory().getType()== InventoryType.ANVIL||event.getClickedInventory().getType()==InventoryType.FURNACE||inventoryClickedTitle.equals("BLAST_FURNACE")||inventoryClickedTitle.equals("SMOKER")){
+                return;
+            }
+
+
+            if(inventoryClickedTitle.equals("CARTOGRAPHY_TABLE")){
+                if(event.getInventory().contains(Material.PAPER)){
+                    ItemStack[] inventory=event.getClickedInventory().getContents();
+
+                    for(ItemStack item:inventory) {
+                        if (SplatterMapManager.isSplatterMap(item)) {
+
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+            }
+            ItemStack[] inventory=event.getClickedInventory().getContents();
+
+            for(ItemStack item:inventory){
+                if (SplatterMapManager.isSplatterMap(item)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
     static public void initMap(ItemStack item)
     {
         if (item != null && item.getType() == Material.FILLED_MAP)

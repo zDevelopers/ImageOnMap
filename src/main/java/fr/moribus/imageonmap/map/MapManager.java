@@ -126,11 +126,19 @@ abstract public class MapManager
     static public int[] getNewMapsIds(int amount)
     {
         int[] mapsIds = new int[amount];
-        for(int i = 0; i < amount; i++)
-        {
-            mapsIds[i] = Bukkit.createMap(Bukkit.getWorlds().get(0)).getId();
+        try {
+            for (int i = 0; i < amount; i++) {
+                mapsIds[i] = Bukkit.createMap(Bukkit.getWorlds().get(0)).getId();
+
+            }
+            return mapsIds;
         }
-        return mapsIds;
+        catch (final Throwable e){
+            PluginLogger.warning("Erreur a la creation de map !!!");
+            throw e;
+        }
+
+
     }
 
     /**
@@ -140,11 +148,14 @@ abstract public class MapManager
      */
     static public int getMapIdFromItemStack(final ItemStack item)
     {
+
+
         final ItemMeta meta = item.getItemMeta();
         if (!(meta instanceof MapMeta)) return 0;
 
         return ((MapMeta) meta).hasMapId() ? ((MapMeta) meta).getMapId() : 0;
     }
+
     
     static public void addMap(ImageMap map) throws MapManagerException
     {
