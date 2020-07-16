@@ -39,7 +39,6 @@ package fr.moribus.imageonmap.map;
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.tools.PluginLogger;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -162,10 +161,8 @@ public abstract class ImageMap implements ConfigurationSerializable
         List<Map<String, Object>> list = (List<Map<String, Object>>) section.getList("mapList");
         if(list == null) return null;
 
-        PluginLogger.info("list ");
         for(Map<String, Object> tMap : list)
         {
-            PluginLogger.info(" "+tMap.toString());
             if(tMap.get("id").equals(id)) {
                     return new Integer[]{(Integer)tMap.get("columns"), (Integer)tMap.get("rows")};
             }

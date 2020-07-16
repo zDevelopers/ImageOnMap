@@ -58,7 +58,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
-@CommandInfo (name =  "update", usageParameters = "<new url> <map name to update> [--confirm]")
+@CommandInfo (name =  "update", usageParameters = "<new url> [stretched|covered] \"<map name to update>\" [--confirm]")
 @WithFlags ({"confirm"})
 public class UpdateCommand extends IoMCommand
 {
@@ -66,14 +66,30 @@ public class UpdateCommand extends IoMCommand
     protected void run() throws CommandException
     {
         final Player player = playerSender();
-        ImageUtils.ScalingType scaling = ImageUtils.ScalingType.NONE;
+        ImageUtils.ScalingType scaling;
+
         URL url;
 
         if(args.length < 1) throwInvalidArgument(I.t("You must give an URL and a map name to update."));
         if(args.length < 2) throwInvalidArgument(I.t("You must give a map name to update."));
 
-        ImageMap map=getMapFromArgs(player,1,true);
+        switch(args[1]) {
 
+            case "stretched":
+                scaling = ImageUtils.ScalingType.STRETCHED;
+                break;
+            case "covered":
+                scaling = ImageUtils.ScalingType.COVERED;
+                break;
+            default:
+                scaling = ImageUtils.ScalingType.CONTAINED;
+                break;
+        }
+        ImageMap map;
+        if(scaling.equals(ImageUtils.ScalingType.CONTAINED))
+            map=getMapFromArgs(player,1,true);
+        else
+            map=getMapFromArgs(player,2,true);
         try
         {
             url = new URL(args[0]);
