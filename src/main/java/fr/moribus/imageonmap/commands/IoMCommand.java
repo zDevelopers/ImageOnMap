@@ -69,7 +69,6 @@ public abstract class IoMCommand extends Command
 		}
 
 		mapName = mapName.trim();
-
 		map = MapManager.getMap(player.getUniqueId(), mapName);
 
 		if(map == null) error(I.t("This map does not exist."));

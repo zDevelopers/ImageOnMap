@@ -61,6 +61,39 @@ import java.util.concurrent.Future;
 @WorkerAttributes(name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker
 {
+    static private URLConnection HTTPconnection(final URL url) throws IOException {
+        final URLConnection connection = url.openConnection();
+        connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
+        connection.connect();
+
+        if (connection instanceof HttpURLConnection)
+        {
+            final HttpURLConnection httpConnection = (HttpURLConnection) connection;
+            final int httpCode = httpConnection.getResponseCode();
+            if ((httpCode / 100) != 2)
+            {
+                throw new IOException(I.t("HTTP error: {0} {1}", httpCode, httpConnection.getResponseMessage()));
+            }
+        }
+        return connection;
+    }
+
+    static private void checkSizeLimit(final UUID playerUUID, final BufferedImage image ) throws IOException {
+        if ((PluginConfiguration.LIMIT_SIZE_X.get() > 0 || PluginConfiguration.LIMIT_SIZE_Y.get() > 0) && !Permissions.BYPASS_SIZE.grantedTo(Bukkit.getPlayer(playerUUID)))
+        {
+            if (PluginConfiguration.LIMIT_SIZE_X.get() > 0)
+            {
+                if (image.getWidth() > PluginConfiguration.LIMIT_SIZE_X.get())
+                    throw new IOException(I.t("The image is too wide!"));
+            }
+            if (PluginConfiguration.LIMIT_SIZE_Y.get() > 0)
+            {
+                if (image.getHeight() > PluginConfiguration.LIMIT_SIZE_Y.get())
+                    throw new IOException(I.t("The image is too tall!"));
+            }
+        }
+    }
+
     static public void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID, final int width, final int height, WorkerCallback<ImageMap> callback)
     {
         submitQuery(new WorkerRunnable<ImageMap>()
@@ -68,39 +101,17 @@ public class ImageRendererExecutor extends Worker
             @Override
             public ImageMap run() throws Throwable
             {
-                final URLConnection connection = url.openConnection();
-                connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
-                connection.connect();
 
-                if (connection instanceof HttpURLConnection)
-                {
-                    final HttpURLConnection httpConnection = (HttpURLConnection) connection;
-                    final int httpCode = httpConnection.getResponseCode();
-                    if ((httpCode / 100) != 2)
-                    {
-                        throw new IOException(I.t("HTTP error: {0} {1}", httpCode, httpConnection.getResponseMessage()));
-                    }
-                }
+                final URLConnection connection = HTTPconnection(url);
 
                 final InputStream stream = connection.getInputStream();
                 final BufferedImage image = ImageIO.read(stream);
+                stream.close();
 
                 if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
 
                 // Limits are in place and the player does NOT have rights to avoid them.
-                if ((PluginConfiguration.LIMIT_SIZE_X.get() > 0 || PluginConfiguration.LIMIT_SIZE_Y.get() > 0) && !Permissions.BYPASS_SIZE.grantedTo(Bukkit.getPlayer(playerUUID)))
-                {
-                    if (PluginConfiguration.LIMIT_SIZE_X.get() > 0)
-                    {
-                        if (image.getWidth() > PluginConfiguration.LIMIT_SIZE_X.get())
-                            throw new IOException(I.t("The image is too wide!"));
-                    }
-                    if (PluginConfiguration.LIMIT_SIZE_Y.get() > 0)
-                    {
-                        if (image.getHeight() > PluginConfiguration.LIMIT_SIZE_Y.get())
-                            throw new IOException(I.t("The image is too tall!"));
-                    }
-                }
+                checkSizeLimit(playerUUID, image );
 
                 if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1)
                 {
@@ -113,6 +124,66 @@ public class ImageRendererExecutor extends Worker
         }, callback);
     }
 
+    public static void update(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID, final ImageMap map, final int width, final int height, WorkerCallback<ImageMap> callback) {
+        submitQuery(new WorkerRunnable<ImageMap>()
+        {
+            @Override
+            public ImageMap run() throws Throwable
+            {
+
+                final URLConnection connection = HTTPconnection(url);
+
+                final InputStream stream = connection.getInputStream();
+                final BufferedImage image = ImageIO.read(stream);
+                stream.close();
+
+                if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
+
+                // Limits are in place and the player does NOT have rights to avoid them.
+                checkSizeLimit(playerUUID, image );
+
+
+                updateMap(ImageUtils.ScalingType.CONTAINED.resize(image, width*128, height*128),playerUUID,map.getMapsIDs());
+                return map;
+                /*if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1)
+                {
+                    return updateSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
+                }
+
+                final BufferedImage resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
+                return updatePoster(resizedImage, playerUUID);*/
+            }
+        }, callback);
+
+    }
+    static private void updateMap(final BufferedImage image, final UUID playerUUID,int[] mapsIDs) throws Throwable
+    {
+
+        final PosterImage poster = new PosterImage(image);
+        poster.splitImages();
+
+
+
+        ImageIOExecutor.saveImage(mapsIDs, poster);
+
+        if (PluginConfiguration.SAVE_FULL_IMAGE.get())
+        {
+            ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
+        }
+
+        submitToMainThread(new Callable<Void>()
+        {
+            @Override
+            public Void call() throws Exception
+            {
+                Renderer.installRenderer(poster, mapsIDs);
+                return null;
+            }
+
+        });
+
+
+    }
     static private ImageMap renderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable
     {
         MapManager.checkMapLimit(1, playerUUID);
@@ -180,4 +251,6 @@ public class ImageRendererExecutor extends Worker
 
         return MapManager.createMap(poster, playerUUID, mapsIDs);
     }
+
+
 }

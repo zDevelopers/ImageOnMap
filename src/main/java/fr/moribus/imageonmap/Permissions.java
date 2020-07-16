@@ -45,6 +45,7 @@ public enum Permissions
     GET("imageonmap.get"),
     RENAME("imageonmap.rename"),
     DELETE("imageonmap.delete"),
+    UPDATE("imageonmap.update"),
     ADMINISTRATIVE("imageonmap.administrative"),
     BYPASS_SIZE("imageonmap.bypasssize")
 
