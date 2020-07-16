@@ -69,7 +69,6 @@ public class UpdateCommand extends IoMCommand
         ImageUtils.ScalingType scaling = ImageUtils.ScalingType.NONE;
         URL url;
 
-
         if(args.length < 1) throwInvalidArgument(I.t("You must give an URL and a map name to update."));
         if(args.length < 2) throwInvalidArgument(I.t("You must give a map name to update."));
 
@@ -82,22 +81,15 @@ public class UpdateCommand extends IoMCommand
             Integer[] size={1,1};
             if(map.getType()== ImageMap.Type.POSTER)
                 size=map.getSize( new HashMap<String, Object>(),map.getUserUUID(),map.getId());
-
             int width=size[0],height=size[1];
-
             try {
-
-
                 ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Updating..."));
                 ImageRendererExecutor.update(url, scaling, player.getUniqueId(), map, width, height, new WorkerCallback<ImageMap>() {
                     @Override
                     public void finished(ImageMap result) {
                         ActionBar.removeMessage(player);
                         MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Updating finished!"));
-
-
                     }
-
                     @Override
                     public void errored(Throwable exception) {
                         player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
@@ -109,123 +101,17 @@ public class UpdateCommand extends IoMCommand
                     }
                 });
             }
-            //Added to fix bug with rendering displaying after error
             finally {
                 ActionBar.removeMessage(player);
             }
-
         }
         catch(MalformedURLException  ex)
         {
             throwInvalidArgument(I.t("Invalid URL."));
             return;
         }
-        /*catch (MapManagerException ex){
-            throwInvalidArgument(I.t("Update failed."));
-            return;
-        }*/
-
-
-
-
-
-       /* if(args.length >= 2)
-        {
-            if(args.length >= 4) {
-                width = Integer.parseInt(args[2]);
-                height = Integer.parseInt(args[3]);
-            }
-
-            switch(args[1]) {
-                case "resize": scaling = ImageUtils.ScalingType.CONTAINED; break;
-                case "resize-stretched": scaling = ImageUtils.ScalingType.STRETCHED; break;
-                case "resize-covered": scaling = ImageUtils.ScalingType.COVERED; break;
-                default: throwInvalidArgument(I.t("Invalid Stretching mode.")); break;
-            }
-        }*/
-       /* try {
-
-
-            ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Updating map..."));
-            //ImageRendererExecutor.render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>() {
-                @Override
-                public void finished(ImageMap result) {
-                    ActionBar.removeMessage(player);
-                    MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Rendering finished!"));
-
-                    if (result.give(player) && (result instanceof PosterMap && !((PosterMap) result).hasColumnData())) {
-                        info(I.t("The rendered map was too big to fit in your inventory."));
-                        info(I.t("Use '/maptool getremaining' to get the remaining maps."));
-                    }
-                }
-
-                @Override
-                public void errored(Throwable exception) {
-                    player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
-
-                    PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
-                            player.getName(),
-                            exception.getClass().getCanonicalName(),
-                            exception.getMessage());
-                }
-            });
-        }
-        //Added to fix bug with rendering displaying after error
-        finally {
-            ActionBar.removeMessage(player);
-        }*/
     }
 
-
-/*
-
-    @Override
-    protected void run() throws CommandException
-    {
-        ImageMap map = getMapFromArgs();
-
-        if (!hasFlag("confirm"))
-        {
-            RawText msg = new RawText(I.t("You are going to update") + " ")
-                .then(map.getId())
-                    .color(ChatColor.GOLD)
-                .then(". " + I.t("Are you sure ? "))
-                    .color(ChatColor.WHITE)
-                .then(I.t("[Confirm]"))
-                    .color(ChatColor.GREEN)
-                    .hover(new RawText(I.t("{red}This map will be updated {bold}forever{red}!")))
-                    .command(getClass(), map.getId(), "--confirm")
-                .build();
-
-            send(msg);
-        }
-        else
-        {
-            Player player = playerSender();
-            MapManager.clear(player.getInventory(), map);
-
-            try
-            {
-                MapManager.updateMap(map);
-                info(I.t("Map successfully updated."));
-            }
-            catch (MapManagerException ex)
-            {
-                PluginLogger.warning("A non-existent map was requested to be updated", ex);
-                warning(I.t("This map does not exist."));
-            }
-        }
-    }
-    
-    @Override
-    protected List<String> complete() throws CommandException
-    {
-        if(args.length == 1) 
-            return getMatchingMapNames(playerSender(), args[0]);
-
-        return null;
-    }
-*/
     @Override
     public boolean canExecute(CommandSender sender)
     {

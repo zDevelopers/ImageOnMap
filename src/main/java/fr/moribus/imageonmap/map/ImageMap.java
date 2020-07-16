@@ -167,18 +167,9 @@ public abstract class ImageMap implements ConfigurationSerializable
         {
             PluginLogger.info(" "+tMap.toString());
             if(tMap.get("id").equals(id)) {
-
                     return new Integer[]{(Integer)tMap.get("columns"), (Integer)tMap.get("rows")};
-
             }
         }
-
-
-
-
-
-
-
         return null;
     }
     static protected <T> T getFieldValue(Map<String, Object> map, String fieldName) throws InvalidConfigurationException

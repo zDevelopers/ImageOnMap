@@ -142,16 +142,9 @@ public class ImageRendererExecutor extends Worker
                 // Limits are in place and the player does NOT have rights to avoid them.
                 checkSizeLimit(playerUUID, image );
 
-
                 updateMap(ImageUtils.ScalingType.CONTAINED.resize(image, width*128, height*128),playerUUID,map.getMapsIDs());
                 return map;
-                /*if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1)
-                {
-                    return updateSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
-                }
 
-                final BufferedImage resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
-                return updatePoster(resizedImage, playerUUID);*/
             }
         }, callback);
 
@@ -161,8 +154,6 @@ public class ImageRendererExecutor extends Worker
 
         final PosterImage poster = new PosterImage(image);
         poster.splitImages();
-
-
 
         ImageIOExecutor.saveImage(mapsIDs, poster);
 
@@ -179,10 +170,7 @@ public class ImageRendererExecutor extends Worker
                 Renderer.installRenderer(poster, mapsIDs);
                 return null;
             }
-
         });
-
-
     }
     static private ImageMap renderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable
     {
