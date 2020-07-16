@@ -149,11 +149,7 @@ public class PlayerMapStore implements ConfigurationSerializable
     {
         return new ArrayList(mapList);
     }
-
-    /*public synchronized ArrayList<ImageMap> getMapList()
-    {
-        return mapList;
-    }*/
+    
     public synchronized ImageMap[] getMaps()
     {
         return mapList.toArray(new ImageMap[mapList.size()]);
