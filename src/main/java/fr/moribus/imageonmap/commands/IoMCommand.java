@@ -40,10 +40,13 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.zlib.components.commands.Command;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.i18n.I;
+import fr.zcraft.zlib.tools.PluginLogger;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public abstract class IoMCommand extends Command
@@ -52,7 +55,47 @@ public abstract class IoMCommand extends Command
 	{
 		return getMapFromArgs(playerSender(), 0, true);
 	}
+//TODO:Add the quote system to zlib and refactor this
+	protected ImageMap getMapFromArgs(Player player, int index) throws CommandException
+	{
+		if(args.length <= index) throwInvalidArgument(I.t("You need to give a map name."));
 
+		ImageMap map;
+		String mapName = args[index];
+		for (int i = index + 1, c = args.length; i < c; i++) {
+			mapName += " " + args[i];
+		}
+		String regex="((\"([^\\\"]*(\\\\\\\")*)*([^\\\\\\\"]\"))|([^\\\"\\s\\\\]*(\\\\\\s)*[\\\\]*)*\"?)";
+
+		 Pattern pattern=Pattern.compile(regex);
+		 Matcher matcher=pattern.matcher(mapName);
+
+		StringBuilder result = new StringBuilder();
+
+		matcher.find();
+		result.append(matcher.group(0));
+		if(result!=null)
+			if(result.charAt(0)=='\"')
+				if(result.length()==1){
+					result.deleteCharAt(0);
+				}
+		 		else
+		 			if(result.charAt(result.length()-1)=='\"') {
+			 			result=result.deleteCharAt(result.length() - 1);
+						if(result!=null&&!result.equals("")&&result.charAt(0)=='\"')
+			 				mapName=result.deleteCharAt(0).toString();
+
+		 		}
+
+
+		mapName = mapName.trim();
+
+		map = MapManager.getMap(player.getUniqueId(), mapName);
+
+		if(map == null) error(I.t("This map does not exist."));
+		PluginLogger.info(""+map.getName());
+		return map;
+	}
 	protected ImageMap getMapFromArgs(Player player, int index, boolean expand) throws CommandException
 	{
 		if(args.length <= index) throwInvalidArgument(I.t("You need to give a map name."));

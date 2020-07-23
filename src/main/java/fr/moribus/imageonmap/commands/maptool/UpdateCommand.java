@@ -44,7 +44,6 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
-import fr.zcraft.zlib.components.commands.WithFlags;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.components.worker.WorkerCallback;
 import fr.zcraft.zlib.tools.PluginLogger;
@@ -58,8 +57,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
-@CommandInfo (name =  "update", usageParameters = "<new url> [stretched|covered] \"<map name to update>\" [--confirm]")
-@WithFlags ({"confirm"})
+@CommandInfo (name =  "update", usageParameters = "<new url> [stretched|covered] \"<map name to update>\"")
 public class UpdateCommand extends IoMCommand
 {
     @Override
@@ -86,14 +84,17 @@ public class UpdateCommand extends IoMCommand
                 break;
         }
         ImageMap map;
+        PluginLogger.info("getting mapfromargs");
         if(scaling.equals(ImageUtils.ScalingType.CONTAINED))
-            map=getMapFromArgs(player,1,true);
+            map=getMapFromArgs(player,1);
         else
-            map=getMapFromArgs(player,2,true);
+            map=getMapFromArgs(player,2);
+        PluginLogger.info("getted mapfromargs");
         try
         {
             url = new URL(args[0]);
             MapManager.load();
+
             Integer[] size={1,1};
             if(map.getType()== ImageMap.Type.POSTER)
                 size=map.getSize( new HashMap<String, Object>(),map.getUserUUID(),map.getId());
