@@ -25,6 +25,7 @@ permissions:
             imageonmap.rename: true
             imageonmap.delete: true
             imageonmap.bypasssize: false
+            imageonmap.give: false
 
     imageonmap.userender:
         description: "Allows you to use /tomap and related commands (/maptool getremaing). Alias of imageonmap.new."
@@ -53,6 +54,10 @@ permissions:
     imageonmap.delete:
         description: "Allows you to delete a map you rendered in the past."
         default: true
+
+    imageonmap.give:
+      description: "Allows you to give a map to a specified player."
+      default: op
 
     imageonmap.administrative:
         description: "Allows you to perform administrative tasks (like /maptool migrate)."
