@@ -46,10 +46,8 @@ import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.components.rawtext.RawText;
 import fr.zcraft.zlib.components.rawtext.RawTextPart;
-import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.text.RawMessage;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -92,14 +90,19 @@ public class ListCommand extends IoMCommand
                 .then(map.getId())
                 .color(ChatColor.WHITE)
                 .command(GetCommand.class, map.getId())
-                .hover(new ItemStackBuilder(Material.FILLED_MAP)
+                .hover(new RawText()
+                        .then(map.getName()).style(ChatColor.BOLD, ChatColor.GREEN).then("\n")
+                        .then(map.getId() + ", " + size).color(ChatColor.GRAY).then("\n\n")
+                        .then(I.t("{white}Click{gray} to get this map"))
+                );
+                /*.hover(new ItemStackBuilder(Material.FILLED_MAP)
                                 .title(ChatColor.GREEN + "" + ChatColor.BOLD + map.getName())
                                 .lore(ChatColor.GRAY + map.getId() + ", " + size)
                                 .lore("")
                                 .lore(I.t("{white}Click{gray} to get this map"))
                                 .hideAttributes()
                                 .item()
-                );
+                );*/
     }
 
     @Override
