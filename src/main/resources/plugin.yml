@@ -25,6 +25,7 @@ permissions:
             imageonmap.rename: true
             imageonmap.delete: true
             imageonmap.bypasssize: false
+            imageonmap.update: false
 
     imageonmap.userender:
         description: "Allows you to use /tomap and related commands (/maptool getremaing). Alias of imageonmap.new."
@@ -61,3 +62,7 @@ permissions:
     imageonmap.bypasssize:
         description: "Allows you to create maps larger than the configured limit."
         default: op
+
+    imageonmap.update:
+      description: "Allows you to update a map."
+      default: op
