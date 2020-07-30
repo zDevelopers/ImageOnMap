@@ -298,10 +298,7 @@ abstract public class SplatterMapManager {
 				frame.setItem(new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
 
 				//Force reset of rotation
-				if(i==0){//First map need to be rotate one time Clockwise
-					frame.setRotation(Rotation.NONE.rotateCounterClockwise());
-				}
-				else{frame.setRotation(Rotation.NONE);}
+				frame.setRotation(Rotation.NONE);
 				MapInitEvent.initMap(id);
 				++i;
 			}

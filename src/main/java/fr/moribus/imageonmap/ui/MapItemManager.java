@@ -43,6 +43,7 @@ import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.core.ZLib;
+import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.items.ItemUtils;
 import org.bukkit.*;
@@ -88,7 +89,7 @@ public class MapItemManager implements Listener
 
     static public boolean give(Player player, SingleMap map)
     {
-        return give(player, createMapItem(map));
+        return give(player, createMapItem(map,true));
     }
 
     static public boolean give(Player player, PosterMap map)
@@ -138,10 +139,14 @@ public class MapItemManager implements Listener
 
         return !given;
     }
-
     static public ItemStack createMapItem(SingleMap map)
     {
         return createMapItem(map.getMapsIDs()[0], map.getName(), false);
+    }
+
+    static public ItemStack createMapItem(SingleMap map, boolean goldTitle)
+    {
+        return createMapItem(map.getMapsIDs()[0], map.getName(), false, goldTitle);
     }
 
     static public ItemStack createMapItem(PosterMap map, int index)
@@ -166,19 +171,31 @@ public class MapItemManager implements Listener
         return I.t("{0} (part {1})", map.getName(), index + 1);
     }
 
-    static public ItemStack createMapItem(int mapID, String text, boolean isMapPart)
+    static public ItemStack createMapItem(int mapID, String text, boolean isMapPart, boolean goldTitle)
     {
-        final ItemStack mapItem = new ItemStackBuilder(Material.FILLED_MAP)
-                .title(text)
-                .hideAttributes()
-                .item();
-
+        ItemStack mapItem;
+        if(goldTitle) {
+            mapItem = new ItemStackBuilder(Material.FILLED_MAP)
+                    .title( ChatColor.GOLD, text)
+                    .hideAttributes()
+                    .item();
+        }
+        else{
+            mapItem= new ItemStackBuilder(Material.FILLED_MAP)
+                    .title(text)
+                    .hideAttributes()
+                    .item();
+        }
         final MapMeta meta = (MapMeta) mapItem.getItemMeta();
         meta.setMapId(mapID);
         meta.setColor(isMapPart ? Color.LIME : Color.GREEN);
         mapItem.setItemMeta(meta);
-
+        PluginLogger.info("color "+meta.getColor());
         return mapItem;
+    }
+    static public ItemStack createMapItem(int mapID, String text, boolean isMapPart)
+    {
+        return createMapItem( mapID,  text,  isMapPart,false);
     }
 
     /**
@@ -248,18 +265,20 @@ public class MapItemManager implements Listener
         if (frame.getItem().getType() != Material.AIR) return;
         if (!MapManager.managesMap(mapItem)) return;
 
-
         if (SplatterMapManager.hasSplatterAttributes(mapItem))
         {
             if (!SplatterMapManager.placeSplatterMap(frame, player,event)){
                 event.setCancelled(true); //In case of an error allow to cancel map placement
-                return;}
+                return;
+            }
+            frame.setRotation(Rotation.NONE.rotateCounterClockwise());
         }
         else
         {
+            frame.setRotation(Rotation.NONE.rotateCounterClockwise());
             // If the item has a display name, bot not one from an anvil by the player, we remove it
             // If it is not displayed on hover on the wall.
-            if (mapItem.hasItemMeta() && mapItem.getItemMeta().hasDisplayName() && mapItem.getItemMeta().getDisplayName().startsWith("§r"))
+            if (mapItem.hasItemMeta() && mapItem.getItemMeta().hasDisplayName() && mapItem.getItemMeta().getDisplayName().startsWith("§6"))
             {
 
                 final ItemStack frameItem = mapItem.clone();
