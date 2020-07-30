@@ -102,7 +102,7 @@ public class MapDetailGui extends ExplorerGui<Integer>
 
         if (map instanceof SingleMap)
         {
-            return MapItemManager.createMapItem((SingleMap)map);
+            return MapItemManager.createMapItem((SingleMap)map,true);
         }
         else if (map instanceof PosterMap)
         {

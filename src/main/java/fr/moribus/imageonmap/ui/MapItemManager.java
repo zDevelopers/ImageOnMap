@@ -43,10 +43,10 @@ import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.core.ZLib;
-import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import fr.zcraft.zlib.tools.items.ItemUtils;
 import org.bukkit.*;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -190,7 +190,6 @@ public class MapItemManager implements Listener
         meta.setMapId(mapID);
         meta.setColor(isMapPart ? Color.LIME : Color.GREEN);
         mapItem.setItemMeta(meta);
-        PluginLogger.info("color "+meta.getColor());
         return mapItem;
     }
     static public ItemStack createMapItem(int mapID, String text, boolean isMapPart)
@@ -271,11 +270,13 @@ public class MapItemManager implements Listener
                 event.setCancelled(true); //In case of an error allow to cancel map placement
                 return;
             }
-            frame.setRotation(Rotation.NONE.rotateCounterClockwise());
+            if(frame.getFacing()!= BlockFace.UP&&frame.getFacing()!= BlockFace.DOWN)
+                frame.setRotation(Rotation.NONE.rotateCounterClockwise());
         }
         else
         {
-            frame.setRotation(Rotation.NONE.rotateCounterClockwise());
+            if(frame.getFacing()!= BlockFace.UP&&frame.getFacing()!= BlockFace.DOWN)
+                frame.setRotation(Rotation.NONE.rotateCounterClockwise());
             // If the item has a display name, bot not one from an anvil by the player, we remove it
             // If it is not displayed on hover on the wall.
             if (mapItem.hasItemMeta() && mapItem.getItemMeta().hasDisplayName() && mapItem.getItemMeta().getDisplayName().startsWith("§6"))
