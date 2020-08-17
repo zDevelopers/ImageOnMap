@@ -66,7 +66,7 @@ public class GiveCommand extends IoMCommand
                 player = playerSender();
             }
             if (args.length == 3) {
-                player = Bukkit.getPlayer(args[2]);
+                player = getPlayerParameter(2);
                 if(player==null){
                     try{
                         playerSender().sendMessage(I.t("Player map store not found"));
