@@ -64,5 +64,5 @@ permissions:
         default: op
 
     imageonmap.update:
-      description: "Allows you to update a map."
+      description: "Allows you to update an existing map with a new image."
       default: op
