@@ -123,7 +123,6 @@ public class UpdateCommand extends IoMCommand
         catch(MalformedURLException  ex)
         {
             throwInvalidArgument(I.t("Invalid URL."));
-            return;
         }
     }
 
