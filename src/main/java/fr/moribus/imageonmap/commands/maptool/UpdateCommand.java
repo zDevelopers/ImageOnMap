@@ -81,7 +81,6 @@ public class UpdateCommand extends IoMCommand
                 break;
             default:
                 scaling = ImageUtils.ScalingType.CONTAINED;
-                break;
         }
         ImageMap map;
         PluginLogger.info("getting mapfromargs");
