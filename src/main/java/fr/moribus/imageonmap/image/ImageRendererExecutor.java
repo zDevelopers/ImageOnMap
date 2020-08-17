@@ -92,7 +92,7 @@ public class ImageRendererExecutor extends Worker
 
                 BufferedImage image=null;
                 //If the link is an imgur one
-                if (url.toString().startsWith("https://imgur.com/")) {
+                if (url.toString().toLowerCase().startsWith("https://imgur.com/")) {
 
                     //Not handled, can't with the hash only access the image in i.imgur.com/<hash>.<extension>
 
