@@ -56,7 +56,7 @@ public class GiveCommand extends IoMCommand
     {
         if(args.length < 2) throwInvalidArgument(I.t("You must give a valid player name and a map name."));
 
-        final Player p= Bukkit.getPlayer(args[0]);
+        final Player p = getPlayerParameter(0);
 
         ImageMap map;
         //TODO does not support map name with space
