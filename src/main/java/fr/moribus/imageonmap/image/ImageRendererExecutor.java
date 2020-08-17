@@ -111,7 +111,7 @@ public class ImageRendererExecutor extends Worker
                 if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
 
                 // Limits are in place and the player does NOT have rights to avoid them.
-                checkSizeLimit(playerUUID, image );
+                checkSizeLimit(playerUUID, image);
 
                 if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1)
                 {
