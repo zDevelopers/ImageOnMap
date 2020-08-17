@@ -117,10 +117,10 @@ public final class ImageOnMap extends ZPlugin
                 ListCommand.class,
                 GetCommand.class,
                 DeleteCommand.class,
+                GiveCommand.class,
                 GetRemainingCommand.class,
                 ExploreCommand.class,
-                MigrateCommand.class,
-                GiveCommand.class
+                MigrateCommand.class
         );
 
         Commands.registerShortcut("maptool", NewCommand.class, "tomap");
