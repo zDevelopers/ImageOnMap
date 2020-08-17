@@ -88,7 +88,6 @@ public class UpdateCommand extends IoMCommand
             map=getMapFromArgs(player,1);
         else
             map=getMapFromArgs(player,2);
-        PluginLogger.info("getted mapfromargs");
         try
         {
             url = new URL(args[0]);
