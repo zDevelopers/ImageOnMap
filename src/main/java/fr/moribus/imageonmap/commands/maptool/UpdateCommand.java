@@ -103,7 +103,7 @@ public class UpdateCommand extends IoMCommand
                     @Override
                     public void finished(ImageMap result) {
                         ActionBar.removeMessage(player);
-                        MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Updating finished!"));
+                        MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("The map was updated using the new image!"));
                     }
                     @Override
                     public void errored(Throwable exception) {
