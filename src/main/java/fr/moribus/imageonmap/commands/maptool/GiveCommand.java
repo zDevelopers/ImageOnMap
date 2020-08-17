@@ -77,10 +77,6 @@ public class GiveCommand extends IoMCommand
                     return;
                 }
             }
-            if (p == null) {
-                player.sendMessage(I.t("Player not found"));
-                return;
-            }
             map = MapManager.getMap(player.getUniqueId(), args[1]);
             if (map == null) {
                 player.sendMessage(I.t("Map not found"));
