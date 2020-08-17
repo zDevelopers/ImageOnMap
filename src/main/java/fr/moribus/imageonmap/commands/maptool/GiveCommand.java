@@ -67,15 +67,6 @@ public class GiveCommand extends IoMCommand
             }
             if (args.length == 3) {
                 player = getPlayerParameter(2);
-                if(player==null){
-                    try{
-                        playerSender().sendMessage(I.t("Player map store not found"));
-                    }
-                    catch (Exception e){
-
-                    }
-                    return;
-                }
             }
             map = MapManager.getMap(player.getUniqueId(), args[1]);
             if (map == null) {
