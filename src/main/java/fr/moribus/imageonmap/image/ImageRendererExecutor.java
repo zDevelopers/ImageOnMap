@@ -140,7 +140,7 @@ public class ImageRendererExecutor extends Worker
                 if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
 
                 // Limits are in place and the player does NOT have rights to avoid them.
-                checkSizeLimit(playerUUID, image );
+                checkSizeLimit(playerUUID, image);
 
                 updateMap(scaling.resize(image, width*128, height*128),playerUUID,map.getMapsIDs());
                 return map;
