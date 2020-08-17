@@ -79,8 +79,7 @@ public class GiveCommand extends IoMCommand
             }
             map = MapManager.getMap(player.getUniqueId(), args[1]);
             if (map == null) {
-                player.sendMessage(I.t("Map not found"));
-                return;
+                throwInvalidArgument(I.t("Map not found"));
             }
             map.give(p);
         }
