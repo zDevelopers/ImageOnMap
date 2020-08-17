@@ -93,7 +93,6 @@ public abstract class IoMCommand extends Command
 		map = MapManager.getMap(player.getUniqueId(), mapName);
 
 		if(map == null) error(I.t("This map does not exist."));
-		PluginLogger.info(""+map.getName());
 		return map;
 	}
 	protected ImageMap getMapFromArgs(Player player, int index, boolean expand) throws CommandException
