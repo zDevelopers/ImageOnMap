@@ -83,7 +83,6 @@ public class UpdateCommand extends IoMCommand
                 scaling = ImageUtils.ScalingType.CONTAINED;
         }
         ImageMap map;
-        PluginLogger.info("getting mapfromargs");
         if(scaling.equals(ImageUtils.ScalingType.CONTAINED))
             map=getMapFromArgs(player,1);
         else
