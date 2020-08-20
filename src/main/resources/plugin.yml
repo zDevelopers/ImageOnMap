@@ -11,6 +11,9 @@ commands:
       description: Manage maps
    maps:
       description: Manage maps through a GUI
+   mapgive:
+     description: give a map to a player from a player map store, by default take from the player that make the command
+     usage: /<command> player_to map_name [player_from]
 
 permissions:
     imageonmap.*:
