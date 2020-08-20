@@ -59,43 +59,33 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 @WorkerAttributes(name = "Image Renderer", queriesMainThread = true)
-public class ImageRendererExecutor extends Worker
-{
-    private static URLConnection connecting(URL url)throws IOException{
+public class ImageRendererExecutor extends Worker {
+    private static URLConnection connecting(URL url) throws IOException {
         final URLConnection connection = url.openConnection();
         connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
         connection.connect();
 
-        if (connection instanceof HttpURLConnection)
-        {
+        if (connection instanceof HttpURLConnection) {
             final HttpURLConnection httpConnection = (HttpURLConnection) connection;
             final int httpCode = httpConnection.getResponseCode();
 
-            if ((httpCode / 100) != 2)
-            {
+            if ((httpCode / 100) != 2) {
                 throw new IOException(I.t("HTTP error: {0} {1}", httpCode, httpConnection.getResponseMessage()));
             }
         }
         return connection;
     }
-    private enum extension{
-    png, jpg, jpeg, gif
-    }
 
-
-    static public void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID, final int width, final int height, WorkerCallback<ImageMap> callback)
-    {
-        submitQuery(new WorkerRunnable<ImageMap>()
-        {
+    static public void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID, final int width, final int height, WorkerCallback<ImageMap> callback) {
+        submitQuery(new WorkerRunnable<ImageMap>() {
             @Override
             public ImageMap run() throws Throwable {
 
-                BufferedImage image=null;
+                BufferedImage image = null;
                 //If the link is an imgur one
                 if (url.toString().toLowerCase().startsWith("https://imgur.com/")) {
 
                     //Not handled, can't with the hash only access the image in i.imgur.com/<hash>.<extension>
-
 
                     if (url.toString().contains("gallery/")) {
                         throw new IOException("We do not support imgur gallery yet, please use direct link to image instead. Right click on the picture you want to use then select copy picture link:) ");
@@ -117,11 +107,9 @@ public class ImageRendererExecutor extends Worker
 
                     }
 
-
                 }
                 //If not an Imgur link
                 else {
-
 
                     //Try connecting
                     URLConnection connection = connecting(url);
@@ -129,8 +117,6 @@ public class ImageRendererExecutor extends Worker
                     final InputStream stream = connection.getInputStream();
 
                     image = ImageIO.read(stream);
-
-
 
                 }
                 if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
@@ -148,7 +134,7 @@ public class ImageRendererExecutor extends Worker
 
 
                 if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1) {
-                    ImageMap ret=renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
+                    ImageMap ret = renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
                     image.flush();//Safe to free
                     return ret;
                 }
@@ -160,26 +146,20 @@ public class ImageRendererExecutor extends Worker
         }, callback);
     }
 
-
-    static private ImageMap renderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable
-    {
+    static private ImageMap renderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable {
         MapManager.checkMapLimit(1, playerUUID);
-        final Future<Integer> futureMapID = submitToMainThread(new Callable<Integer>()
-        {
+        final Future<Integer> futureMapID = submitToMainThread(new Callable<Integer>() {
             @Override
-            public Integer call() throws Exception
-            {
+            public Integer call() throws Exception {
                 return MapManager.getNewMapsIds(1)[0];
             }
         });
 
         final int mapID = futureMapID.get();
-        ImageIOExecutor.saveImage(mapID,image);
-        submitToMainThread(new Callable<Void>()
-        {
+        ImageIOExecutor.saveImage(mapID, image);
+        submitToMainThread(new Callable<Void>() {
             @Override
-            public Void call() throws Exception
-            {
+            public Void call() throws Exception {
                 Renderer.installRenderer(image, mapID);
                 return null;
             }
@@ -187,16 +167,13 @@ public class ImageRendererExecutor extends Worker
         return MapManager.createMap(playerUUID, mapID);
     }
 
-    static private ImageMap renderPoster(final BufferedImage image, final UUID playerUUID) throws Throwable
-    {
+    static private ImageMap renderPoster(final BufferedImage image, final UUID playerUUID) throws Throwable {
         final PosterImage poster = new PosterImage(image);
         final int mapCount = poster.getImagesCount();
         MapManager.checkMapLimit(mapCount, playerUUID);
-        final Future<int[]> futureMapsIds = submitToMainThread(new Callable<int[]>()
-        {
+        final Future<int[]> futureMapsIds = submitToMainThread(new Callable<int[]>() {
             @Override
-            public int[] call() throws Exception
-            {
+            public int[] call() throws Exception {
                 return MapManager.getNewMapsIds(mapCount);
             }
         });
@@ -204,23 +181,24 @@ public class ImageRendererExecutor extends Worker
 
         final int[] mapsIDs = futureMapsIds.get();
 
-        ImageIOExecutor.saveImage(mapsIDs,poster);
-        if (PluginConfiguration.SAVE_FULL_IMAGE.get())
-        {
+        ImageIOExecutor.saveImage(mapsIDs, poster);
+        if (PluginConfiguration.SAVE_FULL_IMAGE.get()) {
             ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
         }
 
-        submitToMainThread(new Callable<Void>()
-        {
+        submitToMainThread(new Callable<Void>() {
             @Override
-            public Void call() throws Exception
-            {
+            public Void call() throws Exception {
                 Renderer.installRenderer(poster, mapsIDs);
                 return null;
             }
 
         });
-        poster.getImage().flush();//Safe?
+        poster.getImage().flush();//Safe to free
         return MapManager.createMap(poster, playerUUID, mapsIDs);
+    }
+
+    private enum extension {
+        png, jpg, jpeg, gif
     }
 }
