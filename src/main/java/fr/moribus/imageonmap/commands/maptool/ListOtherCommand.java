@@ -107,13 +107,11 @@ public class ListOtherCommand extends IoMCommand
                 .then(map.getId())
                 .color(ChatColor.WHITE)
                 .command(GetCommand.class, map.getId())
-                .hover(new ItemStackBuilder(Material.MAP)
-                                .title(ChatColor.GREEN + "" + ChatColor.BOLD + map.getName())
-                                .lore(ChatColor.GRAY + map.getId() + ", " + size)
-                                .lore("")
-                                .lore(I.t("{white}Click{gray} to get this map"))
-                                .hideAttributes()
-                                .item()
+		.hover(new RawText()
+                        .then(map.getName()).style(ChatColor.BOLD, ChatColor.GREEN).then("\n")
+                        .then(map.getId() + ", " + size).color(ChatColor.GRAY).then("\n\n")
+                        .then(I.t("{white}Click{gray} to get this map"))
+                
                 );
     }
     @Override
