@@ -1,0 +1,4 @@
+Gets another player's map.
+
+§6<playername>: §rThe name of the player who owns the map.
+§6<mapname>: §rThe name of the map. Use /maptool listother to get map names.

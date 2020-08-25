@@ -1,4 +1,5 @@
 /*
+
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
  * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2020)
@@ -42,15 +43,18 @@ public enum Permissions
 {
     NEW("imageonmap.new", "imageonmap.userender"),
     LIST("imageonmap.list"),
+    LISTOTHER("imageonmap.listother"),
     GET("imageonmap.get"),
+    GETOTHER("imageonmap.getother"),
     RENAME("imageonmap.rename"),
     REMOVE_SPLATTER_MAP("imageonmap.removesplattermap"),
     DELETE("imageonmap.delete"),
+    DELETEOTHER("imageonmap.deleteother"),
     ADMINISTRATIVE("imageonmap.administrative"),
     BYPASS_SIZE("imageonmap.bypasssize")
-
+      
+      
     ;
-
 
     private final String permission;
     private final String[] aliases;
