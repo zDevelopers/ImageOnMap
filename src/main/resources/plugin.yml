@@ -1,15 +1,16 @@
 name: ImageOnMap
 main: fr.moribus.imageonmap.ImageOnMap
-version: 3.1
+version: "4.0"
+api-version: "1.13"
 
 commands:
    tomap:
       description: render an image in a map
       usage: /<command> [URL]
    maptool:
-      description: manage maps
+      description: Manage maps
    maps:
-      description: manage maps through a GUI
+      description: Manage maps through a GUI
 
 permissions:
     imageonmap.*:
@@ -22,15 +23,16 @@ permissions:
             imageonmap.get: true
             imageonmap.explore: true
             imageonmap.rename: true
+            imageonmap.removesplattermap: true
             imageonmap.delete: true
-            imageonmap.administrative: false
+            imageonmap.bypasssize: false
 
     imageonmap.userender:
-        description: "Allows you to use /tomap and related commands (/maptool getremaing). Alias of imageonmap.new."
+        description: "Allows you to use /tomap and related commands (/maptool getremaining). Alias of imageonmap.new."
         default: true
 
     imageonmap.new:
-        description: "Allows you to use /tomap and related commands (/maptool getremaing)."
+        description: "Allows you to use /tomap and related commands (/maptool getremaining)."
         default: true
 
     imageonmap.list:
@@ -38,7 +40,7 @@ permissions:
         default: true
 
     imageonmap.get:
-        description: "Allows you to get a new map among the ones you already rendered, and related commands (/maptool getremaing)."
+        description: "Allows you to get a new map among the ones you already rendered, and related commands (/maptool getremaining)."
         default: true
 
     imageonmap.explore:
@@ -53,6 +55,14 @@ permissions:
         description: "Allows you to delete a map you rendered in the past."
         default: true
 
+    imageonmap.removesplattermap:
+        description: "Allows you to remove a splatter map from a wall by sneaking and breaking a map."
+        default: true
+
     imageonmap.administrative:
         description: "Allows you to perform administrative tasks (like /maptool migrate)."
+        default: op
+
+    imageonmap.bypasssize:
+        description: "Allows you to create maps larger than the configured limit."
         default: op

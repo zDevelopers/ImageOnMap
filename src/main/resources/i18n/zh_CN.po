@@ -9,47 +9,47 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-07-10 03:07+0200\n"
 "PO-Revision-Date: 2016-07-10 03:08+0200\n"
-"Last-Translator: Adrien Prokopowicz\n"
+"Last-Translator: Souir_Tommer\n"
 "Language-Team: \n"
-"Language: en_US\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n < 1 || n > 1);\n"
 "X-Generator: Poedit 1.8.7.1\n"
 
 #: src/main/java/fr/moribus/imageonmap/commands/IoMCommand.java:40
 msgid "You need to give a map name."
-msgstr "You need to give a map name."
+msgstr "你需要提供名称"
 
 #: src/main/java/fr/moribus/imageonmap/commands/IoMCommand.java:57
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteNoConfirmCommand.java:51
 msgid "This map does not exist."
-msgstr "This map does not exist."
+msgstr "该地图不存在"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteConfirmCommand.java:39
 msgid "You are going to delete"
-msgstr "You are going to delete"
+msgstr "你将要删除"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteConfirmCommand.java:42
 msgid "Are you sure ? "
-msgstr "Are you sure ? "
+msgstr "你确定吗? "
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteConfirmCommand.java:44
 msgid "[Confirm]"
-msgstr "[Confirm]"
+msgstr "[确定]"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteConfirmCommand.java:46
 msgid "{red}This map will be deleted {bold}forever{red}!"
-msgstr "{red}This map will be deleted {bold}forever{red}!"
+msgstr "{red}这个地图将会永久 {bold}删除{red}!"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/DeleteNoConfirmCommand.java:46
 msgid "Map successfully deleted."
-msgstr "Map successfully deleted."
+msgstr "地图已成功删除"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetCommand.java:38
 msgid "The requested map was too big to fit in your inventory."
-msgstr "The requested map was too big to fit in your inventory."
+msgstr "请求的地图太大,无法容纳到您的背包中"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetCommand.java:39
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:71
@@ -58,146 +58,146 @@ msgstr "Use '/maptool getremaining' to get the remaining maps."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetRemainingCommand.java:38
 msgid "You have no remaining map."
-msgstr "You have no remaining map."
+msgstr "你没有剩余的地图"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetRemainingCommand.java:46
 msgid ""
 "Your inventory is full! Make some space before requesting the remaining maps."
 msgstr ""
-"Your inventory is full! Make some space before requesting the remaining maps."
+"你的背包已满!"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetRemainingCommand.java:50
 #, java-format
 msgid "There is {0} map remaining."
 msgid_plural "There are {0} maps remaining."
-msgstr[0] "There is {0} map remaining."
-msgstr[1] "There are {0} maps remaining."
+msgstr[0] "剩余 {0} 张地图"
+msgstr[1] "剩余 {0} 张地图"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/ListCommand.java:49
 msgid "No map found."
-msgstr "No map found."
+msgstr "找不到地图"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/ListCommand.java:53
 msgid "{white}{bold}{0} map found."
 msgid_plural "{white}{bold}{0} maps found."
-msgstr[0] "{white}{bold}{0} map found."
-msgstr[1] "{white}{bold}{0} maps found."
+msgstr[0] "{white}{bold}{0} 地图"
+msgstr[1] "{white}{bold}{0} 地图"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/ListCommand.java:79
 msgid "{white}Click{gray} to get this map"
-msgstr "{white}Click{gray} to get this map"
+msgstr "{white}点击{gray} 得到这张地图"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/MigrateCommand.java:36
 msgid "A migration process is already running. Check console for details."
-msgstr "A migration process is already running. Check console for details."
+msgstr "进程已在运行..请等待"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/MigrateCommand.java:40
 msgid "Migration started. See console for details."
-msgstr "Migration started. See console for details."
+msgstr "开始..."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:44
 msgid "You must give an URL to take the image from."
-msgstr "You must give an URL to take the image from."
+msgstr "您必须提供URL才能从中获取图像"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:52
 msgid "Invalid URL."
-msgstr "Invalid URL."
+msgstr "无效的网址"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:61
 msgid "Rendering..."
-msgstr "Rendering..."
+msgstr "渲染..."
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:67
 msgid "Rendering finished!"
-msgstr "Rendering finished!"
+msgstr "渲染完成！"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:70
 msgid "The rendered map was too big to fit in your inventory."
-msgstr "The rendered map was too big to fit in your inventory."
+msgstr "渲染的地图太大"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:78
 msgid "{ce}Map rendering failed: {0}"
-msgstr "{ce}Map rendering failed: {0}"
+msgstr "{ce}地图渲染失败: {0}"
 
 #. The title of the map deletion GUI. {0}: map name.
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:102
 msgid "{0} » {black}Confirm deletion"
-msgstr "{0} » {black}Confirm deletion"
+msgstr "{0} » {black}确认删除"
 
 #. The title of the map deletion item
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:110
 msgid "{red}You're about to destroy this map..."
-msgstr "{red}You're about to destroy this map..."
+msgstr "{red}您将要销毁这张地图..."
 
 #. The end, in the lore, of a title starting with “You're about to destroy this map...”.
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:112
 msgid "{red}...{italic}forever{red}."
-msgstr "{red}...{italic}forever{red}."
+msgstr "{red}...{italic}永久{red}."
 
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:114
 msgid "{gray}Name: {white}{0}"
-msgstr "{gray}Name: {white}{0}"
+msgstr "{gray}名称: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:115
 msgid "{gray}Map ID: {white}{0}"
-msgstr "{gray}Map ID: {white}{0}"
+msgstr "{gray}地图 ID: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:116
 msgid "{gray}Maps inside: {white}{0}"
-msgstr "{gray}Maps inside: {white}{0}"
+msgstr "{gray}地图: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/ConfirmDeleteMapGui.java:178
 msgid "{gray}Map successfully deleted."
-msgstr "{gray}Map successfully deleted."
+msgstr "{gray}地图已成功删除"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:54
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:71
 msgid "{green}Map part"
-msgstr "{green}Map part"
+msgstr "{green}地图部分"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:55
 msgid "{gray}Column: {white}{0}"
-msgstr "{gray}Column: {white}{0}"
+msgstr "{gray}高: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:56
 msgid "{gray}Row: {white}{0}"
-msgstr "{gray}Row: {white}{0}"
+msgstr "{gray}宽: {white}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:58
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:74
 msgid "{gray}» {white}Click{gray} to get only this part"
-msgstr "{gray}» {white}Click{gray} to get only this part"
+msgstr "{gray}» {white}点击{gray} 得到这部分"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:72
 msgid "{gray}Part: {white}{0}"
-msgstr "{gray}Part: {white}{0}"
+msgstr "{gray}部分: {white}{0}"
 
 #. Title of the map details GUI
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:114
 msgid "Your maps » {black}{0}"
-msgstr "Your maps » {black}{0}"
+msgstr "你的地图 » {black}{0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:136
 msgid "{blue}Rename this image"
-msgstr "{blue}Rename this image"
+msgstr "{blue}重命名这张图片"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:137
 msgid ""
 "{gray}Click here to rename this image; this is used for your own "
 "organization."
 msgstr ""
-"{gray}Click here to rename this image; this is used for your own "
-"organization."
+"{gray}点击此处重命名该图像; 这只对自己生效"
+""
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:141
 msgid "{red}Delete this image"
-msgstr "{red}Delete this image"
+msgstr "{red}删除这张图片"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:142
 msgid ""
 "{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"
 msgstr ""
-"{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"
+"{white}永久{gray} {gray}删除这张地图,此操作无法撤消!"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:144
 msgid "{gray}You will be asked to confirm your choice if you click here."
@@ -205,26 +205,26 @@ msgstr "{gray}You will be asked to confirm your choice if you click here."
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:156
 msgid "{green}« Back"
-msgstr "{green}« Back"
+msgstr "{green}« 返回"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:157
 msgid "{gray}Go back to the list."
-msgstr "{gray}Go back to the list."
+msgstr "{gray}返回到列表"
 
 #. Displayed subtitle description of a single map on the list GUI
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:44
 msgid "{white}Single map"
-msgstr "{white}Single map"
+msgstr "{white}单张地图"
 
 #. Displayed subtitle description of a poster map on the list GUI (columns × rows in english)
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:52
 msgid "{white}Poster map ({0} × {1})"
-msgstr "{white}Poster map ({0} × {1})"
+msgstr "{white}地图大小 ({0} × {1})"
 
 #. Displayed subtitle description of a poster map without column data on the list GUI
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:57
 msgid "{white}Poster map ({0} parts)"
-msgstr "{white}Poster map ({0} parts)"
+msgstr "{white}地图大小 ({0} 部分)"
 
 #. Displayed title of a map on the list GUI
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:62
@@ -234,52 +234,52 @@ msgstr "{green}{bold}{0}"
 #. Map ID displayed in the tooltip of a map on the list GUI
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:67
 msgid "{gray}Map ID: {0}"
-msgstr "{gray}Map ID: {0}"
+msgstr "{gray}地图 ID: {0}"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:69
 msgid "{gray}» {white}Left-click{gray} to get this map"
-msgstr "{gray}» {white}Left-click{gray} to get this map"
+msgstr "{gray}» {white}左击{gray} 获得地图"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:70
 msgid "{gray}» {white}Right-click{gray} for details and options"
-msgstr "{gray}» {white}Right-click{gray} for details and options"
+msgstr "{gray}» {white}右击{gray} 打开更多设置"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:79
 msgid "{red}You don't have any map."
-msgstr "{red}You don't have any map."
+msgstr "{red}你还没有任何地图"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:80
 msgid ""
 "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]"
 "{gray}!"
 msgstr ""
-"{gray}Get started by creating a new one using {white}/tomap <URL> [resize]"
+"{gray}使用指令创建地图吧 {white}/tomap <URL> [resize]"
 "{gray}!"
 
 #. The maps list GUI title
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:119
 msgid "{black}Your maps {reset}({0})"
-msgstr "{black}Your maps {reset}({0})"
+msgstr "{black}你的地图 {reset}({0})"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:148
 msgid "{blue}Usage statistics"
-msgstr "{blue}Usage statistics"
+msgstr "{blue}使用状态"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:150
 msgid "{white}{0}{gray} image rendered"
 msgid_plural "{white}{0}{gray} images rendered"
-msgstr[0] "{white}{0}{gray} image rendered"
-msgstr[1] "{white}{0}{gray} images rendered"
+msgstr[0] "{white}{0}{gray} 渲染地图"
+msgstr[1] "{white}{0}{gray} 渲染地图"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:151
 msgid "{white}{0}{gray} Minecraft map used"
 msgid_plural "{white}{0}{gray} Minecraft maps used"
-msgstr[0] "{white}{0}{gray} Minecraft map used"
-msgstr[1] "{white}{0}{gray} Minecraft maps used"
+msgstr[0] "{white}{0}{gray} 张地图用量"
+msgstr[1] "{white}{0}{gray} 张地图用量"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:156
 msgid "{blue}Minecraft maps limits"
-msgstr "{blue}Minecraft maps limits"
+msgstr "{blue}minecraft地图限制"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapListGui.java:158
 msgid "{gray}Server-wide limit: {white}unlimited"
@@ -314,12 +314,12 @@ msgstr "HTTP error : {0} {1}"
 
 #: src/main/java/fr/moribus/imageonmap/image/ImageRendererExecutor.java:79
 msgid "The given URL is not a valid image"
-msgstr "The given URL is not a valid image"
+msgstr "指定的网址不是有效的图片"
 
 #. The default display name of a map
 #: src/main/java/fr/moribus/imageonmap/map/ImageMap.java:44
 msgid "Map"
-msgstr "Map"
+msgstr "地图"
 
 #: src/main/java/fr/moribus/imageonmap/map/MapManagerException.java:29
 #, java-format
@@ -332,15 +332,15 @@ msgstr "The server ImageOnMap limit has been reached."
 
 #: src/main/java/fr/moribus/imageonmap/map/MapManagerException.java:31
 msgid "The given map does not exist."
-msgstr "The given map does not exist."
+msgstr "地图不存在."
 
 #: src/main/java/fr/moribus/imageonmap/migration/MigratorExecutor.java:34
 msgid "Migration is already running."
-msgstr "Migration is already running."
+msgstr "迁移已在运行"
 
 #: src/main/java/fr/moribus/imageonmap/migration/MigratorExecutor.java:50
 msgid "Waiting for migration to finish..."
-msgstr "Waiting for migration to finish..."
+msgstr "等待迁移完成..."
 
 #: src/main/java/fr/moribus/imageonmap/migration/MigratorExecutor.java:58
 msgid ""
@@ -541,55 +541,55 @@ msgstr "Data that has not been migrated will be kept in the old data files."
 #: src/main/java/fr/moribus/imageonmap/ui/MapItemManager.java:215
 #, java-format
 msgid "{0} (part {1})"
-msgstr "{0} (part {1})"
+msgstr "{0} (部分 {1})"
 
 #. The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
 #: src/main/java/fr/moribus/imageonmap/ui/MapItemManager.java:145
 #: src/main/java/fr/moribus/imageonmap/ui/MapItemManager.java:213
 #, java-format
 msgid "{0} (row {1}, column {2})"
-msgstr "{0} (row {1}, column {2})"
+msgstr "{0} (宽 {1}, 高 {2})"
 
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:44
 msgid "Splatter Map"
-msgstr "Splatter Map"
+msgstr "扩散地图"
 
 #. Title in a splatter map tooltip
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:48
 msgid "Item frames needed"
-msgstr "Item frames needed"
+msgstr "展示框空间所需"
 
 #. Size of a map stored in a splatter map
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:56
 #, java-format
 msgid "{0} × {1}"
-msgstr "{0} × {1}"
+msgstr "宽: {0} × 高: {1}"
 
 #. Size of a map stored in a splatter map, including the total frames count
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:62
 #, java-format
 msgid "{0} × {1} (total {2} frames)"
-msgstr "{0} × {1} (total {2} frames)"
+msgstr "宽: {0} × 高: {1} (共需要 {2} 展示框)"
 
 #. Title in a splatter map tooltip
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:53
 msgid "How to use this?"
-msgstr "How to use this?"
+msgstr "如何使用?"
 
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:54
 msgid ""
 "Place empty item frames on a wall, enough to host the whole map. Then, right-"
 "click on the bottom-left frame with this map."
 msgstr ""
-"Place empty item frames on a wall, enough to host the whole map. Then, right-"
-"click on the bottom-left frame with this map."
+"把一样宽高的展示框全部放在墙上,然后手持此地图右键左下角的"
+"展示框即可"
 
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:56
 msgid ""
 "Shift-click one of the placed maps to remove the whole poster in one shot."
 msgstr ""
-"Shift-click one of the placed maps to remove the whole poster in one shot."
+"潜行攻击放置的地图,即可收回整张地图"
 
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:101
 msgid "{ce}There is not enough space to place this map ({0} × {1})."
-msgstr "{ce}There is not enough space to place this map ({0} × {1})."
+msgstr "{ce}这里没有足够的空间 (宽: {0} × 高: {1})"

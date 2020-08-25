@@ -1,43 +1,61 @@
 /*
- * Copyright (C) 2013 Moribus
- * Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
+ * Copyright or © or Copr. Moribus (2013)
+ * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2020)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2020)
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This software is a computer program whose purpose is to allow insertion of
+ * custom images in a Minecraft world.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
  */
 
 package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.zlib.core.ZLib;
-import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 
+import java.io.File;
 public class MapInitEvent implements Listener
 {
     static public void init()
@@ -54,7 +72,7 @@ public class MapInitEvent implements Listener
         
         for(Player player : Bukkit.getOnlinePlayers())
         {
-            initMap(player.getItemInHand());
+            initMap(player.getInventory().getItemInMainHand());
         }
     }
     
@@ -78,10 +96,10 @@ public class MapInitEvent implements Listener
     }
     
     @EventHandler
-    public void onPlayerPickup(PlayerPickupItemEvent event)
+    public void onPlayerPickup(EntityPickupItemEvent event)
     {
-        ItemStack item = event.getItem().getItemStack();
-        initMap(item);
+        if (!(event.getEntity() instanceof HumanEntity)) return;
+        initMap(event.getItem().getItemStack());
     }
     
     @EventHandler
@@ -99,21 +117,23 @@ public class MapInitEvent implements Listener
     
     static public void initMap(ItemStack item)
     {
-        if (item != null && item.getType() == Material.MAP)
+        if (item != null && item.getType() == Material.FILLED_MAP)
         {
-            initMap(item.getDurability());
+            initMap(MapManager.getMapIdFromItemStack(item));
         }
     }
     
-    static public void initMap(short id)
+    static public void initMap(int id)
     {
-        initMap(Bukkit.getMap(id));
+        initMap(Bukkit.getServer().getMap(id));
     }
     
     static public void initMap(MapView map)
     {
-        if(map == null) return;
-        if(Renderer.isHandled(map)) return;
+        if(map == null) {
+            return;}
+        if(Renderer.isHandled(map)) {
+            return;}
         
         File imageFile = ImageOnMap.getPlugin().getImageFile(map.getId());
         if(imageFile.isFile())

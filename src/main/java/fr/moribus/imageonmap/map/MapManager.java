@@ -1,19 +1,37 @@
 /*
- * Copyright (C) 2013 Moribus
- * Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
+ * Copyright or © or Copr. Moribus (2013)
+ * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2020)
+ * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2020)
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This software is a computer program whose purpose is to allow insertion of
+ * custom images in a Minecraft world.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
  */
 
 package fr.moribus.imageonmap.map;
@@ -28,6 +46,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
@@ -53,7 +73,7 @@ abstract public class MapManager
         if(autosaveTask != null) autosaveTask.cancel();
     }
     
-    static public boolean managesMap(short mapID)
+    static public boolean managesMap(int mapID)
     {
         synchronized(playerMaps)
         {
@@ -68,7 +88,7 @@ abstract public class MapManager
     static public boolean managesMap(ItemStack item)
     {
         if(item == null) return false;
-        if(item.getType() != Material.MAP) return false;
+        if(item.getType() != Material.FILLED_MAP) return false;
         
         synchronized(playerMaps)
         {
@@ -80,16 +100,17 @@ abstract public class MapManager
         return false;
     }
 
-    static public ImageMap createMap(UUID playerUUID, short mapID) throws MapManagerException
+    static public ImageMap createMap(UUID playerUUID, int mapID) throws MapManagerException
     {
         ImageMap newMap = new SingleMap(playerUUID, mapID);
         addMap(newMap);
         return newMap;
     }
     
-    static public ImageMap createMap(PosterImage image, UUID playerUUID, short[] mapsIDs) throws MapManagerException
+    static public ImageMap createMap(PosterImage image, UUID playerUUID, int[] mapsIDs) throws MapManagerException
     {
         ImageMap newMap;
+
         if(image.getImagesCount() == 1)
         {
             newMap = new SingleMap(playerUUID, mapsIDs[0]);
@@ -102,14 +123,27 @@ abstract public class MapManager
         return newMap;
     }
     
-    static public short[] getNewMapsIds(int amount)
+    static public int[] getNewMapsIds(int amount)
     {
-        short[] mapsIds = new short[amount];
+        int[] mapsIds = new int[amount];
         for(int i = 0; i < amount; i++)
         {
             mapsIds[i] = Bukkit.createMap(Bukkit.getWorlds().get(0)).getId();
         }
         return mapsIds;
+    }
+
+    /**
+     * Returns the map ID from an ItemStack
+     * @param item The item stack
+     * @return The map ID, or 0 if invalid.
+     */
+    static public int getMapIdFromItemStack(final ItemStack item)
+    {
+        final ItemMeta meta = item.getItemMeta();
+        if (!(meta instanceof MapMeta)) return 0;
+
+        return ((MapMeta) meta).hasMapId() ? ((MapMeta) meta).getMapId() : 0;
     }
     
     static public void addMap(ImageMap map) throws MapManagerException
@@ -173,7 +207,7 @@ abstract public class MapManager
      * @param mapId The ID of the Minecraft map.
      * @return The {@link ImageMap}.
      */
-    static public ImageMap getMap(short mapId)
+    static public ImageMap getMap(int mapId)
     {
         synchronized(playerMaps)
         {
@@ -204,8 +238,8 @@ abstract public class MapManager
     static public ImageMap getMap(ItemStack item)
     {
         if(item == null) return null;
-        if(item.getType() != Material.MAP) return null;
-        return getMap(item.getDurability());
+        if(item.getType() != Material.FILLED_MAP) return null;
+        return getMap(getMapIdFromItemStack(item));
     }
     
     static public void clear(Inventory inventory)
@@ -306,13 +340,31 @@ abstract public class MapManager
         }
         return mapCount;
     }
+
+    /**
+     * Returns the total number of images rendered by ImageOnMap.
+     *
+     * @return The count.
+     */
+    static public int getImagesCount()
+    {
+        int imagesCount = 0;
+        synchronized(playerMaps)
+        {
+            for(PlayerMapStore tStore : playerMaps)
+            {
+                imagesCount += tStore.getImagesCount();
+            }
+        }
+        return imagesCount;
+    }
     
     /**
      * Returns if the given map ID is valid and exists in the current save.
      * @param mapId the map ID.
      * @return true if the given map ID is valid and exists in the current save, false otherwise.
      */
-    static public boolean mapIdExists(short mapId)
+    static public boolean mapIdExists(int mapId)
     {
         try
         {

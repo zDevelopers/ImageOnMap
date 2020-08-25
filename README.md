@@ -8,13 +8,15 @@ Repo for ImageOnMap, a bukkit plugin.
 
 ImageOnMap allows you to load a picture from the Internet to a Minecraft map.
 
-- Loads an image from a URL onto a map. PNG, JPEG and GIF are supported.
+- Loads an image from a URL onto a map. PNG, JPEG and static GIF are supported.
 - These images will be saved on your server and reloaded at restart.
-- Big pictures will be cut automatically into several parts! As example a 1024x1024 picture will be cut in 16 maps.
+- Big pictures will be cut automatically into several parts, to be rendered over multiple maps so they can cover whole
+  walls! As example a 1024x1024 picture will be cut in 16 maps.
 - Your image will be centered.
-- You can put your map in an item frame.
+- You can put your map in an item frame, or in multiple ones at once—ImageOnMap handles the placement for you!
 
-This plugin is a free software licenced under the GNU General Public License (version 3 or above). You can also get unstable development builds here.
+This plugin is a free software licenced under the [CeCILL-B licence](https://cecill.info/licences/Licence_CeCILL-B_V1-en.html)
+(BSD-style in French law).
 
 
 ## Quick guide
@@ -76,7 +78,7 @@ You can grant `imageonmap.*` to users, as this permission is a shortcut for all 
 
 ```yaml
 # Plugin language. Empty: system language.
-# Available: en_US (default, fallback) and fr_FR.
+# Available: en-US (default, fallback), fr-FR, ru-RU, de-DE.
 lang:
 
 # Allows collection of anonymous statistics on plugin environment and usage
@@ -88,11 +90,18 @@ collect-data: true
 # 0 means unlimited.
 map-global-limit: 0
 map-player-limit: 0
+
+# Maximum size in pixels for an image to be. 0 is unlimited.
+limit-map-size-x: 0
+limit-map-size-y: 0
+
+# Should the full image be saved when a map is rendered?
+save-full-image: false
 ```
 
 ## Changelog
 
-### 3.0
+### 3.0 — The From-Scratch Update
 
 The 3.0 release is a complete rewrite of the original ImageOnMap plugin, now based on zLib, which adds many feature and fixes many bugs.
 
@@ -106,15 +115,34 @@ You will find amongst the new features:
 - Map Quotas (for players and the whole server)
 - A new map Manager (based on an inventory interface), to list, rename, get and delete your maps
 - Improvements on the commands system (integrated help and autocompletion)
-- Asynchronous maps rendering (your server won't freeze anymore when rendering big maps, and you can queue multiple map renderings !)
+- Asynchronous maps rendering (your server won't freeze anymore when rendering big maps, and you can queue multiple map
+  renderings !)
 - UUID management (which requires to run `/maptool migrate`)
 
-### 3.1
+### 3.1 — The Permissions Update
 
 - Fixed permissions support by adding a full set of permissions for every action of the plugin.
 
+### 4.0 — Subtle Comfort
+
+This version is a bit light in content, but we have unified part of the plugin (splatter map) and we prepared upcoming
+changes with required zLib features. The next update should be bigger and will add more stuff : thumbnail, optimization,
+possibility to deploy and place item frames in creative mode, creating interactive map that can run a command if you
+click on a specific frame…
+             
+**This version is only compatible with Minecraft 1.15+.** Compatibility for 1.14 and below is dropped for now, but in
+the future we will try to bring it back. Use 4.0 pre1 for now, if you require 1.13.2 – 1.14.4 compatibility. As for the
+upcoming Minecraft 1.16 version, an update will add compatibility soon after its release.
+
+- **You can now place a map on the ground or on a ceiling.**
+- Languages with non-english characters now display correctly (fixed UTF-8 encoding bug).
+- Splatter maps no longer throw an exception when placed.
+- When a player place a splatter map, other players in the same area see it entirely, including the bottom-left corner.
+- Added Russian and German translations (thx to Danechek and squeezer).
 
 
 ## Data collection
 
-We use metrics to collect basic information about the usage of this plugin. This can be disabled by setting `collect-data` to false in `config.yml`.
+We use metrics to collect [basic information about the usage of this plugin](https://bstats.org/plugin/bukkit/ImageOnMap).
+This is 100% anonymous (you can check the source code or the network traffic), but can of course be disabled by setting
+`collect-data` to false in `config.yml`.
