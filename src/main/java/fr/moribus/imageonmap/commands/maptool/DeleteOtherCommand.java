@@ -44,12 +44,12 @@ public class DeleteOtherCommand extends IoMCommand
     @Override
     protected void run() throws CommandException
     {
-    	if(args.length < 2) warning(I.t("Not enough parameters! Usage: /maptool deleteother <playername> <mapname>"));
     	if(!playerSender().hasPermission("imageonmap.delete.other")) {
     		warning(I.t("You do not have permission for this command. (imageonmap.delete.other)"));
     		return;
     	}
-
+    	if(args.length < 2) warning(I.t("Not enough parameters! Usage: /maptool deleteother <playername> <mapname>"));
+    	
 		Player player = null;
 		UUID uuid = null;
 		OfflinePlayer op = null;
@@ -67,17 +67,16 @@ public class DeleteOtherCommand extends IoMCommand
 		ImageMap map = MapManager.getMap(uuid, mapName);
         
         if(player != null) MapManager.clear(player.getInventory(), map);
-        //if(player == null) MapManager.clear(op.getPlayer().getInventory(), map);
         
             try
             {
                 MapManager.deleteMap(map);
-                info(I.t("Map successfully deleted."));
+                getPlayer().sendMessage(I.t("{gray}Map successfully deleted."));
             }
             catch (MapManagerException ex)
             {
-                PluginLogger.warning("A non-existent map was requested to be deleted", ex);
-                warning(I.t("This map does not exist."));
+                PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
+                getPlayer().sendMessage(ChatColor.RED+(I.t("This map does not exist.")));
             }
         }
    
