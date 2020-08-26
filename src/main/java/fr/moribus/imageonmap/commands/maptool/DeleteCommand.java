@@ -57,6 +57,20 @@ import java.util.List;
 @WithFlags ({"confirm"})
 public class DeleteCommand extends IoMCommand
 {
+
+    private static RawText deleteMsg(Class klass,ImageMap map){
+       return new RawText(I.t("You are going to delete") + " ")
+                .then(map.getId())
+                .color(ChatColor.GOLD)
+                .then(". " + I.t("Are you sure ? "))
+                .color(ChatColor.WHITE)
+                .then(I.t("[Confirm]"))
+                .color(ChatColor.GREEN)
+                .hover(new RawText(I.t("{red}This map will be deleted {bold}forever{red}!")))
+                .command(klass, map.getId(), "--confirm")
+                .build();
+    }
+
     @Override
     protected void run() throws CommandException
     {
@@ -64,17 +78,7 @@ public class DeleteCommand extends IoMCommand
 
         if (!hasFlag("confirm"))
         {
-            RawText msg = new RawText(I.t("You are going to delete") + " ")
-                .then(map.getId())
-                    .color(ChatColor.GOLD)
-                .then(". " + I.t("Are you sure ? "))
-                    .color(ChatColor.WHITE)
-                .then(I.t("[Confirm]"))
-                    .color(ChatColor.GREEN)
-                    .hover(new RawText(I.t("{red}This map will be deleted {bold}forever{red}!")))
-                    .command(getClass(), map.getId(), "--confirm")
-                .build();
-
+            RawText msg = deleteMsg(getClass(),map);
             send(msg);
         }
         else
@@ -89,7 +93,7 @@ public class DeleteCommand extends IoMCommand
             }
             catch (MapManagerException ex)
             {
-                PluginLogger.warning("A non-existent map was requested to be deleted", ex);
+                PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
                 warning(I.t("This map does not exist."));
             }
         }

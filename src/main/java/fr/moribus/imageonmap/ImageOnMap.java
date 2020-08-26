@@ -118,13 +118,14 @@ public final class ImageOnMap extends ZPlugin
                 "maptool",
                 NewCommand.class,
                 ListCommand.class,
+                ListOtherCommand.class,
                 GetCommand.class,
                 GetOtherCommand.class,
-                ListOtherCommand.class,
-                DeleteOtherCommand.class,
                 DeleteCommand.class,
+                DeleteOtherCommand.class,
                 GetRemainingCommand.class,
                 ExploreCommand.class,
+                ExploreOtherCommand.class,
                 MigrateCommand.class
         );
 

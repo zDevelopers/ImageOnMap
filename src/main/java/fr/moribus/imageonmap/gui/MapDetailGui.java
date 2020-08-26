@@ -47,21 +47,25 @@ import fr.zcraft.zlib.components.gui.GuiAction;
 import fr.zcraft.zlib.components.gui.PromptGui;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.Callback;
+import fr.zcraft.zlib.tools.PluginLogger;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
 
 public class MapDetailGui extends ExplorerGui<Integer>
 {
     private final ImageMap map;
+    private OfflinePlayer p;
+    private String name;
 
-    public MapDetailGui(ImageMap map)
-    {
-        this.map = map;
+    public MapDetailGui(ImageMap map, OfflinePlayer p, String name){
+        this.map=map;
+        this.p=p;
+        this.name=name;
     }
-
     @Override
     protected ItemStack getViewItem(int x, int y)
     {
@@ -136,7 +140,12 @@ public class MapDetailGui extends ExplorerGui<Integer>
     protected void onUpdate()
     {
         /// Title of the map details GUI
-        setTitle(I.t(getPlayerLocale(), "Your maps » {black}{0}", map.getName()));
+        if(p.getUniqueId().equals(getPlayer().getUniqueId())) {
+            setTitle(I.t(getPlayerLocale(), "Your maps » {black}{0}", map.getName()));
+        }
+        else{
+            setTitle(I.t(getPlayerLocale(), "{1}'s maps » {black}{0}", map.getName(),name));
+        }
         setKeepHorizontalScrollingSpace(true);
 
         if (map instanceof PosterMap)
@@ -236,13 +245,13 @@ public class MapDetailGui extends ExplorerGui<Integer>
     @GuiAction ("delete")
     public void delete()
     {
+        PluginLogger.info("delete");
         if (!Permissions.DELETE.grantedTo(getPlayer()))
         {
             I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
             update();
             return;
         }
-
         Gui.open(getPlayer(), new ConfirmDeleteMapGui(map), this);
     }
 
