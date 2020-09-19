@@ -59,7 +59,6 @@ public class GetOtherCommand extends IoMCommand
 	@Override
 	protected void run() throws CommandException
 	{
-
     	if(args.length < 2) {
     		warning(I.t("Not enough parameters! Usage: /maptool getother <playername> <mapname>"));
     		return;

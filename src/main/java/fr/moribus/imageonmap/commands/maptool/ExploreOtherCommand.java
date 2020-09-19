@@ -36,7 +36,6 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.gui.MapListGui;
@@ -60,7 +59,6 @@ public class ExploreOtherCommand extends IoMCommand
             warning(I.t("Not enough parameters! Usage: /maptool exploreother <playername>"));
             return;
         }
-
            try{
                OfflinePlayer player=getOfflinePlayerParameter(0);
                String name=args[0];
@@ -71,8 +69,6 @@ public class ExploreOtherCommand extends IoMCommand
                warning(I.t("Can't find player"));
                return;
            }
-
-
     }
 
     @Override

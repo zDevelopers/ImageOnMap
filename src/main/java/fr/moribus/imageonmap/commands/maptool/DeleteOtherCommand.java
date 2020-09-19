@@ -62,15 +62,10 @@ public class DeleteOtherCommand extends IoMCommand
     @Override
     protected void run() throws CommandException
     {
-    	/*if(!playerSender().hasPermission("imageonmap.delete.other")) {
-    		warning(I.t("You do not have permission for this command. (imageonmap.delete.other)"));
-    		return;
-    	}*/
     	if(args.length < 2) {
     	    warning(I.t("Not enough parameters! Usage: /maptool deleteother <playername> <mapname>"));
     	    return;
         }
-
 
 		Player player = null;
 		UUID uuid = null;
@@ -102,8 +97,7 @@ public class DeleteOtherCommand extends IoMCommand
                 warning(ChatColor.RED+(I.t("This map does not exist.")));
             }
         }
-   
-    
+
     @Override
     protected List<String> complete() throws CommandException
     {

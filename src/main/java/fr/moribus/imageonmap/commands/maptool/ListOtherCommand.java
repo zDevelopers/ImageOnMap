@@ -64,7 +64,6 @@ public class ListOtherCommand extends IoMCommand
 	@Override
     protected void run() throws CommandException
     {
-
     	if(args.length < 1){
     	    warning(I.t("Not enough parameters! Usage: /maptool listother <playername>"));
             return;
@@ -127,7 +126,6 @@ public class ListOtherCommand extends IoMCommand
                         .then(map.getName()).style(ChatColor.BOLD, ChatColor.GREEN).then("\n")
                         .then(map.getId() + ", " + size).color(ChatColor.GRAY).then("\n\n")
                         .then(I.t("{white}Click{gray} to get this map"))
-                
                 );
     }
     @Override
