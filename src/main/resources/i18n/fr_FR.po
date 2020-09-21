@@ -568,3 +568,12 @@ msgstr "Carte"
 #~ msgid_plural "{white}{0}{gray} maps left"
 #~ msgstr[0] "{white}{0}{gray} carte restante"
 #~ msgstr[1] "{white}{0}{gray} cartes restantes"
+
+
+#: src/main/java/fr/moribus/imageonmap/commands/maptool/UpdateCommand.java:71
+msgid "{ce}You must give an URL and a map name to update."
+msgstr "{ce}Veuillez donner une URL et un nom de carte a update."
+
+#: src/main/java/fr/moribus/imageonmap/commands/maptool/UpdateCommand.java:72
+msgid "{ce}You must give a map name to update."
+msgstr "{ce}Veuillez un nom de carte a update"

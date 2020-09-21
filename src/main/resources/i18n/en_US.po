@@ -593,3 +593,12 @@ msgstr ""
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:101
 msgid "{ce}There is not enough space to place this map ({0} × {1})."
 msgstr "{ce}There is not enough space to place this map ({0} × {1})."
+
+#New part, added for update (TODO add to other .po file
+#: src/main/java/fr/moribus/imageonmap/commands/maptool/UpdateCommand.java:71
+msgid "{ce}You must give an URL and a map name to update."
+msgstr "{ce}You must give an URL and a map name to update."
+
+#: src/main/java/fr/moribus/imageonmap/commands/maptool/UpdateCommand.java:72
+msgid "{ce}You must give a map name to update.."
+msgstr "{ce}You must give a map name to update.."
