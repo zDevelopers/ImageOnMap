@@ -25,7 +25,8 @@ permissions:
             imageonmap.rename: true
             imageonmap.delete: true
             imageonmap.bypasssize: false
-            imageonmap.update: false
+            imageonmap.update: true
+            imageonmap.updateother: false
 
     imageonmap.userender:
         description: "Allows you to use /tomap and related commands (/maptool getremaing). Alias of imageonmap.new."
@@ -65,4 +66,8 @@ permissions:
 
     imageonmap.update:
       description: "Allows you to update an existing map with a new image."
+      default: true
+
+    imageonmap.updateother:
+      description: "Allows you to update an existing map of an other player with a new image."
       default: op
