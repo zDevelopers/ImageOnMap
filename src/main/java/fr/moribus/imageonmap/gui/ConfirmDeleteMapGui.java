@@ -168,12 +168,13 @@ public class ConfirmDeleteMapGui extends ActionGui
     @GuiAction ("cancel")
     protected void cancel()
     {
-        close();
+         close();
     }
 
     @GuiAction ("delete")
     protected void delete()
     {
+
         // Does the player still have the permission to delete a map?
         if (!Permissions.DELETE.grantedTo(getPlayer()))
         {

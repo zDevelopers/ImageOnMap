@@ -161,9 +161,11 @@ public class ImageRendererExecutor extends Worker {
             @Override
             public Void call() throws Exception {
                 Renderer.installRenderer(image, mapID);
+                image.flush();
                 return null;
             }
         });
+        image.flush();
         return MapManager.createMap(playerUUID, mapID);
     }
 
@@ -178,10 +180,9 @@ public class ImageRendererExecutor extends Worker {
             }
         });
         poster.splitImages();
-
         final int[] mapsIDs = futureMapsIds.get();
-
         ImageIOExecutor.saveImage(mapsIDs, poster);
+
         if (PluginConfiguration.SAVE_FULL_IMAGE.get()) {
             ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
         }
@@ -195,6 +196,9 @@ public class ImageRendererExecutor extends Worker {
 
         });
         poster.getImage().flush();//Safe to free
+
+        image.flush();
+
         return MapManager.createMap(poster, playerUUID, mapsIDs);
     }
 

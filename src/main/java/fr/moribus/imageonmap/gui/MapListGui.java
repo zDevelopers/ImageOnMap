@@ -49,12 +49,25 @@ import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 
 
 public class MapListGui extends ExplorerGui<ImageMap>
 {
+    private OfflinePlayer p;
+    private String name;
+    public MapListGui(Player sender){
+        this.p=sender;
+        this.name=sender.getName();
+    }
+    public MapListGui(OfflinePlayer p,String name){
+        this.p=p;
+        this.name=name;
+    }
+
     @Override
     protected ItemStack getViewItem(ImageMap map)
     {
@@ -106,22 +119,28 @@ public class MapListGui extends ExplorerGui<ImageMap>
     @Override
     protected ItemStack getEmptyViewItem()
     {
-        ItemStackBuilder builder = new ItemStackBuilder(Material.BARRIER)
-                .title(I.tl(getPlayerLocale(), "{red}You don't have any map."));
+        ItemStackBuilder builder = new ItemStackBuilder(Material.BARRIER);
+        if(p.getUniqueId().equals(getPlayer().getUniqueId())) {
 
-        if (Permissions.NEW.grantedTo(getPlayer()))
-            builder.longLore(I.tl(getPlayerLocale(), "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"));
-        else
-            builder.longLore(I.tl(getPlayerLocale(), "{gray}Unfortunately, you are not allowed to create one."));
+            builder.title(I.tl(getPlayerLocale(), "{red}You don't have any map."));
 
+            if (Permissions.NEW.grantedTo(getPlayer()))
+                builder.longLore(I.tl(getPlayerLocale(), "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"));
+            else
+                builder.longLore(I.tl(getPlayerLocale(), "{gray}Unfortunately, you are not allowed to create one."));
+        }
+        else{
+            builder.title(I.tl(getPlayerLocale(), "{red}{0} doesn't have any map.",name));
+        }
         return builder.item();
     }
 
     @Override
     protected void onRightClick(ImageMap data)
     {
-        Gui.open(getPlayer(), new MapDetailGui(data), this);
+        Gui.open(getPlayer(), new MapDetailGui(data,getPlayer(),name), this);
     }
+
 
     @Override
     protected ItemStack getPickedUpItem(ImageMap map)
@@ -131,7 +150,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
 
         if (map instanceof SingleMap)
         {
-            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName(), false);
+            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName(), false,true);
         }
         else if (map instanceof PosterMap)
         {
@@ -151,19 +170,22 @@ public class MapListGui extends ExplorerGui<ImageMap>
     @Override
     protected void onUpdate()
     {
-        ImageMap[] maps = MapManager.getMaps(getPlayer().getUniqueId());
+        ImageMap[] maps = MapManager.getMaps(p.getUniqueId());
         setData(maps);
 
         /// The maps list GUI title
-        setTitle(I.tl(getPlayerLocale(), "{black}Your maps {reset}({0})", maps.length));
+        //Equal if the person who send the command is the owner of the mapList
+        if(p.getUniqueId().equals(getPlayer().getUniqueId()))
+            setTitle(I.tl(getPlayerLocale(), "{black}Your maps {reset}({0})", maps.length));
+        else
+            setTitle(I.tl(getPlayerLocale(), "{black}{1}'s maps {reset}({0})", maps.length, name ));
 
         setKeepHorizontalScrollingSpace(true);
 
 
         /* ** Statistics ** */
-
-        int imagesCount = MapManager.getMapList(getPlayer().getUniqueId()).size();
-        int mapPartCount = MapManager.getMapPartCount(getPlayer().getUniqueId());
+        int imagesCount = MapManager.getMapList(p.getUniqueId()).size();
+        int mapPartCount = MapManager.getMapPartCount(p.getUniqueId());
 
         int mapGlobalLimit = PluginConfiguration.MAP_GLOBAL_LIMIT.get();
         int mapPersonalLimit = PluginConfiguration.MAP_PLAYER_LIMIT.get();

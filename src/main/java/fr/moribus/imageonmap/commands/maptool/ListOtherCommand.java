@@ -36,81 +36,101 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.moribus.imageonmap.map.MapManagerException;
+import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
-import fr.zcraft.zlib.components.commands.WithFlags;
 import fr.zcraft.zlib.components.i18n.I;
 import fr.zcraft.zlib.components.rawtext.RawText;
-import fr.zcraft.zlib.tools.PluginLogger;
+import fr.zcraft.zlib.components.rawtext.RawTextPart;
+import fr.zcraft.zlib.tools.text.RawMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.UUID;
 
-@CommandInfo (name =  "delete", usageParameters = "<map name> [--confirm]")
-@WithFlags ({"confirm"})
-public class DeleteCommand extends IoMCommand
+
+@CommandInfo (name = "listother", usageParameters = "<PlayerName>")
+public class ListOtherCommand extends IoMCommand
 {
-
-    private static RawText deleteMsg(Class klass,ImageMap map){
-       return new RawText(I.t("You are going to delete") + " ")
-                .then(map.getId())
-                .color(ChatColor.GOLD)
-                .then(". " + I.t("Are you sure ? "))
-                .color(ChatColor.WHITE)
-                .then(I.t("[Confirm]"))
-                .color(ChatColor.GREEN)
-                .hover(new RawText(I.t("{red}This map will be deleted {bold}forever{red}!")))
-                .command(klass, map.getId(), "--confirm")
-                .build();
-    }
-
-    @Override
+	@Override
     protected void run() throws CommandException
     {
-        ImageMap map = getMapFromArgs();
+    	if(args.length < 1){
+    	    warning(I.t("Not enough parameters! Usage: /maptool listother <playername>"));
+            return;
+    	}
 
-        if (!hasFlag("confirm"))
-        {
-            RawText msg = deleteMsg(getClass(),map);
-            send(msg);
+		
+		Player player = null;
+		UUID uuid = null;
+        player = Bukkit.getPlayer(args[0]);
+        if(player == null){
+        	OfflinePlayer op = Bukkit.getOfflinePlayer(args[0]);
+			if(op.hasPlayedBefore()) {
+				uuid = op.getUniqueId();
+			}
+			else {
+				warning(I.t("We've never seen that player before!"));
+			}
         }
-        else
-        {
-            Player player = playerSender();
-            MapManager.clear(player.getInventory(), map);
+        else{
+        	 uuid = player.getUniqueId();
+        }
+       
+        List<ImageMap> mapList = null;
+        try{
+        	mapList = MapManager.getMapList(uuid);
+        }
+        catch(Exception e){
+        	return;
+        }
 
-            try
-            {
-                MapManager.deleteMap(map);
-                info(I.t("Map successfully deleted."));
-            }
-            catch (MapManagerException ex)
-            {
-                PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
-                warning(I.t("This map does not exist."));
-            }
+        if(mapList.isEmpty())
+        {
+            info(I.t("No map found."));
+            return;
         }
+        
+        info(I.tn("{white}{bold}{0} map found.", "{white}{bold}{0} maps found.", mapList.size()));
+
+        RawTextPart rawText = new RawText("");
+        rawText = addMap(rawText, mapList.get(0));
+
+        for(int i = 1, c = mapList.size(); i < c; i++)
+        {
+            rawText = rawText.then(", ").color(ChatColor.GRAY);
+            rawText = addMap(rawText, mapList.get(i));
+        }
+
+        RawMessage.send(playerSender(), rawText.build());
     }
-    
-    @Override
-    protected List<String> complete() throws CommandException
+
+    private RawTextPart<?> addMap(RawTextPart<?> rawText, ImageMap map)
     {
-        if(args.length == 1) 
-            return getMatchingMapNames(playerSender(), args[0]);
+        final String size = map.getType() == ImageMap.Type.SINGLE ? "1 × 1" : ((PosterMap) map).getColumnCount() + " × " + ((PosterMap) map).getRowCount();
 
-        return null;
+        return rawText
+                .then(map.getId())
+                .color(ChatColor.WHITE)
+                .command(GetCommand.class, map.getId())
+		.hover(new RawText()
+                        .then(map.getName()).style(ChatColor.BOLD, ChatColor.GREEN).then("\n")
+                        .then(map.getId() + ", " + size).color(ChatColor.GRAY).then("\n\n")
+                        .then(I.t("{white}Click{gray} to get this map"))
+                );
     }
-
     @Override
     public boolean canExecute(CommandSender sender)
     {
-        return Permissions.DELETE.grantedTo(sender);
+        return Permissions.LISTOTHER.grantedTo(sender);
     }
 }

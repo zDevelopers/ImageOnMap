@@ -36,6 +36,7 @@
 
 package fr.moribus.imageonmap;
 
+
 import fr.moribus.imageonmap.commands.maptool.*;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
@@ -60,7 +61,6 @@ public final class ImageOnMap extends ZPlugin
     static private final String IMAGES_DIRECTORY_NAME = "images";
     static private final String MAPS_DIRECTORY_NAME = "maps";
     static private ImageOnMap plugin;
-
     private File imagesDirectory;
     private final File mapsDirectory;
 
@@ -83,6 +83,7 @@ public final class ImageOnMap extends ZPlugin
         return new File(imagesDirectory, "map"+mapID+".png");
     }
     
+    
     @SuppressWarnings ("unchecked")
     @Override
     public void onEnable()
@@ -99,11 +100,12 @@ public final class ImageOnMap extends ZPlugin
             this.setEnabled(false);
             return;
         }
-
+        
+        
         saveDefaultConfig();
 
         loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class, ImageRendererExecutor.class);
-        
+               
         //Init all the things !
         I18n.setPrimaryLocale(PluginConfiguration.LANG.get());
 
@@ -115,11 +117,15 @@ public final class ImageOnMap extends ZPlugin
                 "maptool",
                 NewCommand.class,
                 ListCommand.class,
+                ListOtherCommand.class,
                 GetCommand.class,
+                GetOtherCommand.class,
                 DeleteCommand.class,
                 GiveCommand.class,
+                DeleteOtherCommand.class,
                 GetRemainingCommand.class,
                 ExploreCommand.class,
+                ExploreOtherCommand.class,
                 MigrateCommand.class
         );
 
