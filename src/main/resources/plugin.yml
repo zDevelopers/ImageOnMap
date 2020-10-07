@@ -43,6 +43,10 @@ permissions:
         description: "Allows you to use /tomap and related commands (/maptool getremaining)."
         default: true
 
+    imageonmap.newother:
+        description: "Allows you to create maps for other players."
+        default: true
+
     imageonmap.list:
       description: "Allows you to list the images you rendered."
       default: true
