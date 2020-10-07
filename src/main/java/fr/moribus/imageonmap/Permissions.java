@@ -42,6 +42,7 @@ import org.bukkit.permissions.Permissible;
 public enum Permissions
 {
     NEW("imageonmap.new", "imageonmap.userender"),
+    NEWOTHER("imageonmap.newother", "imageonmap.userender"),
     LIST("imageonmap.list"),
     LISTOTHER("imageonmap.listother"),
     GET("imageonmap.get"),

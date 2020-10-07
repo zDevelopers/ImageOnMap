@@ -21,13 +21,13 @@
                 <configuration>
                     <artifactSet>
                         <includes>
-                            <include>fr.zcraft:zlib</include>
+                            <include>com.github.zDevelopers:zLib</include>
                             <include>org.bstats:bstats-bukkit</include>
                         </includes>
                     </artifactSet>
                     <relocations>
                         <relocation>
-                            <pattern>fr.zcraft.zlib</pattern>
+                            <pattern>com.github.zDevelopers</pattern>
                             <shadedPattern>fr.moribus.imageonmap</shadedPattern>
                         </relocation>
                         <relocation>
@@ -54,11 +54,10 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
-        <repository>
-            <id>zDevelopers</id>
-            <url>http://maven.carrade.eu/artifactory/snapshots</url>
-        </repository>
-
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
         <!-- bStats -->
         <repository>
             <id>CodeMC</id>
@@ -73,10 +72,9 @@
             <version>1.13.2-R0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>fr.zcraft</groupId>
-            <artifactId>zlib</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <groupId>com.github.zDevelopers</groupId>
+            <artifactId>zLib</artifactId>
+            <version>1.15-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
