@@ -51,6 +51,7 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 
 @CommandInfo(name = "give", usageParameters = "<Player> <MapName> or <Player> <MapName> <Player where to find the map>")
@@ -67,7 +68,6 @@ public class GiveCommand extends IoMCommand {
     private OfflinePlayer parse(int index) throws CommandException {
 
         String s = args[index].trim();
-
         String[] subs = s.split(":");
         try {
             //
@@ -102,7 +102,7 @@ public class GiveCommand extends IoMCommand {
                 default:
                     throwInvalidArgument(I.t("Invalid prefix, valid one are: player | uuid"));
             }
-        } catch (InterruptedException | IOException e) {
+        } catch (InterruptedException | ExecutionException e) {
             PluginLogger.warning(I.t("Can't access to mojang API to check the player UUID"));
         }
         return null;
