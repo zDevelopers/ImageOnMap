@@ -62,12 +62,10 @@ public class DeleteOtherCommand extends IoMCommand
     @Override
     protected void run() throws CommandException
     {
-
     	if(args.length < 2) {
     	    warning(I.t("Not enough parameters! Usage: /maptool deleteother <playername> <mapname>"));
     	    return;
         }
-
 
 		Player player = null;
 		UUID uuid = null;
@@ -98,8 +96,7 @@ public class DeleteOtherCommand extends IoMCommand
                 warning(ChatColor.RED+(I.t("This map does not exist.")));
             }
         }
-   
-    
+
     @Override
     protected List<String> complete() throws CommandException
     {

@@ -57,7 +57,6 @@ import org.bstats.bukkit.Metrics;
 import java.io.File;
 import java.io.IOException;
 
-
 public final class ImageOnMap extends ZPlugin
 {
     static private final String IMAGES_DIRECTORY_NAME = "images";

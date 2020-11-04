@@ -63,7 +63,7 @@ public class MapListGui extends ExplorerGui<ImageMap>
         this.p=sender;
         this.name=sender.getName();
     }
-    public MapListGui( OfflinePlayer p,String name){
+    public MapListGui(OfflinePlayer p,String name){
         this.p=p;
         this.name=name;
     }

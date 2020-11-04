@@ -245,7 +245,6 @@ public class MapDetailGui extends ExplorerGui<Integer>
     @GuiAction ("delete")
     public void delete()
     {
-        PluginLogger.info("delete");
         if (!Permissions.DELETE.grantedTo(getPlayer()))
         {
             I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
