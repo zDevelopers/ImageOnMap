@@ -47,7 +47,7 @@ import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
-import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 
 @CommandInfo (name = "exploreother")
@@ -67,17 +67,16 @@ public class ExploreOtherCommand extends IoMCommand
                if(player!=null)
                    Gui.open(playerSender(), new MapListGui(player,name));
            }
-           catch (InterruptedException | IOException e){
+           catch (InterruptedException | ExecutionException e){
                warning(I.t("Can't find player"));
                return;
            }
-
 
     }
 
     @Override
     public boolean canExecute(CommandSender sender)
     {
-        return Permissions.LISTOTHER.grantedTo(sender);
+       return Permissions.LISTOTHER.grantedTo(sender);
     }
 }

@@ -45,6 +45,7 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.migration.MigratorExecutor;
 import fr.moribus.imageonmap.migration.V3Migrator;
 import fr.moribus.imageonmap.ui.MapItemManager;
+import fr.zcraft.zlib.components.commands.CommandWorkers;
 import fr.zcraft.zlib.components.commands.Commands;
 import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.i18n.I18n;
@@ -105,7 +106,7 @@ public final class ImageOnMap extends ZPlugin
         
         saveDefaultConfig();
 
-        loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class, ImageRendererExecutor.class);
+        loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class, ImageRendererExecutor.class, CommandWorkers.class);
                
         //Init all the things !
         I18n.setPrimaryLocale(PluginConfiguration.LANG.get());
@@ -113,6 +114,7 @@ public final class ImageOnMap extends ZPlugin
         MapManager.init();
         MapInitEvent.init();
         MapItemManager.init();
+
 
         Commands.register(
                 "maptool",

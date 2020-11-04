@@ -62,10 +62,7 @@ public class DeleteOtherCommand extends IoMCommand
     @Override
     protected void run() throws CommandException
     {
-    	/*if(!playerSender().hasPermission("imageonmap.delete.other")) {
-    		warning(I.t("You do not have permission for this command. (imageonmap.delete.other)"));
-    		return;
-    	}*/
+
     	if(args.length < 2) {
     	    warning(I.t("Not enough parameters! Usage: /maptool deleteother <playername> <mapname>"));
     	    return;
@@ -87,7 +84,6 @@ public class DeleteOtherCommand extends IoMCommand
             return;
         }
         ImageMap map = getMapFromArgs(player, 1, true);
-		//ImageMap map = MapManager.getMap(uuid, mapName);
         
         if(player != null) MapManager.clear(player.getInventory(), map);
         
