@@ -122,6 +122,7 @@ public final class ImageOnMap extends ZPlugin
                 ListOtherCommand.class,
                 GetCommand.class,
                 GetOtherCommand.class,
+                RenameCommand.class,
                 DeleteCommand.class,
                 DeleteOtherCommand.class,
                 GetRemainingCommand.class,
