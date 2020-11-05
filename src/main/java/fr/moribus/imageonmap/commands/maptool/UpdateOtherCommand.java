@@ -41,7 +41,7 @@ import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.ImageUtils;
 import fr.moribus.imageonmap.map.ImageMap;
-import fr.moribus.imageonmap.map.PosterMap;
+import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.i18n.I;
@@ -55,80 +55,80 @@ import org.bukkit.entity.Player;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
-@CommandInfo (name = "new", usageParameters = "<URL> [resize]")
-public class NewCommand  extends IoMCommand
+@CommandInfo (name =  "update", usageParameters = "<new url> [stretched|covered] \"<map name to update>\"")
+public class UpdateOtherCommand extends IoMCommand
 {
     @Override
     protected void run() throws CommandException
     {
+        //TODO separer les deux update(update et update other)
         final Player player = playerSender();
-        ImageUtils.ScalingType scaling = ImageUtils.ScalingType.NONE;
+        ImageUtils.ScalingType scaling;
+
         URL url;
-        int width = 0, height = 0;
-        
-        if(args.length < 1) throwInvalidArgument(I.t("You must give an URL to take the image from."));
-        
+
+        if(args.length < 1) throwInvalidArgument(I.t("You must give an URL and a map name to update."));
+        if(args.length < 2) throwInvalidArgument(I.t("You must give a map name to update."));
+
+        switch(args[1]) {
+
+            case "stretched":
+                scaling = ImageUtils.ScalingType.STRETCHED;
+                break;
+            case "covered":
+                scaling = ImageUtils.ScalingType.COVERED;
+                break;
+            default:
+                scaling = ImageUtils.ScalingType.CONTAINED;
+        }
+        ImageMap map;
+        if(scaling.equals(ImageUtils.ScalingType.CONTAINED))
+            map=getMapFromArgs(player,1);
+        else
+            map=getMapFromArgs(player,2);
         try
         {
             url = new URL(args[0]);
+            MapManager.load();
+
+            Integer[] size={1,1};
+            if(map.getType()== ImageMap.Type.POSTER)
+                size=map.getSize( new HashMap<String, Object>(),map.getUserUUID(),map.getId());
+            int width=size[0],height=size[1];
+            try {
+                ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Updating..."));
+                ImageRendererExecutor.update(url, scaling, player.getUniqueId(), map, width, height, new WorkerCallback<ImageMap>() {
+                    @Override
+                    public void finished(ImageMap result) {
+                        ActionBar.removeMessage(player);
+                        MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("The map was updated using the new image!"));
+                    }
+                    @Override
+                    public void errored(Throwable exception) {
+                        player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
+
+                        PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
+                                player.getName(),
+                                exception.getClass().getCanonicalName(),
+                                exception.getMessage());
+                    }
+                });
+            }
+            finally {
+                ActionBar.removeMessage(player);
+            }
         }
-        catch(MalformedURLException ex)
+        catch(MalformedURLException  ex)
         {
             throwInvalidArgument(I.t("Invalid URL."));
-            return;
-        }
-        
-        if(args.length >= 2)
-        {
-            if(args.length >= 4) {
-                width = Integer.parseInt(args[2]);
-                height = Integer.parseInt(args[3]);
-            }
-
-            switch(args[1]) {
-                case "resize": scaling = ImageUtils.ScalingType.CONTAINED; break;
-                case "resize-stretched": scaling = ImageUtils.ScalingType.STRETCHED; break;
-                case "resize-covered": scaling = ImageUtils.ScalingType.COVERED; break;
-                default: throwInvalidArgument(I.t("Invalid Stretching mode.")); break;
-            }
-        }
-        try {
-
-
-            ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));
-            ImageRendererExecutor.render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>() {
-                @Override
-                public void finished(ImageMap result) {
-                    ActionBar.removeMessage(player);
-                    MessageSender.sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Rendering finished!"));
-
-                    if (result.give(player) && (result instanceof PosterMap && !((PosterMap) result).hasColumnData())) {
-                        info(I.t("The rendered map was too big to fit in your inventory."));
-                        info(I.t("Use '/maptool getremaining' to get the remaining maps."));
-                    }
-                }
-
-                @Override
-                public void errored(Throwable exception) {
-                    player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
-
-                    PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
-                            player.getName(),
-                            exception.getClass().getCanonicalName(),
-                            exception.getMessage());
-                }
-            });
-        }
-        //Added to fix bug with rendering displaying after error
-        finally {
-            ActionBar.removeMessage(player);
         }
     }
 
     @Override
     public boolean canExecute(CommandSender sender)
     {
-        return Permissions.NEW.grantedTo(sender);
+        return Permissions.UPDATEOTHER.grantedTo(sender);
     }
 }

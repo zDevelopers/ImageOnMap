@@ -1,21 +1,39 @@
 <#if licenseFirst??>
 ${licenseFirst}
 </#if>
-${licensePrefix}Copyright (C) 2013 Moribus
-${licensePrefix}Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
+${licensePrefix}Copyright or © or Copr. Moribus (2013)
+${licensePrefix}Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
+${licensePrefix}Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2020)
+${licensePrefix}Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2020)
 ${licensePrefix?replace(" +$", "", "r")}
-${licensePrefix}This program is free software: you can redistribute it and/or modify
-${licensePrefix}it under the terms of the GNU General Public License as published by
-${licensePrefix}the Free Software Foundation, either version 3 of the License, or
-${licensePrefix}(at your option) any later version.
+${licensePrefix}This software is a computer program whose purpose is to allow insertion of
+${licensePrefix}custom images in a Minecraft word.
 ${licensePrefix?replace(" +$", "", "r")}
-${licensePrefix}This program is distributed in the hope that it will be useful,
-${licensePrefix}but WITHOUT ANY WARRANTY; without even the implied warranty of
-${licensePrefix}MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-${licensePrefix}GNU General Public License for more details.
+${licensePrefix}This software is governed by the CeCILL-B license under French law and
+${licensePrefix}abiding by the rules of distribution of free software.  You can  use, 
+${licensePrefix}modify and/ or redistribute the software under the terms of the CeCILL-B
+${licensePrefix}license as circulated by CEA, CNRS and INRIA at the following URL
+${licensePrefix}"http://www.cecill.info". 
 ${licensePrefix?replace(" +$", "", "r")}
-${licensePrefix}You should have received a copy of the GNU General Public License
-${licensePrefix}along with this program.  If not, see <http://www.gnu.org/licenses/>.
+${licensePrefix}As a counterpart to the access to the source code and  rights to copy,
+${licensePrefix}modify and redistribute granted by the license, users are provided only
+${licensePrefix}with a limited warranty  and the software's author,  the holder of the
+${licensePrefix}economic rights,  and the successive licensors  have only  limited
+${licensePrefix}liability. 
+${licensePrefix?replace(" +$", "", "r")}
+${licensePrefix}In this respect, the user's attention is drawn to the risks associated
+${licensePrefix}with loading,  using,  modifying and/or developing or reproducing the
+${licensePrefix}software by the user in light of its specific status of free software,
+${licensePrefix}that may mean  that it is complicated to manipulate,  and  that  also
+${licensePrefix}therefore means  that it is reserved for developers  and  experienced
+${licensePrefix}professionals having in-depth computer knowledge. Users are therefore
+${licensePrefix}encouraged to load and test the software's suitability as regards their
+${licensePrefix}requirements in conditions enabling the security of their systems and/or 
+${licensePrefix}data to be ensured and,  more generally, to use and operate it in the 
+${licensePrefix}same conditions as regards security. 
+${licensePrefix?replace(" +$", "", "r")}
+${licensePrefix}The fact that you are presently reading this means that you have had
+${licensePrefix}knowledge of the CeCILL-B license and that you accept its terms.
 <#if licenseLast??>
 ${licenseLast}
-</#if> 
+</#if>

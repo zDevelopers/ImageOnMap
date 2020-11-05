@@ -38,42 +38,77 @@ package fr.moribus.imageonmap.commands.maptool;
 
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
-import fr.moribus.imageonmap.ui.MapItemManager;
+import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.map.MapManagerException;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.commands.WithFlags;
 import fr.zcraft.zlib.components.i18n.I;
+import fr.zcraft.zlib.tools.PluginLogger;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandInfo (name = "getremaining", aliases = {"getrest"})
-public class GetRemainingCommand extends IoMCommand
+import java.util.List;
+import java.util.UUID;
+
+@CommandInfo (name =  "deleteother", usageParameters = "<player name> <map name>")
+@WithFlags ({"confirm"})
+public class DeleteOtherCommand extends IoMCommand
 {
     @Override
     protected void run() throws CommandException
     {
-        Player player = playerSender();
-        
-        if(MapItemManager.getCacheSize(player) <= 0)
-        {
-            info(I.t("You have no remaining map."));
+    	if(args.length < 2) {
+    	    warning(I.t("Not enough parameters! Usage: /maptool deleteother <playername> <mapname>"));
+    	    return;
+        }
+
+		Player player = null;
+		UUID uuid = null;
+		OfflinePlayer op = null;
+        player = Bukkit.getPlayer(args[0]);
+        if(player == null){
+        	op = Bukkit.getOfflinePlayer(args[0]);
+			if(op.hasPlayedBefore()) uuid = op.getUniqueId();
+			else warning(I.t("We've never seen that player before!"));
+        }
+        else uuid = player.getUniqueId();
+        if(player==null){
+            warning(I.t("Player not found"));
             return;
         }
+        ImageMap map = getMapFromArgs(player, 1, true);
         
-        int givenMaps = MapItemManager.giveCache(player);
+        if(player != null) MapManager.clear(player.getInventory(), map);
         
-        if(givenMaps == 0)
-        {
-            error(I.t("Your inventory is full! Make some space before requesting the remaining maps."));
+            try
+            {
+                MapManager.deleteMap(map);
+                info(I.t("{gray}Map successfully deleted."));
+            }
+            catch (MapManagerException ex)
+            {
+                PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
+                warning(ChatColor.RED+(I.t("This map does not exist.")));
+            }
         }
-        else
-        {
-            info(I.tn("There is {0} map remaining.", "There are {0} maps remaining.", MapItemManager.getCacheSize(player)));
-        }
+
+    @Override
+    protected List<String> complete() throws CommandException
+    {
+        if(args.length == 1) 
+            return getMatchingMapNames(playerSender(), args[0]);
+
+        return null;
     }
 
     @Override
     public boolean canExecute(CommandSender sender)
     {
-        return Permissions.NEW.grantedTo(sender) || Permissions.GET.grantedTo(sender);
+        return Permissions.DELETEOTHER.grantedTo(sender);
     }
 }

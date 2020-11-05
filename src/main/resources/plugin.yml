@@ -1,17 +1,98 @@
 name: ImageOnMap
 main: fr.moribus.imageonmap.ImageOnMap
-version: 3.0
+version: "4.0"
+api-version: "1.13"
 
 commands:
    tomap:
       description: render an image in a map
       usage: /<command> [URL]
    maptool:
-      description: manage maps
+      description: Manage maps
    maps:
-      description: manage maps through a GUI
+      description: Manage maps through a GUI
 
 permissions:
+    imageonmap.*:
+        description: "Grants all the user permissions (excluding administrative ones)."
+        default: true
+        children:
+            imageonmap.userender: true
+            imageonmap.new: true
+            imageonmap.list: true
+            imageonmap.listother: true
+            imageonmap.get: true
+            imageonmap.getother: true
+            imageonmap.explore: true
+            imageonmap.exploreother: true
+            imageonmap.rename: true
+            imageonmap.removesplattermap: true
+            imageonmap.delete: true
+            imageonmap.deleteother: false
+            imageonmap.bypasssize: false
+            imageonmap.update: true
+            imageonmap.updateother: false
+
     imageonmap.userender:
-        description: Allows you to use /tomap
+        description: "Allows you to use /tomap and related commands (/maptool getremaining). Alias of imageonmap.new."
+        default: true
+
+    imageonmap.new:
+        description: "Allows you to use /tomap and related commands (/maptool getremaining)."
+        default: true
+
+    imageonmap.list:
+      description: "Allows you to list the images you rendered."
+      default: true
+
+    imageonmap.listother:
+      description: "Allows you to list the images a player have rendered."
+      default: false
+
+    imageonmap.get:
+      description: "Allows you to get a new map among the ones you already rendered, and related commands (/maptool getremaining)."
+      default: true
+
+    imageonmap.getother:
+      description: "Allows you to get a new map among the ones a player have already rendered."
+      default: false
+
+    imageonmap.explore:
+      description: "Allows you to open a GUI with all your maps."
+      default: true
+
+    imageonmap.exploreother:
+      description: "Allows you to open a GUI with all of the player maps."
+      default: false
+
+    imageonmap.rename:
+        description: "Allows you to rename a map you rendered in the past."
+        default: true
+
+    imageonmap.delete:
+        description: "Allows you to delete a map you rendered in the past."
+        default: true
+
+    imageonmap.deleteother:
+      description: "Allows you to delete a map a player rendered in the past."
+      default: false
+
+    imageonmap.removesplattermap:
+        description: "Allows you to remove a splatter map from a wall by sneaking and breaking a map."
+        default: true
+
+    imageonmap.administrative:
+        description: "Allows you to perform administrative tasks (like /maptool migrate)."
         default: op
+
+    imageonmap.bypasssize:
+        description: "Allows you to create maps larger than the configured limit."
+        default: op
+
+    imageonmap.update:
+      description: "Allows you to update an existing map with a new image."
+      default: true
+
+    imageonmap.updateother:
+      description: "Allows you to update an existing map of an other player with a new image."
+      default: op

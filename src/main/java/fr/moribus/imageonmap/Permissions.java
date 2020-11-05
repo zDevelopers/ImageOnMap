@@ -1,4 +1,5 @@
 /*
+
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
  * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2020)
@@ -33,47 +34,54 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
+package fr.moribus.imageonmap;
 
-package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.Permissions;
-import fr.moribus.imageonmap.commands.IoMCommand;
-import fr.moribus.imageonmap.ui.MapItemManager;
-import fr.zcraft.zlib.components.commands.CommandException;
-import fr.zcraft.zlib.components.commands.CommandInfo;
-import fr.zcraft.zlib.components.i18n.I;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
 
-@CommandInfo (name = "getremaining", aliases = {"getrest"})
-public class GetRemainingCommand extends IoMCommand
+public enum Permissions
 {
-    @Override
-    protected void run() throws CommandException
+    NEW("imageonmap.new", "imageonmap.userender"),
+    LIST("imageonmap.list"),
+    LISTOTHER("imageonmap.listother"),
+    GET("imageonmap.get"),
+    GETOTHER("imageonmap.getother"),
+    RENAME("imageonmap.rename"),
+    REMOVE_SPLATTER_MAP("imageonmap.removesplattermap"),
+    DELETE("imageonmap.delete"),
+    DELETEOTHER("imageonmap.deleteother"),
+    UPDATE("imageonmap.update"),
+    UPDATEOTHER("imageonmap.updateother"),
+    ADMINISTRATIVE("imageonmap.administrative"),
+    BYPASS_SIZE("imageonmap.bypasssize")
+      
+      
+    ;
+
+    private final String permission;
+    private final String[] aliases;
+
+    Permissions(String permission, String... aliases)
     {
-        Player player = playerSender();
-        
-        if(MapItemManager.getCacheSize(player) <= 0)
-        {
-            info(I.t("You have no remaining map."));
-            return;
-        }
-        
-        int givenMaps = MapItemManager.giveCache(player);
-        
-        if(givenMaps == 0)
-        {
-            error(I.t("Your inventory is full! Make some space before requesting the remaining maps."));
-        }
-        else
-        {
-            info(I.tn("There is {0} map remaining.", "There are {0} maps remaining.", MapItemManager.getCacheSize(player)));
-        }
+        this.permission = permission;
+        this.aliases = aliases;
     }
 
-    @Override
-    public boolean canExecute(CommandSender sender)
+    /**
+     * Checks if this permission is granted to the given permissible.
+     *
+     * @param permissible The permissible to check.
+     * @return {@code true} if this permission is granted to the permissible.
+     */
+    public boolean grantedTo(Permissible permissible)
     {
-        return Permissions.NEW.grantedTo(sender) || Permissions.GET.grantedTo(sender);
+        if (permissible.hasPermission(permission))
+            return true;
+
+        for (String alias : aliases)
+            if (permissible.hasPermission(alias))
+                return true;
+
+        return false;
     }
 }

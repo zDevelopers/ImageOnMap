@@ -36,44 +36,66 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
-import fr.moribus.imageonmap.ui.MapItemManager;
+import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.i18n.I;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandInfo (name = "getremaining", aliases = {"getrest"})
-public class GetRemainingCommand extends IoMCommand
-{
-    @Override
-    protected void run() throws CommandException
-    {
-        Player player = playerSender();
-        
-        if(MapItemManager.getCacheSize(player) <= 0)
-        {
-            info(I.t("You have no remaining map."));
-            return;
-        }
-        
-        int givenMaps = MapItemManager.giveCache(player);
-        
-        if(givenMaps == 0)
-        {
-            error(I.t("Your inventory is full! Make some space before requesting the remaining maps."));
-        }
-        else
-        {
-            info(I.tn("There is {0} map remaining.", "There are {0} maps remaining.", MapItemManager.getCacheSize(player)));
-        }
-    }
+import java.util.UUID;
 
+
+@CommandInfo (name = "getother", usageParameters = "<PlayerName> <MapName>")
+public class GetOtherCommand extends IoMCommand
+{
+
+	@Override
+	protected void run() throws CommandException
+	{
+    	if(args.length < 2) {
+    		warning(I.t("Not enough parameters! Usage: /maptool getother <playername> <mapname>"));
+    		return;
+    	}
+
+		Player player = null;
+		UUID uuid = null;
+        player = Bukkit.getPlayer(args[0]);
+
+        if(player == null){
+        	OfflinePlayer op = Bukkit.getOfflinePlayer(args[0]);
+			if(op.hasPlayedBefore()) uuid = op.getUniqueId();
+			else warning(I.t("We've never seen that player before!"));
+			return;
+        }
+        else {
+        	uuid = player.getUniqueId();        	
+        }
+		ImageMap map = null;
+		String mapName = "";
+		mapName = args[1];
+		if(args.length > 2) {
+			for(int i = 2; i < args.length; i++) {
+				mapName += (" " + args[i - 1]);
+			}
+		}
+		map = MapManager.getMap(uuid, mapName);
+		if(map!=null)
+			map.give(playerSender());
+		else{
+			warning(I.t("Unknown map {0}",mapName));
+		}
+		return;
+	}
     @Override
     public boolean canExecute(CommandSender sender)
     {
-        return Permissions.NEW.grantedTo(sender) || Permissions.GET.grantedTo(sender);
+        return Permissions.GETOTHER.grantedTo(sender);
     }
 }
