@@ -40,6 +40,7 @@ import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.zlib.components.i18n.I;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -47,6 +48,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -150,7 +152,23 @@ public abstract class ImageMap implements ConfigurationSerializable
         this.postSerialize(map);
         return map;
     }
-    
+
+    static public Integer[] getSize(Map<String, Object> map, UUID playerUUID, String id){
+
+        ConfigurationSection section=MapManager.getPlayerMapStore(playerUUID).getToolConfig().getConfigurationSection("PlayerMapStore");
+
+        if(section == null) return null;
+        List<Map<String, Object>> list = (List<Map<String, Object>>) section.getList("mapList");
+        if(list == null) return null;
+
+        for(Map<String, Object> tMap : list)
+        {
+            if(tMap.get("id").equals(id)) {
+                    return new Integer[]{(Integer)tMap.get("columns"), (Integer)tMap.get("rows")};
+            }
+        }
+        return null;
+    }
     static protected <T> T getFieldValue(Map<String, Object> map, String fieldName) throws InvalidConfigurationException
     {
         T value = getNullableFieldValue(map, fieldName);
