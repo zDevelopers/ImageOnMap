@@ -36,6 +36,7 @@
 
 package fr.moribus.imageonmap;
 
+
 import fr.moribus.imageonmap.commands.maptool.*;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
@@ -44,6 +45,7 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.migration.MigratorExecutor;
 import fr.moribus.imageonmap.migration.V3Migrator;
 import fr.moribus.imageonmap.ui.MapItemManager;
+import fr.zcraft.zlib.components.commands.CommandWorkers;
 import fr.zcraft.zlib.components.commands.Commands;
 import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.i18n.I18n;
@@ -60,7 +62,6 @@ public final class ImageOnMap extends ZPlugin
     static private final String IMAGES_DIRECTORY_NAME = "images";
     static private final String MAPS_DIRECTORY_NAME = "maps";
     static private ImageOnMap plugin;
-
     private File imagesDirectory;
     private final File mapsDirectory;
 
@@ -83,6 +84,7 @@ public final class ImageOnMap extends ZPlugin
         return new File(imagesDirectory, "map"+mapID+".png");
     }
     
+    
     @SuppressWarnings ("unchecked")
     @Override
     public void onEnable()
@@ -99,11 +101,12 @@ public final class ImageOnMap extends ZPlugin
             this.setEnabled(false);
             return;
         }
-
+        
+        
         saveDefaultConfig();
 
-        loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class, ImageRendererExecutor.class);
-        
+        loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class, ImageRendererExecutor.class, CommandWorkers.class);
+               
         //Init all the things !
         I18n.setPrimaryLocale(PluginConfiguration.LANG.get());
 
@@ -111,14 +114,19 @@ public final class ImageOnMap extends ZPlugin
         MapInitEvent.init();
         MapItemManager.init();
 
+
         Commands.register(
                 "maptool",
                 NewCommand.class,
                 ListCommand.class,
+                ListOtherCommand.class,
                 GetCommand.class,
+                GetOtherCommand.class,
                 DeleteCommand.class,
+                DeleteOtherCommand.class,
                 GetRemainingCommand.class,
                 ExploreCommand.class,
+                ExploreOtherCommand.class,
                 MigrateCommand.class,
                 UpdateCommand.class
         );
