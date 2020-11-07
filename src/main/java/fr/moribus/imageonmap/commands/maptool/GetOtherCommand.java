@@ -59,24 +59,24 @@ public class GetOtherCommand extends IoMCommand
 	@Override
 	protected void run() throws CommandException
 	{
-    	if(args.length < 2) {
-    		warning(I.t("Not enough parameters! Usage: /maptool getother <playername> <mapname>"));
-    		return;
-    	}
+		if(args.length < 2) {
+			warning(I.t("Not enough parameters! Usage: /maptool getother <playername> <mapname>"));
+			return;
+		}
 
 		Player player = null;
 		UUID uuid = null;
-        player = Bukkit.getPlayer(args[0]);
+		player = Bukkit.getPlayer(args[0]);
 
-        if(player == null){
-        	OfflinePlayer op = Bukkit.getOfflinePlayer(args[0]);
+		if(player == null){
+			OfflinePlayer op = Bukkit.getOfflinePlayer(args[0]);
 			if(op.hasPlayedBefore()) uuid = op.getUniqueId();
 			else warning(I.t("We've never seen that player before!"));
 			return;
-        }
-        else {
-        	uuid = player.getUniqueId();        	
-        }
+		}
+		else {
+			uuid = player.getUniqueId();
+		}
 		ImageMap map = null;
 		String mapName = "";
 		mapName = args[1];
@@ -93,9 +93,9 @@ public class GetOtherCommand extends IoMCommand
 		}
 		return;
 	}
-    @Override
-    public boolean canExecute(CommandSender sender)
-    {
-        return Permissions.GETOTHER.grantedTo(sender);
-    }
+	@Override
+	public boolean canExecute(CommandSender sender)
+	{
+		return Permissions.GETOTHER.grantedTo(sender);
+	}
 }

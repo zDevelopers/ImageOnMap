@@ -61,37 +61,37 @@ import java.util.UUID;
 @CommandInfo (name = "listother", usageParameters = "<PlayerName>")
 public class ListOtherCommand extends IoMCommand
 {
-	@Override
+    @Override
     protected void run() throws CommandException
     {
-    	if(args.length < 1){
-    	    warning(I.t("Not enough parameters! Usage: /maptool listother <playername>"));
+        if(args.length < 1){
+            warning(I.t("Not enough parameters! Usage: /maptool listother <playername>"));
             return;
-    	}
+        }
 
-		
-		Player player = null;
-		UUID uuid = null;
+
+        Player player = null;
+        UUID uuid = null;
         player = Bukkit.getPlayer(args[0]);
         if(player == null){
-        	OfflinePlayer op = Bukkit.getOfflinePlayer(args[0]);
-			if(op.hasPlayedBefore()) {
-				uuid = op.getUniqueId();
-			}
-			else {
-				warning(I.t("We've never seen that player before!"));
-			}
+            OfflinePlayer op = Bukkit.getOfflinePlayer(args[0]);
+            if(op.hasPlayedBefore()) {
+                uuid = op.getUniqueId();
+            }
+            else {
+                warning(I.t("We've never seen that player before!"));
+            }
         }
         else{
-        	 uuid = player.getUniqueId();
+            uuid = player.getUniqueId();
         }
-       
+
         List<ImageMap> mapList = null;
         try{
-        	mapList = MapManager.getMapList(uuid);
+            mapList = MapManager.getMapList(uuid);
         }
         catch(Exception e){
-        	return;
+            return;
         }
 
         if(mapList.isEmpty())
@@ -99,7 +99,7 @@ public class ListOtherCommand extends IoMCommand
             info(I.t("No map found."));
             return;
         }
-        
+
         info(I.tn("{white}{bold}{0} map found.", "{white}{bold}{0} maps found.", mapList.size()));
 
         RawTextPart rawText = new RawText("");
@@ -122,7 +122,7 @@ public class ListOtherCommand extends IoMCommand
                 .then(map.getId())
                 .color(ChatColor.WHITE)
                 .command(GetCommand.class, map.getId())
-		.hover(new RawText()
+                .hover(new RawText()
                         .then(map.getName()).style(ChatColor.BOLD, ChatColor.GREEN).then("\n")
                         .then(map.getId() + ", " + size).color(ChatColor.GRAY).then("\n\n")
                         .then(I.t("{white}Click{gray} to get this map"))

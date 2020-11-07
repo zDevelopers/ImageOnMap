@@ -18,10 +18,13 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
+import fr.zcraft.zlib.components.i18n.I;
+import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
@@ -30,13 +33,17 @@ public class RenameCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException
     {
-        if(args.length == 2)
-        {
-            ImageMap map = getMapFromArgs();
-            map.rename(args[1]);
-        } else {
-            info(I.t("Not enough or too many arguments"));
+        if(args.length != 4) {
+            warning(I.t("Not enough or too many arguments! Usage: /maptool rename <map name> <new map name>"));
+            return;
         }
+        //if(args.length == 2)
+        //{
+            ImageMap map = getMapFromArgs();
+            map.rename(args[2]);
+       // } else {
+        //    info(I.t("Not enough or too many arguments"));
+       // }
     }
     @Override
     protected List<String> complete() throws CommandException

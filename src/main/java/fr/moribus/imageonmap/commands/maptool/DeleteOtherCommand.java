@@ -62,19 +62,19 @@ public class DeleteOtherCommand extends IoMCommand
     @Override
     protected void run() throws CommandException
     {
-    	if(args.length < 2) {
-    	    warning(I.t("Not enough parameters! Usage: /maptool deleteother <playername> <mapname>"));
-    	    return;
+        if(args.length < 2) {
+            warning(I.t("Not enough parameters! Usage: /maptool deleteother <playername> <mapname>"));
+            return;
         }
 
-		Player player = null;
-		UUID uuid = null;
-		OfflinePlayer op = null;
+        Player player = null;
+        UUID uuid = null;
+        OfflinePlayer op = null;
         player = Bukkit.getPlayer(args[0]);
         if(player == null){
-        	op = Bukkit.getOfflinePlayer(args[0]);
-			if(op.hasPlayedBefore()) uuid = op.getUniqueId();
-			else warning(I.t("We've never seen that player before!"));
+            op = Bukkit.getOfflinePlayer(args[0]);
+            if(op.hasPlayedBefore()) uuid = op.getUniqueId();
+            else warning(I.t("We've never seen that player before!"));
         }
         else uuid = player.getUniqueId();
         if(player==null){
@@ -82,25 +82,25 @@ public class DeleteOtherCommand extends IoMCommand
             return;
         }
         ImageMap map = getMapFromArgs(player, 1, true);
-        
+
         if(player != null) MapManager.clear(player.getInventory(), map);
-        
-            try
-            {
-                MapManager.deleteMap(map);
-                info(I.t("{gray}Map successfully deleted."));
-            }
-            catch (MapManagerException ex)
-            {
-                PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
-                warning(ChatColor.RED+(I.t("This map does not exist.")));
-            }
+
+        try
+        {
+            MapManager.deleteMap(map);
+            info(I.t("{gray}Map successfully deleted."));
         }
+        catch (MapManagerException ex)
+        {
+            PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
+            warning(ChatColor.RED+(I.t("This map does not exist.")));
+        }
+    }
 
     @Override
     protected List<String> complete() throws CommandException
     {
-        if(args.length == 1) 
+        if(args.length == 1)
             return getMatchingMapNames(playerSender(), args[0]);
 
         return null;

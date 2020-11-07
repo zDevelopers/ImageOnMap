@@ -43,10 +43,11 @@ import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.i18n.I;
+import fr.zcraft.zlib.tools.PluginLogger;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-
-import java.util.concurrent.ExecutionException;
+import org.bukkit.entity.Player;
 
 
 @CommandInfo (name = "exploreother")
@@ -59,21 +60,31 @@ public class ExploreOtherCommand extends IoMCommand
             warning(I.t("Not enough parameters! Usage: /maptool exploreother <playername>"));
             return;
         }
-           try{
-               OfflinePlayer player=getOfflinePlayerParameter(0);
-               String name=args[0];
-               if(player!=null)
-                   Gui.open(playerSender(), new MapListGui(player,name));
-           }
-           catch (InterruptedException | ExecutionException e){
-               warning(I.t("Can't find player"));
-               return;
-           }
+        String name=args[0];
+        Player sender=playerSender();
+        offlinePlayerParameter(0, uuid -> {
+            if(uuid==null){
+                try {
+                    throwInvalidArgument(I.t("Player not found."));
+                } catch (CommandException e) {
+                    PluginLogger.error("CommandException "+e);
+                    return;
+                }
+            }
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+            if (offlinePlayer != null) {
+                Gui.open(sender, new MapListGui(offlinePlayer, name));
+            }
+            else{
+                PluginLogger.warning(I.t("Can't find player"));
+                return;
+            }
+        });
     }
 
     @Override
     public boolean canExecute(CommandSender sender)
     {
-       return Permissions.LISTOTHER.grantedTo(sender);
+        return Permissions.LISTOTHER.grantedTo(sender);
     }
 }

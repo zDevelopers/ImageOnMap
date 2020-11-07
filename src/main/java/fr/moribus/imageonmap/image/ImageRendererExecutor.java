@@ -165,7 +165,7 @@ public class ImageRendererExecutor extends Worker
             public ImageMap run() throws Throwable
             {
 
-                final URLConnection connection = HTTPconnection(url);
+                final URLConnection connection = connecting(url);
 
                 final InputStream stream = connection.getInputStream();
                 final BufferedImage image = ImageIO.read(stream);
