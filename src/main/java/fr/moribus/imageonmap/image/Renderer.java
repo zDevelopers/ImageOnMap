@@ -36,7 +36,7 @@
 
 package fr.moribus.imageonmap.image;
 
-import fr.zcraft.zlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;

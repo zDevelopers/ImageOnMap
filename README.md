@@ -103,7 +103,7 @@ save-full-image: false
 
 ### 3.0 — The From-Scratch Update
 
-The 3.0 release is a complete rewrite of the original ImageOnMap plugin, now based on zLib, which adds many feature and fixes many bugs.
+The 3.0 release is a complete rewrite of the original ImageOnMap plugin, now based on QuartzLib, which adds many feature and fixes many bugs.
 
 This new version is not compatible with the older ones, so your older maps will not be loaded. Run the `/maptool migrate` command (as op or in console) in order to get them back in this new version.
 

@@ -38,9 +38,9 @@ package fr.moribus.imageonmap.migration;
 
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.tools.PluginLogger;
-import fr.zcraft.zlib.tools.mojang.UUIDFetcher;
+import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.mojang.UUIDFetcher;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.configuration.InvalidConfigurationException;

@@ -38,7 +38,7 @@ package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.zcraft.zlib.core.ZLib;
+import fr.zcraft.quartzlib.core.QuartzLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -60,7 +60,7 @@ public class MapInitEvent implements Listener
 {
     static public void init()
     {
-        ZLib.registerEvents(new MapInitEvent());
+        QuartzLib.registerEvents(new MapInitEvent());
         
         for(World world : Bukkit.getWorlds())
         {

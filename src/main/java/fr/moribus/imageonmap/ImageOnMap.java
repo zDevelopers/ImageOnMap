@@ -45,19 +45,19 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.migration.MigratorExecutor;
 import fr.moribus.imageonmap.migration.V3Migrator;
 import fr.moribus.imageonmap.ui.MapItemManager;
-import fr.zcraft.zlib.components.commands.CommandWorkers;
-import fr.zcraft.zlib.components.commands.Commands;
-import fr.zcraft.zlib.components.gui.Gui;
-import fr.zcraft.zlib.components.i18n.I18n;
-import fr.zcraft.zlib.core.ZPlugin;
-import fr.zcraft.zlib.tools.PluginLogger;
-import fr.zcraft.zlib.tools.UpdateChecker;
+import fr.zcraft.quartzlib.components.commands.CommandWorkers;
+import fr.zcraft.quartzlib.components.commands.Commands;
+import fr.zcraft.quartzlib.components.gui.Gui;
+import fr.zcraft.quartzlib.components.i18n.I18n;
+import fr.zcraft.quartzlib.core.QuartzPlugin;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.UpdateChecker;
 import org.bstats.bukkit.Metrics;
 
 import java.io.File;
 import java.io.IOException;
 
-public final class ImageOnMap extends ZPlugin
+public final class ImageOnMap extends QuartzPlugin
 {
     static private final String IMAGES_DIRECTORY_NAME = "images";
     static private final String MAPS_DIRECTORY_NAME = "maps";

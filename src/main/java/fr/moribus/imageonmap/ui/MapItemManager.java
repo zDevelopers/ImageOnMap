@@ -41,10 +41,10 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
-import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.core.ZLib;
-import fr.zcraft.zlib.tools.items.ItemStackBuilder;
-import fr.zcraft.zlib.tools.items.ItemUtils;
+import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.core.QuartzLib;
+import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
+import fr.zcraft.quartzlib.tools.items.ItemUtils;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
@@ -71,7 +71,7 @@ public class MapItemManager implements Listener
     static public void init()
     {
         mapItemCache = new HashMap<>();
-        ZLib.registerEvents(new MapItemManager());
+        QuartzLib.registerEvents(new MapItemManager());
     }
 
     static public void exit()
