@@ -177,13 +177,13 @@ public class MapItemManager implements Listener
         if(goldTitle) {
             mapItem = new ItemStackBuilder(Material.FILLED_MAP)
                     .title( ChatColor.GOLD, text)
-                    .hideAttributes()
+                    //.hideAllAttributes()
                     .item();
         }
         else{
             mapItem= new ItemStackBuilder(Material.FILLED_MAP)
                     .title(text)
-                    .hideAttributes()
+                    //.hideAllAttributes()
                     .item();
         }
         final MapMeta meta = (MapMeta) mapItem.getItemMeta();
@@ -327,7 +327,7 @@ public class MapItemManager implements Listener
 
         frame.setItem(new ItemStackBuilder(item)
                 .title(getMapTitle(item))
-                .hideAttributes()
+                //.hideAllAttributes()
                 .item());
 
     }

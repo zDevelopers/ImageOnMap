@@ -39,6 +39,7 @@ package fr.moribus.imageonmap.image;
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.core.QuartzLib;
+import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -54,8 +55,6 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
-
-import java.io.File;
 public class MapInitEvent implements Listener
 {
     static public void init()

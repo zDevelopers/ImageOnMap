@@ -52,7 +52,6 @@ import fr.zcraft.quartzlib.components.i18n.I18n;
 import fr.zcraft.quartzlib.core.QuartzPlugin;
 import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.UpdateChecker;
-import org.bstats.bukkit.Metrics;
 
 import java.io.File;
 import java.io.IOException;
@@ -142,10 +141,10 @@ public final class ImageOnMap extends QuartzPlugin
 
         if (PluginConfiguration.COLLECT_DATA.get())
         {
-            final Metrics metrics = new Metrics(this);
+           /* final Metrics metrics = new Metrics(this);
 
             metrics.addCustomChart(new Metrics.SingleLineChart("rendered-images", MapManager::getImagesCount));
-            metrics.addCustomChart(new Metrics.SingleLineChart("used-minecraft-maps", MapManager::getMapCount));
+            metrics.addCustomChart(new Metrics.SingleLineChart("used-minecraft-maps", MapManager::getMapCount));*/
         }
     }
 

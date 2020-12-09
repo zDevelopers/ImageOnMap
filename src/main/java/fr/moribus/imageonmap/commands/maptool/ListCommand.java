@@ -95,14 +95,6 @@ public class ListCommand extends IoMCommand
                         .then(map.getId() + ", " + size).color(ChatColor.GRAY).then("\n\n")
                         .then(I.t("{white}Click{gray} to get this map"))
                 );
-                /*.hover(new ItemStackBuilder(Material.FILLED_MAP)
-                                .title(ChatColor.GREEN + "" + ChatColor.BOLD + map.getName())
-                                .lore(ChatColor.GRAY + map.getId() + ", " + size)
-                                .lore("")
-                                .lore(I.t("{white}Click{gray} to get this map"))
-                                .hideAttributes()
-                                .item()
-                );*/
     }
 
     @Override
