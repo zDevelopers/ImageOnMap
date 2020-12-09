@@ -256,7 +256,7 @@ public class PlayerMapStore implements ConfigurationSerializable
     private FileConfiguration mapConfig = null;
     private File mapsFile = null;
     
-    private FileConfiguration getToolConfig()
+    public FileConfiguration getToolConfig()
     {
         if(mapConfig == null) load();
         

@@ -52,7 +52,7 @@ public class ExploreCommand extends IoMCommand
 	@Override
 	protected void run() throws CommandException
 	{
-		Gui.open(playerSender(), new MapListGui());
+		Gui.open(playerSender(), new MapListGui(playerSender()));
 	}
 
 	@Override

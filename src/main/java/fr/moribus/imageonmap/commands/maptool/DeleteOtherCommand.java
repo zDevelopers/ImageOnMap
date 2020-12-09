@@ -45,64 +45,62 @@ import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
 import fr.zcraft.zlib.components.commands.WithFlags;
 import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.components.rawtext.RawText;
 import fr.zcraft.zlib.tools.PluginLogger;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.UUID;
 
-@CommandInfo (name =  "delete", usageParameters = "<map name> [--confirm]")
+@CommandInfo (name =  "deleteother", usageParameters = "<player name> <map name>")
 @WithFlags ({"confirm"})
-public class DeleteCommand extends IoMCommand
+public class DeleteOtherCommand extends IoMCommand
 {
-
-    private static RawText deleteMsg(Class klass,ImageMap map){
-       return new RawText(I.t("You are going to delete") + " ")
-                .then(map.getId())
-                .color(ChatColor.GOLD)
-                .then(". " + I.t("Are you sure ? "))
-                .color(ChatColor.WHITE)
-                .then(I.t("[Confirm]"))
-                .color(ChatColor.GREEN)
-                .hover(new RawText(I.t("{red}This map will be deleted {bold}forever{red}!")))
-                .command(klass, map.getId(), "--confirm")
-                .build();
-    }
-
     @Override
     protected void run() throws CommandException
     {
-        ImageMap map = getMapFromArgs();
-
-        if (!hasFlag("confirm"))
-        {
-            RawText msg = deleteMsg(getClass(),map);
-            send(msg);
+        if(args.length < 2) {
+            warning(I.t("Not enough parameters! Usage: /maptool deleteother <playername> <mapname>"));
+            return;
         }
-        else
-        {
-            Player player = playerSender();
-            MapManager.clear(player.getInventory(), map);
 
-            try
-            {
-                MapManager.deleteMap(map);
-                info(I.t("Map successfully deleted."));
-            }
-            catch (MapManagerException ex)
-            {
-                PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
-                warning(I.t("This map does not exist."));
-            }
+        Player player = null;
+        UUID uuid = null;
+        OfflinePlayer op = null;
+        player = Bukkit.getPlayer(args[0]);
+        if(player == null){
+            op = Bukkit.getOfflinePlayer(args[0]);
+            if(op.hasPlayedBefore()) uuid = op.getUniqueId();
+            else warning(I.t("We've never seen that player before!"));
+        }
+        else uuid = player.getUniqueId();
+        if(player==null){
+            warning(I.t("Player not found"));
+            return;
+        }
+        ImageMap map = getMapFromArgs(player, 1, true);
+
+        if(player != null) MapManager.clear(player.getInventory(), map);
+
+        try
+        {
+            MapManager.deleteMap(map);
+            info(I.t("{gray}Map successfully deleted."));
+        }
+        catch (MapManagerException ex)
+        {
+            PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
+            warning(ChatColor.RED+(I.t("This map does not exist.")));
         }
     }
-    
+
     @Override
     protected List<String> complete() throws CommandException
     {
-        if(args.length == 1) 
+        if(args.length == 1)
             return getMatchingMapNames(playerSender(), args[0]);
 
         return null;
@@ -111,6 +109,6 @@ public class DeleteCommand extends IoMCommand
     @Override
     public boolean canExecute(CommandSender sender)
     {
-        return Permissions.DELETE.grantedTo(sender);
+        return Permissions.DELETEOTHER.grantedTo(sender);
     }
 }

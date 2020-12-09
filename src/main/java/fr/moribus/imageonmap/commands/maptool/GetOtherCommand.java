@@ -36,81 +36,66 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.moribus.imageonmap.map.MapManagerException;
 import fr.zcraft.zlib.components.commands.CommandException;
 import fr.zcraft.zlib.components.commands.CommandInfo;
-import fr.zcraft.zlib.components.commands.WithFlags;
 import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.components.rawtext.RawText;
-import fr.zcraft.zlib.tools.PluginLogger;
-import org.bukkit.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.List;
+import java.util.UUID;
 
-@CommandInfo (name =  "delete", usageParameters = "<map name> [--confirm]")
-@WithFlags ({"confirm"})
-public class DeleteCommand extends IoMCommand
+
+@CommandInfo (name = "getother", usageParameters = "<PlayerName> <MapName>")
+public class GetOtherCommand extends IoMCommand
 {
 
-    private static RawText deleteMsg(Class klass,ImageMap map){
-       return new RawText(I.t("You are going to delete") + " ")
-                .then(map.getId())
-                .color(ChatColor.GOLD)
-                .then(". " + I.t("Are you sure ? "))
-                .color(ChatColor.WHITE)
-                .then(I.t("[Confirm]"))
-                .color(ChatColor.GREEN)
-                .hover(new RawText(I.t("{red}This map will be deleted {bold}forever{red}!")))
-                .command(klass, map.getId(), "--confirm")
-                .build();
-    }
+	@Override
+	protected void run() throws CommandException
+	{
+		if(args.length < 2) {
+			warning(I.t("Not enough parameters! Usage: /maptool getother <playername> <mapname>"));
+			return;
+		}
 
-    @Override
-    protected void run() throws CommandException
-    {
-        ImageMap map = getMapFromArgs();
+		Player player = null;
+		UUID uuid = null;
+		player = Bukkit.getPlayer(args[0]);
 
-        if (!hasFlag("confirm"))
-        {
-            RawText msg = deleteMsg(getClass(),map);
-            send(msg);
-        }
-        else
-        {
-            Player player = playerSender();
-            MapManager.clear(player.getInventory(), map);
-
-            try
-            {
-                MapManager.deleteMap(map);
-                info(I.t("Map successfully deleted."));
-            }
-            catch (MapManagerException ex)
-            {
-                PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
-                warning(I.t("This map does not exist."));
-            }
-        }
-    }
-    
-    @Override
-    protected List<String> complete() throws CommandException
-    {
-        if(args.length == 1) 
-            return getMatchingMapNames(playerSender(), args[0]);
-
-        return null;
-    }
-
-    @Override
-    public boolean canExecute(CommandSender sender)
-    {
-        return Permissions.DELETE.grantedTo(sender);
-    }
+		if(player == null){
+			OfflinePlayer op = Bukkit.getOfflinePlayer(args[0]);
+			if(op.hasPlayedBefore()) uuid = op.getUniqueId();
+			else warning(I.t("We've never seen that player before!"));
+			return;
+		}
+		else {
+			uuid = player.getUniqueId();
+		}
+		ImageMap map = null;
+		String mapName = "";
+		mapName = args[1];
+		if(args.length > 2) {
+			for(int i = 2; i < args.length; i++) {
+				mapName += (" " + args[i - 1]);
+			}
+		}
+		map = MapManager.getMap(uuid, mapName);
+		if(map!=null)
+			map.give(playerSender());
+		else{
+			warning(I.t("Unknown map {0}",mapName));
+		}
+		return;
+	}
+	@Override
+	public boolean canExecute(CommandSender sender)
+	{
+		return Permissions.GETOTHER.grantedTo(sender);
+	}
 }

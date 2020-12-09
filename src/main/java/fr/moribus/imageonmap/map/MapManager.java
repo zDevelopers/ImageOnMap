@@ -106,7 +106,7 @@ abstract public class MapManager
         addMap(newMap);
         return newMap;
     }
-    
+
     static public ImageMap createMap(PosterImage image, UUID playerUUID, int[] mapsIDs) throws MapManagerException
     {
         ImageMap newMap;
@@ -122,7 +122,7 @@ abstract public class MapManager
         addMap(newMap);
         return newMap;
     }
-    
+
     static public int[] getNewMapsIds(int amount)
     {
         int[] mapsIds = new int[amount];
@@ -161,7 +161,7 @@ abstract public class MapManager
         getPlayerMapStore(map.getUserUUID()).deleteMap(map);
         ImageIOExecutor.deleteImage(map);
     }
-    
+
     static public void notifyModification(UUID playerUUID)
     {
         getPlayerMapStore(playerUUID).notifyModification();
@@ -376,7 +376,7 @@ abstract public class MapManager
         }
     }
     
-    static private PlayerMapStore getPlayerMapStore(UUID playerUUID)
+    static public PlayerMapStore getPlayerMapStore(UUID playerUUID)
     {
         PlayerMapStore store;
         synchronized(playerMaps)
