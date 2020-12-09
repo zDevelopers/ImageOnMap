@@ -19,20 +19,16 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
+                        <createDependencyReducedPom>false</createDependencyReducedPom>
                     <artifactSet>
                         <includes>
-                            <include>fr.zcraft:zlib</include>
-                            <include>org.bstats:bstats-bukkit</include>
+                            <include>fr.zcraft:quartzlib</include>
                         </includes>
                     </artifactSet>
                     <relocations>
                         <relocation>
-                            <pattern>fr.zcraft.zlib</pattern>
-                            <shadedPattern>fr.moribus.imageonmap</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.bstats</pattern>
-                            <shadedPattern>fr.moribus.imageonmap</shadedPattern>
+                            <pattern>fr.zcraft.quartzlib</pattern>
+                            <shadedPattern>fr.zcraft.imageonmap.quartzlib</shadedPattern>
                         </relocation>
                     </relocations>
                     <minimizeJar>true</minimizeJar>
@@ -55,8 +51,8 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
-            <id>zDevelopers</id>
-            <url>http://maven.carrade.eu/artifactory/snapshots</url>
+            <id>zdevelopers-quartzlib</id>
+            <url>https://maven.zcraft.fr/QuartzLib</url>
         </repository>
 
         <!-- bStats -->
@@ -74,9 +70,8 @@
         </dependency>
         <dependency>
             <groupId>fr.zcraft</groupId>
-            <artifactId>zlib</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <artifactId>quartzlib</artifactId>
+            <version>0.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>

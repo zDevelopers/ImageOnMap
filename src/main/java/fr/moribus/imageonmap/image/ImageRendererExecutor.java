@@ -40,11 +40,11 @@ import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.components.worker.Worker;
-import fr.zcraft.zlib.components.worker.WorkerAttributes;
-import fr.zcraft.zlib.components.worker.WorkerCallback;
-import fr.zcraft.zlib.components.worker.WorkerRunnable;
+import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.components.worker.Worker;
+import fr.zcraft.quartzlib.components.worker.WorkerAttributes;
+import fr.zcraft.quartzlib.components.worker.WorkerCallback;
+import fr.zcraft.quartzlib.components.worker.WorkerRunnable;
 import org.bukkit.Bukkit;
 
 import javax.imageio.ImageIO;

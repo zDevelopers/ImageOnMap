@@ -41,12 +41,12 @@ import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
-import fr.zcraft.zlib.components.commands.CommandException;
-import fr.zcraft.zlib.components.commands.CommandInfo;
-import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.components.rawtext.RawText;
-import fr.zcraft.zlib.components.rawtext.RawTextPart;
-import fr.zcraft.zlib.tools.text.RawMessage;
+import fr.zcraft.quartzlib.components.commands.CommandException;
+import fr.zcraft.quartzlib.components.commands.CommandInfo;
+import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.components.rawtext.RawText;
+import fr.zcraft.quartzlib.components.rawtext.RawTextPart;
+import fr.zcraft.quartzlib.tools.text.RawMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -95,14 +95,6 @@ public class ListCommand extends IoMCommand
                         .then(map.getId() + ", " + size).color(ChatColor.GRAY).then("\n\n")
                         .then(I.t("{white}Click{gray} to get this map"))
                 );
-                /*.hover(new ItemStackBuilder(Material.FILLED_MAP)
-                                .title(ChatColor.GREEN + "" + ChatColor.BOLD + map.getName())
-                                .lore(ChatColor.GRAY + map.getId() + ", " + size)
-                                .lore("")
-                                .lore(I.t("{white}Click{gray} to get this map"))
-                                .hideAttributes()
-                                .item()
-                );*/
     }
 
     @Override

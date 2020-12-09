@@ -36,12 +36,12 @@
 
 package fr.moribus.imageonmap;
 
-import fr.zcraft.zlib.components.configuration.Configuration;
-import fr.zcraft.zlib.components.configuration.ConfigurationItem;
+import fr.zcraft.quartzlib.components.configuration.Configuration;
+import fr.zcraft.quartzlib.components.configuration.ConfigurationItem;
 
 import java.util.Locale;
 
-import static fr.zcraft.zlib.components.configuration.ConfigurationItem.item;
+import static fr.zcraft.quartzlib.components.configuration.ConfigurationItem.item;
 
 
 public final class PluginConfiguration extends Configuration

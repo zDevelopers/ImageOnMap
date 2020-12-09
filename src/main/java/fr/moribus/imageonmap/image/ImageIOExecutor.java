@@ -38,9 +38,9 @@ package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.ImageMap;
-import fr.zcraft.zlib.components.worker.Worker;
-import fr.zcraft.zlib.components.worker.WorkerAttributes;
-import fr.zcraft.zlib.components.worker.WorkerRunnable;
+import fr.zcraft.quartzlib.components.worker.Worker;
+import fr.zcraft.quartzlib.components.worker.WorkerAttributes;
+import fr.zcraft.quartzlib.components.worker.WorkerRunnable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

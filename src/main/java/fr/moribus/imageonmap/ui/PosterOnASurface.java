@@ -37,8 +37,8 @@
 package fr.moribus.imageonmap.ui;
 
 import fr.moribus.imageonmap.map.PosterMap;
-import fr.zcraft.zlib.tools.world.FlatLocation;
-import fr.zcraft.zlib.tools.world.WorldUtils;
+import fr.zcraft.quartzlib.tools.world.FlatLocation;
+import fr.zcraft.quartzlib.tools.world.WorldUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;

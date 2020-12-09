@@ -40,12 +40,12 @@ import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.MapManagerException;
-import fr.zcraft.zlib.components.gui.ActionGui;
-import fr.zcraft.zlib.components.gui.Gui;
-import fr.zcraft.zlib.components.gui.GuiAction;
-import fr.zcraft.zlib.components.i18n.I;
-import fr.zcraft.zlib.tools.PluginLogger;
-import fr.zcraft.zlib.tools.items.ItemStackBuilder;
+import fr.zcraft.quartzlib.components.gui.ActionGui;
+import fr.zcraft.quartzlib.components.gui.Gui;
+import fr.zcraft.quartzlib.components.gui.GuiAction;
+import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -129,7 +129,7 @@ public class ConfirmDeleteMapGui extends ActionGui
                 .lore(I.t(getPlayerLocale(), "{gray}Name: {white}{0}",mapToDelete.getName()))
                 .lore(I.t(getPlayerLocale(), "{gray}Map ID: {white}{0}", mapToDelete.getId()))
                 .lore(I.t(getPlayerLocale(), "{gray}Maps inside: {white}{0}", mapToDelete.getMapsIDs().length))
-                .hideAttributes()
+                //.hideAllAttributes()
         );
 
 
