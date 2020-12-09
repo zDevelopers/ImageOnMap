@@ -124,6 +124,7 @@ public final class ImageOnMap extends QuartzPlugin
                 RenameCommand.class,
                 DeleteCommand.class,
                 DeleteOtherCommand.class,
+                GiveCommand.class,
                 GetRemainingCommand.class,
                 ExploreCommand.class,
                 ExploreOtherCommand.class,
@@ -133,6 +134,7 @@ public final class ImageOnMap extends QuartzPlugin
 
         Commands.registerShortcut("maptool", NewCommand.class, "tomap");
         Commands.registerShortcut("maptool", ExploreCommand.class, "maps");
+        Commands.registerShortcut("maptool", GiveCommand.class, "mapgive");
 
         if (PluginConfiguration.CHECK_FOR_UPDATES.get())
         {

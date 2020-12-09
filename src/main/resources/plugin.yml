@@ -12,6 +12,9 @@ commands:
       description: Manage maps
    maps:
       description: Manage maps through a GUI
+   mapgive:
+     description: give a map to a player from a player map store, by default take from the player that make the command
+     usage: /<command> player_to map_name [player_from]
 
 permissions:
     imageonmap.*:
@@ -31,6 +34,7 @@ permissions:
             imageonmap.delete: true
             imageonmap.deleteother: false
             imageonmap.bypasssize: false
+            imageonmap.give: false
             imageonmap.update: true
             imageonmap.updateother: false
 
@@ -74,6 +78,10 @@ permissions:
         description: "Allows you to delete a map you rendered in the past."
         default: true
 
+    imageonmap.give:
+      description: "Allows you to give a map to a specified player."
+      default: op
+      
     imageonmap.deleteother:
       description: "Allows you to delete a map a player rendered in the past."
       default: false

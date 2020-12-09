@@ -36,6 +36,8 @@
 
 package fr.moribus.imageonmap.image;
 
+import fr.zcraft.zlib.tools.PluginLogger;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -44,45 +46,25 @@ import java.awt.image.BufferedImage;
  */
 public class ImageUtils {
 
-    public enum ScalingType {
-        NONE,
-        CONTAINED,
-        COVERED,
-        STRETCHED,
-        ;
-
-        public BufferedImage resize(BufferedImage source, int destinationW, int destinationH) {
-            switch(this) {
-                case CONTAINED: return ImageUtils.resize(source, destinationW, destinationH, false);
-                case COVERED: return ImageUtils.resize(source, destinationW, destinationH, true);
-                case STRETCHED: return resizeStretched(source, destinationW, destinationH);
-                default: return source;
-            }
-        }
-    }
-
     /**
      * Generates a resized buffer of the given source
+     *
      * @param source
      * @param destinationW
      * @param destinationH
      * @return
      */
-    static private BufferedImage resize(BufferedImage source, int destinationW, int destinationH, boolean covered)
-    {
-        float ratioW = (float)destinationW / (float)source.getWidth();
-        float ratioH = (float)destinationH / (float)source.getHeight();
+    static private BufferedImage resize(BufferedImage source, int destinationW, int destinationH, boolean covered) {
+        float ratioW = (float) destinationW / (float) source.getWidth();
+        float ratioH = (float) destinationH / (float) source.getHeight();
         int finalW, finalH;
         int x, y;
 
-        if(covered ? ratioW > ratioH : ratioW < ratioH)
-        {
+        if (covered ? ratioW > ratioH : ratioW < ratioH) {
             finalW = destinationW;
-            finalH = (int)(source.getHeight() * ratioW);
-        }
-        else
-        {
-            finalW = (int)(source.getWidth() * ratioH);
+            finalH = (int) (source.getHeight() * ratioW);
+        } else {
+            finalW = (int) (source.getWidth() * ratioH);
             finalH = destinationH;
         }
 
@@ -95,7 +77,6 @@ public class ImageUtils {
     }
 
     /**
-     *
      * @param source
      * @param destinationW
      * @param destinationH
@@ -110,24 +91,57 @@ public class ImageUtils {
     /**
      * Draws the source image on a new buffer, and returns it.
      * The source buffer can be drawn at any size and position in the new buffer.
-     * @param source The source buffer to draw
+     *
+     * @param source  The source buffer to draw
      * @param bufferW The width of the new buffer
      * @param bufferH The height of the new buffer
-     * @param posX The X position of the source buffer
-     * @param posY The Y position of the source buffer
+     * @param posX    The X position of the source buffer
+     * @param posY    The Y position of the source buffer
      * @param sourceW The width of the source buffer
      * @param sourceH The height of the source buffer
      * @return The new buffer, with the source buffer drawn on it
      */
     static private BufferedImage drawImage(BufferedImage source,
-                                          int bufferW, int bufferH,
-                                          int posX, int posY,
-                                          int sourceW, int sourceH) {
-        BufferedImage newImage = new BufferedImage(bufferW, bufferH, BufferedImage.TYPE_INT_ARGB);
+                                           int bufferW, int bufferH,
+                                           int posX, int posY,
+                                           int sourceW, int sourceH) {
+        Graphics graphics = null;
+        BufferedImage newImage = null;
+        try {
+            newImage = new BufferedImage(bufferW, bufferH, BufferedImage.TYPE_INT_ARGB);
 
-        Graphics graphics = newImage.getGraphics();
-        graphics.drawImage(source, posX, posY, sourceW, sourceH, null);
-        graphics.dispose();
-        return newImage;
+            graphics = newImage.getGraphics();
+            graphics.drawImage(source, posX, posY, sourceW, sourceH, null);
+
+            return newImage;
+        } catch (final Throwable e) {
+            PluginLogger.warning("Exception/error at drawImage");
+            if (newImage != null)
+                newImage.flush();//Safe to free
+            throw e;
+        }
+
+    }
+
+    public enum ScalingType {
+        NONE,
+        CONTAINED,
+        COVERED,
+        STRETCHED,
+        ;
+
+        public BufferedImage resize(BufferedImage source, int destinationW, int destinationH) {
+            switch (this) {
+                case CONTAINED:
+                    return ImageUtils.resize(source, destinationW, destinationH, false);
+                case COVERED:
+                    return ImageUtils.resize(source, destinationW, destinationH, true);
+                case STRETCHED:
+                    return resizeStretched(source, destinationW, destinationH);
+                default:
+                    return source;
+
+            }
+        }
     }
 }
