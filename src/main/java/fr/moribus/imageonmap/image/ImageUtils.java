@@ -36,9 +36,8 @@
 
 package fr.moribus.imageonmap.image;
 
-import fr.zcraft.zlib.tools.PluginLogger;
-
-import java.awt.*;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 /**
@@ -49,16 +48,18 @@ public class ImageUtils {
     /**
      * Generates a resized buffer of the given source
      *
-     * @param source
-     * @param destinationW
-     * @param destinationH
-     * @return
+     * @param source       The source buffer to draw
+     * @param destinationW resize width
+     * @param destinationH resize height
+     * @return The new buffer, with the source buffer drawn on it
      */
-    static private BufferedImage resize(BufferedImage source, int destinationW, int destinationH, boolean covered) {
+    private static BufferedImage resize(BufferedImage source, int destinationW, int destinationH, boolean covered) {
         float ratioW = (float) destinationW / (float) source.getWidth();
         float ratioH = (float) destinationH / (float) source.getHeight();
-        int finalW, finalH;
-        int x, y;
+        int finalW;
+        int finalH;
+        int x;
+        int y;
 
         if (covered ? ratioW > ratioH : ratioW < ratioH) {
             finalW = destinationW;
@@ -77,12 +78,12 @@ public class ImageUtils {
     }
 
     /**
-     * @param source
-     * @param destinationW
-     * @param destinationH
-     * @return
+     * @param source       The source buffer to draw
+     * @param destinationW resize width
+     * @param destinationH resize height
+     * @return The new buffer, with the source buffer drawn on it
      */
-    static private BufferedImage resizeStretched(BufferedImage source, int destinationW, int destinationH) {
+    private static BufferedImage resizeStretched(BufferedImage source, int destinationW, int destinationH) {
         return drawImage(source,
                 destinationW, destinationH,
                 0, 0, destinationW, destinationH);
@@ -101,11 +102,11 @@ public class ImageUtils {
      * @param sourceH The height of the source buffer
      * @return The new buffer, with the source buffer drawn on it
      */
-    static private BufferedImage drawImage(BufferedImage source,
+    private static BufferedImage drawImage(BufferedImage source,
                                            int bufferW, int bufferH,
                                            int posX, int posY,
                                            int sourceW, int sourceH) {
-        Graphics graphics = null;
+        Graphics graphics;
         BufferedImage newImage = null;
         try {
             newImage = new BufferedImage(bufferW, bufferH, BufferedImage.TYPE_INT_ARGB);
@@ -116,8 +117,9 @@ public class ImageUtils {
             return newImage;
         } catch (final Throwable e) {
             PluginLogger.warning("Exception/error at drawImage");
-            if (newImage != null)
+            if (newImage != null) {
                 newImage.flush();//Safe to free
+            }
             throw e;
         }
 

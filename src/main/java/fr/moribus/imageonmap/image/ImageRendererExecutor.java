@@ -45,9 +45,6 @@ import fr.zcraft.quartzlib.components.worker.Worker;
 import fr.zcraft.quartzlib.components.worker.WorkerAttributes;
 import fr.zcraft.quartzlib.components.worker.WorkerCallback;
 import fr.zcraft.quartzlib.components.worker.WorkerRunnable;
-import org.bukkit.Bukkit;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,12 +54,15 @@ import java.net.URLConnection;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import javax.imageio.ImageIO;
+import org.bukkit.Bukkit;
 
 @WorkerAttributes(name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker {
     private static URLConnection connecting(URL url) throws IOException {
         final URLConnection connection = url.openConnection();
-        connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
+        connection.addRequestProperty("User-Agent",
+                "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
         connection.connect();
 
         if (connection instanceof HttpURLConnection) {
@@ -75,30 +75,25 @@ public class ImageRendererExecutor extends Worker {
         return connection;
     }
 
-    static private void checkSizeLimit(final UUID playerUUID, final BufferedImage image) throws IOException {
-        if ((PluginConfiguration.LIMIT_SIZE_X.get() > 0 || PluginConfiguration.LIMIT_SIZE_Y.get() > 0) && !Permissions.BYPASS_SIZE.grantedTo(Bukkit.getPlayer(playerUUID)))
-        {
-            if (PluginConfiguration.LIMIT_SIZE_X.get() > 0)
-            {
-                if (image.getWidth() > PluginConfiguration.LIMIT_SIZE_X.get())
+    private static void checkSizeLimit(final UUID playerUUID, final BufferedImage image) throws IOException {
+        if ((PluginConfiguration.LIMIT_SIZE_X.get() > 0 || PluginConfiguration.LIMIT_SIZE_Y.get() > 0)
+                && !Permissions.BYPASS_SIZE.grantedTo(Bukkit.getPlayer(playerUUID))) {
+            if (PluginConfiguration.LIMIT_SIZE_X.get() > 0) {
+                if (image.getWidth() > PluginConfiguration.LIMIT_SIZE_X.get()) {
                     throw new IOException(I.t("The image is too wide!"));
+                }
             }
-            if (PluginConfiguration.LIMIT_SIZE_Y.get() > 0)
-            {
-                if (image.getHeight() > PluginConfiguration.LIMIT_SIZE_Y.get())
+            if (PluginConfiguration.LIMIT_SIZE_Y.get() > 0) {
+                if (image.getHeight() > PluginConfiguration.LIMIT_SIZE_Y.get()) {
                     throw new IOException(I.t("The image is too tall!"));
+                }
             }
         }
     }
 
-    private enum extension{
-    png, jpg, jpeg, gif
-    }
-
-    static public void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID, final int width, final int height, WorkerCallback<ImageMap> callback)
-    {
-        submitQuery(new WorkerRunnable<ImageMap>()
-        {
+    public static void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID,
+                              final int width, final int height, WorkerCallback<ImageMap> callback) {
+        submitQuery(new WorkerRunnable<ImageMap>() {
             @Override
             public ImageMap run() throws Throwable {
 
@@ -109,11 +104,16 @@ public class ImageRendererExecutor extends Worker {
                     //Not handled, can't with the hash only access the image in i.imgur.com/<hash>.<extension>
 
                     if (url.toString().contains("gallery/")) {
-                        throw new IOException("We do not support imgur gallery yet, please use direct link to image instead. Right click on the picture you want to use then select copy picture link:) ");
+                        throw new IOException(
+                                "We do not support imgur gallery yet, please use direct link to image instead."
+                                        + " Right click on the picture you want "
+                                        + "to use then select copy picture link:) ");
                     }
 
-                    for (extension ext : extension.values()) {
-                        String newLink = "https://i.imgur.com/" + url.toString().split("https://imgur.com/")[1] + "." + ext.toString();
+                    for (Extension ext : Extension.values()) {
+                        String newLink = "https://i.imgur.com/" + url.toString().split("https://imgur.com/")[1]
+                                + "."
+                                + ext.toString();
                         URL url2 = new URL(newLink);
 
                         //Try connecting
@@ -124,13 +124,13 @@ public class ImageRendererExecutor extends Worker {
                         image = ImageIO.read(stream);
 
                         //valid image
-                        if (image != null) break;
+                        if (image != null) {
+                            break;
+                        }
 
                     }
 
-                }
-                //If not an Imgur link
-                else {
+                } else {
                     //Try connecting
                     URLConnection connection = connecting(url);
 
@@ -138,7 +138,9 @@ public class ImageRendererExecutor extends Worker {
 
                     image = ImageIO.read(stream);
                 }
-                if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
+                if (image == null) {
+                    throw new IOException(I.t("The given URL is not a valid image"));
+                }
                 // Limits are in place and the player does NOT have rights to avoid them.
                 checkSizeLimit(playerUUID, image);
                 if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1) {
@@ -146,19 +148,20 @@ public class ImageRendererExecutor extends Worker {
                     image.flush();//Safe to free
                     return ret;
                 }
-                final BufferedImage resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
+                final BufferedImage resizedImage =
+                        scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
                 image.flush();//Safe to free
                 return renderPoster(resizedImage, playerUUID);
             }
         }, callback);
     }
 
-    public static void update(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID, final ImageMap map, final int width, final int height, WorkerCallback<ImageMap> callback) {
-        submitQuery(new WorkerRunnable<ImageMap>()
-        {
+    public static void update(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID,
+                              final ImageMap map, final int width, final int height,
+                              WorkerCallback<ImageMap> callback) {
+        submitQuery(new WorkerRunnable<ImageMap>() {
             @Override
-            public ImageMap run() throws Throwable
-            {
+            public ImageMap run() throws Throwable {
 
                 final URLConnection connection = connecting(url);
 
@@ -166,44 +169,42 @@ public class ImageRendererExecutor extends Worker {
                 final BufferedImage image = ImageIO.read(stream);
                 stream.close();
 
-                if (image == null) throw new IOException(I.t("The given URL is not a valid image"));
+                if (image == null) {
+                    throw new IOException(I.t("The given URL is not a valid image"));
+                }
 
                 // Limits are in place and the player does NOT have rights to avoid them.
                 checkSizeLimit(playerUUID, image);
 
-                updateMap(scaling.resize(image, width*128, height*128),playerUUID,map.getMapsIDs());
+                updateMap(scaling.resize(image, width * 128, height * 128), playerUUID, map.getMapsIDs());
                 return map;
 
             }
         }, callback);
 
     }
-    static private void updateMap(final BufferedImage image, final UUID playerUUID,int[] mapsIDs) throws Throwable
-    {
+
+    private static void updateMap(final BufferedImage image, final UUID playerUUID, int[] mapsIDs) throws Throwable {
 
         final PosterImage poster = new PosterImage(image);
         poster.splitImages();
 
         ImageIOExecutor.saveImage(mapsIDs, poster);
 
-        if (PluginConfiguration.SAVE_FULL_IMAGE.get())
-        {
+        if (PluginConfiguration.SAVE_FULL_IMAGE.get()) {
             ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
         }
 
-        submitToMainThread(new Callable<Void>()
-        {
+        submitToMainThread(new Callable<Void>() {
             @Override
-            public Void call() throws Exception
-            {
+            public Void call() throws Exception {
                 Renderer.installRenderer(poster, mapsIDs);
                 return null;
             }
         });
     }
 
-    static private ImageMap renderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable
-    {
+    private static ImageMap renderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable {
         MapManager.checkMapLimit(1, playerUUID);
         final Future<Integer> futureMapID = submitToMainThread(new Callable<Integer>() {
             @Override
@@ -224,7 +225,7 @@ public class ImageRendererExecutor extends Worker {
         return MapManager.createMap(playerUUID, mapID);
     }
 
-    static private ImageMap renderPoster(final BufferedImage image, final UUID playerUUID) throws Throwable {
+    private static ImageMap renderPoster(final BufferedImage image, final UUID playerUUID) throws Throwable {
         final PosterImage poster = new PosterImage(image);
         final int mapCount = poster.getImagesCount();
         MapManager.checkMapLimit(mapCount, playerUUID);
@@ -238,7 +239,6 @@ public class ImageRendererExecutor extends Worker {
         final int[] mapsIDs = futureMapsIds.get();
         ImageIOExecutor.saveImage(mapsIDs, poster);
 
-        final int[] mapsIDs = futureMapsIds.get();
 
         ImageIOExecutor.saveImage(mapsIDs, poster);
         if (PluginConfiguration.SAVE_FULL_IMAGE.get()) {
@@ -257,7 +257,8 @@ public class ImageRendererExecutor extends Worker {
         return MapManager.createMap(poster, playerUUID, mapsIDs);
     }
 
-    private enum extension {
+    private enum Extension {
         png, jpg, jpeg, gif
     }
+
 }

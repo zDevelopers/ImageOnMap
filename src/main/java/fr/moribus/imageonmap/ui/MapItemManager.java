@@ -45,7 +45,17 @@ import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.core.QuartzLib;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.items.ItemUtils;
-import org.bukkit.*;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Queue;
+import java.util.UUID;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.Rotation;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -59,68 +69,70 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Queue;
-import java.util.UUID;
+public class MapItemManager implements Listener {
+    private static HashMap<UUID, Queue<ItemStack>> mapItemCache;
 
-public class MapItemManager implements Listener
-{
-    static private HashMap<UUID, Queue<ItemStack>> mapItemCache;
-
-    static public void init()
-    {
+    public static void init() {
         mapItemCache = new HashMap<>();
         QuartzLib.registerEvents(new MapItemManager());
     }
 
-    static public void exit()
-    {
-        if (mapItemCache != null) mapItemCache.clear();
+    public static void exit() {
+        if (mapItemCache != null) {
+            mapItemCache.clear();
+        }
         mapItemCache = null;
     }
 
-    static public boolean give(Player player, ImageMap map)
-    {
-        if (map instanceof PosterMap) return give(player, (PosterMap) map);
-        else if (map instanceof SingleMap) return give(player, (SingleMap) map);
+    public static boolean give(Player player, ImageMap map) {
+        if (map instanceof PosterMap) {
+            return give(player, (PosterMap) map);
+        } else if (map instanceof SingleMap) {
+            return give(player, (SingleMap) map);
+        }
         return false;
     }
 
-    static public boolean give(Player player, SingleMap map)
-    {
-        return give(player, createMapItem(map,true));
+    public static boolean give(Player player, SingleMap map) {
+        return give(player, createMapItem(map, true));
     }
 
-    static public boolean give(Player player, PosterMap map)
-    {
-        if (!map.hasColumnData())
+    public static boolean give(Player player, PosterMap map) {
+        if (!map.hasColumnData()) {
             return giveParts(player, map);
+        }
         return give(player, SplatterMapManager.makeSplatterMap(map));
     }
 
-    static public boolean giveParts(Player player, PosterMap map)
-    {
+    private static boolean give(final Player player, final ItemStack item) {
+        boolean given = ItemUtils.give(player, item);
+
+        if (given) {
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 1, 1);
+        }
+
+        return !given;
+    }
+
+    public static boolean giveParts(Player player, PosterMap map) {
         boolean inventoryFull = false;
 
         ItemStack mapPartItem;
-        for (int i = 0, c = map.getMapCount(); i < c; i++)
-        {
-            mapPartItem = map.hasColumnData() ? createMapItem(map, map.getColumnAt(i), map.getRowAt(i)) : createMapItem(map, i);
+        for (int i = 0, c = map.getMapCount(); i < c; i++) {
+            mapPartItem = map.hasColumnData() ? createMapItem(map, map.getColumnAt(i), map.getRowAt(i)) :
+                    createMapItem(map, i);
             inventoryFull = give(player, mapPartItem) || inventoryFull;
         }
 
         return inventoryFull;
     }
 
-    static public int giveCache(Player player)
-    {
+    public static int giveCache(Player player) {
         Queue<ItemStack> cache = getCache(player);
         Inventory inventory = player.getInventory();
         int givenItemsCount = 0;
 
-        while (inventory.firstEmpty() >= 0 && !cache.isEmpty())
-        {
+        while (inventory.firstEmpty() >= 0 && !cache.isEmpty()) {
             give(player, cache.poll());
             givenItemsCount++;
         }
@@ -128,60 +140,35 @@ public class MapItemManager implements Listener
         return givenItemsCount;
     }
 
-    static private boolean give(final Player player, final ItemStack item)
-    {
-        boolean given = ItemUtils.give(player, item);
-
-        if (given)
-        {
-            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 1, 1);
-        }
-
-        return !given;
-    }
-    static public ItemStack createMapItem(SingleMap map)
-    {
+    public static ItemStack createMapItem(SingleMap map) {
         return createMapItem(map.getMapsIDs()[0], map.getName(), false);
     }
 
-    static public ItemStack createMapItem(SingleMap map, boolean goldTitle)
-    {
+    public static ItemStack createMapItem(SingleMap map, boolean goldTitle) {
         return createMapItem(map.getMapsIDs()[0], map.getName(), false, goldTitle);
     }
 
-    static public ItemStack createMapItem(PosterMap map, int index)
-    {
+    public static ItemStack createMapItem(PosterMap map, int index) {
         return createMapItem(map.getMapIdAt(index), getMapTitle(map, index), true);
     }
 
-    static public ItemStack createMapItem(PosterMap map, int x, int y)
-    {
+    public static ItemStack createMapItem(PosterMap map, int x, int y) {
         return createMapItem(map.getMapIdAt(x, y), getMapTitle(map, y, x), true);
     }
 
-    static public String getMapTitle(PosterMap map, int row, int column)
-    {
-        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
-        return I.t("{0} (row {1}, column {2})", map.getName(), row + 1, column + 1);
+    public static ItemStack createMapItem(int mapID, String text, boolean isMapPart) {
+        return createMapItem(mapID, text, isMapPart, false);
     }
 
-    static public String getMapTitle(PosterMap map, int index)
-    {
-        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = index.
-        return I.t("{0} (part {1})", map.getName(), index + 1);
-    }
-
-    static public ItemStack createMapItem(int mapID, String text, boolean isMapPart, boolean goldTitle)
-    {
+    public static ItemStack createMapItem(int mapID, String text, boolean isMapPart, boolean goldTitle) {
         ItemStack mapItem;
-        if(goldTitle) {
+        if (goldTitle) {
             mapItem = new ItemStackBuilder(Material.FILLED_MAP)
-                    .title( ChatColor.GOLD, text)
+                    .title(ChatColor.GOLD, text)
                     //.hideAllAttributes()
                     .item();
-        }
-        else{
-            mapItem= new ItemStackBuilder(Material.FILLED_MAP)
+        } else {
+            mapItem = new ItemStackBuilder(Material.FILLED_MAP)
                     .title(text)
                     //.hideAllAttributes()
                     .item();
@@ -192,11 +179,33 @@ public class MapItemManager implements Listener
         mapItem.setItemMeta(meta);
         return mapItem;
     }
-    static public ItemStack createMapItem(int mapID, String text, boolean isMapPart)
-    {
-        return createMapItem( mapID,  text,  isMapPart,false);
+
+    public static String getMapTitle(PosterMap map, int row, int column) {
+        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = row; 2 = column.
+        return I.t("{0} (row {1}, column {2})", map.getName(), row + 1, column + 1);
     }
 
+    public static String getMapTitle(PosterMap map, int index) {
+        /// The name of a map item given to a player, if splatter maps are not used. 0 = map name; 1 = index.
+        return I.t("{0} (part {1})", map.getName(), index + 1);
+    }
+
+    private static String getMapTitle(ItemStack item) {
+        ImageMap map = MapManager.getMap(item);
+        if (map instanceof SingleMap) {
+            return map.getName();
+        } else {
+            PosterMap poster = (PosterMap) map;
+            int index = poster.getIndex(MapManager.getMapIdFromItemStack(item));
+            if (poster.hasColumnData()) {
+                return getMapTitle(poster, poster.getRowAt(index), poster.getColumnAt(index));
+            }
+
+            return getMapTitle(poster, index);
+        }
+    }
+
+    //
     /**
      * Returns the item to place to display the (col;row) part of the given poster.
      *
@@ -206,16 +215,11 @@ public class MapItemManager implements Listener
      * @return The map.
      * @throws ArrayIndexOutOfBoundsException If x;y is not inside the map.
      */
-    static public ItemStack createSubMapItem(ImageMap map, int x, int y)
-    {
-        if (map instanceof PosterMap && ((PosterMap) map).hasColumnData())
-        {
+    public static ItemStack createSubMapItem(ImageMap map, int x, int y) {
+        if (map instanceof PosterMap && ((PosterMap) map).hasColumnData()) {
             return MapItemManager.createMapItem((PosterMap) map, x, y);
-        }
-        else
-        {
-            if (x != 0 || y != 0)
-            {
+        } else {
+            if (x != 0 || y != 0) {
                 throw new ArrayIndexOutOfBoundsException(); // Coherence
             }
 
@@ -223,64 +227,45 @@ public class MapItemManager implements Listener
         }
     }
 
-    static public int getCacheSize(Player player)
-    {
+    public static int getCacheSize(Player player) {
         return getCache(player).size();
     }
 
-    static private Queue<ItemStack> getCache(Player player)
-    {
+    private static Queue<ItemStack> getCache(Player player) {
         Queue<ItemStack> cache = mapItemCache.get(player.getUniqueId());
-        if (cache == null)
-        {
+        if (cache == null) {
             cache = new ArrayDeque<>();
             mapItemCache.put(player.getUniqueId(), cache);
         }
         return cache;
     }
 
-    static private String getMapTitle(ItemStack item)
-    {
-        ImageMap map = MapManager.getMap(item);
-        if (map instanceof SingleMap)
-        {
-            return map.getName();
-        }
-        else
-        {
-            PosterMap poster = (PosterMap) map;
-            int index = poster.getIndex(MapManager.getMapIdFromItemStack(item));
-            if (poster.hasColumnData())
-                return getMapTitle(poster, poster.getRowAt(index), poster.getColumnAt(index));
-
-            return getMapTitle(poster, index);
-        }
-    }
-
-    static private void onItemFramePlace(ItemFrame frame, Player player, PlayerInteractEntityEvent event)
-    {
+    private static void onItemFramePlace(ItemFrame frame, Player player, PlayerInteractEntityEvent event) {
         final ItemStack mapItem = player.getInventory().getItemInMainHand();
 
-        if (frame.getItem().getType() != Material.AIR) return;
-        if (!MapManager.managesMap(mapItem)) return;
+        if (frame.getItem().getType() != Material.AIR) {
+            return;
+        }
+        if (!MapManager.managesMap(mapItem)) {
+            return;
+        }
 
-        if (SplatterMapManager.hasSplatterAttributes(mapItem))
-        {
-            if (!SplatterMapManager.placeSplatterMap(frame, player,event)){
+        if (SplatterMapManager.hasSplatterAttributes(mapItem)) {
+            if (!SplatterMapManager.placeSplatterMap(frame, player, event)) {
                 event.setCancelled(true); //In case of an error allow to cancel map placement
                 return;
             }
-            if(frame.getFacing()!= BlockFace.UP&&frame.getFacing()!= BlockFace.DOWN)
+            if (frame.getFacing() != BlockFace.UP && frame.getFacing() != BlockFace.DOWN) {
                 frame.setRotation(Rotation.NONE.rotateCounterClockwise());
-        }
-        else
-        {
-            if(frame.getFacing()!= BlockFace.UP&&frame.getFacing()!= BlockFace.DOWN)
+            }
+        } else {
+            if (frame.getFacing() != BlockFace.UP && frame.getFacing() != BlockFace.DOWN) {
                 frame.setRotation(Rotation.NONE.rotateCounterClockwise());
+            }
             // If the item has a display name, bot not one from an anvil by the player, we remove it
             // If it is not displayed on hover on the wall.
-            if (mapItem.hasItemMeta() && mapItem.getItemMeta().hasDisplayName() && mapItem.getItemMeta().getDisplayName().startsWith("§6"))
-            {
+            if (mapItem.hasItemMeta() && mapItem.getItemMeta().hasDisplayName()
+                    && mapItem.getItemMeta().getDisplayName().startsWith("§6")) {
 
                 final ItemStack frameItem = mapItem.clone();
                 final ItemMeta meta = frameItem.getItemMeta();
@@ -289,9 +274,7 @@ public class MapItemManager implements Listener
                 frameItem.setItemMeta(meta);
 
                 frame.setItem(frameItem);
-            }
-
-            else{
+            } else {
                 frame.setItem(mapItem);
             }
 
@@ -301,29 +284,31 @@ public class MapItemManager implements Listener
         ItemUtils.consumeItem(player);
     }
 
-    static private void onItemFrameRemove(ItemFrame frame, Player player, EntityDamageByEntityEvent event)
-    {
+    private static void onItemFrameRemove(ItemFrame frame, Player player, EntityDamageByEntityEvent event) {
         ItemStack item = frame.getItem();
-        if (frame.getItem().getType() != Material.FILLED_MAP) return;
+        if (item.getType() != Material.FILLED_MAP) {
+            return;
+        }
 
-        if (Permissions.REMOVE_SPLATTER_MAP.grantedTo(player))
-        {
-            if (player.isSneaking())
-            {
-                PosterMap poster = SplatterMapManager.removeSplatterMap(frame,player);
-                if (poster != null)
-                {
+        if (Permissions.REMOVE_SPLATTER_MAP.grantedTo(player)) {
+            if (player.isSneaking()) {
+                PosterMap poster = SplatterMapManager.removeSplatterMap(frame, player);
+                if (poster != null) {
                     event.setCancelled(true);
 
-                    if (player.getGameMode() != GameMode.CREATIVE || !SplatterMapManager.hasSplatterMap(player, poster))
+                    if (player.getGameMode() != GameMode.CREATIVE
+                            || !SplatterMapManager.hasSplatterMap(player, poster)) {
                         poster.give(player);
+                    }
 
                     return;
                 }
             }
         }
 
-        if (!MapManager.managesMap(frame.getItem())) return;
+        if (!MapManager.managesMap(frame.getItem())) {
+            return;
+        }
 
         frame.setItem(new ItemStackBuilder(item)
                 .title(getMapTitle(item))
@@ -333,18 +318,22 @@ public class MapItemManager implements Listener
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    static public void onEntityDamage(EntityDamageByEntityEvent event)
-    {
-        if (!(event.getEntity() instanceof ItemFrame)) return;
-        if (!(event.getDamager() instanceof Player)) return;
+    public static void onEntityDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof ItemFrame)) {
+            return;
+        }
+        if (!(event.getDamager() instanceof Player)) {
+            return;
+        }
 
         onItemFrameRemove((ItemFrame) event.getEntity(), (Player) event.getDamager(), event);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    static public void onEntityInteract(PlayerInteractEntityEvent event)
-    {
-        if (!(event.getRightClicked() instanceof ItemFrame)) return;
+    public static void onEntityInteract(PlayerInteractEntityEvent event) {
+        if (!(event.getRightClicked() instanceof ItemFrame)) {
+            return;
+        }
         onItemFramePlace((ItemFrame) event.getRightClicked(), event.getPlayer(), event);
     }
 }

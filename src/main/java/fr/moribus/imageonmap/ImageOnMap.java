@@ -37,7 +37,20 @@
 package fr.moribus.imageonmap;
 
 
-import fr.moribus.imageonmap.commands.maptool.*;
+import fr.moribus.imageonmap.commands.maptool.DeleteCommand;
+import fr.moribus.imageonmap.commands.maptool.DeleteOtherCommand;
+import fr.moribus.imageonmap.commands.maptool.ExploreCommand;
+import fr.moribus.imageonmap.commands.maptool.ExploreOtherCommand;
+import fr.moribus.imageonmap.commands.maptool.GetCommand;
+import fr.moribus.imageonmap.commands.maptool.GetOtherCommand;
+import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
+import fr.moribus.imageonmap.commands.maptool.GiveCommand;
+import fr.moribus.imageonmap.commands.maptool.ListCommand;
+import fr.moribus.imageonmap.commands.maptool.ListOtherCommand;
+import fr.moribus.imageonmap.commands.maptool.MigrateCommand;
+import fr.moribus.imageonmap.commands.maptool.NewCommand;
+import fr.moribus.imageonmap.commands.maptool.RenameCommand;
+import fr.moribus.imageonmap.commands.maptool.UpdateCommand;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
@@ -52,60 +65,58 @@ import fr.zcraft.quartzlib.components.i18n.I18n;
 import fr.zcraft.quartzlib.core.QuartzPlugin;
 import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.UpdateChecker;
-
 import java.io.File;
 import java.io.IOException;
 
-public final class ImageOnMap extends QuartzPlugin
-{
-    static private final String IMAGES_DIRECTORY_NAME = "images";
-    static private final String MAPS_DIRECTORY_NAME = "maps";
-    static private ImageOnMap plugin;
-    private File imagesDirectory;
+public final class ImageOnMap extends QuartzPlugin {
+    private static final String IMAGES_DIRECTORY_NAME = "images";
+    private static final String MAPS_DIRECTORY_NAME = "maps";
+    private static ImageOnMap plugin;
     private final File mapsDirectory;
+    private File imagesDirectory;
 
-    public ImageOnMap()
-    {
+    public ImageOnMap() {
         imagesDirectory = new File(this.getDataFolder(), IMAGES_DIRECTORY_NAME);
         mapsDirectory = new File(this.getDataFolder(), MAPS_DIRECTORY_NAME);
         plugin = this;
     }
 
-    static public ImageOnMap getPlugin()
-    {
+    public static ImageOnMap getPlugin() {
         return plugin;
     }
-    
-    public File getImagesDirectory() {return imagesDirectory;}
-    public File getMapsDirectory() {return mapsDirectory;}
-    public File getImageFile(int mapID)
-    {
-        return new File(imagesDirectory, "map"+mapID+".png");
+
+    public File getImagesDirectory() {
+        return imagesDirectory;
     }
-    
-    
-    @SuppressWarnings ("unchecked")
+
+    public File getMapsDirectory() {
+        return mapsDirectory;
+    }
+
+    public File getImageFile(int mapID) {
+        return new File(imagesDirectory, "map" + mapID + ".png");
+    }
+
+
+    @SuppressWarnings("unchecked")
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         // Creating the images and maps directories if necessary
-        try
-        {
+        try {
             imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
             checkPluginDirectory(mapsDirectory);
-        }
-        catch(final IOException ex)
-        {
+        } catch (final IOException ex) {
             PluginLogger.error("FATAL: " + ex.getMessage());
             this.setEnabled(false);
             return;
         }
-        
-        
+
+
         saveDefaultConfig();
 
-        loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class, ImageRendererExecutor.class, CommandWorkers.class);
-               
+        loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class,
+                ImageRendererExecutor.class, CommandWorkers.class);
+
         //Init all the things !
         I18n.setPrimaryLocale(PluginConfiguration.LANG.get());
 
@@ -136,39 +147,40 @@ public final class ImageOnMap extends QuartzPlugin
         Commands.registerShortcut("maptool", ExploreCommand.class, "maps");
         Commands.registerShortcut("maptool", GiveCommand.class, "mapgive");
 
-        if (PluginConfiguration.CHECK_FOR_UPDATES.get())
-        {
+        if (PluginConfiguration.CHECK_FOR_UPDATES.get()) {
             UpdateChecker.boot("imageonmap.26585");
         }
 
-        if (PluginConfiguration.COLLECT_DATA.get())
-        {
-           /* final Metrics metrics = new Metrics(this);
+        if (PluginConfiguration.COLLECT_DATA.get()) {
 
-            metrics.addCustomChart(new Metrics.SingleLineChart("rendered-images", MapManager::getImagesCount));
-            metrics.addCustomChart(new Metrics.SingleLineChart("used-minecraft-maps", MapManager::getMapCount));*/
+            PluginLogger.warning("Collect data disabled");
+            //final Metrics metrics = new Metrics(this);
+            //metrics.addCustomChart(new Metrics.SingleLineChart("rendered-images", MapManager::getImagesCount));
+            //metrics.addCustomChart(new Metrics.SingleLineChart("used-minecraft-maps", MapManager::getMapCount));
         }
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         MapManager.exit();
         MapItemManager.exit();
         MigratorExecutor.waitForMigration();
 
         super.onDisable();
     }
-    
-    private File checkPluginDirectory(File primaryFile, File... alternateFiles) throws IOException
-    {
-        if(primaryFile.exists()) return primaryFile;
-        for(File file : alternateFiles)
-        {
-            if(file.exists()) return file;
+
+    private File checkPluginDirectory(File primaryFile, File... alternateFiles) throws IOException {
+        if (primaryFile.exists()) {
+            return primaryFile;
         }
-        if(!primaryFile.mkdirs()) 
+        for (File file : alternateFiles) {
+            if (file.exists()) {
+                return file;
+            }
+        }
+        if (!primaryFile.mkdirs()) {
             throw new IOException("Could not create '" + primaryFile.getName() + "' plugin directory.");
+        }
         return primaryFile;
     }
 }

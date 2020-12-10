@@ -48,23 +48,20 @@ import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.components.rawtext.RawText;
 import fr.zcraft.quartzlib.components.rawtext.RawTextPart;
 import fr.zcraft.quartzlib.tools.text.RawMessage;
+import java.util.List;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.UUID;
 
-
-@CommandInfo (name = "listother", usageParameters = "<PlayerName>")
-public class ListOtherCommand extends IoMCommand
-{
+@CommandInfo(name = "listother", usageParameters = "<PlayerName>")
+public class ListOtherCommand extends IoMCommand {
     @Override
-    protected void run() throws CommandException
-    {
-        if(args.length < 1){
+    protected void run() throws CommandException {
+        if (args.length < 1) {
             warning(I.t("Not enough parameters! Usage: /maptool listother <playername>"));
             return;
         }
@@ -73,29 +70,25 @@ public class ListOtherCommand extends IoMCommand
         Player player = null;
         UUID uuid = null;
         player = Bukkit.getPlayer(args[0]);
-        if(player == null){
+        if (player == null) {
             OfflinePlayer op = Bukkit.getOfflinePlayer(args[0]);
-            if(op.hasPlayedBefore()) {
+            if (op.hasPlayedBefore()) {
                 uuid = op.getUniqueId();
-            }
-            else {
+            } else {
                 warning(I.t("We've never seen that player before!"));
             }
-        }
-        else{
+        } else {
             uuid = player.getUniqueId();
         }
 
         List<ImageMap> mapList = null;
-        try{
+        try {
             mapList = MapManager.getMapList(uuid);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return;
         }
 
-        if(mapList.isEmpty())
-        {
+        if (mapList.isEmpty()) {
             info(I.t("No map found."));
             return;
         }
@@ -105,8 +98,7 @@ public class ListOtherCommand extends IoMCommand
         RawTextPart rawText = new RawText("");
         rawText = addMap(rawText, mapList.get(0));
 
-        for(int i = 1, c = mapList.size(); i < c; i++)
-        {
+        for (int i = 1, c = mapList.size(); i < c; i++) {
             rawText = rawText.then(", ").color(ChatColor.GRAY);
             rawText = addMap(rawText, mapList.get(i));
         }
@@ -114,9 +106,9 @@ public class ListOtherCommand extends IoMCommand
         RawMessage.send(playerSender(), rawText.build());
     }
 
-    private RawTextPart<?> addMap(RawTextPart<?> rawText, ImageMap map)
-    {
-        final String size = map.getType() == ImageMap.Type.SINGLE ? "1 × 1" : ((PosterMap) map).getColumnCount() + " × " + ((PosterMap) map).getRowCount();
+    private RawTextPart<?> addMap(RawTextPart<?> rawText, ImageMap map) {
+        final String size = map.getType() == ImageMap.Type.SINGLE ? "1 × 1" :
+                ((PosterMap) map).getColumnCount() + " × " + ((PosterMap) map).getRowCount();
 
         return rawText
                 .then(map.getId())
@@ -128,9 +120,9 @@ public class ListOtherCommand extends IoMCommand
                         .then(I.t("{white}Click{gray} to get this map"))
                 );
     }
+
     @Override
-    public boolean canExecute(CommandSender sender)
-    {
+    public boolean canExecute(CommandSender sender) {
         return Permissions.LISTOTHER.grantedTo(sender);
     }
 }

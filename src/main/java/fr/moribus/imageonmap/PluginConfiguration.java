@@ -36,29 +36,27 @@
 
 package fr.moribus.imageonmap;
 
-import fr.zcraft.quartzlib.components.configuration.Configuration;
-import fr.zcraft.quartzlib.components.configuration.ConfigurationItem;
-
-import java.util.Locale;
-
 import static fr.zcraft.quartzlib.components.configuration.ConfigurationItem.item;
 
-
-public final class PluginConfiguration extends Configuration
-{
-    static public ConfigurationItem<Locale> LANG = item("lang", Locale.class);
-
-    static public ConfigurationItem<Boolean> COLLECT_DATA = item("collect-data", true);
-
-    static public ConfigurationItem<Boolean> CHECK_FOR_UPDATES = item("check-for-updates", true);
-
-    static public ConfigurationItem<Integer> MAP_GLOBAL_LIMIT = item("map-global-limit", 0, "Limit-map-by-server");
-    static public ConfigurationItem<Integer> MAP_PLAYER_LIMIT = item("map-player-limit", 0, "Limit-map-by-player");
-
-    static public ConfigurationItem<Boolean> SAVE_FULL_IMAGE = item("save-full-image", true);
+import fr.zcraft.quartzlib.components.configuration.Configuration;
+import fr.zcraft.quartzlib.components.configuration.ConfigurationItem;
+import java.util.Locale;
 
 
-    static public ConfigurationItem<Integer> LIMIT_SIZE_X = item("limit-map-size-x", 0);
-    static public ConfigurationItem<Integer> LIMIT_SIZE_Y = item("limit-map-size-y", 0);
+public final class PluginConfiguration extends Configuration {
+    public static ConfigurationItem<Locale> LANG = item("lang", Locale.class);
+
+    public static ConfigurationItem<Boolean> COLLECT_DATA = item("collect-data", true);
+
+    public static ConfigurationItem<Boolean> CHECK_FOR_UPDATES = item("check-for-updates", true);
+
+    public static ConfigurationItem<Integer> MAP_GLOBAL_LIMIT = item("map-global-limit", 0, "Limit-map-by-server");
+    public static ConfigurationItem<Integer> MAP_PLAYER_LIMIT = item("map-player-limit", 0, "Limit-map-by-player");
+
+    public static ConfigurationItem<Boolean> SAVE_FULL_IMAGE = item("save-full-image", true);
+
+
+    public static ConfigurationItem<Integer> LIMIT_SIZE_X = item("limit-map-size-x", 0);
+    public static ConfigurationItem<Integer> LIMIT_SIZE_Y = item("limit-map-size-y", 0);
 
 }

@@ -41,24 +41,19 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.zcraft.quartzlib.components.worker.Worker;
 import fr.zcraft.quartzlib.components.worker.WorkerAttributes;
 import fr.zcraft.quartzlib.components.worker.WorkerRunnable;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Files;
+import javax.imageio.ImageIO;
 
 
-@WorkerAttributes (name = "Image IO")
-public class ImageIOExecutor extends Worker
-{
-    static public void loadImage(final File file, final Renderer mapRenderer) 
-    {
+@WorkerAttributes(name = "Image IO")
+public class ImageIOExecutor extends Worker {
+    public static void loadImage(final File file, final Renderer mapRenderer) {
 
-        submitQuery(new WorkerRunnable<Void>()
-        {
+        submitQuery(new WorkerRunnable<Void>() {
             @Override
-            public Void run() throws Exception
-            {
+            public Void run() throws Exception {
                 BufferedImage image = ImageIO.read(file);
                 mapRenderer.setImage(image);
                 image.flush();//Safe to free
@@ -66,51 +61,40 @@ public class ImageIOExecutor extends Worker
             }
         });
     }
-    
-    static public void saveImage(final File file, final BufferedImage image)
-    {
-        submitQuery(new WorkerRunnable<Void>()
-        {
+
+    public static void saveImage(final File file, final BufferedImage image) {
+        submitQuery(new WorkerRunnable<Void>() {
             @Override
-            public Void run() throws Throwable
-            {
+            public Void run() throws Throwable {
                 ImageIO.write(image, "png", file);
                 return null;
             }
         });
     }
-    
-    static public void saveImage(int mapID, BufferedImage image)
-    {
+
+    public static void saveImage(int mapID, BufferedImage image) {
         saveImage(ImageOnMap.getPlugin().getImageFile(mapID), image);
     }
-    
-    static public void saveImage(int[] mapsIDs, PosterImage image)
-    {
-        for(int i = 0, c = mapsIDs.length; i < c; i++)
-        {
-            BufferedImage img=image.getImageAt(i);
+
+    public static void saveImage(int[] mapsIDs, PosterImage image) {
+        for (int i = 0, c = mapsIDs.length; i < c; i++) {
+            BufferedImage img = image.getImageAt(i);
             ImageIOExecutor.saveImage(ImageOnMap.getPlugin().getImageFile(mapsIDs[i]), img);
             img.flush();//Safe to free
         }
     }
-    
-    static public void deleteImage(ImageMap map)
-    {
+
+    public static void deleteImage(ImageMap map) {
         int[] mapsIDs = map.getMapsIDs();
-        for(int i = 0, c = mapsIDs.length; i < c; i++)
-        {
+        for (int i = 0, c = mapsIDs.length; i < c; i++) {
             deleteImage(ImageOnMap.getPlugin().getImageFile(mapsIDs[i]));
         }
     }
-    
-    static public void deleteImage(final File file)
-    {
-        submitQuery(new WorkerRunnable<Void>()
-        {
+
+    public static void deleteImage(final File file) {
+        submitQuery(new WorkerRunnable<Void>() {
             @Override
-            public Void run() throws Throwable
-            {
+            public Void run() throws Throwable {
                 Files.delete(file.toPath());
                 return null;
             }

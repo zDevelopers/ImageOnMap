@@ -55,89 +55,80 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
-public class MapInitEvent implements Listener
-{
-    static public void init()
-    {
+
+public class MapInitEvent implements Listener {
+    public static void init() {
         QuartzLib.registerEvents(new MapInitEvent());
-        
-        for(World world : Bukkit.getWorlds())
-        {
-            for(ItemFrame frame : world.getEntitiesByClass(ItemFrame.class))
-            {
+
+        for (World world : Bukkit.getWorlds()) {
+            for (ItemFrame frame : world.getEntitiesByClass(ItemFrame.class)) {
                 initMap(frame.getItem());
             }
         }
-        
-        for(Player player : Bukkit.getOnlinePlayers())
-        {
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
             initMap(player.getInventory().getItemInMainHand());
         }
     }
-    
+
+    public static void initMap(ItemStack item) {
+        if (item != null && item.getType() == Material.FILLED_MAP) {
+            initMap(MapManager.getMapIdFromItemStack(item));
+        }
+    }
+
+    public static void initMap(int id) {
+        initMap(Bukkit.getServer().getMap(id));
+    }
+
+    public static void initMap(MapView map) {
+        if (map == null) {
+            return;
+        }
+        if (Renderer.isHandled(map)) {
+            return;
+        }
+
+        File imageFile = ImageOnMap.getPlugin().getImageFile(map.getId());
+        if (imageFile.isFile()) {
+            ImageIOExecutor.loadImage(imageFile, Renderer.installRenderer(map));
+        }
+    }
+
     @EventHandler
-    public void onChunkLoad(ChunkLoadEvent event)
-    {
-        for (Entity entity : event.getChunk().getEntities())
-        {
-            if (entity instanceof ItemFrame)
-            {
-                initMap(((ItemFrame)entity).getItem());
+    public void onChunkLoad(ChunkLoadEvent event) {
+        for (Entity entity : event.getChunk().getEntities()) {
+            if (entity instanceof ItemFrame) {
+                initMap(((ItemFrame) entity).getItem());
             }
         }
     }
-    
+
     @EventHandler
-    public void onPlayerInv(PlayerItemHeldEvent event)
-    {
+    public void onPlayerInv(PlayerItemHeldEvent event) {
         ItemStack item = event.getPlayer().getInventory().getItem(event.getNewSlot());
         initMap(item);
     }
-    
+
     @EventHandler
-    public void onPlayerPickup(EntityPickupItemEvent event)
-    {
-        if (!(event.getEntity() instanceof HumanEntity)) return;
+    public void onPlayerPickup(EntityPickupItemEvent event) {
+        if (!(event.getEntity() instanceof HumanEntity)) {
+            return;
+        }
         initMap(event.getItem().getItemStack());
     }
-    
+
     @EventHandler
-    public void onPlayerInventoryPlace(InventoryClickEvent event)
-    {
-        switch(event.getAction())
-        {
+    public void onPlayerInventoryPlace(InventoryClickEvent event) {
+        switch (event.getAction()) {
             case PLACE_ALL:
             case PLACE_ONE:
             case PLACE_SOME:
             case SWAP_WITH_CURSOR:
                 initMap(event.getCursor());
-        }
-    }
-    
-    static public void initMap(ItemStack item)
-    {
-        if (item != null && item.getType() == Material.FILLED_MAP)
-        {
-            initMap(MapManager.getMapIdFromItemStack(item));
-        }
-    }
-    
-    static public void initMap(int id)
-    {
-        initMap(Bukkit.getServer().getMap(id));
-    }
-    
-    static public void initMap(MapView map)
-    {
-        if(map == null) {
-            return;}
-        if(Renderer.isHandled(map)) {
-            return;}
-        
-        File imageFile = ImageOnMap.getPlugin().getImageFile(map.getId());
-        if(imageFile.isFile())
-        {
-            ImageIOExecutor.loadImage(imageFile, Renderer.installRenderer(map));
+                break;
+            default:
+
         }
     }
 }

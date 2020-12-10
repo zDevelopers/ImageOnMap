@@ -36,42 +36,36 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import java.util.List;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
+import java.util.List;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-@CommandInfo (name = "get")
-public class GetCommand extends IoMCommand
-{
+@CommandInfo(name = "get")
+public class GetCommand extends IoMCommand {
     @Override
-    protected void run() throws CommandException
-    {
+    protected void run() throws CommandException {
         Player player = playerSender();
-        if(getMapFromArgs().give(player))
-        {
+        if (getMapFromArgs().give(player)) {
             info(I.t("The requested map was too big to fit in your inventory."));
             info(I.t("Use '/maptool getremaining' to get the remaining maps."));
         }
     }
-    
+
     @Override
-    protected List<String> complete() throws CommandException
-    {
-        if(args.length == 1) 
+    protected List<String> complete() throws CommandException {
+        if (args.length == 1) {
             return getMatchingMapNames(playerSender(), args[0]);
+        }
         return null;
     }
 
     @Override
-    public boolean canExecute(CommandSender sender)
-    {
+    public boolean canExecute(CommandSender sender) {
         return Permissions.GET.grantedTo(sender);
     }
 }

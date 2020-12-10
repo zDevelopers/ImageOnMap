@@ -44,26 +44,20 @@ import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
 import org.bukkit.command.CommandSender;
 
-@CommandInfo (name = "migrate")
-public class MigrateCommand extends IoMCommand
-{
+@CommandInfo(name = "migrate")
+public class MigrateCommand extends IoMCommand {
     @Override
-    protected void run() throws CommandException
-    {
-        if(MigratorExecutor.isRunning())
-        {
+    protected void run() throws CommandException {
+        if (MigratorExecutor.isRunning()) {
             error(I.t("A migration process is already running. Check console for details."));
-        }
-        else
-        {
+        } else {
             info(I.t("Migration started. See console for details."));
             MigratorExecutor.migrate();
         }
     }
-    
+
     @Override
-    public boolean canExecute(CommandSender sender)
-    {
+    public boolean canExecute(CommandSender sender) {
         return sender.isOp() || Permissions.ADMINISTRATIVE.grantedTo(sender);
     }
 }

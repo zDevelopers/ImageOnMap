@@ -44,58 +44,56 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
 
+@CommandInfo(name = "getother", usageParameters = "<PlayerName> <MapName>")
+public class GetOtherCommand extends IoMCommand {
 
-@CommandInfo (name = "getother", usageParameters = "<PlayerName> <MapName>")
-public class GetOtherCommand extends IoMCommand
-{
+    @Override
+    protected void run() throws CommandException {
+        if (args.length < 2) {
+            warning(I.t("Not enough parameters! Usage: /maptool getother <playername> <mapname>"));
+            return;
+        }
 
-	@Override
-	protected void run() throws CommandException
-	{
-		if(args.length < 2) {
-			warning(I.t("Not enough parameters! Usage: /maptool getother <playername> <mapname>"));
-			return;
-		}
+        Player player = null;
+        UUID uuid = null;
+        player = Bukkit.getPlayer(args[0]);
 
-		Player player = null;
-		UUID uuid = null;
-		player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            OfflinePlayer op = Bukkit.getOfflinePlayer(args[0]);
+            if (op.hasPlayedBefore()) {
+                uuid = op.getUniqueId();
+            } else {
+                warning(I.t("We've never seen that player before!"));
+            }
+            return;
+        } else {
+            uuid = player.getUniqueId();
+        }
+        ImageMap map = null;
+        String mapName = "";
+        mapName = args[1];
+        if (args.length > 2) {
+            for (int i = 2; i < args.length; i++) {
+                mapName += (" " + args[i - 1]);
+            }
+        }
+        map = MapManager.getMap(uuid, mapName);
+        if (map != null) {
+            map.give(playerSender());
+        } else {
+            warning(I.t("Unknown map {0}", mapName));
+        }
+    }
 
-		if(player == null){
-			OfflinePlayer op = Bukkit.getOfflinePlayer(args[0]);
-			if(op.hasPlayedBefore()) uuid = op.getUniqueId();
-			else warning(I.t("We've never seen that player before!"));
-			return;
-		}
-		else {
-			uuid = player.getUniqueId();
-		}
-		ImageMap map = null;
-		String mapName = "";
-		mapName = args[1];
-		if(args.length > 2) {
-			for(int i = 2; i < args.length; i++) {
-				mapName += (" " + args[i - 1]);
-			}
-		}
-		map = MapManager.getMap(uuid, mapName);
-		if(map!=null)
-			map.give(playerSender());
-		else{
-			warning(I.t("Unknown map {0}",mapName));
-		}
-		return;
-	}
-	@Override
-	public boolean canExecute(CommandSender sender)
-	{
-		return Permissions.GETOTHER.grantedTo(sender);
-	}
+    @Override
+    public boolean canExecute(CommandSender sender) {
+        return Permissions.GETOTHER.grantedTo(sender);
+    }
 }

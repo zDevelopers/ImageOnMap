@@ -47,19 +47,17 @@ import fr.zcraft.quartzlib.components.commands.WithFlags;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.components.rawtext.RawText;
 import fr.zcraft.quartzlib.tools.PluginLogger;
+import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.List;
+@CommandInfo(name = "delete", usageParameters = "<map name> [--confirm]")
+@WithFlags({"confirm"})
+public class DeleteCommand extends IoMCommand {
 
-@CommandInfo (name =  "delete", usageParameters = "<map name> [--confirm]")
-@WithFlags ({"confirm"})
-public class DeleteCommand extends IoMCommand
-{
-
-    private static RawText deleteMsg(Class klass,ImageMap map){
-       return new RawText(I.t("You are going to delete") + " ")
+    private static RawText deleteMsg(Class klass, ImageMap map) {
+        return new RawText(I.t("You are going to delete") + " ")
                 .then(map.getId())
                 .color(ChatColor.GOLD)
                 .then(". " + I.t("Are you sure ? "))
@@ -72,45 +70,37 @@ public class DeleteCommand extends IoMCommand
     }
 
     @Override
-    protected void run() throws CommandException
-    {
+    protected void run() throws CommandException {
         ImageMap map = getMapFromArgs();
 
-        if (!hasFlag("confirm"))
-        {
-            RawText msg = deleteMsg(getClass(),map);
+        if (!hasFlag("confirm")) {
+            RawText msg = deleteMsg(getClass(), map);
             send(msg);
-        }
-        else
-        {
+        } else {
             Player player = playerSender();
             MapManager.clear(player.getInventory(), map);
 
-            try
-            {
+            try {
                 MapManager.deleteMap(map);
                 info(I.t("Map successfully deleted."));
-            }
-            catch (MapManagerException ex)
-            {
+            } catch (MapManagerException ex) {
                 PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
                 warning(I.t("This map does not exist."));
             }
         }
     }
-    
+
     @Override
-    protected List<String> complete() throws CommandException
-    {
-        if(args.length == 1) 
+    protected List<String> complete() throws CommandException {
+        if (args.length == 1) {
             return getMatchingMapNames(playerSender(), args[0]);
+        }
 
         return null;
     }
 
     @Override
-    public boolean canExecute(CommandSender sender)
-    {
+    public boolean canExecute(CommandSender sender) {
         return Permissions.DELETE.grantedTo(sender);
     }
 }

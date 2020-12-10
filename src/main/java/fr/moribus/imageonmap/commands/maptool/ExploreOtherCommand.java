@@ -50,32 +50,29 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
-@CommandInfo (name = "exploreother")
-public class ExploreOtherCommand extends IoMCommand
-{
+@CommandInfo(name = "exploreother")
+public class ExploreOtherCommand extends IoMCommand {
     @Override
-    protected void run() throws CommandException
-    {
-        if(args.length < 1) {
+    protected void run() throws CommandException {
+        if (args.length < 1) {
             warning(I.t("Not enough parameters! Usage: /maptool exploreother <playername>"));
             return;
         }
-        String name=args[0];
-        Player sender=playerSender();
+        String name = args[0];
+        Player sender = playerSender();
         offlinePlayerParameter(0, uuid -> {
-            if(uuid==null){
+            if (uuid == null) {
                 try {
                     throwInvalidArgument(I.t("Player not found."));
                 } catch (CommandException e) {
-                    PluginLogger.error("CommandException "+e);
+                    PluginLogger.error("CommandException " + e);
                     return;
                 }
             }
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             if (offlinePlayer != null) {
                 Gui.open(sender, new MapListGui(offlinePlayer, name));
-            }
-            else{
+            } else {
                 PluginLogger.warning(I.t("Can't find player"));
                 return;
             }
@@ -83,8 +80,7 @@ public class ExploreOtherCommand extends IoMCommand
     }
 
     @Override
-    public boolean canExecute(CommandSender sender)
-    {
+    public boolean canExecute(CommandSender sender) {
         return Permissions.LISTOTHER.grantedTo(sender);
     }
 }

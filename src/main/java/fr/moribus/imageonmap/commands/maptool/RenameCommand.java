@@ -24,38 +24,37 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
+import java.util.List;
 import org.bukkit.command.CommandSender;
 
-import java.util.List;
-
-@CommandInfo(name = "rename",usageParameters = "<original map name> <new map name>")
+@CommandInfo(name = "rename", usageParameters = "<original map name> <new map name>")
 public class RenameCommand extends IoMCommand {
     @Override
-    protected void run() throws CommandException
-    {
-        if(args.length != 4) {
+    protected void run() throws CommandException {
+        if (args.length != 4) {
             warning(I.t("Not enough or too many arguments! Usage: /maptool rename <map name> <new map name>"));
             return;
         }
         //if(args.length == 2)
         //{
-            ImageMap map = getMapFromArgs();
-            map.rename(args[2]);
-       // } else {
+        ImageMap map = getMapFromArgs();
+        map.rename(args[2]);
+        // } else {
         //    info(I.t("Not enough or too many arguments"));
-       // }
+        // }
     }
-    @Override
-    protected List<String> complete() throws CommandException
-    {
 
-        if(args.length == 1)
+    @Override
+    protected List<String> complete() throws CommandException {
+
+        if (args.length == 1) {
             return getMatchingMapNames(playerSender(), args[0]);
+        }
         return null;
     }
+
     @Override
-    public boolean canExecute(CommandSender sender)
-    {
+    public boolean canExecute(CommandSender sender) {
         return Permissions.RENAME.grantedTo(sender);
     }
 }

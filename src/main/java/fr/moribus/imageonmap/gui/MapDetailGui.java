@@ -54,20 +54,19 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
 
-public class MapDetailGui extends ExplorerGui<Integer>
-{
+public class MapDetailGui extends ExplorerGui<Integer> {
     private final ImageMap map;
-    private OfflinePlayer p;
+    private OfflinePlayer offplayer;
     private String name;
 
-    public MapDetailGui(ImageMap map, OfflinePlayer p, String name){
-        this.map=map;
-        this.p=p;
-        this.name=name;
+    public MapDetailGui(ImageMap map, OfflinePlayer p, String name) {
+        this.map = map;
+        this.offplayer = p;
+        this.name = name;
     }
+
     @Override
-    protected ItemStack getViewItem(int x, int y)
-    {
+    protected ItemStack getViewItem(int x, int y) {
         final Material partMaterial = y % 2 == x % 2 ? Material.MAP : Material.PAPER;
 
         final ItemStackBuilder builder = new ItemStackBuilder(partMaterial)
@@ -75,15 +74,15 @@ public class MapDetailGui extends ExplorerGui<Integer>
                 .lore(I.t(getPlayerLocale(), "{gray}Row: {white}{0}", y + 1))
                 .lore(I.t(getPlayerLocale(), "{gray}Column: {white}{0}", x + 1));
 
-        if (Permissions.GET.grantedTo(getPlayer()))
+        if (Permissions.GET.grantedTo(getPlayer())) {
             builder.loreLine().lore(I.t(getPlayerLocale(), "{gray}» {white}Click{gray} to get only this part"));
+        }
 
         return builder.item();
     }
-    
+
     @Override
-    protected ItemStack getViewItem(Integer mapId)
-    {
+    protected ItemStack getViewItem(Integer mapId) {
         final int index = ((PosterMap) map).getIndex(mapId);
         final Material partMaterial = index % 2 == 0 ? Material.MAP : Material.PAPER;
 
@@ -91,77 +90,66 @@ public class MapDetailGui extends ExplorerGui<Integer>
                 .title(I.t(getPlayerLocale(), "{green}Map part"))
                 .lore(I.t(getPlayerLocale(), "{gray}Part: {white}{0}", index + 1));
 
-        if (Permissions.GET.grantedTo(getPlayer()))
+        if (Permissions.GET.grantedTo(getPlayer())) {
             builder.loreLine().lore(I.t(getPlayerLocale(), "{gray}» {white}Click{gray} to get only this part"));
+        }
 
         return builder.item();
     }
-    
-    @Override
-    protected ItemStack getPickedUpItem(int x, int y)
-    {
-        if (!Permissions.GET.grantedTo(getPlayer()))
-            return null;
 
-        if (map instanceof SingleMap)
-        {
-            return MapItemManager.createMapItem((SingleMap)map,true);
+    @Override
+    protected ItemStack getPickedUpItem(int x, int y) {
+        if (!Permissions.GET.grantedTo(getPlayer())) {
+            return null;
         }
-        else if (map instanceof PosterMap)
-        {
-            return MapItemManager.createMapItem((PosterMap)map, x, y);
+
+        if (map instanceof SingleMap) {
+            return MapItemManager.createMapItem((SingleMap) map, true);
+        } else if (map instanceof PosterMap) {
+            return MapItemManager.createMapItem((PosterMap) map, x, y);
         }
-        
+
         throw new IllegalStateException("Unsupported map type: " + map.getType());
     }
 
     @Override
-    protected ItemStack getPickedUpItem(Integer mapId)
-    {
-        if (!Permissions.GET.grantedTo(getPlayer()))
+    protected ItemStack getPickedUpItem(Integer mapId) {
+        if (!Permissions.GET.grantedTo(getPlayer())) {
             return null;
+        }
 
         final PosterMap poster = (PosterMap) map;
         return MapItemManager.createMapItem(poster, poster.getIndex(mapId));
     }
-    
+
     @Override
-    protected ItemStack getEmptyViewItem()
-    {
-        if (map instanceof SingleMap)
-        {
+    protected ItemStack getEmptyViewItem() {
+        if (map instanceof SingleMap) {
             return getViewItem(0, 0);
+        } else {
+            return super.getEmptyViewItem();
         }
-        else return super.getEmptyViewItem();
     }
 
     @Override
-    protected void onUpdate()
-    {
+    protected void onUpdate() {
         /// Title of the map details GUI
-        if(p.getUniqueId().equals(getPlayer().getUniqueId())) {
+        if (offplayer.getUniqueId().equals(getPlayer().getUniqueId())) {
             setTitle(I.t(getPlayerLocale(), "Your maps » {black}{0}", map.getName()));
-        }
-        else{
-            setTitle(I.t(getPlayerLocale(), "{1}'s maps » {black}{0}", map.getName(),name));
+        } else {
+            setTitle(I.t(getPlayerLocale(), "{1}'s maps » {black}{0}", map.getName(), name));
         }
         setKeepHorizontalScrollingSpace(true);
 
-        if (map instanceof PosterMap)
-        {
+        if (map instanceof PosterMap) {
             PosterMap poster = (PosterMap) map;
-            if(poster.hasColumnData())
-            {
+            if (poster.hasColumnData()) {
                 setDataShape(poster.getColumnCount(), poster.getRowCount());
-            }
-            else
-            {
+            } else {
                 setData(ArrayUtils.toObject(poster.getMapsIDs()));
             }
-        }
-        else
-        {
-            setDataShape(1,1); 
+        } else {
+            setDataShape(1, 1);
         }
 
         final boolean canRename = Permissions.RENAME.grantedTo(getPlayer());
@@ -170,24 +158,26 @@ public class MapDetailGui extends ExplorerGui<Integer>
         int renameSlot = getSize() - 7;
         int deleteSlot = getSize() - 6;
 
-        if (!canRename)
+        if (!canRename) {
             deleteSlot--;
+        }
 
-        if (canRename)
-        {
+        if (canRename) {
             action("rename", renameSlot, new ItemStackBuilder(Material.WRITABLE_BOOK)
                     .title(I.t(getPlayerLocale(), "{blue}Rename this image"))
-                    .longLore(I.t(getPlayerLocale(), "{gray}Click here to rename this image; this is used for your own organization."))
+                    .longLore(I.t(getPlayerLocale(),
+                            "{gray}Click here to rename this image; this is used for your own organization."))
             );
         }
 
-        if (canDelete)
-        {
+        if (canDelete) {
             action("delete", deleteSlot, new ItemStackBuilder(Material.BARRIER)
                     .title(I.t(getPlayerLocale(), "{red}Delete this image"))
-                    .longLore(I.t(getPlayerLocale(), "{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"))
+                    .longLore(I.t(getPlayerLocale(),
+                            "{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"))
                     .loreLine()
-                    .longLore(I.t(getPlayerLocale(), "{gray}You will be asked to confirm your choice if you click here."))
+                    .longLore(
+                            I.t(getPlayerLocale(), "{gray}You will be asked to confirm your choice if you click here."))
             );
         }
 
@@ -196,10 +186,11 @@ public class MapDetailGui extends ExplorerGui<Integer>
         // arrow isn't displayed, so when the map fit on the grid without sliders.
         int backSlot = getSize() - 4;
 
-        if (!canRename && !canDelete)
+        if (!canRename && !canDelete) {
             backSlot = getSize() - 5;
-        else if (map instanceof PosterMap && ((PosterMap) map).getColumnCount() <= INVENTORY_ROW_SIZE)
+        } else if (map instanceof PosterMap && ((PosterMap) map).getColumnCount() <= INVENTORY_ROW_SIZE) {
             backSlot++;
+        }
 
         action("back", backSlot, new ItemStackBuilder(Material.EMERALD)
                 .title(I.t(getPlayerLocale(), "{green}« Back"))
@@ -208,29 +199,23 @@ public class MapDetailGui extends ExplorerGui<Integer>
     }
 
 
-    @GuiAction ("rename")
-    public void rename()
-    {
-        if (!Permissions.RENAME.grantedTo(getPlayer()))
-        {
+    @GuiAction("rename")
+    public void rename() {
+        if (!Permissions.RENAME.grantedTo(getPlayer())) {
             I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
             update();
             return;
         }
 
-        PromptGui.prompt(getPlayer(), new Callback<String>()
-        {
+        PromptGui.prompt(getPlayer(), new Callback<String>() {
             @Override
-            public void call(String newName)
-            {
-                if (!Permissions.RENAME.grantedTo(getPlayer()))
-                {
+            public void call(String newName) {
+                if (!Permissions.RENAME.grantedTo(getPlayer())) {
                     I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
                     return;
                 }
 
-                if (newName == null || newName.isEmpty())
-                {
+                if (newName == null || newName.isEmpty()) {
                     I.sendT(getPlayer(), "{ce}Map names can't be empty.");
                     return;
                 }
@@ -241,11 +226,9 @@ public class MapDetailGui extends ExplorerGui<Integer>
         }, map.getName(), this);
     }
 
-    @GuiAction ("delete")
-    public void delete()
-    {
-        if (!Permissions.DELETE.grantedTo(getPlayer()))
-        {
+    @GuiAction("delete")
+    public void delete() {
+        if (!Permissions.DELETE.grantedTo(getPlayer())) {
             I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
             update();
             return;
@@ -253,9 +236,8 @@ public class MapDetailGui extends ExplorerGui<Integer>
         Gui.open(getPlayer(), new ConfirmDeleteMapGui(map), this);
     }
 
-    @GuiAction ("back")
-    public void back()
-    {
+    @GuiAction("back")
+    public void back() {
         close();
     }
 }

@@ -39,96 +39,89 @@ package fr.moribus.imageonmap.migration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.InvalidConfigurationException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.InvalidConfigurationException;
 
-class OldSavedPoster 
-{
+class OldSavedPoster {
     private final String userName;
     private final String posterName;
     private final short[] mapsIds;
-    
-    public OldSavedPoster(Object rawData, String key) throws InvalidConfigurationException
-    {
+
+    public OldSavedPoster(Object rawData, String key) throws InvalidConfigurationException {
         posterName = key;
         List<String> data;
-        try
-        {
+        try {
             data = (List<String>) rawData;
-        }
-        catch(ClassCastException ex)
-        {
+        } catch (ClassCastException ex) {
             throw new InvalidConfigurationException("Invalid map data : " + ex.getMessage());
         }
-        
-        if(data.size() < 2) 
-            throw new InvalidConfigurationException("Poster data too short (given : " + data.size() + ", expected at least 2)");
+
+        if (data.size() < 2) {
+            throw new InvalidConfigurationException(
+                    "Poster data too short (given : " + data.size() + ", expected at least 2)");
+        }
         userName = data.get(0);
         mapsIds = new short[data.size() - 1];
-        
-        for(int i = 1, c = data.size(); i < c; i++)
-        {
-            try
-            {
+
+        for (int i = 1, c = data.size(); i < c; i++) {
+            try {
                 mapsIds[i - 1] = Short.parseShort(data.get(i));
-            }
-            catch(NumberFormatException ex)
-            {
+            } catch (NumberFormatException ex) {
                 throw new InvalidConfigurationException("Invalid map ID : " + ex.getMessage());
             }
         }
     }
-    
-    public boolean contains(OldSavedMap map)
-    {
+
+    public boolean contains(OldSavedMap map) {
         short mapId = map.getMapId();
-        
-        for(int i = 0, c = mapsIds.length; i < c; i++)
-        {
-            if(mapsIds[i] == mapId) return true;
+
+        for (short mapsId : mapsIds) {
+            if (mapsId == mapId) {
+                return true;
+            }
         }
-        
+
         return false;
     }
-    
-    public ImageMap toImageMap(UUID userUUID)
-    {
+
+    public ImageMap toImageMap(UUID userUUID) {
         // Converts the maps IDs to int as MC 1.13.2+ uses integer ids
         final int[] mapsIdsInt = new int[mapsIds.length];
         Arrays.setAll(mapsIdsInt, i -> mapsIds[i]);
 
         return new PosterMap(userUUID, mapsIdsInt, null, "poster", 0, 0);
     }
-    
-    public void serialize(Configuration configuration)
-    {
+
+    public void serialize(Configuration configuration) {
         ArrayList<String> data = new ArrayList<String>();
         data.add(userName);
-        
-        for(short mapId : mapsIds)
-        {
+
+        for (short mapId : mapsIds) {
             data.add(Short.toString(mapId));
         }
-        
+
         configuration.set(posterName, data);
-        
+
     }
-    
-    public boolean isMapValid()
-    {
-        for(short mapId : mapsIds)
-        {
-            if(!MapManager.mapIdExists(mapId))
+
+    public boolean isMapValid() {
+        for (short mapId : mapsIds) {
+            if (!MapManager.mapIdExists(mapId)) {
                 return false;
+            }
         }
         return true;
     }
-    
-    public String getUserName() {return userName;}
-    public short[] getMapsIds() {return mapsIds;}
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public short[] getMapsIds() {
+        return mapsIds;
+    }
 }

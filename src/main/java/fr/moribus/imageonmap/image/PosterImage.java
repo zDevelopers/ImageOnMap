@@ -44,15 +44,16 @@ import java.awt.image.BufferedImage;
  * This class represents an image split into pieces
  */
 public class PosterImage {
-    static private final int WIDTH = 128;
-    static private final int HEIGHT = 128;
+    private static final int WIDTH = 128;
+    private static final int HEIGHT = 128;
 
     private BufferedImage originalImage;
     private BufferedImage[] cutImages;
     private int lines;
     private int columns;
     private int cutImagesCount;
-    private int remainderX, remainderY;
+    private int remainderX;
+    private int remainderY;
 
     /**
      * Creates a new Poster from an entire image
@@ -74,8 +75,12 @@ public class PosterImage {
         remainderX = originalWidth % WIDTH;
         remainderY = originalHeight % HEIGHT;
 
-        if (remainderX > 0) columns++;
-        if (remainderY > 0) lines++;
+        if (remainderX > 0) {
+            columns++;
+        }
+        if (remainderY > 0) {
+            lines++;
+        }
 
         cutImagesCount = columns * lines;
     }
@@ -95,12 +100,13 @@ public class PosterImage {
                 imageY += HEIGHT;
             }
         } catch (final Throwable e) {
-            if (cutImages != null)
+            if (cutImages != null) {
                 for (BufferedImage bi : cutImages) {
                     if (bi != null) {
                         bi.flush();//Safe to free
                     }
                 }
+            }
             throw e;
         }
 

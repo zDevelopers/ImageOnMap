@@ -37,91 +37,79 @@
 package fr.moribus.imageonmap.image;
 
 import fr.zcraft.quartzlib.tools.PluginLogger;
+import java.awt.image.BufferedImage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
-import java.awt.image.BufferedImage;
+public class Renderer extends MapRenderer {
+    private BufferedImage image;
 
-public class Renderer extends MapRenderer
-{
-    static public boolean isHandled(MapView map)
-    {
-        if(map == null) return false;
-        for(MapRenderer renderer : map.getRenderers())
-        {
-            if(renderer instanceof Renderer) return true;
+    protected Renderer() {
+        this(null);
+    }
+
+    protected Renderer(BufferedImage image) {
+        this.image = image;
+    }
+
+    public static boolean isHandled(MapView map) {
+        if (map == null) {
+            return false;
+        }
+        for (MapRenderer renderer : map.getRenderers()) {
+            if (renderer instanceof Renderer) {
+                return true;
+            }
         }
         return false;
     }
-    
-    static public void installRenderer(PosterImage image, int[] mapsIds)
-    {
-        for(int i = 0; i < mapsIds.length; i++)
-        {
+
+    public static void installRenderer(PosterImage image, int[] mapsIds) {
+        for (int i = 0; i < mapsIds.length; i++) {
             installRenderer(image.getImageAt(i), mapsIds[i]);
         }
     }
-    
-    static public void installRenderer(BufferedImage image, int mapID)
-    {
+
+    public static void installRenderer(BufferedImage image, int mapID) {
         MapView map = Bukkit.getMap(mapID);
-        if(map == null)
-        {
+        if (map == null) {
             PluginLogger.warning("Could not install renderer for map {0}: the Minecraft map does not exist", mapID);
-        }
-        else
-        {
+        } else {
             installRenderer(map).setImage(image);
         }
     }
-    
-    static public Renderer installRenderer(MapView map)
-    {
+
+    public static Renderer installRenderer(MapView map) {
         Renderer renderer = new Renderer();
         removeRenderers(map);
         map.addRenderer(renderer);
         return renderer;
     }
-    
-    static public void removeRenderers(MapView map)
-    {
-        for(MapRenderer renderer : map.getRenderers())
-        {
+
+    public static void removeRenderers(MapView map) {
+        for (MapRenderer renderer : map.getRenderers()) {
             map.removeRenderer(renderer);
         }
     }
-    
-    private BufferedImage image;
-    
-    protected Renderer()
-    {
-        this(null);
-    }
-    
-    protected Renderer(BufferedImage image)
-    {
-        this.image = image;
-    }
 
     @Override
-    public void render(MapView v, final MapCanvas canvas, Player p)
-    {
+    public void render(MapView v, final MapCanvas canvas, Player p) {
         //Render only once to avoid overloading the server
-        if (image == null) return;
+        if (image == null) {
+            return;
+        }
         canvas.drawImage(0, 0, image);
         image = null;
     }
-    
-    public BufferedImage getImage()
-    {
+
+    public BufferedImage getImage() {
         return image;
     }
-    
-    public void setImage(BufferedImage image)
-    {
+
+    public void setImage(BufferedImage image) {
         this.image = image;
     }
 }

@@ -33,6 +33,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
+
 package fr.moribus.imageonmap.gui;
 
 import fr.moribus.imageonmap.Permissions;
@@ -55,38 +56,33 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 
 
-public class MapListGui extends ExplorerGui<ImageMap>
-{
-    private OfflinePlayer p;
+public class MapListGui extends ExplorerGui<ImageMap> {
+    private OfflinePlayer offplayer;
     private String name;
-    public MapListGui(Player sender){
-        this.p=sender;
-        this.name=sender.getName();
+
+    public MapListGui(Player sender) {
+        this.offplayer = sender;
+        this.name = sender.getName();
     }
-    public MapListGui(OfflinePlayer p,String name){
-        this.p=p;
-        this.name=name;
+
+    public MapListGui(OfflinePlayer p, String name) {
+        this.offplayer = p;
+        this.name = name;
     }
 
     @Override
-    protected ItemStack getViewItem(ImageMap map)
-    {
+    protected ItemStack getViewItem(ImageMap map) {
         String mapDescription;
-        if (map instanceof SingleMap)
-        {
+        if (map instanceof SingleMap) {
             /// Displayed subtitle description of a single map on the list GUI
             mapDescription = I.t(getPlayerLocale(), "{white}Single map");
-        }
-        else
-        {
+        } else {
             PosterMap poster = (PosterMap) map;
-            if(poster.hasColumnData())
-            {
+            if (poster.hasColumnData()) {
                 /// Displayed subtitle description of a poster map on the list GUI (columns × rows in english)
-                mapDescription = I.t(getPlayerLocale(), "{white}Poster map ({0} × {1})", poster.getColumnCount(), poster.getRowCount());
-            }
-            else
-            {
+                mapDescription = I.t(getPlayerLocale(), "{white}Poster map ({0} × {1})", poster.getColumnCount(),
+                        poster.getRowCount());
+            } else {
                 /// Displayed subtitle description of a poster map without column data on the list GUI
                 mapDescription = I.t(getPlayerLocale(), "{white}Poster map ({0} parts)", poster.getMapCount());
             }
@@ -102,8 +98,9 @@ public class MapListGui extends ExplorerGui<ImageMap>
                 .lore(I.tl(getPlayerLocale(), "{gray}Map ID: {0}", map.getId()))
                 .loreLine();
 
-        if (Permissions.GET.grantedTo(getPlayer()))
+        if (Permissions.GET.grantedTo(getPlayer())) {
             builder.lore(I.tl(getPlayerLocale(), "{gray}» {white}Left-click{gray} to get this map"));
+        }
 
         builder.lore(I.tl(getPlayerLocale(), "{gray}» {white}Right-click{gray} for details and options"));
 
@@ -117,48 +114,45 @@ public class MapListGui extends ExplorerGui<ImageMap>
     }
 
     @Override
-    protected ItemStack getEmptyViewItem()
-    {
+    protected ItemStack getEmptyViewItem() {
         ItemStackBuilder builder = new ItemStackBuilder(Material.BARRIER);
-        if(p.getUniqueId().equals(getPlayer().getUniqueId())) {
+        if (offplayer.getUniqueId().equals(getPlayer().getUniqueId())) {
 
             builder.title(I.tl(getPlayerLocale(), "{red}You don't have any map."));
 
-            if (Permissions.NEW.grantedTo(getPlayer()))
-                builder.longLore(I.tl(getPlayerLocale(), "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"));
-            else
+            if (Permissions.NEW.grantedTo(getPlayer())) {
+                builder.longLore(I.tl(getPlayerLocale(),
+                        "{gray}Get started by creating a new one using {white}/tomap <URL> [resize]{gray}!"));
+            } else {
                 builder.longLore(I.tl(getPlayerLocale(), "{gray}Unfortunately, you are not allowed to create one."));
-        }
-        else{
-            builder.title(I.tl(getPlayerLocale(), "{red}{0} doesn't have any map.",name));
+            }
+        } else {
+            builder.title(I.tl(getPlayerLocale(), "{red}{0} doesn't have any map.", name));
         }
         return builder.item();
     }
 
     @Override
-    protected void onRightClick(ImageMap data)
-    {
-        Gui.open(getPlayer(), new MapDetailGui(data,getPlayer(),name), this);
+    protected void onRightClick(ImageMap data) {
+        Gui.open(getPlayer(), new MapDetailGui(data, getPlayer(), name), this);
     }
 
 
     @Override
-    protected ItemStack getPickedUpItem(ImageMap map)
-    {
-        if (!Permissions.GET.grantedTo(getPlayer()))
+    protected ItemStack getPickedUpItem(ImageMap map) {
+        if (!Permissions.GET.grantedTo(getPlayer())) {
             return null;
-
-        if (map instanceof SingleMap)
-        {
-            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName(), false,true);
         }
-        else if (map instanceof PosterMap)
-        {
+
+        if (map instanceof SingleMap) {
+            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName(), false, true);
+        } else if (map instanceof PosterMap) {
             PosterMap poster = (PosterMap) map;
-            
-            if(poster.hasColumnData())
+
+            if (poster.hasColumnData()) {
                 return SplatterMapManager.makeSplatterMap((PosterMap) map);
-            
+            }
+
             MapItemManager.giveParts(getPlayer(), poster);
             return null;
         }
@@ -168,24 +162,24 @@ public class MapListGui extends ExplorerGui<ImageMap>
     }
 
     @Override
-    protected void onUpdate()
-    {
-        ImageMap[] maps = MapManager.getMaps(p.getUniqueId());
+    protected void onUpdate() {
+        ImageMap[] maps = MapManager.getMaps(offplayer.getUniqueId());
         setData(maps);
 
         /// The maps list GUI title
         //Equal if the person who send the command is the owner of the mapList
-        if(p.getUniqueId().equals(getPlayer().getUniqueId()))
+        if (offplayer.getUniqueId().equals(getPlayer().getUniqueId())) {
             setTitle(I.tl(getPlayerLocale(), "{black}Your maps {reset}({0})", maps.length));
-        else
-            setTitle(I.tl(getPlayerLocale(), "{black}{1}'s maps {reset}({0})", maps.length, name ));
+        } else {
+            setTitle(I.tl(getPlayerLocale(), "{black}{1}'s maps {reset}({0})", maps.length, name));
+        }
 
         setKeepHorizontalScrollingSpace(true);
 
 
         /* ** Statistics ** */
-        int imagesCount = MapManager.getMapList(p.getUniqueId()).size();
-        int mapPartCount = MapManager.getMapPartCount(p.getUniqueId());
+        int imagesCount = MapManager.getMapList(offplayer.getUniqueId()).size();
+        int mapPartCount = MapManager.getMapPartCount(offplayer.getUniqueId());
 
         int mapGlobalLimit = PluginConfiguration.MAP_GLOBAL_LIMIT.get();
         int mapPersonalLimit = PluginConfiguration.MAP_PLAYER_LIMIT.get();
@@ -194,25 +188,28 @@ public class MapListGui extends ExplorerGui<ImageMap>
         int mapPartPersonallyLeft = mapPersonalLimit - mapPartCount;
 
         int mapPartLeft;
-        if (mapGlobalLimit <= 0 && mapPersonalLimit <= 0)
+        if (mapGlobalLimit <= 0 && mapPersonalLimit <= 0) {
             mapPartLeft = -1;
-        else if (mapGlobalLimit <= 0)
+        } else if (mapGlobalLimit <= 0) {
             mapPartLeft = mapPartPersonallyLeft;
-        else if (mapPersonalLimit <= 0)
+        } else if (mapPersonalLimit <= 0) {
             mapPartLeft = mapPartGloballyLeft;
-        else
+        } else {
             mapPartLeft = Math.min(mapPartGloballyLeft, mapPartPersonallyLeft);
+        }
 
-        double percentageUsed = mapPartLeft < 0 ? 0 : ((double) mapPartCount) / ((double) (mapPartCount + mapPartLeft)) * 100;
+        double percentageUsed =
+                mapPartLeft < 0 ? 0 : ((double) mapPartCount) / ((double) (mapPartCount + mapPartLeft)) * 100;
 
         ItemStackBuilder statistics = new ItemStackBuilder(Material.ENCHANTED_BOOK)
                 .title(I.t(getPlayerLocale(), "{blue}Usage statistics"))
                 .loreLine()
-                .lore(I.tn(getPlayerLocale(), "{white}{0}{gray} image rendered", "{white}{0}{gray} images rendered", imagesCount))
-                .lore(I.tn(getPlayerLocale(), "{white}{0}{gray} Minecraft map used", "{white}{0}{gray} Minecraft maps used", mapPartCount));
+                .lore(I.tn(getPlayerLocale(), "{white}{0}{gray} image rendered", "{white}{0}{gray} images rendered",
+                        imagesCount))
+                .lore(I.tn(getPlayerLocale(), "{white}{0}{gray} Minecraft map used",
+                        "{white}{0}{gray} Minecraft maps used", mapPartCount));
 
-        if(mapPartLeft >= 0)
-        {
+        if (mapPartLeft >= 0) {
             statistics
                     .lore("", I.t(getPlayerLocale(), "{blue}Minecraft maps limits"), "")
                     .lore(mapGlobalLimit == 0
@@ -222,8 +219,10 @@ public class MapListGui extends ExplorerGui<ImageMap>
                             ? I.t(getPlayerLocale(), "{gray}Per-player limit: {white}unlimited")
                             : I.t(getPlayerLocale(), "{gray}Per-player limit: {white}{0}", mapPersonalLimit))
                     .loreLine()
-                    .lore(I.t(getPlayerLocale(), "{white}{0} %{gray} of your quota used", (int) Math.rint(percentageUsed)))
-                    .lore(I.tn(getPlayerLocale(), "{white}{0}{gray} map left", "{white}{0}{gray} maps left", mapPartLeft));
+                    .lore(I.t(getPlayerLocale(), "{white}{0} %{gray} of your quota used",
+                            (int) Math.rint(percentageUsed)))
+                    .lore(I.tn(getPlayerLocale(), "{white}{0}{gray} map left", "{white}{0}{gray} maps left",
+                            mapPartLeft));
         }
 
         //statistics.hideAllAttributes();

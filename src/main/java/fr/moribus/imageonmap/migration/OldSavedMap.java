@@ -45,58 +45,53 @@ import java.util.UUID;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.InvalidConfigurationException;
 
-class OldSavedMap 
-{
+class OldSavedMap {
     private final short mapId;
     private final String mapName;
     private final String userName;
-    
-    public OldSavedMap(Object rawData) throws InvalidConfigurationException
-    {
+
+    public OldSavedMap(Object rawData) throws InvalidConfigurationException {
         List<String> data;
-        try
-        {
+        try {
             data = (List<String>) rawData;
-        }
-        catch(ClassCastException ex)
-        {
+        } catch (ClassCastException ex) {
             throw new InvalidConfigurationException("Invalid map data : " + ex.getMessage());
         }
-        
-        if(data.size() < 3) 
+
+        if (data.size() < 3) {
             throw new InvalidConfigurationException("Map data too short (given : " + data.size() + ", expected 3)");
-        try
-        {
-            mapId = Short.parseShort(data.get(0));
         }
-        catch(NumberFormatException ex)
-        {
+        try {
+            mapId = Short.parseShort(data.get(0));
+        } catch (NumberFormatException ex) {
             throw new InvalidConfigurationException("Invalid map ID : " + ex.getMessage());
         }
-        
+
         mapName = data.get(1);
         userName = data.get(2);
     }
-    
-    public ImageMap toImageMap(UUID userUUID)
-    {
+
+    public ImageMap toImageMap(UUID userUUID) {
         return new SingleMap(userUUID, mapId, null, mapName);
     }
-    
-    public void serialize(Configuration configuration)
-    {
+
+    public void serialize(Configuration configuration) {
         ArrayList<String> data = new ArrayList<String>();
         data.add(Short.toString(mapId));
         data.add(mapName);
         data.add(userName);
         configuration.set(mapName, data);
     }
-    
-    public boolean isMapValid()
-    {
+
+    public boolean isMapValid() {
         return MapManager.mapIdExists(mapId);
     }
-    
-    public short getMapId() {return mapId;}
-    public String getUserName() {return userName;}
+
+    public short getMapId() {
+        return mapId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
 }

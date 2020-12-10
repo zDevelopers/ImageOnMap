@@ -43,21 +43,47 @@ import fr.moribus.imageonmap.gui.MapListGui;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.gui.Gui;
+import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 
-@CommandInfo (name = "explore")
-public class ExploreCommand extends IoMCommand
-{
-	@Override
-	protected void run() throws CommandException
-	{
-		Gui.open(playerSender(), new MapListGui(playerSender()));
-	}
+@CommandInfo(name = "explore")
+public class ExploreCommand extends IoMCommand {
+    @Override
+    protected void run() throws CommandException {
+        if (args.length < 1) {
+            Gui.open(playerSender(), new MapListGui(playerSender()));
+        } else {
+            if (Permissions.LISTOTHER.grantedTo(sender)) {
+                String name = args[0];
+                Player sender = playerSender();
+                offlinePlayerParameter(0, uuid -> {
+                    if (uuid == null) {
+                        try {
+                            throwInvalidArgument(I.t("Player not found."));
+                        } catch (CommandException e) {
+                            PluginLogger.error("CommandException " + e);
+                            return;
+                        }
+                    }
 
-	@Override
-	public boolean canExecute(CommandSender sender)
-	{
-		return Permissions.LIST.grantedTo(sender);
-	}
+                    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+                    if (offlinePlayer != null) {
+                        Gui.open(sender, new MapListGui(offlinePlayer, name));
+                    } else {
+                        PluginLogger.warning(I.t("Can't find player"));
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    public boolean canExecute(CommandSender sender) {
+        return Permissions.LIST.grantedTo(sender);
+    }
 }

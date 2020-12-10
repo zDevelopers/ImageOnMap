@@ -37,38 +37,34 @@
 package fr.moribus.imageonmap.map;
 
 import fr.zcraft.quartzlib.components.i18n.I;
-
 import java.text.MessageFormat;
 
-public class MapManagerException extends Exception
-{
-    public enum Reason
-    {
-        MAXIMUM_PLAYER_MAPS_EXCEEDED(I.t("You have too many maps (maximum : {0}).")),
-        MAXIMUM_SERVER_MAPS_EXCEEDED(I.t("The server ImageOnMap limit has been reached.")),
-        IMAGEMAP_DOES_NOT_EXIST(I.t("The given map does not exist."));
-        
-        private final String reasonString;
-
-        Reason(String reasonString)
-        {
-            this.reasonString = reasonString;
-        }
-        
-        public String getReasonString(Object ...arguments)
-        {
-            return MessageFormat.format(reasonString, arguments);
-        }
-    }
-
-
+public class MapManagerException extends Exception {
     private final Reason reason;
-    
-    public MapManagerException(Reason reason, Object ...arguments)
-    {
+
+
+    public MapManagerException(Reason reason, Object... arguments) {
         super(reason.getReasonString(arguments));
         this.reason = reason;
     }
+
+    public Reason getReason() {
+        return reason;
+    }
     
-    public Reason getReason() { return reason; }
+    public enum Reason {
+        MAXIMUM_PLAYER_MAPS_EXCEEDED(I.t("You have too many maps (maximum : {0}).")),
+        MAXIMUM_SERVER_MAPS_EXCEEDED(I.t("The server ImageOnMap limit has been reached.")),
+        IMAGEMAP_DOES_NOT_EXIST(I.t("The given map does not exist."));
+
+        private final String reasonString;
+
+        Reason(String reasonString) {
+            this.reasonString = reasonString;
+        }
+
+        public String getReasonString(Object... arguments) {
+            return MessageFormat.format(reasonString, arguments);
+        }
+    }
 }

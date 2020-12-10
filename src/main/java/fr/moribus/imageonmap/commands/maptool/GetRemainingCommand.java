@@ -45,35 +45,29 @@ import fr.zcraft.quartzlib.components.i18n.I;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandInfo (name = "getremaining", aliases = {"getrest"})
-public class GetRemainingCommand extends IoMCommand
-{
+@CommandInfo(name = "getremaining", aliases = {"getrest"})
+public class GetRemainingCommand extends IoMCommand {
     @Override
-    protected void run() throws CommandException
-    {
+    protected void run() throws CommandException {
         Player player = playerSender();
-        
-        if(MapItemManager.getCacheSize(player) <= 0)
-        {
+
+        if (MapItemManager.getCacheSize(player) <= 0) {
             info(I.t("You have no remaining map."));
             return;
         }
-        
+
         int givenMaps = MapItemManager.giveCache(player);
-        
-        if(givenMaps == 0)
-        {
+
+        if (givenMaps == 0) {
             error(I.t("Your inventory is full! Make some space before requesting the remaining maps."));
-        }
-        else
-        {
-            info(I.tn("There is {0} map remaining.", "There are {0} maps remaining.", MapItemManager.getCacheSize(player)));
+        } else {
+            info(I.tn("There is {0} map remaining.", "There are {0} maps remaining.",
+                    MapItemManager.getCacheSize(player)));
         }
     }
 
     @Override
-    public boolean canExecute(CommandSender sender)
-    {
+    public boolean canExecute(CommandSender sender) {
         return Permissions.NEW.grantedTo(sender) || Permissions.GET.grantedTo(sender);
     }
 }

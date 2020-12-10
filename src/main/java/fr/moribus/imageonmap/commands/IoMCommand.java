@@ -33,6 +33,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
+
 package fr.moribus.imageonmap.commands;
 
 import fr.moribus.imageonmap.map.ImageMap;
@@ -40,97 +41,100 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.Command;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.i18n.I;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.bukkit.entity.Player;
 
 
-public abstract class IoMCommand extends Command
-{
-	protected ImageMap getMapFromArgs() throws CommandException
-	{
-		return getMapFromArgs(playerSender(), 0, true);
-	}
-//TODO:Add the quote system to zlib and refactor this
-	protected ImageMap getMapFromArgs(Player player, int index) throws CommandException
-	{
-		if(args.length <= index) throwInvalidArgument(I.t("You need to give a map name."));
+public abstract class IoMCommand extends Command {
+    protected ImageMap getMapFromArgs() throws CommandException {
+        return getMapFromArgs(playerSender(), 0, true);
+    }
 
-		ImageMap map;
-		String mapName = args[index];
-		for (int i = index + 1, c = args.length; i < c; i++) {
-			mapName += " " + args[i];
-		}
-		String regex="((\"([^\\\"]*(\\\\\\\")*)*([^\\\\\\\"]\"))|([^\\\"\\s\\\\]*(\\\\\\s)*[\\\\]*)*\"?)";
-
-		 Pattern pattern=Pattern.compile(regex);
-		 Matcher matcher=pattern.matcher(mapName);
-
-		StringBuilder result = new StringBuilder();
-
-		matcher.find();
-		result.append(matcher.group(0));
-		if(result!=null)
-			if(result.charAt(0)=='\"')
-				if(result.length()==1){
-					result.deleteCharAt(0);
-				}
-		 		else
-		 			if(result.charAt(result.length()-1)=='\"') {
-			 			result=result.deleteCharAt(result.length() - 1);
-						if(result!=null&&!result.equals("")&&result.charAt(0)=='\"')
-			 				mapName=result.deleteCharAt(0).toString();
-
-		 		}
+    //TODO:Add the quote system to zlib and refactor this
+    protected ImageMap getMapFromArgs(Player player, int index) throws CommandException {
+        if (args.length <= index) {
+            throwInvalidArgument(I.t("You need to give a map name."));
+        }
 
 
-		mapName = mapName.trim();
+        StringBuilder mapName = new StringBuilder(args[index]);
+        for (int i = index + 1, c = args.length; i < c; i++) {
+            mapName.append(" ").append(args[i]);
+        }
+        String regex = "((\"([^\\\"]*(\\\\\\\")*)*([^\\\\\\\"]\"))|([^\\\"\\s\\\\]*(\\\\\\s)*[\\\\]*)*\"?)";
 
-		map = MapManager.getMap(player.getUniqueId(), mapName);
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(mapName.toString());
 
-		if(map == null) error(I.t("This map does not exist."));
-		return map;
-	}
-	protected ImageMap getMapFromArgs(Player player, int index, boolean expand) throws CommandException
-	{
-		if(args.length <= index) throwInvalidArgument(I.t("You need to give a map name."));
+        StringBuilder result = new StringBuilder();
 
-		ImageMap map;
-		String mapName = args[index];
+        //matcher.find();
+        result.append(matcher.group(0));
+        if (result != null) {
+            if (result.charAt(0) == '\"') {
+                if (result.length() == 1) {
+                    result.deleteCharAt(0);
+                } else if (result.charAt(result.length() - 1) == '\"') {
+                    result = result.deleteCharAt(result.length() - 1);
+                    if (result != null && !result.equals("") && result.charAt(0) == '\"') {
+                        mapName = new StringBuilder(result.deleteCharAt(0).toString());
+                    }
 
-		if(expand)
-		{
-			for(int i = index + 1, c = args.length; i < c; i++)
-			{
-				mapName += " " + args[i];
-			}
-		}
+                }
+            }
+        }
 
-		mapName = mapName.trim();
-		map = MapManager.getMap(player.getUniqueId(), mapName);
 
-		if(map == null) error(I.t("This map does not exist."));
+        mapName = new StringBuilder(mapName.toString().trim());
+        ImageMap map;
+        map = MapManager.getMap(player.getUniqueId(), mapName.toString());
 
-		return map;
-	}
+        if (map == null) {
+            error(I.t("This map does not exist."));
+        }
+        return map;
+    }
 
-	protected List<String> getMatchingMapNames(Player player, String prefix)
-	{
-		return getMatchingMapNames(MapManager.getMapList(player.getUniqueId()), prefix);
-	}
+    protected ImageMap getMapFromArgs(Player player, int index, boolean expand) throws CommandException {
+        if (args.length <= index) {
+            throwInvalidArgument(I.t("You need to give a map name."));
+        }
 
-	protected List<String> getMatchingMapNames(Iterable<? extends ImageMap> maps, String prefix)
-	{
-		List<String> matches = new ArrayList<>();
+        ImageMap map;
+        String mapName = args[index];
 
-		for(ImageMap map : maps)
-		{
-			if(map.getId().startsWith(prefix)) matches.add(map.getId());
-		}
+        if (expand) {
+            for (int i = index + 1, c = args.length; i < c; i++) {
+                mapName += " " + args[i];
+            }
+        }
 
-		return matches;
-	}
+        mapName = mapName.trim();
+        map = MapManager.getMap(player.getUniqueId(), mapName);
+
+        if (map == null) {
+            error(I.t("This map does not exist."));
+        }
+
+        return map;
+    }
+
+    protected List<String> getMatchingMapNames(Player player, String prefix) {
+        return getMatchingMapNames(MapManager.getMapList(player.getUniqueId()), prefix);
+    }
+
+    protected List<String> getMatchingMapNames(Iterable<? extends ImageMap> maps, String prefix) {
+        List<String> matches = new ArrayList<>();
+
+        for (ImageMap map : maps) {
+            if (map.getId().startsWith(prefix)) {
+                matches.add(map.getId());
+            }
+        }
+
+        return matches;
+    }
 }

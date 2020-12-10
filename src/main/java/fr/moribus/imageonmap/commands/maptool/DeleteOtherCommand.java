@@ -46,23 +46,20 @@ import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.commands.WithFlags;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.tools.PluginLogger;
+import java.util.List;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.UUID;
-
-@CommandInfo (name =  "deleteother", usageParameters = "<player name> <map name>")
-@WithFlags ({"confirm"})
-public class DeleteOtherCommand extends IoMCommand
-{
+@CommandInfo(name = "deleteother", usageParameters = "<player name> <map name>")
+@WithFlags({"confirm"})
+public class DeleteOtherCommand extends IoMCommand {
     @Override
-    protected void run() throws CommandException
-    {
-        if(args.length < 2) {
+    protected void run() throws CommandException {
+        if (args.length < 2) {
             warning(I.t("Not enough parameters! Usage: /maptool deleteother <playername> <mapname>"));
             return;
         }
@@ -71,44 +68,46 @@ public class DeleteOtherCommand extends IoMCommand
         UUID uuid = null;
         OfflinePlayer op = null;
         player = Bukkit.getPlayer(args[0]);
-        if(player == null){
+        if (player == null) {
             op = Bukkit.getOfflinePlayer(args[0]);
-            if(op.hasPlayedBefore()) uuid = op.getUniqueId();
-            else warning(I.t("We've never seen that player before!"));
+            if (op.hasPlayedBefore()) {
+                uuid = op.getUniqueId();
+            } else {
+                warning(I.t("We've never seen that player before!"));
+            }
+        } else {
+            uuid = player.getUniqueId();
         }
-        else uuid = player.getUniqueId();
-        if(player==null){
+        if (player == null) {
             warning(I.t("Player not found"));
             return;
         }
         ImageMap map = getMapFromArgs(player, 1, true);
 
-        if(player != null) MapManager.clear(player.getInventory(), map);
+        //if (player != null) {
+        MapManager.clear(player.getInventory(), map);
+        //}
 
-        try
-        {
+        try {
             MapManager.deleteMap(map);
             info(I.t("{gray}Map successfully deleted."));
-        }
-        catch (MapManagerException ex)
-        {
+        } catch (MapManagerException ex) {
             PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
-            warning(ChatColor.RED+(I.t("This map does not exist.")));
+            warning(ChatColor.RED + (I.t("This map does not exist.")));
         }
     }
 
     @Override
-    protected List<String> complete() throws CommandException
-    {
-        if(args.length == 1)
+    protected List<String> complete() throws CommandException {
+        if (args.length == 1) {
             return getMatchingMapNames(playerSender(), args[0]);
+        }
 
         return null;
     }
 
     @Override
-    public boolean canExecute(CommandSender sender)
-    {
+    public boolean canExecute(CommandSender sender) {
         return Permissions.DELETEOTHER.grantedTo(sender);
     }
 }

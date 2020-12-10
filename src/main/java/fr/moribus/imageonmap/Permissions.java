@@ -34,13 +34,13 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
+
 package fr.moribus.imageonmap;
 
 
 import org.bukkit.permissions.Permissible;
 
-public enum Permissions
-{
+public enum Permissions {
     NEW("imageonmap.new", "imageonmap.userender"),
     LIST("imageonmap.list"),
     LISTOTHER("imageonmap.listother"),
@@ -54,14 +54,12 @@ public enum Permissions
     UPDATEOTHER("imageonmap.updateother"),
     ADMINISTRATIVE("imageonmap.administrative"),
     BYPASS_SIZE("imageonmap.bypasssize"),
-    GIVE("imageonmap.give")
-    ;
+    GIVE("imageonmap.give");
 
     private final String permission;
     private final String[] aliases;
 
-    Permissions(String permission, String... aliases)
-    {
+    Permissions(String permission, String... aliases) {
         this.permission = permission;
         this.aliases = aliases;
     }
@@ -72,14 +70,16 @@ public enum Permissions
      * @param permissible The permissible to check.
      * @return {@code true} if this permission is granted to the permissible.
      */
-    public boolean grantedTo(Permissible permissible)
-    {
-        if (permissible.hasPermission(permission))
+    public boolean grantedTo(Permissible permissible) {
+        if (permissible.hasPermission(permission)) {
             return true;
+        }
 
-        for (String alias : aliases)
-            if (permissible.hasPermission(alias))
+        for (String alias : aliases) {
+            if (permissible.hasPermission(alias)) {
                 return true;
+            }
+        }
 
         return false;
     }
