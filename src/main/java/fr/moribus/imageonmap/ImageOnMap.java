@@ -46,7 +46,6 @@ import fr.moribus.imageonmap.commands.maptool.GetOtherCommand;
 import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
 import fr.moribus.imageonmap.commands.maptool.GiveCommand;
 import fr.moribus.imageonmap.commands.maptool.ListCommand;
-import fr.moribus.imageonmap.commands.maptool.ListOtherCommand;
 import fr.moribus.imageonmap.commands.maptool.MigrateCommand;
 import fr.moribus.imageonmap.commands.maptool.NewCommand;
 import fr.moribus.imageonmap.commands.maptool.RenameCommand;
@@ -74,6 +73,7 @@ public final class ImageOnMap extends QuartzPlugin {
     private static ImageOnMap plugin;
     private final File mapsDirectory;
     private File imagesDirectory;
+    private CommandWorkers commandWorker;
 
     public ImageOnMap() {
         imagesDirectory = new File(this.getDataFolder(), IMAGES_DIRECTORY_NAME);
@@ -97,6 +97,9 @@ public final class ImageOnMap extends QuartzPlugin {
         return new File(imagesDirectory, "map" + mapID + ".png");
     }
 
+    public CommandWorkers getCommandWorker() {
+        return commandWorker;
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -113,9 +116,9 @@ public final class ImageOnMap extends QuartzPlugin {
 
 
         saveDefaultConfig();
-
+        commandWorker = loadComponent(CommandWorkers.class);
         loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class,
-                ImageRendererExecutor.class, CommandWorkers.class);
+                ImageRendererExecutor.class);
 
         //Init all the things !
         I18n.setPrimaryLocale(PluginConfiguration.LANG.get());
@@ -129,7 +132,6 @@ public final class ImageOnMap extends QuartzPlugin {
                 "maptool",
                 NewCommand.class,
                 ListCommand.class,
-                ListOtherCommand.class,
                 GetCommand.class,
                 GetOtherCommand.class,
                 RenameCommand.class,

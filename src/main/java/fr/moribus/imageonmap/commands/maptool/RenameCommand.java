@@ -42,7 +42,6 @@ public class RenameCommand extends IoMCommand {
             return;
         }
 
-
         ImageMap map = MapManager.getMap(playerSender().getUniqueId(), argList.get(0));
         if (map == null) {
             error(I.t("This map does not exist."));
