@@ -36,11 +36,15 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
+import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
+import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -49,11 +53,46 @@ import org.bukkit.entity.Player;
 public class GetCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
-        Player player = playerSender();
-        if (getMapFromArgs().give(player)) {
-            info(I.t("The requested map was too big to fit in your inventory."));
-            info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+        ArrayList<String> arguments = getArgs();
+        if (arguments.size() > 2) {
+            warning(I.t("Too many parameters! Usage: /maptool getother [playername] <mapname>"));
+            return;
         }
+
+        final String playerName;
+        final String mapName;
+        final Player sender = playerSender();
+        if (arguments.size() == 2) {
+            if (!Permissions.GETOTHER.grantedTo(sender)) {
+                info(sender, I.t("You can't use this command"));
+                return;
+            }
+
+            playerName = arguments.get(0);
+            mapName = arguments.get(1);
+        } else {
+            playerName = sender.getName();
+            mapName = arguments.get(0);
+        }
+
+        //TODO passer en static
+        ImageOnMap.getPlugin().getCommandWorker().OfflineNameFetch(playerName, uuid -> {
+            if (uuid == null) {
+                info(sender, I.t("The player {0} does not exist.", playerName));
+                return;
+            }
+            ImageMap map = MapManager.getMap(uuid, mapName);
+
+            if (map == null) {
+                info(sender, I.t("This map does not exist."));
+                return;
+            }
+
+            if (map.give(sender)) {
+                info(I.t("The requested map was too big to fit in your inventory."));
+                info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+            }
+        });
     }
 
     @Override

@@ -42,7 +42,6 @@ import fr.moribus.imageonmap.commands.maptool.DeleteOtherCommand;
 import fr.moribus.imageonmap.commands.maptool.ExploreCommand;
 import fr.moribus.imageonmap.commands.maptool.ExploreOtherCommand;
 import fr.moribus.imageonmap.commands.maptool.GetCommand;
-import fr.moribus.imageonmap.commands.maptool.GetOtherCommand;
 import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
 import fr.moribus.imageonmap.commands.maptool.GiveCommand;
 import fr.moribus.imageonmap.commands.maptool.ListCommand;
@@ -133,7 +132,6 @@ public final class ImageOnMap extends QuartzPlugin {
                 NewCommand.class,
                 ListCommand.class,
                 GetCommand.class,
-                GetOtherCommand.class,
                 RenameCommand.class,
                 DeleteCommand.class,
                 DeleteOtherCommand.class,
