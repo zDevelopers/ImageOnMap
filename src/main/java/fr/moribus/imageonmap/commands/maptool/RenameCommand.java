@@ -25,59 +25,12 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.command.CommandSender;
 
 @CommandInfo(name = "rename", usageParameters = "<original map name> <new map name>")
 public class RenameCommand extends IoMCommand {
-
-    private ArrayList<String> getArgs() {
-        ArrayList<String> arguments = new ArrayList<>();
-
-        //State of the automaton, can read word like:
-        //name_here; "name here"
-        int state = 0;
-        StringBuilder s = new StringBuilder();
-        for (String arg : args) {
-
-            PluginLogger.info("arg  " + arg);
-            switch (state) {
-                case 0:
-                    if (arg.startsWith("\"")) {
-                        PluginLogger.info("start with ");
-                        state = 1;
-                        arg = arg.substring(1);
-
-                        s = s.append(arg);
-                    } else {
-                        PluginLogger.info("not start with ");
-                        arguments.add(arg.toString());
-                    }
-                    break;
-                case 1:
-                    if (arg.endsWith("\"")) {
-                        PluginLogger.info("end with ");
-                        arg = arg.substring(0, arg.length() - 1);
-                        s = s.append(" " +   arg);
-                        arguments.add(s.toString());
-                        s = new StringBuilder();
-                        state = 0;
-                    } else {
-                        PluginLogger.info("not end with ");
-                        s = s.append(" " + arg);
-                    }
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + state);
-            }
-            //arguments.add(arg.toString());
-
-
-        }
-        return arguments;
-    }
 
     @Override
     protected void run() throws CommandException {

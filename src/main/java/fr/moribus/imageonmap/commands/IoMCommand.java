@@ -53,6 +53,43 @@ public abstract class IoMCommand extends Command {
         return getMapFromArgs(playerSender(), 0, true);
     }
 
+    protected ArrayList<String> getArgs() {
+        ArrayList<String> arguments = new ArrayList<>();
+
+        //State of the automaton, can read word like:
+        //name_here; "name here"
+        int state = 0;
+        StringBuilder s = new StringBuilder();
+        for (String arg : args) {
+            switch (state) {
+                case 0:
+                    if (arg.startsWith("\"")) {
+                        state = 1;
+                        arg = arg.substring(1);
+
+                        s = s.append(arg);
+                    } else {
+                        arguments.add(arg.toString());
+                    }
+                    break;
+                case 1:
+                    if (arg.endsWith("\"")) {
+                        arg = arg.substring(0, arg.length() - 1);
+                        s = s.append(" " +   arg);
+                        arguments.add(s.toString());
+                        s = new StringBuilder();
+                        state = 0;
+                    } else {
+                        s = s.append(" " + arg);
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + state);
+            }
+        }
+        return arguments;
+    }
+
     //TODO:Add the quote system to zlib and refactor this
     protected ImageMap getMapFromArgs(Player player, int index) throws CommandException {
         if (args.length <= index) {
