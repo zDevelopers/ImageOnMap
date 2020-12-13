@@ -58,7 +58,7 @@ public class ExploreCommand extends IoMCommand {
     protected void run() throws CommandException {
         ArrayList<String> arguments = getArgs();
         if (arguments.size() > 1) {
-            warning(I.t("Too many parameters! Usage: /maptool get [playername] <mapname>"));
+            warning(I.t("Too many parameters! Usage: /maptool explore [playername]"));
             return;
         }
         final String playerName;
