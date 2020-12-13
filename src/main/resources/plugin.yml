@@ -32,11 +32,11 @@ permissions:
       imageonmap.rename: true
       imageonmap.removesplattermap: true
       imageonmap.delete: true
-      imageonmap.deleteother: false
+      imageonmap.deleteother: true
       imageonmap.bypasssize: false
       imageonmap.give: false
       imageonmap.update: true
-      imageonmap.updateother: false
+      imageonmap.updateother: true
 
   imageonmap.userender:
     description: "Allows you to use /tomap and related commands (/maptool getremaining). Alias of imageonmap.new."
