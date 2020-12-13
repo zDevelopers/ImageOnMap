@@ -143,7 +143,7 @@ public final class ImageOnMap extends QuartzPlugin {
 
         Commands.registerShortcut("maptool", NewCommand.class, "tomap");
         Commands.registerShortcut("maptool", ExploreCommand.class, "maps");
-        Commands.registerShortcut("maptool", GiveCommand.class, "mapgive");
+        Commands.registerShortcut("maptool", GiveCommand.class, "givemap");
 
         if (PluginConfiguration.CHECK_FOR_UPDATES.get()) {
             UpdateChecker.boot("imageonmap.26585");

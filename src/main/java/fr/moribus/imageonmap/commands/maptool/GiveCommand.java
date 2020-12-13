@@ -36,6 +36,7 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
@@ -43,6 +44,9 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.mojang.UUIDFetcher;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -54,14 +58,14 @@ import org.bukkit.entity.Player;
 public class GiveCommand extends IoMCommand {
 
     //TODO passer avec une reconnaissance player/UUID, par défaut
+
     /**
      * Parse an argument given at a specific index, it will return a player depending on the given prefixe.
      * Can be player:< username > or uuid:< uuid >
      *
      * @param index The index.
      * @return The retrieved player.
-     * @throws CommandException     If the value is invalid.
-     *
+     * @throws CommandException If the value is invalid.
      */
     private OfflinePlayer parse(int index) throws CommandException {
 
@@ -119,26 +123,64 @@ public class GiveCommand extends IoMCommand {
             throwInvalidArgument(I.t("You must give a valid player name and a map name."));
         }
 
-        final Player p = getPlayerParameter(0);
-
-        ImageMap map;
-        //TODO add support for map name with spaces "cool name" or name or "name" "cool name with a \" and some stuff"
-        // should work
-        OfflinePlayer player = null;
-
-        if (args.length < 4) {
-            if (args.length == 2) {
-                player = playerSender();
-            }
-            if (args.length == 3) {
-                player = parse(2);
-            }
-            map = MapManager.getMap(player.getUniqueId(), args[1]);
-            if (map == null) {
-                throwInvalidArgument(I.t("Map not found"));
-            }
-            map.give(p);
+        ArrayList<String> arguments = getArgs();
+        if (arguments.size() > 3) {
+            warning(I.t("Too many parameters! Usage: /maptool give [playerFrom] <playername> <mapname>"));
+            return;
         }
+        if (arguments.size() < 1) {
+            warning(I.t("Too few parameters! Usage: /maptool give [playerFrom] <playername> <mapname>"));
+            return;
+        }
+        final String mapName;
+        final String from;
+        final String playerName;
+        final Player sender = playerSender();
+        if (arguments.size() == 2) {
+            from = sender.getName();
+            playerName = arguments.get(0);
+            mapName = arguments.get(1);
+        } else {
+            if (arguments.size() == 3) {
+                from = arguments.get(0);
+                playerName = arguments.get(1);
+                mapName = arguments.get(2);
+            } else {
+                from = "";
+                playerName = "";
+                mapName = "";
+            }
+        }
+
+        //TODO passer en static
+        ImageOnMap.getPlugin().getCommandWorker().OfflineNameFetch(from, uuid -> {
+            if (uuid == null) {
+                info(sender, I.t("The player {0} does not exist.", from));
+                return;
+            }
+            final ImageMap map = MapManager.getMap(uuid, mapName);
+
+            if (map == null) {
+                info(sender, I.t("This map does not exist."));
+                return;
+            }
+            try {
+                UUID uuid2 = UUIDFetcher.fetch(playerName);
+                if (uuid2 == null) {
+                    info(sender, I.t("The player {0} does not exist.", playerName));
+                    return;
+                }
+                if (map.give(Bukkit.getPlayer(uuid2))) {
+                    info(I.t("The requested map was too big to fit in your inventory."));
+                    info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+                }
+
+            } catch (IOException | InterruptedException e) {
+                info(sender, I.t("The player {0} does not exist.", playerName));
+                return;
+            }
+        });
+
     }
 
     @Override
