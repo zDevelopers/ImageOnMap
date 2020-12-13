@@ -55,7 +55,11 @@ public class GetCommand extends IoMCommand {
     protected void run() throws CommandException {
         ArrayList<String> arguments = getArgs();
         if (arguments.size() > 2) {
-            warning(I.t("Too many parameters! Usage: /maptool getother [playername] <mapname>"));
+            warning(I.t("Too many parameters! Usage: /maptool get [playername] <mapname>"));
+            return;
+        }
+        if (arguments.size() < 1) {
+            warning(I.t("Too few parameters! Usage: /maptool get [playername] <mapname>"));
             return;
         }
 
