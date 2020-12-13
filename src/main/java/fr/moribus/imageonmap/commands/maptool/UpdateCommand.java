@@ -36,6 +36,7 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
@@ -51,28 +52,87 @@ import fr.zcraft.quartzlib.tools.text.ActionBar;
 import fr.zcraft.quartzlib.tools.text.MessageSender;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "update", usageParameters = "<new url> [stretched|covered] \"<map name to update>\"")
+@CommandInfo(name = "update", usageParameters = "[playername] <new url> [stretched|covered] <map name to update>")
 public class UpdateCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
-        final Player player = playerSender();
-        ImageUtils.ScalingType scaling;
 
-        URL url;
-
-        if (args.length < 1) {
-            throwInvalidArgument(I.t("You must give an URL and a map name to update."));
+        ArrayList<String> arguments = getArgs();
+        String warningMsg;
+        if (arguments.size() > 4) {
+            warningMsg = "Too many parameters!"
+                    + " Usage: /maptool update [playername] <new url> [stretched|covered] <mapname>";
+            warning(I.t(warningMsg));
+            return;
         }
-        if (args.length < 2) {
-            throwInvalidArgument(I.t("You must give a map name to update."));
+        if (arguments.size() < 2) {
+            warningMsg =
+                    "Too few parameters! Usage: /maptool update [playername] <new url> [stretched|covered] <mapname>";
+            warning(I.t(warningMsg));
+            return;
+        }
+        final String playerName;
+        final String mapName;
+        final String url;
+        final String resize;
+        final Player sender = playerSender();
+
+
+        if (arguments.size() == 2) {
+            resize = "";
+            playerName = sender.getName();
+            mapName = arguments.get(1);
+            url = arguments.get(0);
+        } else {
+            if (arguments.size() == 4) {
+                if (!Permissions.UPDATEOTHER.grantedTo(sender)) {
+                    info(sender, I.t("You can't use this command"));
+                    return;
+                }
+
+                playerName = arguments.get(0);
+                url = arguments.get(1);
+                resize = arguments.get(2);
+                mapName = arguments.get(3);
+            } else {
+                if (arguments.size() == 3) {
+                    if (arguments.get(1).equals("covered") || arguments.get(1).equals("stretched")) {
+
+                        playerName = sender.getName();
+                        url = arguments.get(0);
+                        resize = arguments.get(1);
+                        mapName = arguments.get(2);
+
+                    } else {
+                        if (!Permissions.UPDATEOTHER.grantedTo(sender)) {
+                            info(sender, I.t("You can't use this command"));
+                            return;
+                        }
+                        playerName = arguments.get(0);
+                        url = arguments.get(1);
+                        resize = "";
+                        mapName = arguments.get(2);
+                    }
+                } else {
+                    resize = "";
+                    playerName = "";
+                    url = "";
+                    mapName = "";
+                }
+            }
         }
 
-        switch (args[1]) {
+
+        final ImageUtils.ScalingType scaling;
+
+
+        switch (resize) {
 
             case "stretched":
                 scaling = ImageUtils.ScalingType.STRETCHED;
@@ -83,50 +143,65 @@ public class UpdateCommand extends IoMCommand {
             default:
                 scaling = ImageUtils.ScalingType.CONTAINED;
         }
-        ImageMap map;
-        if (scaling.equals(ImageUtils.ScalingType.CONTAINED)) {
-            map = getMapFromArgs(player, 1);
-        } else {
-            map = getMapFromArgs(player, 2);
-        }
-        try {
-            url = new URL(args[0]);
-            MapManager.load();
 
-            Integer[] size = {1, 1};
-            if (map.getType() == ImageMap.Type.POSTER) {
-                size = map.getSize(new HashMap<String, Object>(), map.getUserUUID(), map.getId());
+
+        //TODO passer en static
+        ImageOnMap.getPlugin().getCommandWorker().OfflineNameFetch(playerName, uuid -> {
+            if (uuid == null) {
+                info(sender, I.t("The player {0} does not exist.", playerName));
+                return;
             }
-            //assert size != null;
-            int width = size[0];
-            int height = size[1];
+            ImageMap map = MapManager.getMap(uuid, mapName);
+
+            if (map == null) {
+                info(sender, I.t("This map does not exist."));
+                return;
+            }
+
+            URL url1;
             try {
-                ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Updating..."));
-                ImageRendererExecutor
-                        .update(url, scaling, player.getUniqueId(), map, width, height, new WorkerCallback<ImageMap>() {
-                            @Override
-                            public void finished(ImageMap result) {
-                                ActionBar.removeMessage(player);
-                                MessageSender.sendActionBarMessage(player,
-                                        ChatColor.DARK_GREEN + I.t("The map was updated using the new image!"));
-                            }
+                url1 = new URL(url);
+                MapManager.load();
 
-                            @Override
-                            public void errored(Throwable exception) {
-                                player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
+                Integer[] size = {1, 1};
+                if (map.getType() == ImageMap.Type.POSTER) {
+                    size = map.getSize(new HashMap<String, Object>(), map.getUserUUID(), map.getId());
+                }
+                //assert size != null;
+                int width = size[0];
+                int height = size[1];
+                try {
+                    ActionBar.sendPermanentMessage(sender, ChatColor.DARK_GREEN + I.t("Updating..."));
+                    ImageRendererExecutor
+                            .update(url1, scaling, uuid, map, width, height, new WorkerCallback<ImageMap>() {
+                                @Override
+                                public void finished(ImageMap result) {
+                                    ActionBar.removeMessage(sender);
+                                    MessageSender.sendActionBarMessage(sender,
+                                            ChatColor.DARK_GREEN + I.t("The map was updated using the new image!"));
+                                }
 
-                                PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
-                                        player.getName(),
-                                        exception.getClass().getCanonicalName(),
-                                        exception.getMessage());
-                            }
-                        });
-            } finally {
-                ActionBar.removeMessage(player);
+                                @Override
+                                public void errored(Throwable exception) {
+                                    sender.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
+
+                                    PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
+                                            sender.getName(),
+                                            exception.getClass().getCanonicalName(),
+                                            exception.getMessage());
+                                }
+                            });
+                } finally {
+                    ActionBar.removeMessage(sender);
+                }
+            } catch (MalformedURLException ex) {
+                warning(sender, I.t("Invalid URL."));
             }
-        } catch (MalformedURLException ex) {
-            throwInvalidArgument(I.t("Invalid URL."));
-        }
+
+
+        });
+
+
     }
 
     @Override
