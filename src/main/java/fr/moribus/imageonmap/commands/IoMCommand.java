@@ -43,56 +43,10 @@ import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.i18n.I;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.bukkit.entity.Player;
 
 
 public abstract class IoMCommand extends Command {
-    //TODO:Add the quote system to zlib and refactor this
-    protected ImageMap getMapFromArgs(Player player, int index) throws CommandException {
-        if (args.length <= index) {
-            throwInvalidArgument(I.t("You need to give a map name."));
-        }
-
-
-        StringBuilder mapName = new StringBuilder(args[index]);
-        for (int i = index + 1, c = args.length; i < c; i++) {
-            mapName.append(" ").append(args[i]);
-        }
-        String regex = "((\"([^\\\"]*(\\\\\\\")*)*([^\\\\\\\"]\"))|([^\\\"\\s\\\\]*(\\\\\\s)*[\\\\]*)*\"?)";
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(mapName.toString());
-
-        StringBuilder result = new StringBuilder();
-
-        //matcher.find();
-        result.append(matcher.group(0));
-        if (result != null) {
-            if (result.charAt(0) == '\"') {
-                if (result.length() == 1) {
-                    result.deleteCharAt(0);
-                } else if (result.charAt(result.length() - 1) == '\"') {
-                    result = result.deleteCharAt(result.length() - 1);
-                    if (result != null && !result.equals("") && result.charAt(0) == '\"') {
-                        mapName = new StringBuilder(result.deleteCharAt(0).toString());
-                    }
-
-                }
-            }
-        }
-
-
-        mapName = new StringBuilder(mapName.toString().trim());
-        ImageMap map;
-        map = MapManager.getMap(player.getUniqueId(), mapName.toString());
-
-        if (map == null) {
-            error(I.t("This map does not exist."));
-        }
-        return map;
-    }
 
     protected ImageMap getMapFromArgs() throws CommandException {
         return getMapFromArgs(playerSender(), 0, true);
