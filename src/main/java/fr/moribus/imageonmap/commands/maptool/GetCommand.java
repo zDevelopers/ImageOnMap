@@ -93,12 +93,12 @@ public class GetCommand extends IoMCommand {
                 //insert bank support after
                 info(sender, I.t("Error in the prefix used, valid ones are ['p:']"));
                 return;
-            //break;
+                //break;
             default:
                 playerName = "Error found";
                 mapName = "Error found";
         }
-        
+
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().OfflineNameFetch(playerName, uuid -> {
             if (uuid == null) {

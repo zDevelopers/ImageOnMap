@@ -34,6 +34,7 @@ permissions:
       imageonmap.delete: true
       imageonmap.deleteother: true
       imageonmap.bypasssize: false
+      imageonmap.bypassmapnumber: false
       imageonmap.give: false
       imageonmap.update: true
       imageonmap.updateother: true
@@ -96,6 +97,10 @@ permissions:
 
   imageonmap.bypasssize:
     description: "Allows you to create maps larger than the configured limit."
+    default: op
+
+  imageonmap.bypassmapnumber:
+    description: "Allows you to create more maps than the configured limit."
     default: op
 
   imageonmap.update:

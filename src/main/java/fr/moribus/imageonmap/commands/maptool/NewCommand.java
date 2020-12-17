@@ -124,7 +124,7 @@ public class NewCommand extends IoMCommand {
                                     exception.getClass().getCanonicalName(),
                                     exception.getMessage());
                         }
-                    });
+                    },playerSender());
         } finally {
             ActionBar.removeMessage(player);
         }

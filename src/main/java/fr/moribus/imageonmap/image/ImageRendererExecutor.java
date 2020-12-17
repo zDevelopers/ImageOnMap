@@ -56,6 +56,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import javax.imageio.ImageIO;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 @WorkerAttributes(name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker {
@@ -92,7 +93,7 @@ public class ImageRendererExecutor extends Worker {
     }
 
     public static void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID,
-                              final int width, final int height, WorkerCallback<ImageMap> callback) {
+                              final int width, final int height, WorkerCallback<ImageMap> callback, Player sender) {
         submitQuery(new WorkerRunnable<ImageMap>() {
             @Override
             public ImageMap run() throws Throwable {
@@ -144,14 +145,15 @@ public class ImageRendererExecutor extends Worker {
                 // Limits are in place and the player does NOT have rights to avoid them.
                 checkSizeLimit(playerUUID, image);
                 if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1) {
-                    ImageMap ret = renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
+                    ImageMap ret =
+                            renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID, sender);
                     image.flush();//Safe to free
                     return ret;
                 }
                 final BufferedImage resizedImage =
                         scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
                 image.flush();//Safe to free
-                return renderPoster(resizedImage, playerUUID);
+                return renderPoster(resizedImage, playerUUID, sender);
             }
         }, callback);
     }
@@ -204,7 +206,8 @@ public class ImageRendererExecutor extends Worker {
         });
     }
 
-    private static ImageMap renderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable {
+    private static ImageMap renderSingle(final BufferedImage image, final UUID playerUUID, Player sender)
+            throws Throwable {
         MapManager.checkMapLimit(1, playerUUID);
         final Future<Integer> futureMapID = submitToMainThread(new Callable<Integer>() {
             @Override
@@ -222,10 +225,12 @@ public class ImageRendererExecutor extends Worker {
                 return null;
             }
         });
-        return MapManager.createMap(playerUUID, mapID);
+
+        return MapManager.createMap(playerUUID, mapID, sender);
     }
 
-    private static ImageMap renderPoster(final BufferedImage image, final UUID playerUUID) throws Throwable {
+    private static ImageMap renderPoster(final BufferedImage image, final UUID playerUUID, Player sender)
+            throws Throwable {
         final PosterImage poster = new PosterImage(image);
         final int mapCount = poster.getImagesCount();
         MapManager.checkMapLimit(mapCount, playerUUID);
@@ -254,7 +259,7 @@ public class ImageRendererExecutor extends Worker {
 
         });
         poster.getImage().flush();//Safe to free
-        return MapManager.createMap(poster, playerUUID, mapsIDs);
+        return MapManager.createMap(poster, playerUUID, mapsIDs, sender);
     }
 
     private enum Extension {

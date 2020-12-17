@@ -54,6 +54,7 @@ public enum Permissions {
     UPDATEOTHER("imageonmap.updateother"),
     ADMINISTRATIVE("imageonmap.administrative"),
     BYPASS_SIZE("imageonmap.bypasssize"),
+    BYPASS_MAP_NUMBER("imageonmap.bypassmapnumber"),
     GIVE("imageonmap.give");
 
     private final String permission;

@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -100,13 +101,14 @@ public abstract class MapManager {
         return false;
     }
 
-    public static ImageMap createMap(UUID playerUUID, int mapID) throws MapManagerException {
+    public static ImageMap createMap(UUID playerUUID, int mapID, Player sender) throws MapManagerException {
         ImageMap newMap = new SingleMap(playerUUID, mapID);
         addMap(newMap);
         return newMap;
     }
 
-    public static ImageMap createMap(PosterImage image, UUID playerUUID, int[] mapsIDs) throws MapManagerException {
+    public static ImageMap createMap(PosterImage image, UUID playerUUID, int[] mapsIDs, Player sender)
+            throws MapManagerException {
         ImageMap newMap;
 
         if (image.getImagesCount() == 1) {
@@ -143,6 +145,10 @@ public abstract class MapManager {
 
     public static void addMap(ImageMap map) throws MapManagerException {
         getPlayerMapStore(map.getUserUUID()).addMap(map);
+    }
+
+    public static void addMap(ImageMap map, Player sender) throws MapManagerException {
+        getPlayerMapStore(map.getUserUUID()).addMap(map, sender);
     }
 
     public static void insertMap(ImageMap map) {

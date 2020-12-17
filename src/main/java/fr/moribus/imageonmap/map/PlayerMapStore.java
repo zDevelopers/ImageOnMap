@@ -37,6 +37,7 @@
 package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.MapManagerException.Reason;
 import fr.zcraft.quartzlib.tools.PluginLogger;
@@ -53,6 +54,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class PlayerMapStore implements ConfigurationSerializable {
@@ -92,10 +94,16 @@ public class PlayerMapStore implements ConfigurationSerializable {
         return false;
     }
 
+    public synchronized void addMap(ImageMap map, Player sender) throws MapManagerException {
+        checkMapLimit(map, sender);
+        insertMap(map);
+    }
+
     public synchronized void addMap(ImageMap map) throws MapManagerException {
         checkMapLimit(map);
         insertMap(map);
     }
+
 
     public synchronized void insertMap(ImageMap map) {
         add_Map(map);
@@ -166,8 +174,24 @@ public class PlayerMapStore implements ConfigurationSerializable {
         checkMapLimit(map.getMapCount());
     }
 
+    public void checkMapLimit(ImageMap map, Player sender) throws MapManagerException {
+        checkMapLimit(map.getMapCount(), sender);
+    }
+
     public void checkMapLimit(int newMapsCount) throws MapManagerException {
+        checkMapLimit(newMapsCount, null);
+    }
+
+    public void checkMapLimit(int newMapsCount, Player player) throws MapManagerException {
         int limit = PluginConfiguration.MAP_PLAYER_LIMIT.get();
+
+        if (player != null && Permissions.BYPASS_MAP_NUMBER.grantedTo(player)) {
+            PluginLogger.info("" + Permissions.BYPASS_MAP_NUMBER.grantedTo(player));
+            return;
+        }
+        if (player != null) {
+            PluginLogger.info("" + Permissions.BYPASS_MAP_NUMBER.grantedTo(player));
+        }
         if (limit <= 0) {
             return;
         }
