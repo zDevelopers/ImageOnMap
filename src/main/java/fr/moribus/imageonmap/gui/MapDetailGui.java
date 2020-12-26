@@ -46,7 +46,7 @@ import fr.zcraft.quartzlib.components.gui.Gui;
 import fr.zcraft.quartzlib.components.gui.GuiAction;
 import fr.zcraft.quartzlib.components.gui.PromptGui;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.Callback;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Material;
@@ -60,6 +60,8 @@ public class MapDetailGui extends ExplorerGui<Integer> {
     private String name;
 
     public MapDetailGui(ImageMap map, OfflinePlayer p, String name) {
+        super();
+        PluginLogger.info("MapdetailGUI constructor");
         this.map = map;
         this.offplayer = p;
         this.name = name;
@@ -207,22 +209,19 @@ public class MapDetailGui extends ExplorerGui<Integer> {
             return;
         }
 
-        PromptGui.prompt(getPlayer(), new Callback<String>() {
-            @Override
-            public void call(String newName) {
-                if (!Permissions.RENAME.grantedTo(getPlayer())) {
-                    I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
-                    return;
-                }
-
-                if (newName == null || newName.isEmpty()) {
-                    I.sendT(getPlayer(), "{ce}Map names can't be empty.");
-                    return;
-                }
-
-                map.rename(newName);
-                I.sendT(getPlayer(), "{cs}Map successfully renamed.");
+        PromptGui.prompt(getPlayer(), newName -> {
+            if (!Permissions.RENAME.grantedTo(getPlayer())) {
+                I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
+                return;
             }
+
+            if (newName == null || newName.isEmpty()) {
+                I.sendT(getPlayer(), "{ce}Map names can't be empty.");
+                return;
+            }
+
+            map.rename(newName);
+            I.sendT(getPlayer(), "{cs}Map successfully renamed.");
         }, map.getName(), this);
     }
 

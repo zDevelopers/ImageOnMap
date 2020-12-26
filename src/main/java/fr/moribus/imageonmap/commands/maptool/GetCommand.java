@@ -100,7 +100,7 @@ public class GetCommand extends IoMCommand {
         }
         
         //TODO passer en static
-        ImageOnMap.getPlugin().getCommandWorker().OfflineNameFetch(playerName, uuid -> {
+        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
             if (uuid == null) {
                 info(sender, I.t("The player {0} does not exist.", playerName));
                 return;

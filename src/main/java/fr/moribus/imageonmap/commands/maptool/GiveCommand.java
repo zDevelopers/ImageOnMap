@@ -93,7 +93,7 @@ public class GiveCommand extends IoMCommand {
         }
 
         //TODO passer en static
-        ImageOnMap.getPlugin().getCommandWorker().OfflineNameFetch(from, uuid -> {
+        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(from, uuid -> {
             if (uuid == null) {
                 info(sender, I.t("The player {0} does not exist.", from));
                 return;

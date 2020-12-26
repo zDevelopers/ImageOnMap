@@ -43,8 +43,10 @@ import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.core.QuartzLib;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.items.ItemUtils;
+import fr.zcraft.quartzlib.tools.runners.RunTask;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Queue;
@@ -206,6 +208,7 @@ public class MapItemManager implements Listener {
     }
 
     //
+
     /**
      * Returns the item to place to display the (col;row) part of the given poster.
      *
@@ -249,8 +252,10 @@ public class MapItemManager implements Listener {
         if (!MapManager.managesMap(mapItem)) {
             return;
         }
-
+        frame.setItem(new ItemStack(Material.AIR));
+        PluginLogger.info("map iom placed");
         if (SplatterMapManager.hasSplatterAttributes(mapItem)) {
+
             if (!SplatterMapManager.placeSplatterMap(frame, player, event)) {
                 event.setCancelled(true); //In case of an error allow to cancel map placement
                 return;
@@ -258,6 +263,8 @@ public class MapItemManager implements Listener {
             if (frame.getFacing() != BlockFace.UP && frame.getFacing() != BlockFace.DOWN) {
                 frame.setRotation(Rotation.NONE.rotateCounterClockwise());
             }
+
+            PluginLogger.info("splatter map");
         } else {
             if (frame.getFacing() != BlockFace.UP && frame.getFacing() != BlockFace.DOWN) {
                 frame.setRotation(Rotation.NONE.rotateCounterClockwise());
@@ -266,16 +273,26 @@ public class MapItemManager implements Listener {
             // If it is not displayed on hover on the wall.
             if (mapItem.hasItemMeta() && mapItem.getItemMeta().hasDisplayName()
                     && mapItem.getItemMeta().getDisplayName().startsWith("§6")) {
-
+                //runtask
+                //TODO utiliser run task.later pour essayer de regler le pb d'itemframe bas gauche sans carte
                 final ItemStack frameItem = mapItem.clone();
                 final ItemMeta meta = frameItem.getItemMeta();
 
                 meta.setDisplayName(null);
                 frameItem.setItemMeta(meta);
+                PluginLogger.info("test1");
+                RunTask.later(() -> {
+                    frame.setItem(frameItem);
+                    frame.setRotation(Rotation.NONE);
+                }, 5L);
 
-                frame.setItem(frameItem);
             } else {
-                frame.setItem(mapItem);
+                PluginLogger.info("test2");
+                frame.setRotation(Rotation.NONE);
+                RunTask.later(() -> {
+                    frame.setItem(mapItem);
+                }, 5L);
+
             }
 
         }
