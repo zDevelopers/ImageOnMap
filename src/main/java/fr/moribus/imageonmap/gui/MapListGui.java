@@ -47,7 +47,6 @@ import fr.moribus.imageonmap.ui.SplatterMapManager;
 import fr.zcraft.quartzlib.components.gui.ExplorerGui;
 import fr.zcraft.quartzlib.components.gui.Gui;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -61,13 +60,11 @@ public class MapListGui extends ExplorerGui<ImageMap> {
     private String name;
 
     public MapListGui(OfflinePlayer sender) {
-        PluginLogger.info("MaplistGUI constructor");
         this.offplayer = sender;
         this.name = sender.getName();
     }
 
     public MapListGui(OfflinePlayer p, String name) {
-        PluginLogger.info("MaplistGUI constructor");
         this.offplayer = p;
         this.name = name;
     }
@@ -171,7 +168,6 @@ public class MapListGui extends ExplorerGui<ImageMap> {
     protected void onUpdate() {
         ImageMap[] maps = MapManager.getMaps(offplayer.getUniqueId());
         setData(maps);
-        PluginLogger.info("on update MaplistGUI");
         /// The maps list GUI title
         //Equal if the person who send the command is the owner of the mapList
         if (offplayer.getUniqueId().equals(getPlayer().getUniqueId())) {

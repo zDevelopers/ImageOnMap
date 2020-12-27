@@ -43,7 +43,6 @@ import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.core.QuartzLib;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.items.ItemUtils;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
@@ -253,7 +252,6 @@ public class MapItemManager implements Listener {
             return;
         }
         frame.setItem(new ItemStack(Material.AIR));
-        PluginLogger.info("map iom placed");
         if (SplatterMapManager.hasSplatterAttributes(mapItem)) {
 
             if (!SplatterMapManager.placeSplatterMap(frame, player, event)) {
@@ -261,13 +259,13 @@ public class MapItemManager implements Listener {
                 return;
             }
             if (frame.getFacing() != BlockFace.UP && frame.getFacing() != BlockFace.DOWN) {
-                frame.setRotation(Rotation.NONE.rotateCounterClockwise());
+                frame.setRotation(Rotation.NONE);
             }
+            frame.setRotation(Rotation.NONE);
 
-            PluginLogger.info("splatter map");
         } else {
             if (frame.getFacing() != BlockFace.UP && frame.getFacing() != BlockFace.DOWN) {
-                frame.setRotation(Rotation.NONE.rotateCounterClockwise());
+                frame.setRotation(Rotation.NONE);
             }
             // If the item has a display name, bot not one from an anvil by the player, we remove it
             // If it is not displayed on hover on the wall.
@@ -280,14 +278,12 @@ public class MapItemManager implements Listener {
 
                 meta.setDisplayName(null);
                 frameItem.setItemMeta(meta);
-                PluginLogger.info("test1");
                 RunTask.later(() -> {
                     frame.setItem(frameItem);
                     frame.setRotation(Rotation.NONE);
                 }, 5L);
 
             } else {
-                PluginLogger.info("test2");
                 frame.setRotation(Rotation.NONE);
                 RunTask.later(() -> {
                     frame.setItem(mapItem);

@@ -46,8 +46,8 @@ import fr.zcraft.quartzlib.components.gui.Gui;
 import fr.zcraft.quartzlib.components.gui.GuiAction;
 import fr.zcraft.quartzlib.components.gui.PromptGui;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
+import fr.zcraft.quartzlib.tools.runners.RunTask;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -61,7 +61,6 @@ public class MapDetailGui extends ExplorerGui<Integer> {
 
     public MapDetailGui(ImageMap map, OfflinePlayer p, String name) {
         super();
-        PluginLogger.info("MapdetailGUI constructor");
         this.map = map;
         this.offplayer = p;
         this.name = name;
@@ -219,10 +218,22 @@ public class MapDetailGui extends ExplorerGui<Integer> {
                 I.sendT(getPlayer(), "{ce}Map names can't be empty.");
                 return;
             }
+            if (newName.equals(map.getName())) {
+                return;
+            }
 
             map.rename(newName);
             I.sendT(getPlayer(), "{cs}Map successfully renamed.");
+
+            if (getParent() != null) {
+                RunTask.later(() -> Gui.open(getPlayer(), this), 1L);
+
+            } else {
+                close();
+            }
         }, map.getName(), this);
+
+
     }
 
     @GuiAction("delete")
