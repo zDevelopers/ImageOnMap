@@ -82,32 +82,40 @@ public abstract class IoMCommand extends Command {
         //State of the automaton, can read word like:
         //name_here; "name here"
         int state = 0;
-        StringBuilder s = new StringBuilder();
-        for (String arg : args) {
-            switch (state) {
-                case 0:
-                    if (arg.startsWith("\"")) {
-                        state = 1;
-                        arg = arg.substring(1);
+        StringBuilder s;
 
-                        s = s.append(arg);
-                    } else {
-                        arguments.add(arg.toString());
-                    }
-                    break;
-                case 1:
-                    if (arg.endsWith("\"")) {
-                        arg = arg.substring(0, arg.length() - 1);
-                        s = s.append(" " + arg);
-                        arguments.add(s.toString());
-                        s = new StringBuilder();
-                        state = 0;
-                    } else {
-                        s = s.append(" " + arg);
-                    }
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + state);
+        for (String arg : args) {
+            s = new StringBuilder();
+            for (char c : arg.toCharArray()) {
+                switch (state) {
+                    case 0:
+                        if (c == '\"') {
+                            state = 1;
+                        } else {
+                            //If we read a : that means that we are on a new argument example:"hello"
+                            if (c == ':') {
+                                arguments.add(s.toString());
+                                s = new StringBuilder();
+                            } else {
+                                s = s.append(c);
+                            }
+                        }
+                        break;
+                    case 1:
+                        if (c == '\"') {
+                            arguments.add(s.toString());
+                            s = new StringBuilder();
+                            state = 0;
+                        } else {
+                            s = s.append(c);
+                        }
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + state);
+                }
+            }
+            if (s.length() > 0) {
+                arguments.add(s.toString());
             }
         }
         return arguments;

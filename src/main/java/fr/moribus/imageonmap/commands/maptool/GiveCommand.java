@@ -44,6 +44,7 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.mojang.UUIDFetcher;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
-@CommandInfo(name = "give", usageParameters = "[playerFrom] <playername> <mapname>")
+@CommandInfo(name = "give", usageParameters = "<playername> [playerFrom]:<mapname>")
 public class GiveCommand extends IoMCommand {
 
     @Override
@@ -64,26 +65,41 @@ public class GiveCommand extends IoMCommand {
         }
 
         ArrayList<String> arguments = getArgs();
+
+        for (String arg : arguments) {
+            PluginLogger.info(arg);
+        }
+
         if (arguments.size() > 3) {
-            warning(I.t("Too many parameters! Usage: /maptool give [playerFrom] <playername> <mapname>"));
+            warning(I.t("Too many parameters! Usage: /maptool give <playername> [playerFrom]:<mapname>"));
             return;
         }
         if (arguments.size() < 1) {
-            warning(I.t("Too few parameters! Usage: /maptool give [playerFrom] <playername> <mapname>"));
+            warning(I.t("Too few parameters! Usage: /maptool give <playername> [playerFrom]:<mapname>"));
             return;
         }
         final String mapName;
         final String from;
         final String playerName;
-        final Player sender = playerSender();
+        final Player playerSender;
+        Player playerSender1;
+        try {
+            playerSender1 = playerSender();
+        } catch (CommandException ignored) {
+            if (arguments.size() == 2) {
+                throwInvalidArgument(I.t("Usage: /maptool give <playername> <playerFrom>:<mapname>"));
+            }
+            playerSender1 = null;
+        }
+        playerSender = playerSender1;
         if (arguments.size() == 2) {
-            from = sender.getName();
+            from = playerSender.getName();
             playerName = arguments.get(0);
             mapName = arguments.get(1);
         } else {
             if (arguments.size() == 3) {
-                from = arguments.get(0);
-                playerName = arguments.get(1);
+                from = arguments.get(1);
+                playerName = arguments.get(0);
                 mapName = arguments.get(2);
             } else {
                 from = "";
@@ -93,21 +109,27 @@ public class GiveCommand extends IoMCommand {
         }
 
         //TODO passer en static
-        ImageOnMap.getPlugin().getCommandWorker().OfflineNameFetch(from, uuid -> {
+        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(from, uuid -> {
             if (uuid == null) {
-                info(sender, I.t("The player {0} does not exist.", from));
+                if (playerSender != null) {
+                    info(playerSender, I.t("The player {0} does not exist.", from));
+                }
                 return;
             }
             final ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
-                info(sender, I.t("This map does not exist."));
+                if (playerSender != null) {
+                    info(playerSender, I.t("This map does not exist."));
+                }
                 return;
             }
             try {
                 UUID uuid2 = UUIDFetcher.fetch(playerName);
                 if (uuid2 == null) {
-                    info(sender, I.t("The player {0} does not exist.", playerName));
+                    if (playerSender != null) {
+                        info(playerSender, I.t("The player {0} does not exist.", playerName));
+                    }
                     return;
                 }
                 if (map.give(Bukkit.getPlayer(uuid2))) {
@@ -116,7 +138,9 @@ public class GiveCommand extends IoMCommand {
                 }
 
             } catch (IOException | InterruptedException e) {
-                info(sender, I.t("The player {0} does not exist.", playerName));
+                if (playerSender != null) {
+                    info(playerSender, I.t("The player {0} does not exist.", playerName));
+                }
                 return;
             }
         });

@@ -79,7 +79,7 @@ public class ListCommand extends IoMCommand {
         final Player sender = playerSender();
 
         //TODO passer en static
-        ImageOnMap.getPlugin().getCommandWorker().OfflineNameFetch(playerName, uuid -> {
+        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
             List<ImageMap> mapList = MapManager.getMapList(uuid);
             if (uuid == null) {
                 info(sender, I.t("Player {} not found.", playerName));
