@@ -85,6 +85,10 @@ public abstract class IoMCommand extends Command {
         StringBuilder s;
 
         for (String arg : args) {
+            if (arg.startsWith("http:") || arg.startsWith("https:")) {
+                arguments.add(arg);
+                continue;
+            }
             s = new StringBuilder();
             for (char c : arg.toCharArray()) {
                 switch (state) {

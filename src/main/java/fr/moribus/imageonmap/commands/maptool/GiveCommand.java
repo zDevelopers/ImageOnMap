@@ -44,7 +44,6 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.mojang.UUIDFetcher;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,10 +64,6 @@ public class GiveCommand extends IoMCommand {
         }
 
         ArrayList<String> arguments = getArgs();
-
-        for (String arg : arguments) {
-            PluginLogger.info(arg);
-        }
 
         if (arguments.size() > 3) {
             warning(I.t("Too many parameters! Usage: /maptool give <playername> [playerFrom]:<mapname>"));

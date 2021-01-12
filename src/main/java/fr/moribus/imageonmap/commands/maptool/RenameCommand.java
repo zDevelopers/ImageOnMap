@@ -48,7 +48,6 @@ public class RenameCommand extends IoMCommand {
             return;
         }
         map.rename(argList.get(1));
-
     }
 
     @Override

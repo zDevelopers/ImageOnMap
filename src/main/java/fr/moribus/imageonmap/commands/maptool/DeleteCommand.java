@@ -78,11 +78,11 @@ public class DeleteCommand extends IoMCommand {
         final boolean confirm = hasFlag("confirm");
 
         if (arguments.size() > 3 || (arguments.size() > 2 && !confirm)) {
-            warning(I.t("Too many parameters! Usage: /maptool delete [playername] <mapname>"));
+            warning(I.t("Too many parameters! Usage: /maptool delete [playername]:<mapname>"));
             return;
         }
         if (arguments.size() < 1) {
-            warning(I.t("Too few parameters! Usage: /maptool delete [playername] <mapname>"));
+            warning(I.t("Too few parameters! Usage: /maptool delete [playername]:<mapname>"));
             return;
         }
 

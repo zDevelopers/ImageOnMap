@@ -55,7 +55,7 @@ public class GetCommand extends IoMCommand {
     protected void run() throws CommandException {
         ArrayList<String> arguments = getArgs();
 
-        if (arguments.size() > 1) {
+        if (arguments.size() > 2) {
             warning(I.t("Too many parameters! Usage: /maptool get [playername]:<mapname>"));
             return;
         }
@@ -66,39 +66,22 @@ public class GetCommand extends IoMCommand {
         final String playerName;
         final String mapName;
         final Player sender = playerSender();
-        String[] prefixes = arguments.get(0).split(":");
 
-        switch (prefixes.length) {
-            case 1:
-                playerName = sender.getName();
-                mapName = prefixes[0];
-                break;
-            case 2:
-                if (!Permissions.GETOTHER.grantedTo(sender)) {
-                    info(sender, I.t("You can't use this command"));
-                    return;
-                }
-                playerName = prefixes[0];
-                mapName = prefixes[1];
-                break;
-            case 3:
-                if (prefixes[0].equals("p")) {
-                    if (!Permissions.GETOTHER.grantedTo(sender)) {
-                        info(sender, I.t("You can't use this command"));
-                        return;
-                    }
-                    playerName = prefixes[1];
-                    mapName = prefixes[2];
-                }
-                //insert bank support after
-                info(sender, I.t("Error in the prefix used, valid ones are ['p:']"));
+        if (arguments.size() == 1) {
+            playerName = sender.getName();
+            mapName = arguments.get(0);
+        } else {
+            if (!Permissions.GETOTHER.grantedTo(sender)) {
+                info(sender, I.t("You can't use this command"));
                 return;
-            //break;
-            default:
-                playerName = "Error found";
-                mapName = "Error found";
+            }
+            playerName = arguments.get(0);
+            mapName = arguments.get(1);
         }
-        
+
+
+
+
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
             if (uuid == null) {
