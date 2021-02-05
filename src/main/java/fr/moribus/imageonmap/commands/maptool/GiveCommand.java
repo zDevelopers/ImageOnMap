@@ -127,9 +127,7 @@ public class GiveCommand extends IoMCommand {
                 }
 
             } catch (IOException | InterruptedException e) {
-                if (playerSender != null) {
-                    info(playerSender, I.t("The player {0} does not exist.", playerName));
-                }
+                warning(sender, I.t("The player {0} does not exist.", playerName));
                 return;
             }
         });
