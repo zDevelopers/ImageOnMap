@@ -60,7 +60,7 @@ public class GetCommand extends IoMCommand {
             return;
         }
         if (arguments.size() < 1) {
-            warning(I.t("Too few parameters! Usage: /maptool get [playername]:<mapname>"));
+            throwInvalidArgument(I.t("Too few parameters!"));
             return;
         }
         final String playerName;
