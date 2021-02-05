@@ -56,7 +56,7 @@ public class GetCommand extends IoMCommand {
         ArrayList<String> arguments = getArgs();
 
         if (arguments.size() > 2) {
-            warning(I.t("Too many parameters! Usage: /maptool get [playername]:<mapname>"));
+            throwInvalidArgument(I.t("Too many parameters!"));
             return;
         }
         if (arguments.size() < 1) {
