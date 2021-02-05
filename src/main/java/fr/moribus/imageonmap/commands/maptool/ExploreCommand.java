@@ -81,7 +81,9 @@ public class ExploreCommand extends IoMCommand {
                 return;
             }
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-            Gui.open(sender, new MapListGui(offlinePlayer,playerName));
+            if (sender.isOnline()) {
+                Gui.open(sender, new MapListGui(offlinePlayer,playerName));
+            }
 
         });
 
