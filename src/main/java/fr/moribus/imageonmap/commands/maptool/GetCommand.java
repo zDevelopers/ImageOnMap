@@ -72,7 +72,7 @@ public class GetCommand extends IoMCommand {
             mapName = arguments.get(0);
         } else {
             if (!Permissions.GETOTHER.grantedTo(sender)) {
-                info(sender, I.t("You can't use this command"));
+                throwNotAuthorized();
                 return;
             }
             playerName = arguments.get(0);
