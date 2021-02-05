@@ -66,7 +66,7 @@ public class ExploreCommand extends IoMCommand {
         final Player sender = playerSender();
         if (arguments.size() == 1) {
             if (!Permissions.LISTOTHER.grantedTo(sender)) {
-                info(sender, I.t("You can't use this command"));
+                throwNotAuthorized();
                 return;
             }
             playerName = arguments.get(0);
