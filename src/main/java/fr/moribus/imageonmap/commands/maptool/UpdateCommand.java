@@ -223,11 +223,7 @@ public class UpdateCommand extends IoMCommand {
                     }
                 }
             } catch (MalformedURLException ex) {
-                if (playerSender != null) {
-                    warning(playerSender, I.t("Invalid URL."));
-                } else {
-                    PluginLogger.warning(I.t("Invalid URL."));
-                }
+                warning(sender, I.t("Invalid URL."));
             }
         });
 
