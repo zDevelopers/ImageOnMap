@@ -122,9 +122,7 @@ public class GiveCommand extends IoMCommand {
             try {
                 UUID uuid2 = UUIDFetcher.fetch(playerName);
                 if (uuid2 == null) {
-                    if (playerSender != null) {
-                        info(playerSender, I.t("The player {0} does not exist.", playerName));
-                    }
+                    warning(sender, I.t("The player {0} does not exist.", playerName));
                     return;
                 }
                 if (map.give(Bukkit.getPlayer(uuid2))) {
