@@ -77,7 +77,7 @@ public class ExploreCommand extends IoMCommand {
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
             if (uuid == null) {
-                info(sender, I.t("The player {0} does not exist.", playerName));
+                warning(sender, I.t("The player {0} does not exist.", playerName));
                 return;
             }
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
