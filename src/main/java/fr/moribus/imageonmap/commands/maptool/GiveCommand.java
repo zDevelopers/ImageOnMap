@@ -66,11 +66,11 @@ public class GiveCommand extends IoMCommand {
         ArrayList<String> arguments = getArgs();
 
         if (arguments.size() > 3) {
-            warning(I.t("Too many parameters! Usage: /maptool give <playername> [playerFrom]:<mapname>"));
+            throwInvalidArgument(I.t("Too many parameters!"));
             return;
         }
         if (arguments.size() < 1) {
-            warning(I.t("Too few parameters! Usage: /maptool give <playername> [playerFrom]:<mapname>"));
+            throwInvalidArgument(I.t("Too few parameters!"));
             return;
         }
         final String mapName;

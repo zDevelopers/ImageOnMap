@@ -78,11 +78,11 @@ public class DeleteCommand extends IoMCommand {
         final boolean confirm = hasFlag("confirm");
 
         if (arguments.size() > 3 || (arguments.size() > 2 && !confirm)) {
-            warning(I.t("Too many parameters! Usage: /maptool delete [playername]:<mapname>"));
+            throwInvalidArgument(I.t("Too many parameters!"));
             return;
         }
         if (arguments.size() < 1) {
-            warning(I.t("Too few parameters! Usage: /maptool delete [playername]:<mapname>"));
+            throwInvalidArgument(I.t("Too few parameters!"));
             return;
         }
 
@@ -92,7 +92,7 @@ public class DeleteCommand extends IoMCommand {
         info(sender, "" + arguments.size());
         if (arguments.size() == 2 || arguments.size() == 3) {
             if (!Permissions.DELETEOTHER.grantedTo(sender)) {
-                info(sender, I.t("You can't use this command"));
+                throwNotAuthorized();
                 return;
             }
 
@@ -106,13 +106,13 @@ public class DeleteCommand extends IoMCommand {
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
             if (uuid == null) {
-                info(sender, I.t("The player {0} does not exist.", playerName));
+                warning(sender, I.t("The player {0} does not exist.", playerName));
                 return;
             }
             ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
-                info(sender, I.t("This map does not exist."));
+                warning(sender, I.t("This map does not exist."));
                 return;
             }
 
@@ -125,7 +125,7 @@ public class DeleteCommand extends IoMCommand {
 
                 try {
                     MapManager.deleteMap(map);
-                    info(sender, I.t("Map successfully deleted."));
+                    success(sender, I.t("Map successfully deleted."));
                 } catch (MapManagerException ex) {
                     PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
                     warning(sender, I.t("This map does not exist."));

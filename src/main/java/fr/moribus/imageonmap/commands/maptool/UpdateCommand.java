@@ -95,7 +95,7 @@ public class UpdateCommand extends IoMCommand {
 
         //Sent by a non player and not enough arguments
         if (arguments.size() == 2 && playerSender == null) {
-            PluginLogger.warning("Usage: /maptool update [player name]:<map name> <new url> [stretched|covered]");
+            throwInvalidArgument("Usage: /maptool update [player name]:<map name> <new url> [stretched|covered]");
             return;
         }
 
@@ -106,8 +106,8 @@ public class UpdateCommand extends IoMCommand {
             url = arguments.get(1);
         } else {
             if (arguments.size() == 4) {
-                if (playerSender != null && !Permissions.UPDATEOTHER.grantedTo(playerSender)) {
-                    info(playerSender, I.t("You can't use this command"));
+                if (!Permissions.UPDATEOTHER.grantedTo(sender)) {
+                    throwNotAuthorized();
                     return;
                 }
                 playerName = arguments.get(0);
@@ -122,8 +122,8 @@ public class UpdateCommand extends IoMCommand {
                         url = arguments.get(1);
                         resize = arguments.get(2);
                     } else {
-                        if (playerSender != null && !Permissions.UPDATEOTHER.grantedTo(playerSender)) {
-                            info(playerSender, I.t("You can't use this command"));
+                        if (!Permissions.UPDATEOTHER.grantedTo(sender)) {
+                            throwNotAuthorized();
                             return;
                         }
                         playerName = arguments.get(0);
@@ -157,22 +157,13 @@ public class UpdateCommand extends IoMCommand {
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
             if (uuid == null) {
-                if (playerSender != null) {
-                    info(playerSender, I.t("The player {0} does not exist.", playerName));
-                } else {
-                    PluginLogger.info(I.t("The player {0} does not exist.", playerName));
-                }
+                warning(sender, I.t("The player {0} does not exist.", playerName));
                 return;
             }
             ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
-                if (playerSender != null) {
-                    info(playerSender, I.t("This map does not exist."));
-                } else {
-                    PluginLogger.info(I.t("This map does not exist."));
-                    ;
-                }
+                warning(sender, I.t("This map does not exist."));
                 return;
             }
 

@@ -60,14 +60,14 @@ public class ListCommand extends IoMCommand {
     protected void run() throws CommandException {
         ArrayList<String> arguments = getArgs();
         if (arguments.size() > 1) {
-            warning(I.t("Too many parameters! Usage: /maptool list [playername]"));
+            throwInvalidArgument(I.t("Too many parameters!"));
             return;
         }
 
         String playerName;
         if (arguments.size() == 1) {
             if (!Permissions.LISTOTHER.grantedTo(sender)) {
-                info(sender, I.t("You can't use this command"));
+                throwNotAuthorized();
                 return;
             }
 
