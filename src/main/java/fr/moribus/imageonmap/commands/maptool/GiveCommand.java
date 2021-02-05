@@ -112,9 +112,7 @@ public class GiveCommand extends IoMCommand {
             final ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
-                if (playerSender != null) {
-                    info(playerSender, I.t("This map does not exist."));
-                }
+                warning(sender, I.t("This map does not exist."));
                 return;
             }
             try {
