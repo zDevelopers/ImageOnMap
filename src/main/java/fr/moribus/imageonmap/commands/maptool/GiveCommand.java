@@ -106,9 +106,7 @@ public class GiveCommand extends IoMCommand {
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(from, uuid -> {
             if (uuid == null) {
-                if (playerSender != null) {
-                    info(playerSender, I.t("The player {0} does not exist.", from));
-                }
+                warning(sender, I.t("The player {0} does not exist.", from));
                 return;
             }
             final ImageMap map = MapManager.getMap(uuid, mapName);
