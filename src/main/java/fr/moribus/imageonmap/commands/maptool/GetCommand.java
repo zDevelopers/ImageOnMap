@@ -91,7 +91,7 @@ public class GetCommand extends IoMCommand {
             ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
-                info(sender, I.t("This map does not exist."));
+                warning(sender, I.t("This map does not exist."));
                 return;
             }
 
