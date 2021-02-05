@@ -82,7 +82,7 @@ public class GiveCommand extends IoMCommand {
             playerSender1 = playerSender();
         } catch (CommandException ignored) {
             if (arguments.size() == 2) {
-                throwInvalidArgument(I.t("Usage: /maptool give <playername> <playerFrom>:<mapname>"));
+                throwInvalidArgument(I.t("Player name is required from the console"));
             }
             playerSender1 = null;
         }
