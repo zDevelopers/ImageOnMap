@@ -54,7 +54,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "list")
+@CommandInfo(name = "list", usageParameters = "[player name]")
 public class ListCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {

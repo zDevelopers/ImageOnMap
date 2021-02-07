@@ -55,7 +55,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "delete", usageParameters = "<map name> [--confirm]")
+@CommandInfo(name = "delete", usageParameters = "[player name]:<map name> [--confirm]")
 @WithFlags({"confirm"})
 public class DeleteCommand extends IoMCommand {
 

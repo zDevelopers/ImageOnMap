@@ -53,7 +53,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
-@CommandInfo(name = "give", usageParameters = "<playername> [playerFrom]:<mapname>")
+@CommandInfo(name = "give", usageParameters = "<player name> [playerFrom]:<map name>")
 public class GiveCommand extends IoMCommand {
 
     @Override

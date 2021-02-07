@@ -49,7 +49,7 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "get")
+@CommandInfo(name = "get",usageParameters = "[player name]:<map name>")
 public class GetCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
@@ -84,7 +84,9 @@ public class GetCommand extends IoMCommand {
 
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
-            if (!sender.isOnline()) return;
+            if (!sender.isOnline()) {
+                return;
+            }
             if (uuid == null) {
                 warning(sender, I.t("The player {0} does not exist.", playerName));
                 return;
