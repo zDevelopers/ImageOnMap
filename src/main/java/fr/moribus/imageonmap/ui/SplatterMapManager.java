@@ -169,7 +169,7 @@ public abstract class SplatterMapManager {
     }
 
     /**
-     * Return true if it is a platter map
+     * Return true if it is a splatter map
      *
      * @param itemStack The item to check.
      * @return True if is a splatter map
@@ -182,7 +182,13 @@ public abstract class SplatterMapManager {
     }
 
 
-    //TODO doc a faire
+    /**
+     * Return true if it has a specified splatter map
+     *
+     * @param player The player to check.
+     * @param map The map to check.
+     * @return True if the player has this map
+     */
     public static boolean hasSplatterMap(Player player, PosterMap map) {
         Inventory playerInventory = player.getInventory();
 
