@@ -120,8 +120,9 @@ public class DeleteCommand extends IoMCommand {
                 RawText msg = deleteMsg(getClass(), sender, map);
                 RawMessage.send(sender, msg);
             } else {
-
-                MapManager.clear(sender.getInventory(), map);
+                if (sender != null && sender.isOnline() && sender.getInventory() != null) {
+                    MapManager.clear(sender.getInventory(), map);
+                }
 
                 try {
                     MapManager.deleteMap(map);
