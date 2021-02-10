@@ -61,6 +61,7 @@ public class GiveCommand extends IoMCommand {
 
         if (args.length < 2) {
             throwInvalidArgument(I.t("You must give a valid player name and a map name."));
+            return;
         }
 
         ArrayList<String> arguments = getArgs();
@@ -103,6 +104,8 @@ public class GiveCommand extends IoMCommand {
             }
         }
 
+        final Player sender = playerSender();
+
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(from, uuid -> {
             if (uuid == null) {
@@ -121,13 +124,18 @@ public class GiveCommand extends IoMCommand {
                     warning(sender, I.t("The player {0} does not exist.", playerName));
                     return;
                 }
-                if (map.give(Bukkit.getPlayer(uuid2))) {
+                if (Bukkit.getPlayer((uuid2)) != null && Bukkit.getPlayer((uuid2)).isOnline()
+                        && map.give(Bukkit.getPlayer(uuid2))) {
                     info(I.t("The requested map was too big to fit in your inventory."));
                     info(I.t("Use '/maptool getremaining' to get the remaining maps."));
                 }
 
             } catch (IOException | InterruptedException e) {
-                warning(sender, I.t("The player {0} does not exist.", playerName));
+                try {
+                    throwInvalidArgument(I.t("The player {0} does not exist.", playerName));
+                } catch (CommandException ex) {
+                    ex.printStackTrace();
+                }
                 return;
             }
         });

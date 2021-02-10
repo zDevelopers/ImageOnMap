@@ -82,14 +82,18 @@ public abstract class IoMCommand extends Command {
         //State of the automaton, can read word like:
         //name_here; "name here"
         int state = 0;
-        StringBuilder s;
+        StringBuilder s = new StringBuilder();
 
         for (String arg : args) {
             if (arg.startsWith("http:") || arg.startsWith("https:")) {
                 arguments.add(arg);
                 continue;
             }
-            s = new StringBuilder();
+            if (state == 0) {
+                s = new StringBuilder();
+            } else {
+                s.append(" ");
+            }
             for (char c : arg.toCharArray()) {
                 switch (state) {
                     case 0:
@@ -118,9 +122,10 @@ public abstract class IoMCommand extends Command {
                         throw new IllegalStateException("Unexpected value: " + state);
                 }
             }
-            if (s.length() > 0) {
+            if (s.length() > 0 && state != 1) {
                 arguments.add(s.toString());
             }
+
         }
         return arguments;
     }
