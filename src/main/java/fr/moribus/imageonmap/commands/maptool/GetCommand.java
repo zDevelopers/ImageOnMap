@@ -55,7 +55,7 @@ public class GetCommand extends IoMCommand {
     protected void run() throws CommandException {
         ArrayList<String> arguments = getArgs();
 
-        if (args.length > 1) {
+        if (arguments.size() > 2) {
             throwInvalidArgument(I.t("Too many parameters!"));
             return;
         }

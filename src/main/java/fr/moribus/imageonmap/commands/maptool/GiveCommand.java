@@ -124,6 +124,10 @@ public class GiveCommand extends IoMCommand {
                     warning(sender, I.t("The player {0} does not exist.", playerName));
                     return;
                 }
+                if (Bukkit.getPlayer((uuid2)) == null || !Bukkit.getPlayer((uuid2)).isOnline()) {
+                    warning(sender, I.t("The player {0} is not connected.", playerName));
+                    return;
+                }
                 if (Bukkit.getPlayer((uuid2)) != null && Bukkit.getPlayer((uuid2)).isOnline()
                         && map.give(Bukkit.getPlayer(uuid2))) {
                     info(I.t("The requested map was too big to fit in your inventory."));

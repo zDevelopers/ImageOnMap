@@ -59,7 +59,7 @@ import org.bukkit.entity.Player;
 @WithFlags({"confirm"})
 public class DeleteCommand extends IoMCommand {
 
-    private static RawText deleteMsg(Class klass, Player sender, ImageMap map) {
+    private static RawText deleteMsg(Class klass, String playerName, ImageMap map) {
         return new RawText(I.t("You are going to delete") + " ")
                 .then(map.getId())
                 .color(ChatColor.GOLD)
@@ -68,7 +68,7 @@ public class DeleteCommand extends IoMCommand {
                 .then(I.t("[Confirm]"))
                 .color(ChatColor.GREEN)
                 .hover(new RawText(I.t("{red}This map will be deleted {bold}forever{red}!")))
-                .command(klass, sender.getName(), map.getId(), "--confirm")
+                .command(klass, playerName + ":" + "\"" + map.getId() + "\"", "--confirm")
                 .build();
     }
 
@@ -89,7 +89,6 @@ public class DeleteCommand extends IoMCommand {
         final String playerName;
         final String mapName;
         final Player sender = playerSender();
-        info(sender, "" + arguments.size());
         if (arguments.size() == 2 || arguments.size() == 3) {
             if (!Permissions.DELETEOTHER.grantedTo(sender)) {
                 throwNotAuthorized();
@@ -109,6 +108,7 @@ public class DeleteCommand extends IoMCommand {
                 warning(sender, I.t("The player {0} does not exist.", playerName));
                 return;
             }
+
             ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
@@ -117,7 +117,7 @@ public class DeleteCommand extends IoMCommand {
             }
 
             if (!confirm) {
-                RawText msg = deleteMsg(getClass(), sender, map);
+                RawText msg = deleteMsg(getClass(), playerName, map);
                 RawMessage.send(sender, msg);
             } else {
                 if (sender != null && sender.isOnline() && sender.getInventory() != null) {
@@ -132,8 +132,6 @@ public class DeleteCommand extends IoMCommand {
                     warning(sender, I.t("This map does not exist."));
                 }
             }
-
-
         });
 
 
