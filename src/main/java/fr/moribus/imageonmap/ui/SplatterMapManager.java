@@ -95,7 +95,7 @@ public abstract class SplatterMapManager {
                 .loreLine()
                 .longLore(ChatColor.GRAY
                         + I.t("Shift-click one of the placed maps to remove the whole poster in one shot."), 40)
-                //.hideAllAttributes()
+                .hideAllAttributes()
                 .craftItem();
 
         final MapMeta meta = (MapMeta) splatter.getItemMeta();

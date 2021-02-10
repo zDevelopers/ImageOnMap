@@ -123,9 +123,8 @@ public class ConfirmDeleteMapGui extends ActionGui {
                 .lore(I.t(getPlayerLocale(), "{gray}Name: {white}{0}", mapToDelete.getName()))
                 .lore(I.t(getPlayerLocale(), "{gray}Map ID: {white}{0}", mapToDelete.getId()))
                 .lore(I.t(getPlayerLocale(), "{gray}Maps inside: {white}{0}", mapToDelete.getMapsIDs().length))
-
+                .hideAllAttributes()
         );
-        //.hideAllAttributes()
 
         /* ** Buttons ** */
 

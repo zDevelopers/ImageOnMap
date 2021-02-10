@@ -224,7 +224,7 @@ public class MapListGui extends ExplorerGui<ImageMap> {
                             mapPartLeft));
         }
 
-        //statistics.hideAllAttributes();
+        statistics.hideAllAttributes();
 
         action("", getSize() - 5, statistics);
     }
