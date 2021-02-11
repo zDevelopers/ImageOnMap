@@ -54,20 +54,20 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "list")
+@CommandInfo(name = "list", usageParameters = "[player name]")
 public class ListCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
         ArrayList<String> arguments = getArgs();
         if (arguments.size() > 1) {
-            warning(I.t("Too many parameters! Usage: /maptool list [playername]"));
+            throwInvalidArgument(I.t("Too many parameters!"));
             return;
         }
 
         String playerName;
         if (arguments.size() == 1) {
             if (!Permissions.LISTOTHER.grantedTo(sender)) {
-                info(sender, I.t("You can't use this command"));
+                throwNotAuthorized();
                 return;
             }
 
@@ -82,7 +82,11 @@ public class ListCommand extends IoMCommand {
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
             List<ImageMap> mapList = MapManager.getMapList(uuid);
             if (uuid == null) {
-                info(sender, I.t("Player {} not found.", playerName));
+                try {
+                    throwInvalidArgument(I.t("Player {} not found.", playerName));
+                } catch (CommandException e) {
+                    e.printStackTrace();
+                }
                 return;
             }
             if (mapList.isEmpty()) {
@@ -98,6 +102,7 @@ public class ListCommand extends IoMCommand {
             RawTextPart rawText = new RawText("");
             rawText = addMap(rawText, mapList.get(0));
 
+            //TODO pagination chat
             for (int i = 1, c = mapList.size(); i < c; i++) {
                 rawText = rawText.then(", ").color(ChatColor.GRAY);
                 rawText = addMap(rawText, mapList.get(i));

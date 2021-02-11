@@ -53,27 +53,26 @@ import fr.zcraft.quartzlib.tools.text.MessageSender;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "update", usageParameters = "[playername] <new url> [stretched|covered] <map name to update>")
+@CommandInfo(name = "update", usageParameters = "[player name]:<map name> <new url> [stretched|covered] ")
 public class UpdateCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
-
+        //TODO fix the issue where to many quick usage of offlineNameFetch will return null
         ArrayList<String> arguments = getArgs();
         String warningMsg;
         if (arguments.size() > 4) {
             warningMsg = "Too many parameters!"
-                    + " Usage: /maptool update [playername] <new url> [stretched|covered] <mapname>";
+                    + " Usage: /maptool update [player name]:<map name> <new url> [stretched|covered]";
             warning(I.t(warningMsg));
             return;
         }
         if (arguments.size() < 2) {
             warningMsg =
-                    "Too few parameters! Usage: /maptool update [playername] <new url> [stretched|covered] <mapname>";
+                    "Too few parameters! Usage: /maptool update [player name]:<map name> <new url> [stretched|covered]";
             warning(I.t(warningMsg));
             return;
         }
@@ -81,43 +80,56 @@ public class UpdateCommand extends IoMCommand {
         final String mapName;
         final String url;
         final String resize;
-        final Player sender = playerSender();
+        final Player playerSender;
+        Player playerSender1;
+        try {
+            playerSender1 = playerSender();
+        } catch (CommandException ignored) {
+            if (arguments.size() == 2) {
+                throwInvalidArgument(
+                        I.t("Usage: /maptool update [player name]:<map name> <new url> [stretched|covered]"));
+            }
+            playerSender1 = null;
+        }
+        playerSender = playerSender1;
 
+        //Sent by a non player and not enough arguments
+        if (arguments.size() == 2 && playerSender == null) {
+            throwInvalidArgument("Usage: /maptool update [player name]:<map name> <new url> [stretched|covered]");
+            return;
+        }
 
         if (arguments.size() == 2) {
             resize = "";
-            playerName = sender.getName();
-            mapName = arguments.get(1);
-            url = arguments.get(0);
+            playerName = playerSender.getName();
+            mapName = arguments.get(0);
+            url = arguments.get(1);
         } else {
             if (arguments.size() == 4) {
                 if (!Permissions.UPDATEOTHER.grantedTo(sender)) {
-                    info(sender, I.t("You can't use this command"));
+                    throwNotAuthorized();
                     return;
                 }
-
                 playerName = arguments.get(0);
-                url = arguments.get(1);
-                resize = arguments.get(2);
-                mapName = arguments.get(3);
+                mapName = arguments.get(1);
+                url = arguments.get(2);
+                resize = arguments.get(3);
             } else {
                 if (arguments.size() == 3) {
-                    if (arguments.get(1).equals("covered") || arguments.get(1).equals("stretched")) {
-
-                        playerName = sender.getName();
-                        url = arguments.get(0);
-                        resize = arguments.get(1);
-                        mapName = arguments.get(2);
-
+                    if (arguments.get(2).equals("covered") || arguments.get(2).equals("stretched")) {
+                        playerName = playerSender.getName();
+                        mapName = arguments.get(0);
+                        url = arguments.get(1);
+                        resize = arguments.get(2);
                     } else {
                         if (!Permissions.UPDATEOTHER.grantedTo(sender)) {
-                            info(sender, I.t("You can't use this command"));
+                            throwNotAuthorized();
                             return;
                         }
                         playerName = arguments.get(0);
-                        url = arguments.get(1);
+                        mapName = arguments.get(1);
+                        url = arguments.get(2);
                         resize = "";
-                        mapName = arguments.get(2);
                     }
                 } else {
                     resize = "";
@@ -128,9 +140,7 @@ public class UpdateCommand extends IoMCommand {
             }
         }
 
-
         final ImageUtils.ScalingType scaling;
-
 
         switch (resize) {
 
@@ -144,61 +154,68 @@ public class UpdateCommand extends IoMCommand {
                 scaling = ImageUtils.ScalingType.CONTAINED;
         }
 
-
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
             if (uuid == null) {
-                info(sender, I.t("The player {0} does not exist.", playerName));
+                warning(sender, I.t("The player {0} does not exist.", playerName));
                 return;
             }
             ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
-                info(sender, I.t("This map does not exist."));
+                warning(sender, I.t("This map does not exist."));
                 return;
             }
 
             URL url1;
             try {
                 url1 = new URL(url);
-                MapManager.load();
+                //TODO replace by a check of the load status.(if not loaded load the mapmanager)
+                MapManager.load(false);//we don't want to spam the console each time we reload the mapManager
 
                 Integer[] size = {1, 1};
                 if (map.getType() == ImageMap.Type.POSTER) {
-                    size = map.getSize(new HashMap<String, Object>(), map.getUserUUID(), map.getId());
+                    size = map.getSize(map.getUserUUID(), map.getId());
                 }
-                //assert size != null;
+
                 int width = size[0];
                 int height = size[1];
                 try {
-                    ActionBar.sendPermanentMessage(sender, ChatColor.DARK_GREEN + I.t("Updating..."));
+                    if (playerSender != null) {
+                        ActionBar.sendPermanentMessage(playerSender, ChatColor.DARK_GREEN + I.t("Updating..."));
+                    }
                     ImageRendererExecutor
                             .update(url1, scaling, uuid, map, width, height, new WorkerCallback<ImageMap>() {
                                 @Override
                                 public void finished(ImageMap result) {
-                                    ActionBar.removeMessage(sender);
-                                    MessageSender.sendActionBarMessage(sender,
-                                            ChatColor.DARK_GREEN + I.t("The map was updated using the new image!"));
+                                    if (playerSender != null) {
+                                        ActionBar.removeMessage(playerSender);
+                                        MessageSender.sendActionBarMessage(playerSender,
+                                                ChatColor.DARK_GREEN + I.t("The map was updated using the new image!"));
+                                    }
                                 }
 
                                 @Override
                                 public void errored(Throwable exception) {
-                                    sender.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
-
+                                    if (playerSender != null) {
+                                        playerSender
+                                                .sendMessage(
+                                                        I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
+                                    }
                                     PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
-                                            sender.getName(),
+                                            playerSender.getName(),
                                             exception.getClass().getCanonicalName(),
                                             exception.getMessage());
                                 }
                             });
                 } finally {
-                    ActionBar.removeMessage(sender);
+                    if (playerSender != null) {
+                        ActionBar.removeMessage(playerSender);
+                    }
                 }
             } catch (MalformedURLException ex) {
                 warning(sender, I.t("Invalid URL."));
             }
-
-
         });
 
 

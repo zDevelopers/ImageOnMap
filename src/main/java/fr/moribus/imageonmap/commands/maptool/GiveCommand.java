@@ -53,7 +53,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
-@CommandInfo(name = "give", usageParameters = "[playerFrom] <playername> <mapname>")
+@CommandInfo(name = "give", usageParameters = "<player name> [playerFrom]:<map name>")
 public class GiveCommand extends IoMCommand {
 
     @Override
@@ -61,29 +61,41 @@ public class GiveCommand extends IoMCommand {
 
         if (args.length < 2) {
             throwInvalidArgument(I.t("You must give a valid player name and a map name."));
+            return;
         }
 
         ArrayList<String> arguments = getArgs();
+
         if (arguments.size() > 3) {
-            warning(I.t("Too many parameters! Usage: /maptool give [playerFrom] <playername> <mapname>"));
+            throwInvalidArgument(I.t("Too many parameters!"));
             return;
         }
         if (arguments.size() < 1) {
-            warning(I.t("Too few parameters! Usage: /maptool give [playerFrom] <playername> <mapname>"));
+            throwInvalidArgument(I.t("Too few parameters!"));
             return;
         }
         final String mapName;
         final String from;
         final String playerName;
-        final Player sender = playerSender();
+        final Player playerSender;
+        Player playerSender1;
+        try {
+            playerSender1 = playerSender();
+        } catch (CommandException ignored) {
+            if (arguments.size() == 2) {
+                throwInvalidArgument(I.t("Player name is required from the console"));
+            }
+            playerSender1 = null;
+        }
+        playerSender = playerSender1;
         if (arguments.size() == 2) {
-            from = sender.getName();
+            from = playerSender.getName();
             playerName = arguments.get(0);
             mapName = arguments.get(1);
         } else {
             if (arguments.size() == 3) {
-                from = arguments.get(0);
-                playerName = arguments.get(1);
+                from = arguments.get(1);
+                playerName = arguments.get(0);
                 mapName = arguments.get(2);
             } else {
                 from = "";
@@ -92,31 +104,42 @@ public class GiveCommand extends IoMCommand {
             }
         }
 
+        final Player sender = playerSender();
+
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(from, uuid -> {
             if (uuid == null) {
-                info(sender, I.t("The player {0} does not exist.", from));
+                warning(sender, I.t("The player {0} does not exist.", from));
                 return;
             }
             final ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
-                info(sender, I.t("This map does not exist."));
+                warning(sender, I.t("This map does not exist."));
                 return;
             }
             try {
                 UUID uuid2 = UUIDFetcher.fetch(playerName);
                 if (uuid2 == null) {
-                    info(sender, I.t("The player {0} does not exist.", playerName));
+                    warning(sender, I.t("The player {0} does not exist.", playerName));
                     return;
                 }
-                if (map.give(Bukkit.getPlayer(uuid2))) {
+                if (Bukkit.getPlayer((uuid2)) == null || !Bukkit.getPlayer((uuid2)).isOnline()) {
+                    warning(sender, I.t("The player {0} is not connected.", playerName));
+                    return;
+                }
+                if (Bukkit.getPlayer((uuid2)) != null && Bukkit.getPlayer((uuid2)).isOnline()
+                        && map.give(Bukkit.getPlayer(uuid2))) {
                     info(I.t("The requested map was too big to fit in your inventory."));
                     info(I.t("Use '/maptool getremaining' to get the remaining maps."));
                 }
 
             } catch (IOException | InterruptedException e) {
-                info(sender, I.t("The player {0} does not exist.", playerName));
+                try {
+                    throwInvalidArgument(I.t("The player {0} does not exist.", playerName));
+                } catch (CommandException ex) {
+                    ex.printStackTrace();
+                }
                 return;
             }
         });

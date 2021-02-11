@@ -52,13 +52,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
-@CommandInfo(name = "explore")
+@CommandInfo(name = "explore",usageParameters = "[player name]")
 public class ExploreCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
         ArrayList<String> arguments = getArgs();
         if (arguments.size() > 1) {
-            warning(I.t("Too many parameters! Usage: /maptool explore [playername]"));
+            throwInvalidArgument(I.t("Too many parameters!"));
             return;
         }
         final String playerName;
@@ -66,7 +66,7 @@ public class ExploreCommand extends IoMCommand {
         final Player sender = playerSender();
         if (arguments.size() == 1) {
             if (!Permissions.LISTOTHER.grantedTo(sender)) {
-                info(sender, I.t("You can't use this command"));
+                throwNotAuthorized();
                 return;
             }
             playerName = arguments.get(0);
@@ -77,11 +77,13 @@ public class ExploreCommand extends IoMCommand {
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
             if (uuid == null) {
-                info(sender, I.t("The player {0} does not exist.", playerName));
+                warning(sender, I.t("The player {0} does not exist.", playerName));
                 return;
             }
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-            Gui.open(sender, new MapListGui(offlinePlayer));
+            if (sender.isOnline()) {
+                Gui.open(sender, new MapListGui(offlinePlayer,playerName));
+            }
 
         });
 

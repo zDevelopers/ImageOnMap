@@ -260,7 +260,13 @@ public abstract class MapManager {
         }
     }
 
+    //Silent load
     public static void load() {
+        load(true);
+    }
+
+    //Loading
+    public static void load(boolean verbose) {
         int loadedFilesCount = 0;
         for (File file : ImageOnMap.getPlugin().getMapsDirectory().listFiles()) {
             UUID uuid = getUUIDFromFile(file);
@@ -271,7 +277,9 @@ public abstract class MapManager {
             ++loadedFilesCount;
         }
 
-        PluginLogger.info("Loaded {0} player map files.", loadedFilesCount);
+        if (verbose) {
+            PluginLogger.info("Loaded {0} player map files.", loadedFilesCount);
+        }
     }
 
     public static void save() {

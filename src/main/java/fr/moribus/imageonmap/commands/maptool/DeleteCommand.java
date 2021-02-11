@@ -55,11 +55,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "delete", usageParameters = "<map name> [--confirm]")
+@CommandInfo(name = "delete", usageParameters = "[player name]:<map name> [--confirm]")
 @WithFlags({"confirm"})
 public class DeleteCommand extends IoMCommand {
 
-    private static RawText deleteMsg(Class klass, Player sender, ImageMap map) {
+    private static RawText deleteMsg(Class klass, String playerName, ImageMap map) {
         return new RawText(I.t("You are going to delete") + " ")
                 .then(map.getId())
                 .color(ChatColor.GOLD)
@@ -68,7 +68,7 @@ public class DeleteCommand extends IoMCommand {
                 .then(I.t("[Confirm]"))
                 .color(ChatColor.GREEN)
                 .hover(new RawText(I.t("{red}This map will be deleted {bold}forever{red}!")))
-                .command(klass, sender.getName(), map.getId(), "--confirm")
+                .command(klass, playerName + ":" + "\"" + map.getId() + "\"", "--confirm")
                 .build();
     }
 
@@ -78,21 +78,20 @@ public class DeleteCommand extends IoMCommand {
         final boolean confirm = hasFlag("confirm");
 
         if (arguments.size() > 3 || (arguments.size() > 2 && !confirm)) {
-            warning(I.t("Too many parameters! Usage: /maptool delete [playername] <mapname>"));
+            throwInvalidArgument(I.t("Too many parameters!"));
             return;
         }
         if (arguments.size() < 1) {
-            warning(I.t("Too few parameters! Usage: /maptool delete [playername] <mapname>"));
+            throwInvalidArgument(I.t("Too few parameters!"));
             return;
         }
 
         final String playerName;
         final String mapName;
         final Player sender = playerSender();
-        info(sender, "" + arguments.size());
         if (arguments.size() == 2 || arguments.size() == 3) {
             if (!Permissions.DELETEOTHER.grantedTo(sender)) {
-                info(sender, I.t("You can't use this command"));
+                throwNotAuthorized();
                 return;
             }
 
@@ -106,33 +105,33 @@ public class DeleteCommand extends IoMCommand {
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
             if (uuid == null) {
-                info(sender, I.t("The player {0} does not exist.", playerName));
+                warning(sender, I.t("The player {0} does not exist.", playerName));
                 return;
             }
+
             ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
-                info(sender, I.t("This map does not exist."));
+                warning(sender, I.t("This map does not exist."));
                 return;
             }
 
             if (!confirm) {
-                RawText msg = deleteMsg(getClass(), sender, map);
+                RawText msg = deleteMsg(getClass(), playerName, map);
                 RawMessage.send(sender, msg);
             } else {
-
-                MapManager.clear(sender.getInventory(), map);
+                if (sender != null && sender.isOnline() && sender.getInventory() != null) {
+                    MapManager.clear(sender.getInventory(), map);
+                }
 
                 try {
                     MapManager.deleteMap(map);
-                    info(sender, I.t("Map successfully deleted."));
+                    success(sender, I.t("Map successfully deleted."));
                 } catch (MapManagerException ex) {
                     PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
                     warning(sender, I.t("This map does not exist."));
                 }
             }
-
-
         });
 
 

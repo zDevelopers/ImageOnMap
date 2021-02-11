@@ -108,7 +108,7 @@ public abstract class ImageMap implements ConfigurationSerializable {
         }
     }
 
-    public static Integer[] getSize(Map<String, Object> map, UUID playerUUID, String id) {
+    public static Integer[] getSize(UUID playerUUID, String id) {
 
         ConfigurationSection section =
                 MapManager.getPlayerMapStore(playerUUID).getToolConfig().getConfigurationSection("PlayerMapStore");
