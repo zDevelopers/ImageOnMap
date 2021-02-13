@@ -50,6 +50,7 @@ import fr.moribus.imageonmap.commands.maptool.UpdateCommand;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
+import fr.moribus.imageonmap.integrity.MapIdChecker;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.migration.MigratorExecutor;
 import fr.moribus.imageonmap.migration.V3Migrator;
@@ -124,6 +125,7 @@ public final class ImageOnMap extends QuartzPlugin {
         MapManager.init();
         MapInitEvent.init();
         MapItemManager.init();
+        MapIdChecker.check();
 
 
         Commands.register(
