@@ -44,7 +44,9 @@ import fr.moribus.imageonmap.map.MapManagerException.Reason;
 import fr.zcraft.quartzlib.tools.PluginLogger;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -360,6 +362,29 @@ public abstract class MapManager {
             }
         }
         return store;
+    }
+
+    /**
+     * Returns a map of all minecraft maps id used by ImageOnMap images with the player uuid as key.
+     *
+     * @return The set of all map id used by each player.
+     */
+    public static Map<UUID, List<Integer>> getMapIdSet() {
+        HashMap<UUID, List<Integer>> hashMap = new HashMap<>();
+        synchronized (playerMaps) {
+            for (PlayerMapStore tmpStore : playerMaps) {
+                ArrayList<Integer> ids = new ArrayList<>();
+                UUID uuid = tmpStore.getUUID();
+                List<ImageMap> mapList = tmpStore.getMapList();
+                for (ImageMap map : mapList) {
+                    for (int id : map.getMapsIDs()) {
+                        ids.add(id);
+                    }
+                }
+                hashMap.put(uuid, ids);
+            }
+        }
+        return hashMap;
     }
 
     private static PlayerMapStore getExistingPlayerMapStore(UUID playerUUID) {
