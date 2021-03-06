@@ -36,6 +36,7 @@
 
 package fr.moribus.imageonmap.commands;
 
+import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.Command;
@@ -47,6 +48,13 @@ import org.bukkit.entity.Player;
 
 
 public abstract class IoMCommand extends Command {
+
+    protected void sanityCheckAssert() {
+        if (ImageOnMap.getPlugin().isMapIdCorrupted()) {
+            warning(sender, I.t("You can't perform this command as long as the sanity check is ongoing."));
+            return;
+        }
+    }
 
     protected ImageMap getMapFromArgs() throws CommandException {
         return getMapFromArgs(playerSender(), 0, true);

@@ -74,6 +74,7 @@ public class DeleteCommand extends IoMCommand {
 
     @Override
     protected void run() throws CommandException {
+        sanityCheckAssert();
         ArrayList<String> arguments = getArgs();
         final boolean confirm = hasFlag("confirm");
 

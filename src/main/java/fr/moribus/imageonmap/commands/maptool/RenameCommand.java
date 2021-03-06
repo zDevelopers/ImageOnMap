@@ -34,7 +34,7 @@ public class RenameCommand extends IoMCommand {
 
     @Override
     protected void run() throws CommandException {
-
+        sanityCheckAssert();
         ArrayList<String> argList = getArgs();
 
         if (argList.size() != 2) {

@@ -74,6 +74,7 @@ public class NewCommand extends IoMCommand {
 
     @Override
     protected void run() throws CommandException {
+        sanityCheckAssert();
         final Player player = playerSender();
         ImageUtils.ScalingType scaling = ImageUtils.ScalingType.NONE;
         URL url;

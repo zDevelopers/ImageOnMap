@@ -58,7 +58,7 @@ public class GiveCommand extends IoMCommand {
 
     @Override
     protected void run() throws CommandException {
-
+        sanityCheckAssert();
         if (args.length < 2) {
             throwInvalidArgument(I.t("You must give a valid player name and a map name."));
             return;
