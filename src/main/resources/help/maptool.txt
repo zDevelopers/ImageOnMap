@@ -10,5 +10,8 @@ list: Lists all the map you currently have.
 listother: list all the map of another player.
 explore: Opens a GUI to see and manage your maps.
 exploreother: Opens a GUI to see and manage another player maps.
+give: Give a specified player a map
+rename: Rename an ImageOnMap
+update: Update a specified ImageOnMap
 migrate: Lauches the migration process from V2.7 to V3.x.
 help : Use help for more information about a command.

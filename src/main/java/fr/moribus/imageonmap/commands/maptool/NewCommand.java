@@ -57,6 +57,21 @@ import org.bukkit.entity.Player;
 
 @CommandInfo(name = "new", usageParameters = "<URL> [resize]")
 public class NewCommand extends IoMCommand {
+
+    private ImageUtils.ScalingType resizeMode() throws CommandException {
+        switch (args[1]) {
+            case "resize":
+                return ImageUtils.ScalingType.CONTAINED;
+            case "resize-stretched":
+                return ImageUtils.ScalingType.STRETCHED;
+            case "resize-covered":
+                return ImageUtils.ScalingType.COVERED;
+            default:
+                throwInvalidArgument(I.t("Invalid Stretching mode."));
+                return ImageUtils.ScalingType.NONE;
+        }
+    }
+
     @Override
     protected void run() throws CommandException {
         final Player player = playerSender();
@@ -81,21 +96,7 @@ public class NewCommand extends IoMCommand {
                 width = Integer.parseInt(args[2]);
                 height = Integer.parseInt(args[3]);
             }
-
-            switch (args[1]) {
-                case "resize":
-                    scaling = ImageUtils.ScalingType.CONTAINED;
-                    break;
-                case "resize-stretched":
-                    scaling = ImageUtils.ScalingType.STRETCHED;
-                    break;
-                case "resize-covered":
-                    scaling = ImageUtils.ScalingType.COVERED;
-                    break;
-                default:
-                    throwInvalidArgument(I.t("Invalid Stretching mode."));
-                    break;
-            }
+            scaling = resizeMode();
         }
         try {
             ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));

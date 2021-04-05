@@ -36,6 +36,7 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
@@ -43,102 +44,106 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.mojang.UUIDFetcher;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.UUID;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
-@CommandInfo(name = "give", usageParameters = "<Player> <MapName> or <Player> <MapName> <Player where to find the map>")
+@CommandInfo(name = "give", usageParameters = "<player name> [playerFrom]:<map name>")
 public class GiveCommand extends IoMCommand {
-
-    //TODO passer avec une reconnaissance player/UUID, par défaut
-    /**
-     * Parse an argument given at a specific index, it will return a player depending on the given prefixe.
-     * Can be player:< username > or uuid:< uuid >
-     *
-     * @param index The index.
-     * @return The retrieved player.
-     * @throws CommandException     If the value is invalid.
-     *
-     */
-    private OfflinePlayer parse(int index) throws CommandException {
-
-        String s = args[index].trim();
-        String[] subs = s.split(":");
-        //try {
-        //
-        if (subs.length == 1) {
-            return null;//temp
-            //return offlinePlayerParameter(index);
-        }
-
-        switch (subs[0]) {
-            case "player":
-                return null;//temp
-            // return offlinePlayerParameter(subs[1]);
-
-            case "uuid":
-                StringBuffer string = new StringBuffer(subs[1].toLowerCase());
-                //if there are no '-'
-                if (string.length() == 32) {
-                    //we try to fix it by adding - at pos 8,12,16,20
-                    Integer[] pos = {20, 16, 12, 8};
-                    for (int i : pos) {
-                        string = string.insert(i, "-");
-                    }
-                }
-
-                //if the given uuid is well formed with 8-4-4-4-12 = 36 chars in length (including '-')
-                if (string.length() == 36) {
-                    return Bukkit.getOfflinePlayer(UUID.fromString(string.toString()));
-                }
-
-                throwInvalidArgument(
-                        I.t("Invalid uuid, please provide an uuid of this form xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                                + " or xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"));
-                break;
-            case "bank":
-                throwInvalidArgument(I.t("Not supported yet"));
-                break;
-
-            default:
-                throwInvalidArgument(I.t("Invalid prefix, valid one are: player | uuid"));
-        }
-        /*} catch (InterruptedException | ExecutionException e) {
-            PluginLogger.warning(I.t("Can't access to mojang API to check the player UUID"));
-        }*/
-        return null;
-    }
 
     @Override
     protected void run() throws CommandException {
 
         if (args.length < 2) {
             throwInvalidArgument(I.t("You must give a valid player name and a map name."));
+            return;
         }
 
-        final Player p = getPlayerParameter(0);
+        ArrayList<String> arguments = getArgs();
 
-        ImageMap map;
-        //TODO add support for map name with spaces "cool name" or name or "name" "cool name with a \" and some stuff"
-        // should work
-        OfflinePlayer player = null;
+        if (arguments.size() > 3) {
+            throwInvalidArgument(I.t("Too many parameters!"));
+            return;
+        }
+        if (arguments.size() < 1) {
+            throwInvalidArgument(I.t("Too few parameters!"));
+            return;
+        }
+        final String mapName;
+        final String from;
+        final String playerName;
+        final Player playerSender;
+        Player playerSender1;
+        try {
+            playerSender1 = playerSender();
+        } catch (CommandException ignored) {
+            if (arguments.size() == 2) {
+                throwInvalidArgument(I.t("Player name is required from the console"));
+            }
+            playerSender1 = null;
+        }
+        playerSender = playerSender1;
+        if (arguments.size() == 2) {
+            from = playerSender.getName();
+            playerName = arguments.get(0);
+            mapName = arguments.get(1);
+        } else {
+            if (arguments.size() == 3) {
+                from = arguments.get(1);
+                playerName = arguments.get(0);
+                mapName = arguments.get(2);
+            } else {
+                from = "";
+                playerName = "";
+                mapName = "";
+            }
+        }
 
-        if (args.length < 4) {
-            if (args.length == 2) {
-                player = playerSender();
+        final Player sender = playerSender();
+
+        //TODO passer en static
+        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(from, uuid -> {
+            if (uuid == null) {
+                warning(sender, I.t("The player {0} does not exist.", from));
+                return;
             }
-            if (args.length == 3) {
-                player = parse(2);
-            }
-            map = MapManager.getMap(player.getUniqueId(), args[1]);
+            final ImageMap map = MapManager.getMap(uuid, mapName);
+
             if (map == null) {
-                throwInvalidArgument(I.t("Map not found"));
+                warning(sender, I.t("This map does not exist."));
+                return;
             }
-            map.give(p);
-        }
+            try {
+                UUID uuid2 = UUIDFetcher.fetch(playerName);
+                if (uuid2 == null) {
+                    warning(sender, I.t("The player {0} does not exist.", playerName));
+                    return;
+                }
+                if (Bukkit.getPlayer((uuid2)) == null || !Bukkit.getPlayer((uuid2)).isOnline()) {
+                    warning(sender, I.t("The player {0} is not connected.", playerName));
+                    return;
+                }
+                if (Bukkit.getPlayer((uuid2)) != null && Bukkit.getPlayer((uuid2)).isOnline()
+                        && map.give(Bukkit.getPlayer(uuid2))) {
+                    info(I.t("The requested map was too big to fit in your inventory."));
+                    info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+                }
+
+            } catch (IOException | InterruptedException e) {
+                try {
+                    throwInvalidArgument(I.t("The player {0} does not exist.", playerName));
+                } catch (CommandException ex) {
+                    ex.printStackTrace();
+                }
+                return;
+            }
+        });
+
     }
 
     @Override

@@ -51,7 +51,6 @@ import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 
@@ -60,7 +59,7 @@ public class MapListGui extends ExplorerGui<ImageMap> {
     private OfflinePlayer offplayer;
     private String name;
 
-    public MapListGui(Player sender) {
+    public MapListGui(OfflinePlayer sender) {
         this.offplayer = sender;
         this.name = sender.getName();
     }
@@ -225,7 +224,7 @@ public class MapListGui extends ExplorerGui<ImageMap> {
                             mapPartLeft));
         }
 
-        //statistics.hideAllAttributes();
+        statistics.hideAllAttributes();
 
         action("", getSize() - 5, statistics);
     }

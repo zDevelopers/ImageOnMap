@@ -37,6 +37,7 @@
 package fr.moribus.imageonmap.commands.maptool;
 
 
+import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.gui.MapListGui;
@@ -44,42 +45,48 @@ import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.gui.Gui;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
+import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
-@CommandInfo(name = "explore")
+@CommandInfo(name = "explore",usageParameters = "[player name]")
 public class ExploreCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
-        if (args.length < 1) {
-            Gui.open(playerSender(), new MapListGui(playerSender()));
-        } else {
-            if (Permissions.LISTOTHER.grantedTo(sender)) {
-                String name = args[0];
-                Player sender = playerSender();
-                offlinePlayerParameter(0, uuid -> {
-                    if (uuid == null) {
-                        try {
-                            throwInvalidArgument(I.t("Player not found."));
-                        } catch (CommandException e) {
-                            PluginLogger.error("CommandException " + e);
-                            return;
-                        }
-                    }
-
-                    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-                    if (offlinePlayer != null) {
-                        Gui.open(sender, new MapListGui(offlinePlayer, name));
-                    } else {
-                        PluginLogger.warning(I.t("Can't find player"));
-                    }
-                });
-            }
+        ArrayList<String> arguments = getArgs();
+        if (arguments.size() > 1) {
+            throwInvalidArgument(I.t("Too many parameters!"));
+            return;
         }
+        final String playerName;
+
+        final Player sender = playerSender();
+        if (arguments.size() == 1) {
+            if (!Permissions.LISTOTHER.grantedTo(sender)) {
+                throwNotAuthorized();
+                return;
+            }
+            playerName = arguments.get(0);
+        } else {
+            playerName = sender.getName();
+        }
+
+        //TODO passer en static
+        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
+            if (uuid == null) {
+                warning(sender, I.t("The player {0} does not exist.", playerName));
+                return;
+            }
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+            if (sender.isOnline()) {
+                Gui.open(sender, new MapListGui(offlinePlayer,playerName));
+            }
+
+        });
+
     }
 
     @Override

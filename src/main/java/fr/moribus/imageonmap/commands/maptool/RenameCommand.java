@@ -21,27 +21,33 @@ package fr.moribus.imageonmap.commands.maptool;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
+import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.command.CommandSender;
 
 @CommandInfo(name = "rename", usageParameters = "<original map name> <new map name>")
 public class RenameCommand extends IoMCommand {
+
     @Override
     protected void run() throws CommandException {
-        if (args.length != 4) {
+
+        ArrayList<String> argList = getArgs();
+
+        if (argList.size() != 2) {
             warning(I.t("Not enough or too many arguments! Usage: /maptool rename <map name> <new map name>"));
             return;
         }
-        //if(args.length == 2)
-        //{
-        ImageMap map = getMapFromArgs();
-        map.rename(args[2]);
-        // } else {
-        //    info(I.t("Not enough or too many arguments"));
-        // }
+
+        ImageMap map = MapManager.getMap(playerSender().getUniqueId(), argList.get(0));
+        if (map == null) {
+            error(I.t("This map does not exist."));
+            return;
+        }
+        map.rename(argList.get(1));
     }
 
     @Override
