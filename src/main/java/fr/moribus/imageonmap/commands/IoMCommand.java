@@ -49,11 +49,12 @@ import org.bukkit.entity.Player;
 
 public abstract class IoMCommand extends Command {
 
-    protected void sanityCheckAssert() {
+    protected boolean isSanityCheckFinished() {
         if (ImageOnMap.getPlugin().isMapIdCorrupted()) {
             warning(sender, I.t("You can't perform this command as long as the sanity check is ongoing."));
-            return;
+            return false;
         }
+        return true;
     }
 
     protected ImageMap getMapFromArgs() throws CommandException {

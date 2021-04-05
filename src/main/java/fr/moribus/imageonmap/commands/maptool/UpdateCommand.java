@@ -61,7 +61,9 @@ import org.bukkit.entity.Player;
 public class UpdateCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
-        sanityCheckAssert();
+        if (!isSanityCheckFinished()) {
+            return;
+        }
         //TODO fix the issue where to many quick usage of offlineNameFetch will return null
         ArrayList<String> arguments = getArgs();
         String warningMsg;

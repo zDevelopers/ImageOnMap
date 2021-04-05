@@ -49,7 +49,9 @@ import org.bukkit.entity.Player;
 public class GetRemainingCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
-        sanityCheckAssert();
+        if (!isSanityCheckFinished()) {
+            return;
+        }
         Player player = playerSender();
 
         if (MapItemManager.getCacheSize(player) <= 0) {

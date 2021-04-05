@@ -56,7 +56,9 @@ import org.bukkit.entity.Player;
 public class ExploreCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
-        sanityCheckAssert();
+        if (!isSanityCheckFinished()) {
+            return;
+        }
         ArrayList<String> arguments = getArgs();
         if (arguments.size() > 1) {
             throwInvalidArgument(I.t("Too many parameters!"));

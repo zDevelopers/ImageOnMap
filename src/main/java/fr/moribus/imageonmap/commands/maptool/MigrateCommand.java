@@ -48,7 +48,9 @@ import org.bukkit.command.CommandSender;
 public class MigrateCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
-        sanityCheckAssert();
+        if (!isSanityCheckFinished()) {
+            return;
+        }
         if (MigratorExecutor.isRunning()) {
             error(I.t("A migration process is already running. Check console for details."));
         } else {

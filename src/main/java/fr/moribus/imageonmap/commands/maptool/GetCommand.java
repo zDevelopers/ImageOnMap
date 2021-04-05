@@ -53,7 +53,9 @@ import org.bukkit.entity.Player;
 public class GetCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
-        sanityCheckAssert();
+        if (!isSanityCheckFinished()) {
+            return;
+        }
         ArrayList<String> arguments = getArgs();
 
         if (arguments.size() > 2) {
