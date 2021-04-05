@@ -149,7 +149,7 @@ public final class ImageOnMap extends QuartzPlugin {
         }
 
         if (PluginConfiguration.COLLECT_DATA.get()) {
-            final Metrics metrics = new Metrics(this);
+            final Metrics metrics = new Metrics(this,5920);
             metrics.addCustomChart(new Metrics.SingleLineChart("rendered-images", MapManager::getImagesCount));
             metrics.addCustomChart(new Metrics.SingleLineChart("used-minecraft-maps", MapManager::getMapCount));
         } else {
