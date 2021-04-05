@@ -49,6 +49,7 @@ import fr.zcraft.quartzlib.components.nbt.NBTList;
 import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.reflection.NMSException;
+import fr.zcraft.quartzlib.tools.runners.RunTask;
 import fr.zcraft.quartzlib.tools.text.MessageSender;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
 import fr.zcraft.quartzlib.tools.world.WorldUtils;
@@ -121,9 +122,7 @@ public abstract class SplatterMapManager {
      * prettier).
      *
      * @param itemStack The item stack to mark as a splatter map.
-     * @return The modified item stack. The instance may be different if the passed item stack is not
-      a craft item stack; that's why the instance is returned.
-     *
+     * @return The modified item stack. The instance may be different if the passed item stack is not a craft itemstack.
      */
     public static ItemStack addSplatterAttribute(final ItemStack itemStack) {
         try {
@@ -254,7 +253,11 @@ public abstract class SplatterMapManager {
                 }
                 //Rotation management relative to player rotation the default position is North,
                 // when on ceiling we flipped the rotation
-                frame.setItem(new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+                RunTask.later(() -> {
+                    frame.setItem(
+                            new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+                }, 5L);
+
                 if (i == 0) {
                     //First map need to be rotate one time CounterClockwise
                     rot = rot.rotateCounterClockwise();
@@ -310,7 +313,12 @@ public abstract class SplatterMapManager {
             for (ItemFrame frame : wall.frames) {
 
                 int id = poster.getMapIdAtReverseY(i);
-                frame.setItem(new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+
+                RunTask.later(() -> {
+                    frame.setItem(
+                            new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+                }, 5L);
+
 
                 //Force reset of rotation
                 frame.setRotation(Rotation.NONE);

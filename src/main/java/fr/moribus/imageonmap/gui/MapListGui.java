@@ -136,6 +136,10 @@ public class MapListGui extends ExplorerGui<ImageMap> {
         Gui.open(getPlayer(), new MapDetailGui(data, getPlayer(), name), this);
     }
 
+    @Override
+    protected void onClose() {
+        super.onClose();
+    }
 
     @Override
     protected ItemStack getPickedUpItem(ImageMap map) {
@@ -164,7 +168,6 @@ public class MapListGui extends ExplorerGui<ImageMap> {
     protected void onUpdate() {
         ImageMap[] maps = MapManager.getMaps(offplayer.getUniqueId());
         setData(maps);
-
         /// The maps list GUI title
         //Equal if the person who send the command is the owner of the mapList
         if (offplayer.getUniqueId().equals(getPlayer().getUniqueId())) {
