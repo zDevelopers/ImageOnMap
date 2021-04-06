@@ -36,6 +36,7 @@
                             <shadedPattern>fr.moribus.imageonmap</shadedPattern>
                         </relocation>
                     </relocations>
+                    <minimizeJar>true</minimizeJar>
                 </configuration>
                 <executions>
                     <execution>
