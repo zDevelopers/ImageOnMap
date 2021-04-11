@@ -293,8 +293,7 @@ public class MapItemManager implements Listener {
 
         }
 
-
-        ItemUtils.consumeItem(player);
+        ItemUtils.consumeItem(player, mapItem);
     }
 
     private static void onItemFrameRemove(ItemFrame frame, Player player, EntityDamageByEntityEvent event) {
