@@ -87,7 +87,9 @@ Main command to manage the maps. The less used in everyday usage, too.
   - `imageonmap.administrative` for `/maptool migrate`.
   - `imageonmap.explore` for `/maptool explore`;
   - `imageonmap.update` for `/maptool update`;
-  - `imageonmap.give` for `/maptool give`;
+  - `imageonmap.give` for `/maptool give`.
+  
+
 ### About the permissions
 
 All permissions are by default granted to everyone, with the exception of `imageonmap.administrative`, `imageonmap.give` and the ones that used the suffix `other` . We believe that in most cases, servers administrators want to give the availability to create images on maps to every player.  
@@ -167,27 +169,38 @@ upcoming Minecraft 1.16 version, an update will add compatibility soon after its
 - Added Russian and German translations (thx to Danechek and squeezer).
 
 ### 4.1 — Moderation Update
- Moderation Update gives mods or admins commands to see maps for other players, to give maps, but also to update maps already placed in the world. You can also use ImageOnMap commands from the console or from command blocks, opening a whole new realm of automation around ImageOnMap (read: commands executed from skripts and data-packs should work).
+
+*4.1 — Moderation Update* gives mods or admins commands to see maps for other players, to give maps, but also to update maps already placed in the world. You can also use ImageOnMap commands from the console or from command blocks, opening a whole new realm of automation around ImageOnMap (read: commands executed from skripts and data-packs should work).
 
 We also fixed some bugs that were reported by lots of people.
 
-This version is only compatible with Minecraft 1.15+.
+**This version is only compatible with Minecraft 1.15+.**
 
-- Added /maptool update to change the image attached to a map.
-- Added /givemap to give a map of a specific player to another.
-- All command can now be executed for other players. As example, /maps username will allow you to see all username maps.
+- Added `/maptool update` to change the image attached to a map.
+- Added `/givemap` to give a map of a specific player to another.
+- All command can now be executed for other players. As example, `/maps username` will allow you to see all `username` maps.
 - You can now use ImageOnMap commands from command blocks or from the console.
 - Commands now support map name between quotes: "A nice name to have for a map".
-- Added /maptool rename if you don't want or cannot use the GUI.
+- Added `/maptool rename` if you don't want or cannot use the GUI.
 - Size limit (in frame).
 - Bug fixes & optimizations.
-    - Various optimizations.
-    - Fixed AWT memory leak—can happen if you do a lot of 50x50 renders.
-    -   /maptool list no longer throw an exception.
-    -  Fixed an issue where the bottom left map that not render like it should.
-    -  Fixed the gui rename issue that was the cause of inventory loss.
+  - Various optimizations.
+  - Fixed AWT memory leak—can happen if you do a lot of 50x50 renders.
+  - `/maptool list` no longer throw an exception.
+  - Fixed an issue where the bottom left map don't render like it should.
+  - Fixed the gui rename issue that was the cause of inventory loss.
+  
+### 4.1.1 — Moderation Update Too
 
+This version fix bugs introduced with 4.1, and others fixed on QuartzLib side,
+as this update the QuartzLib version we use to 0.0.3.
 
+- Fixed update message sent even if the plugin is updated.
+- Fixed weird update message (raw JSON instead of formatted text).   
+- Fixed rare inventory bugs, causing items to be duplicated or barrier blocks to be obtained.
+- Fixed possibility to get XP from the glowing effect applied on maps.
+- Fixed `/maps` not working on Java 15+ due to JavaScript engine being unavailable.
+- Fixed plugin not working on Minehut host due to Javascript engines being restricted.
 
 ## Data collection
 
