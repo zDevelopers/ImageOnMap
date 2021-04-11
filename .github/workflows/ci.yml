@@ -3,10 +3,11 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - indev
   pull_request:
     branches:
-      - master
+      - indev
+
 jobs:
   build:
     name: Test on Java ${{ matrix.java }}
