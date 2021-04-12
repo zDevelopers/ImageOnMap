@@ -202,6 +202,13 @@ as this update the QuartzLib version we use to 0.0.3.
 - Fixed `/maps` not working on Java 15+ due to JavaScript engine being unavailable.
 - Fixed plugin not working on Minehut host due to Javascript engines being restricted.
 
+### 4.1.2 — Moderation Update Three
+
+This version fixes some small console spam bugs and improves the performance of the translations of the plugin.
+
+- Updates to [QuartzLib 0.0.4](https://github.com/zDevelopers/QuartzLib/blob/master/CHANGELOG.md#quartzlib-004),
+  where all these improvements were made.
+
 ## Data collection
 
 We use metrics to collect [basic information about the usage of this plugin](https://bstats.org/plugin/bukkit/ImageOnMap).
