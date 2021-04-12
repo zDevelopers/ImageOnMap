@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.moribus</groupId>
     <artifactId>ImageOnMap</artifactId>
-    <version>4.1.1</version>
+    <version>4.1.2</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -98,7 +98,7 @@
         <dependency>
             <groupId>fr.zcraft</groupId>
             <artifactId>quartzlib</artifactId>
-            <version>0.0.3</version>
+            <version>0.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>

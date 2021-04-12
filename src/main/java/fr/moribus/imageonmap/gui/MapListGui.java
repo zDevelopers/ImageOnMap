@@ -74,16 +74,16 @@ public class MapListGui extends ExplorerGui<ImageMap> {
         String mapDescription;
         if (map instanceof SingleMap) {
             /// Displayed subtitle description of a single map on the list GUI
-            mapDescription = I.t(getPlayerLocale(), "{white}Single map");
+            mapDescription = I.tl(getPlayerLocale(), "{white}Single map");
         } else {
             PosterMap poster = (PosterMap) map;
             if (poster.hasColumnData()) {
                 /// Displayed subtitle description of a poster map on the list GUI (columns × rows in english)
-                mapDescription = I.t(getPlayerLocale(), "{white}Poster map ({0} × {1})", poster.getColumnCount(),
+                mapDescription = I.tl(getPlayerLocale(), "{white}Poster map ({0} × {1})", poster.getColumnCount(),
                         poster.getRowCount());
             } else {
                 /// Displayed subtitle description of a poster map without column data on the list GUI
-                mapDescription = I.t(getPlayerLocale(), "{white}Poster map ({0} parts)", poster.getMapCount());
+                mapDescription = I.tl(getPlayerLocale(), "{white}Poster map ({0} parts)", poster.getMapCount());
             }
         }
 
