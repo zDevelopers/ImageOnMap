@@ -62,9 +62,9 @@ public class NewCommand extends IoMCommand {
         switch (args[1]) {
             case "resize":
                 return ImageUtils.ScalingType.CONTAINED;
-            case "resize-stretched":
+            case "stretch":
                 return ImageUtils.ScalingType.STRETCHED;
-            case "resize-covered":
+            case "cover":
                 return ImageUtils.ScalingType.COVERED;
             default:
                 throwInvalidArgument(I.t("Invalid Stretching mode."));
