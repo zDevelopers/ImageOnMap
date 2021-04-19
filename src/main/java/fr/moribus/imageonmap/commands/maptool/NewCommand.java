@@ -92,11 +92,34 @@ public class NewCommand extends IoMCommand {
         }
 
         if (args.length >= 2) {
-            if (args.length >= 4) {
-                width = Integer.parseInt(args[2]);
-                height = Integer.parseInt(args[3]);
+            if (args.length >= 3) {
+                try {
+                    if (args.length >= 4) {
+                        width = Integer.parseInt(args[2]);
+                        height = Integer.parseInt(args[3]);
+                    } else {
+                        String[] size;
+                        if (args[2].contains("*") && !args[2].contains("x")) {
+                            size = args[2].split("\\*");
+                            width = Integer.parseInt(size[0]);
+                            height = Integer.parseInt(size[1]);
+                        }
+                        if (!args[2].contains("*") && args[2].contains("x")) {
+                            size = args[2].split("x");
+                            width = Integer.parseInt(size[0]);
+                            height = Integer.parseInt(size[1]);
+                        }
+                    }
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                    throwInvalidArgument(I.t("resize dimension as to be in format <n m> or <nxm> or <n*m>."));
+                    return;
+                }
             }
             scaling = resizeMode();
+        }
+        if (width == 0 || height == 0) {
+            throwInvalidArgument(I.t("You need to specify a valid size. e.g. resize 4 5"));
+            return;
         }
         try {
             ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));
