@@ -62,8 +62,12 @@ public class NewCommand extends IoMCommand {
         switch (args[1]) {
             case "resize":
                 return ImageUtils.ScalingType.CONTAINED;
+            case "stretch":
+            case "stretched":
             case "resize-stretched":
                 return ImageUtils.ScalingType.STRETCHED;
+            case "cover":
+            case "covered":
             case "resize-covered":
                 return ImageUtils.ScalingType.COVERED;
             default:
