@@ -253,7 +253,7 @@ public class MapItemManager implements Listener {
         }
 
         if (!Permissions.PLACE_SPLATTER_MAP.grantedTo(player)) {
-            player.sendMessage(ChatColor.RED + "You do not have permission to place splatter maps.");
+            player.sendMessage(I.t(ChatColor.RED + "You do not have permission to place splatter maps."));
             event.setCancelled(true);
             return;
         }

@@ -30,6 +30,7 @@ permissions:
       imageonmap.explore: true
       imageonmap.exploreother: false
       imageonmap.rename: true
+      imageonmap.placesplattermap: true
       imageonmap.removesplattermap: true
       imageonmap.delete: true
       imageonmap.deleteother: false
@@ -85,6 +86,10 @@ permissions:
   imageonmap.deleteother:
     description: "Allows you to delete a map a player rendered in the past."
     default: op
+
+  imageonmap.placesplattermap:
+    description: "Allows you to place a splatter map."
+    default: true
 
   imageonmap.removesplattermap:
     description: "Allows you to remove a splatter map from a wall by sneaking and breaking a map."
