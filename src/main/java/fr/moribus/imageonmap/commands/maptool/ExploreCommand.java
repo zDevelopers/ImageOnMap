@@ -52,7 +52,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
-@CommandInfo(name = "explore",usageParameters = "[player name]")
+@CommandInfo(name = "explore", usageParameters = "[player name]")
 public class ExploreCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
@@ -81,8 +81,14 @@ public class ExploreCommand extends IoMCommand {
                 return;
             }
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+            if (offlinePlayer == null) {
+                warning(sender, I.t("The player {0} does not exist.", playerName));
+                return;
+            }
             if (sender.isOnline()) {
-                Gui.open(sender, new MapListGui(offlinePlayer,playerName));
+                //RunTask.nextTick(() -> {
+                Gui.open(sender, new MapListGui(offlinePlayer, playerName));
+                //});
             }
 
         });

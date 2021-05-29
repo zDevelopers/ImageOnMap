@@ -80,7 +80,9 @@ public class ListCommand extends IoMCommand {
 
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
-            List<ImageMap> mapList = MapManager.getMapList(uuid);
+            if (!sender.isOnline()) {
+                return;
+            }
             if (uuid == null) {
                 try {
                     throwInvalidArgument(I.t("Player {} not found.", playerName));
@@ -89,6 +91,7 @@ public class ListCommand extends IoMCommand {
                 }
                 return;
             }
+            List<ImageMap> mapList = MapManager.getMapList(uuid);
             if (mapList.isEmpty()) {
                 info(sender, I.t("No map found."));
                 return;
