@@ -44,9 +44,9 @@ import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.components.nbt.NBT;
 import fr.zcraft.quartzlib.components.nbt.NBTCompound;
-import fr.zcraft.quartzlib.components.nbt.NBTException;
 import fr.zcraft.quartzlib.components.nbt.NBTList;
 import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.items.GlowEffect;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.reflection.NMSException;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
@@ -125,22 +125,8 @@ public abstract class SplatterMapManager {
      * @return The modified item stack. The instance may be different if the passed item stack is not a craft itemstack.
      */
     public static ItemStack addSplatterAttribute(final ItemStack itemStack) {
-        try {
-            final NBTCompound nbt = NBT.fromItemStack(itemStack);
-            final NBTList enchantments = new NBTList();
-            final NBTCompound protection = new NBTCompound();
-
-            protection.put("id", "minecraft:mending");
-            protection.put("lvl", 1);
-            enchantments.add(protection);
-
-            nbt.put("Enchantments", enchantments);
-
-            return NBT.addToItemStack(itemStack, nbt, false);
-        } catch (NBTException | NMSException e) {
-            PluginLogger.error("Unable to set Splatter Map attribute on item", e);
-            return itemStack;
-        }
+        GlowEffect.addGlow(itemStack);
+        return itemStack;
     }
 
     /**
@@ -185,7 +171,7 @@ public abstract class SplatterMapManager {
      * Return true if it has a specified splatter map
      *
      * @param player The player to check.
-     * @param map The map to check.
+     * @param map    The map to check.
      * @return True if the player has this map
      */
     public static boolean hasSplatterMap(Player player, PosterMap map) {
