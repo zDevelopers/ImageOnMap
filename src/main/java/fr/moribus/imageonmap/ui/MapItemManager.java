@@ -37,12 +37,14 @@
 package fr.moribus.imageonmap.ui;
 
 import fr.moribus.imageonmap.Permissions;
+import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.core.QuartzLib;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.items.ItemUtils;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
@@ -260,7 +262,6 @@ public class MapItemManager implements Listener {
 
         frame.setItem(new ItemStack(Material.AIR));
         if (SplatterMapManager.hasSplatterAttributes(mapItem)) {
-
             if (!SplatterMapManager.placeSplatterMap(frame, player, event)) {
                 event.setCancelled(true); //In case of an error allow to cancel map placement
                 return;
