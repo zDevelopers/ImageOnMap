@@ -75,7 +75,6 @@ public class ExploreCommand extends IoMCommand {
         }
 
         consumePlayerCommand(playerName, uuid -> {
-            PluginLogger.info("uuid " + uuid);
 
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             if (sender.isOnline()) {
