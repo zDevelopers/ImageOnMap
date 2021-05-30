@@ -155,11 +155,9 @@ public class UpdateCommand extends IoMCommand {
         }
 
         //TODO passer en static
-        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
-            if (uuid == null) {
-                warning(sender, I.t("The player {0} does not exist.", playerName));
-                return;
-            }
+        //ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
+        consumePlayerCommand(playerName, uuid -> {
+
             ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {

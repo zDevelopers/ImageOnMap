@@ -36,7 +36,6 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
@@ -78,17 +77,9 @@ public class ListCommand extends IoMCommand {
 
         final Player sender = playerSender();
 
-        //TODO passer en static
-        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
+
+        consumePlayerCommand(playerName, uuid -> {
             List<ImageMap> mapList = MapManager.getMapList(uuid);
-            if (uuid == null) {
-                try {
-                    throwInvalidArgument(I.t("Player {} not found.", playerName));
-                } catch (CommandException e) {
-                    e.printStackTrace();
-                }
-                return;
-            }
             if (mapList.isEmpty()) {
                 info(sender, I.t("No map found."));
                 return;

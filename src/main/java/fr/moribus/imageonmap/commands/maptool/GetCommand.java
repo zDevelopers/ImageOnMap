@@ -82,16 +82,13 @@ public class GetCommand extends IoMCommand {
 
 
 
-        //TODO passer en static
-        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
+
+        consumePlayerCommand(playerName, uuid -> {
 
             if (!sender.isOnline()) {
                 return;
             }
-            if (uuid == null) {
-                warning(sender, I.t("The player {0} does not exist.", playerName));
-                return;
-            }
+
             ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {

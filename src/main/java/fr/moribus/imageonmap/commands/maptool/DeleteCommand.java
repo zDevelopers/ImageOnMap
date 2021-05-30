@@ -36,7 +36,6 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
@@ -102,13 +101,7 @@ public class DeleteCommand extends IoMCommand {
             mapName = arguments.get(0);
         }
 
-        //TODO passer en static
-        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
-            if (uuid == null) {
-                warning(sender, I.t("The player {0} does not exist.", playerName));
-                return;
-            }
-
+        consumePlayerCommand(playerName, uuid -> {
             ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
