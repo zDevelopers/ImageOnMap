@@ -43,10 +43,26 @@ import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.i18n.I;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 
 public abstract class IoMCommand extends Command {
+
+
+    protected void retrieveUUID(String arg, Consumer<UUID> consumer) {
+        UUID uuid;
+        OfflinePlayer offlinePlayer;
+
+        offlinePlayer = Bukkit.getOfflinePlayer(arg);//If it is being removed we may have to use mojang services
+        uuid = offlinePlayer.getUniqueId();
+
+        consumer.accept(uuid);
+
+    }
 
     protected ImageMap getMapFromArgs() throws CommandException {
         return getMapFromArgs(playerSender(), 0, true);

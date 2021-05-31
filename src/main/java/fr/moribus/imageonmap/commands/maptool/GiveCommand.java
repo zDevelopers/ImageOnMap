@@ -36,7 +36,6 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
@@ -44,10 +43,7 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.mojang.UUIDFetcher;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -106,42 +102,21 @@ public class GiveCommand extends IoMCommand {
 
         final Player sender = playerSender();
 
-        //TODO passer en static
-        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(from, uuid -> {
-            if (uuid == null) {
-                warning(sender, I.t("The player {0} does not exist.", from));
-                return;
-            }
+        retrieveUUID(from, uuid -> {
             final ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
                 warning(sender, I.t("This map does not exist."));
                 return;
             }
-            try {
-                UUID uuid2 = UUIDFetcher.fetch(playerName);
-                if (uuid2 == null) {
-                    warning(sender, I.t("The player {0} does not exist.", playerName));
-                    return;
-                }
-                if (Bukkit.getPlayer((uuid2)) == null || !Bukkit.getPlayer((uuid2)).isOnline()) {
-                    warning(sender, I.t("The player {0} is not connected.", playerName));
-                    return;
-                }
+
+            retrieveUUID(playerName, uuid2 -> {
                 if (Bukkit.getPlayer((uuid2)) != null && Bukkit.getPlayer((uuid2)).isOnline()
                         && map.give(Bukkit.getPlayer(uuid2))) {
                     info(I.t("The requested map was too big to fit in your inventory."));
                     info(I.t("Use '/maptool getremaining' to get the remaining maps."));
                 }
-
-            } catch (IOException | InterruptedException e) {
-                try {
-                    throwInvalidArgument(I.t("The player {0} does not exist.", playerName));
-                } catch (CommandException ex) {
-                    ex.printStackTrace();
-                }
-                return;
-            }
+            });
         });
 
     }

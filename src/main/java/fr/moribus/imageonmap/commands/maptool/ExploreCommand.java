@@ -37,7 +37,6 @@
 package fr.moribus.imageonmap.commands.maptool;
 
 
-import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.gui.MapListGui;
@@ -45,6 +44,7 @@ import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.gui.Gui;
 import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -52,7 +52,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
-@CommandInfo(name = "explore",usageParameters = "[player name]")
+@CommandInfo(name = "explore", usageParameters = "[player name]")
 public class ExploreCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
@@ -74,15 +74,11 @@ public class ExploreCommand extends IoMCommand {
             playerName = sender.getName();
         }
 
-        //TODO passer en static
-        ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
-            if (uuid == null) {
-                warning(sender, I.t("The player {0} does not exist.", playerName));
-                return;
-            }
+        retrieveUUID(playerName, uuid -> {
+
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             if (sender.isOnline()) {
-                Gui.open(sender, new MapListGui(offlinePlayer,playerName));
+                Gui.open(sender, new MapListGui(offlinePlayer, playerName));
             }
 
         });
