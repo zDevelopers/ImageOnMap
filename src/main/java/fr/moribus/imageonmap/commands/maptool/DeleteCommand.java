@@ -101,7 +101,7 @@ public class DeleteCommand extends IoMCommand {
             mapName = arguments.get(0);
         }
 
-        consumePlayerCommand(playerName, uuid -> {
+        retrieveUUID(playerName, uuid -> {
             ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {

@@ -156,7 +156,7 @@ public class UpdateCommand extends IoMCommand {
 
         //TODO passer en static
         //ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
-        consumePlayerCommand(playerName, uuid -> {
+        retrieveUUID(playerName, uuid -> {
 
             ImageMap map = MapManager.getMap(uuid, mapName);
 

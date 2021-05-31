@@ -102,7 +102,7 @@ public class GiveCommand extends IoMCommand {
 
         final Player sender = playerSender();
 
-        consumePlayerCommand(from, uuid -> {
+        retrieveUUID(from, uuid -> {
             final ImageMap map = MapManager.getMap(uuid, mapName);
 
             if (map == null) {
@@ -110,7 +110,7 @@ public class GiveCommand extends IoMCommand {
                 return;
             }
 
-            consumePlayerCommand(playerName, uuid2 -> {
+            retrieveUUID(playerName, uuid2 -> {
                 if (Bukkit.getPlayer((uuid2)) != null && Bukkit.getPlayer((uuid2)).isOnline()
                         && map.give(Bukkit.getPlayer(uuid2))) {
                     info(I.t("The requested map was too big to fit in your inventory."));

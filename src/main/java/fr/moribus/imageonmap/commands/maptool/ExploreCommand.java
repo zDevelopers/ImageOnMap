@@ -74,7 +74,7 @@ public class ExploreCommand extends IoMCommand {
             playerName = sender.getName();
         }
 
-        consumePlayerCommand(playerName, uuid -> {
+        retrieveUUID(playerName, uuid -> {
 
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             if (sender.isOnline()) {

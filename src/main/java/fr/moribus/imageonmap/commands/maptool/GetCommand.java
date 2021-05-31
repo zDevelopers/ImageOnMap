@@ -83,7 +83,7 @@ public class GetCommand extends IoMCommand {
 
 
 
-        consumePlayerCommand(playerName, uuid -> {
+        retrieveUUID(playerName, uuid -> {
 
             if (!sender.isOnline()) {
                 return;

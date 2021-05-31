@@ -78,7 +78,7 @@ public class ListCommand extends IoMCommand {
         final Player sender = playerSender();
 
 
-        consumePlayerCommand(playerName, uuid -> {
+        retrieveUUID(playerName, uuid -> {
             List<ImageMap> mapList = MapManager.getMapList(uuid);
             if (mapList.isEmpty()) {
                 info(sender, I.t("No map found."));
