@@ -36,6 +36,7 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
+import com.oracle.js.parser.ir.Module;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
@@ -47,6 +48,7 @@ import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.components.worker.WorkerCallback;
 import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.reflection.Reflection;
 import fr.zcraft.quartzlib.tools.text.ActionBar;
 import fr.zcraft.quartzlib.tools.text.MessageSender;
 import java.net.MalformedURLException;
@@ -80,6 +82,12 @@ public class NewCommand extends IoMCommand {
         int width = 0;
         int height = 0;
 
+
+        PluginLogger.info(" " + Reflection.getBukkitPackageName());
+        PluginLogger.info(" " + Reflection.getMinecraftPackageName());
+        PluginLogger.info(" " + Reflection.getCallerClass().getName());
+
+
         if (args.length < 1) {
             throwInvalidArgument(I.t("You must give an URL to take the image from."));
         }
@@ -99,7 +107,9 @@ public class NewCommand extends IoMCommand {
             scaling = resizeMode();
         }
         try {
+            PluginLogger.info("action bar");
             ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));
+            PluginLogger.info("render executor");
             ImageRendererExecutor
                     .render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>() {
                         @Override
@@ -123,11 +133,16 @@ public class NewCommand extends IoMCommand {
                                     player.getName(),
                                     exception.getClass().getCanonicalName(),
                                     exception.getMessage());
+
+                            for (StackTraceElement ste : exception.getStackTrace()) {
+                                PluginLogger.warning("Debug: " + ste.toString());
+                            }
                         }
                     });
         } finally {
             ActionBar.removeMessage(player);
         }
+
     }
 
     @Override

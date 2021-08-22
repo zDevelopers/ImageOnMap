@@ -37,7 +37,9 @@
 package fr.moribus.imageonmap;
 
 
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public enum Permissions {
     NEW("imageonmap.new", "imageonmap.userender"),
@@ -70,6 +72,16 @@ public enum Permissions {
      * @return {@code true} if this permission is granted to the permissible.
      */
     public boolean grantedTo(Permissible permissible) {
+        StringBuilder sb = new StringBuilder("Permissions for: " + permissible.toString() + "\nimageonmap.");
+        for (PermissionAttachmentInfo pai : permissible.getEffectivePermissions()) {
+            String perm = pai.getPermission();
+            if (perm.startsWith("imageonmap.")) {
+                sb = sb.append("\n--" + perm.split("imageonmap.")[1] + " " + pai.getValue());
+            }
+            PluginLogger
+                    .debug(ImageOnMap.getPlugin(), PluginLogger.DebugLevel.USER_LOG, sb.toString());
+        }
+
         if (permissible.hasPermission(permission)) {
             return true;
         }

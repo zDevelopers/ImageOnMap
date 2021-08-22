@@ -36,11 +36,13 @@
 
 package fr.moribus.imageonmap.commands;
 
+import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.Command;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.entity.Player;
@@ -53,6 +55,7 @@ public abstract class IoMCommand extends Command {
     }
 
     protected ImageMap getMapFromArgs(Player player, int index, boolean expand) throws CommandException {
+        PluginLogger.debug(ImageOnMap.getPlugin(), PluginLogger.DebugLevel.DEVELOPER_LOG, "getMapFromArgs");
         if (args.length <= index) {
             throwInvalidArgument(I.t("You need to give a map name."));
         }
@@ -69,14 +72,17 @@ public abstract class IoMCommand extends Command {
         mapName = mapName.trim();
         map = MapManager.getMap(player.getUniqueId(), mapName);
 
+        PluginLogger.debug(ImageOnMap.getPlugin(), PluginLogger.DebugLevel.DEVELOPER_LOG,
+                "map arguments " + index + expand + player.getName() + mapName);
         if (map == null) {
             error(I.t("This map does not exist."));
         }
-
+        PluginLogger.debug(ImageOnMap.getPlugin(), PluginLogger.DebugLevel.USER_LOG, "Map " + map);
         return map;
     }
 
     protected ArrayList<String> getArgs() {
+        PluginLogger.debug(ImageOnMap.getPlugin(), PluginLogger.DebugLevel.DEVELOPER_LOG, "getArgs");
         ArrayList<String> arguments = new ArrayList<>();
 
         //State of the automaton, can read word like:
@@ -136,6 +142,7 @@ public abstract class IoMCommand extends Command {
     }
 
     protected List<String> getMatchingMapNames(Iterable<? extends ImageMap> maps, String prefix) {
+        PluginLogger.debug(ImageOnMap.getPlugin(), PluginLogger.DebugLevel.DEVELOPER_LOG, "getMatchingMapNames");
         List<String> matches = new ArrayList<>();
 
         for (ImageMap map : maps) {
@@ -143,7 +150,7 @@ public abstract class IoMCommand extends Command {
                 matches.add(map.getId());
             }
         }
-
+        PluginLogger.debug(ImageOnMap.getPlugin(), PluginLogger.DebugLevel.DEVELOPER_LOG, matches);
         return matches;
     }
 }

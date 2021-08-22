@@ -45,6 +45,7 @@ import fr.zcraft.quartzlib.components.worker.Worker;
 import fr.zcraft.quartzlib.components.worker.WorkerAttributes;
 import fr.zcraft.quartzlib.components.worker.WorkerCallback;
 import fr.zcraft.quartzlib.components.worker.WorkerRunnable;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,6 +94,7 @@ public class ImageRendererExecutor extends Worker {
 
     public static void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID,
                               final int width, final int height, WorkerCallback<ImageMap> callback) {
+        PluginLogger.info("render");
         submitQuery(new WorkerRunnable<ImageMap>() {
             @Override
             public ImageMap run() throws Throwable {
@@ -151,6 +153,7 @@ public class ImageRendererExecutor extends Worker {
                 final BufferedImage resizedImage =
                         scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
                 image.flush();//Safe to free
+                PluginLogger.info("render poster");
                 return renderPoster(resizedImage, playerUUID);
             }
         }, callback);
@@ -229,22 +232,26 @@ public class ImageRendererExecutor extends Worker {
         final PosterImage poster = new PosterImage(image);
         final int mapCount = poster.getImagesCount();
         MapManager.checkMapLimit(mapCount, playerUUID);
+        PluginLogger.info("futuremapsids");
         final Future<int[]> futureMapsIds = submitToMainThread(new Callable<int[]>() {
             @Override
             public int[] call() throws Exception {
                 return MapManager.getNewMapsIds(mapCount);
             }
         });
+        PluginLogger.info("splitting");
         poster.splitImages();
+        PluginLogger.info("get ids");
         final int[] mapsIDs = futureMapsIds.get();
+        PluginLogger.info("save");
         ImageIOExecutor.saveImage(mapsIDs, poster);
 
 
-        ImageIOExecutor.saveImage(mapsIDs, poster);
+        //ImageIOExecutor.saveImage(mapsIDs, poster);
         if (PluginConfiguration.SAVE_FULL_IMAGE.get()) {
             ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
         }
-
+        PluginLogger.info("install renderer");
         submitToMainThread(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
@@ -254,6 +261,7 @@ public class ImageRendererExecutor extends Worker {
 
         });
         poster.getImage().flush();//Safe to free
+        PluginLogger.info("create map");
         return MapManager.createMap(poster, playerUUID, mapsIDs);
     }
 

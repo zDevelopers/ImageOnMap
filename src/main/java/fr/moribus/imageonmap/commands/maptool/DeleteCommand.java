@@ -48,6 +48,7 @@ import fr.zcraft.quartzlib.components.commands.WithFlags;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.components.rawtext.RawText;
 import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.PluginLogger.DebugLevel;
 import fr.zcraft.quartzlib.tools.text.RawMessage;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,23 +73,33 @@ public class DeleteCommand extends IoMCommand {
                 .build();
     }
 
+    public void invalidArgument(String msg) throws CommandException {
+        PluginLogger.debug(ImageOnMap.getPlugin(), DebugLevel.DEVELOPER_LOG, msg);
+        throwInvalidArgument(I.t(msg));
+    }
+
+
     @Override
     protected void run() throws CommandException {
+        PluginLogger.debug(ImageOnMap.getPlugin(), DebugLevel.DEVELOPER_LOG, "DeleteCommand");
+
         ArrayList<String> arguments = getArgs();
+        PluginLogger.debug(ImageOnMap.getPlugin(), DebugLevel.DEVELOPER_LOG, arguments);
         final boolean confirm = hasFlag("confirm");
 
         if (arguments.size() > 3 || (arguments.size() > 2 && !confirm)) {
-            throwInvalidArgument(I.t("Too many parameters!"));
+            invalidArgument(I.t("Too many parameters!"));
             return;
         }
         if (arguments.size() < 1) {
-            throwInvalidArgument(I.t("Too few parameters!"));
+            invalidArgument(I.t("Too few parameters!"));
             return;
         }
 
         final String playerName;
         final String mapName;
         final Player sender = playerSender();
+
         if (arguments.size() == 2 || arguments.size() == 3) {
             if (!Permissions.DELETEOTHER.grantedTo(sender)) {
                 throwNotAuthorized();
@@ -101,21 +112,29 @@ public class DeleteCommand extends IoMCommand {
             playerName = sender.getName();
             mapName = arguments.get(0);
         }
-
+        PluginLogger
+                .debug(ImageOnMap.getPlugin(), DebugLevel.DEVELOPER_LOG, "player {0} map name {1} command sender {2}",
+                        playerName, mapName,
+                        sender);
         //TODO passer en static
         ImageOnMap.getPlugin().getCommandWorker().offlineNameFetch(playerName, uuid -> {
+            PluginLogger.debug(ImageOnMap.getPlugin(), DebugLevel.DEVELOPER_LOG,
+                    "offlineNameFetch uuid " + uuid.toString());
             if (uuid == null) {
                 warning(sender, I.t("The player {0} does not exist.", playerName));
                 return;
             }
 
+            PluginLogger.debug(ImageOnMap.getPlugin(), DebugLevel.DEVELOPER_LOG, "offlineNameFetch getMap");
             ImageMap map = MapManager.getMap(uuid, mapName);
-
+            PluginLogger.debug(ImageOnMap.getPlugin(), DebugLevel.DEVELOPER_LOG,
+                    "offlineNameFetch map" + map);
             if (map == null) {
                 warning(sender, I.t("This map does not exist."));
                 return;
             }
-
+            PluginLogger.debug(ImageOnMap.getPlugin(), DebugLevel.DEVELOPER_LOG,
+                    "offlineNameFetch map id " + map.getId() + " count " + map.getMapCount());
             if (!confirm) {
                 RawText msg = deleteMsg(getClass(), playerName, map);
                 RawMessage.send(sender, msg);

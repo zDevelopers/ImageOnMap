@@ -120,7 +120,9 @@ public abstract class MapManager {
 
     public static int[] getNewMapsIds(int amount) {
         int[] mapsIds = new int[amount];
+        PluginLogger.info("" + Bukkit.getWorlds().get(0));
         for (int i = 0; i < amount; i++) {
+            PluginLogger.info("creating maps " + i);
             mapsIds[i] = Bukkit.createMap(Bukkit.getWorlds().get(0)).getId();
         }
         return mapsIds;

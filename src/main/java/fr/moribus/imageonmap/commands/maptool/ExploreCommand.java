@@ -46,16 +46,21 @@ import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.gui.Gui;
 import fr.zcraft.quartzlib.components.i18n.I;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
-@CommandInfo(name = "explore",usageParameters = "[player name]")
+@CommandInfo(name = "explore", usageParameters = "[player name]")
 public class ExploreCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
+        ImageOnMap.getPlugin().getLogger()
+                .log(Level.CONFIG, "/maps qsjhcguhqscjvbhqsjhvcqsjnvbcnvb ,nbc,nbwbnj,vbn,x,nbwxn,b,bnnb,d");
+
+
         ArrayList<String> arguments = getArgs();
         if (arguments.size() > 1) {
             throwInvalidArgument(I.t("Too many parameters!"));
@@ -82,7 +87,7 @@ public class ExploreCommand extends IoMCommand {
             }
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             if (sender.isOnline()) {
-                Gui.open(sender, new MapListGui(offlinePlayer,playerName));
+                Gui.open(sender, new MapListGui(offlinePlayer, playerName));
             }
 
         });
