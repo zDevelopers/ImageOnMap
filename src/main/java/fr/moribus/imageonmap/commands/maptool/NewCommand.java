@@ -121,7 +121,7 @@ public class NewCommand extends IoMCommand {
             }
             scaling = resizeMode();
         }
-        if (width == 0 || height == 0) {
+        if (width < 0 || height < 0) {
             throwInvalidArgument(I.t("You need to specify a valid size. e.g. resize 4 5"));
             return;
         }

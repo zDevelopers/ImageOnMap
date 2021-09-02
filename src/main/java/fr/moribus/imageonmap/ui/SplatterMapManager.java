@@ -137,6 +137,7 @@ public abstract class SplatterMapManager {
      * @return True if the attribute was detected.
      */
     public static boolean hasSplatterAttributes(ItemStack itemStack) {
+
         try {
             final NBTCompound nbt = NBT.fromItemStack(itemStack);
             if (!nbt.containsKey("Enchantments")) {

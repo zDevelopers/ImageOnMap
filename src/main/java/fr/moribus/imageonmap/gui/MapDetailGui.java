@@ -46,6 +46,7 @@ import fr.zcraft.quartzlib.components.gui.Gui;
 import fr.zcraft.quartzlib.components.gui.GuiAction;
 import fr.zcraft.quartzlib.components.gui.PromptGui;
 import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
 import org.apache.commons.lang.ArrayUtils;
@@ -208,32 +209,35 @@ public class MapDetailGui extends ExplorerGui<Integer> {
             return;
         }
 
-        PromptGui.prompt(getPlayer(), newName -> {
-            if (!Permissions.RENAME.grantedTo(getPlayer())) {
-                I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
-                return;
-            }
+        try {
+            PromptGui.prompt(getPlayer(), newName -> {
+                if (!Permissions.RENAME.grantedTo(getPlayer())) {
+                    I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
+                    return;
+                }
 
-            if (newName == null || newName.isEmpty()) {
-                I.sendT(getPlayer(), "{ce}Map names can't be empty.");
-                return;
-            }
-            if (newName.equals(map.getName())) {
-                return;
-            }
+                if (newName == null || newName.isEmpty()) {
+                    I.sendT(getPlayer(), "{ce}Map names can't be empty.");
+                    return;
+                }
+                if (newName.equals(map.getName())) {
+                    return;
+                }
 
-            map.rename(newName);
-            I.sendT(getPlayer(), "{cs}Map successfully renamed.");
+                map.rename(newName);
+                I.sendT(getPlayer(), "{cs}Map successfully renamed.");
 
-            if (getParent() != null) {
-                RunTask.later(() -> Gui.open(getPlayer(), this), 1L);
+                if (getParent() != null) {
+                    RunTask.later(() -> Gui.open(getPlayer(), this), 1L);
 
-            } else {
-                close();
-            }
-        }, map.getName(), this);
+                } else {
+                    close();
+                }
+            }, map.getName(), this);
 
-
+        } catch (IllegalStateException e) {
+            PluginLogger.info("error while renaming");
+        }
     }
 
     @GuiAction("delete")
