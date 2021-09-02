@@ -64,6 +64,7 @@ import fr.zcraft.quartzlib.tools.PluginLogger.DebugLevel;
 import fr.zcraft.quartzlib.tools.UpdateChecker;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 
@@ -74,13 +75,11 @@ public final class ImageOnMap extends QuartzPlugin {
     private static ImageOnMap plugin;
     private final File mapsDirectory;
     private File imagesDirectory;
-    private File logsDirectory;
     private CommandWorkers commandWorker;
 
     public ImageOnMap() {
         imagesDirectory = new File(this.getDataFolder(), IMAGES_DIRECTORY_NAME);
         mapsDirectory = new File(this.getDataFolder(), MAPS_DIRECTORY_NAME);
-        logsDirectory = new File(this.getDataFolder(), LOGS_DIRECTORY_NAME);
         plugin = this;
         setDebugLevel(DebugLevel.DEVELOPER_LOG); //TODO to remove only for testing purpose
     }
@@ -162,10 +161,10 @@ public final class ImageOnMap extends QuartzPlugin {
             PluginLogger.warning("Collect data disabled");
         }
 
-        PluginLogger.debug(this, DebugLevel.DEVELOPER_LOG,
+        PluginLogger.debug(true,this, DebugLevel.DEVELOPER_LOG,
                 "Server version and information:\n   Bukkit implementation and MC version: " + Bukkit.getVersion()
-                    + "\n   Server version: " + Bukkit.getBukkitVersion()
-                    + "\n   ImageOnMap version: " + this.getDescription().getVersion());
+                        + "\n   Server version: " + Bukkit.getBukkitVersion()
+                        + "\n   ImageOnMap version: " + this.getDescription().getVersion());
     }
 
     @Override
