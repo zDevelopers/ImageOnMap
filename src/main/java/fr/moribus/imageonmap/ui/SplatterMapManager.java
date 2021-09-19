@@ -65,7 +65,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 
-
+//TODO rework splatter effect, using ID is far more stable than nbt tags.
+// To update when adding small picture previsualization.
 public abstract class SplatterMapManager {
     private SplatterMapManager() {
     }

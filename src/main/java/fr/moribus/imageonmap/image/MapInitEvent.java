@@ -39,6 +39,7 @@ package fr.moribus.imageonmap.image;
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.core.QuartzLib;
+import fr.zcraft.quartzlib.tools.runners.RunTask;
 import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -97,11 +98,14 @@ public class MapInitEvent implements Listener {
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
-        for (Entity entity : event.getChunk().getEntities()) {
-            if (entity instanceof ItemFrame) {
-                initMap(((ItemFrame) entity).getItem());
+        //Fix for paper
+        RunTask.later(() -> {
+            for (Entity entity : event.getChunk().getEntities()) {
+                if (entity instanceof ItemFrame) {
+                    initMap(((ItemFrame) entity).getItem());
+                }
             }
-        }
+        }, 5L);
     }
 
     @EventHandler
