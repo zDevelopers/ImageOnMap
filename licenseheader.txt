@@ -3,8 +3,8 @@ ${licenseFirst}
 </#if>
 ${licensePrefix}Copyright or © or Copr. Moribus (2013)
 ${licensePrefix}Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
-${licensePrefix}Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2020)
-${licensePrefix}Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2020)
+${licensePrefix}Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
+${licensePrefix}Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
 ${licensePrefix?replace(" +$", "", "r")}
 ${licensePrefix}This software is a computer program whose purpose is to allow insertion of
 ${licensePrefix}custom images in a Minecraft word.
