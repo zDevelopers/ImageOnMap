@@ -43,7 +43,6 @@ import fr.moribus.imageonmap.commands.maptool.GetCommand;
 import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
 import fr.moribus.imageonmap.commands.maptool.GiveCommand;
 import fr.moribus.imageonmap.commands.maptool.ListCommand;
-import fr.moribus.imageonmap.commands.maptool.MigrateCommand;
 import fr.moribus.imageonmap.commands.maptool.NewCommand;
 import fr.moribus.imageonmap.commands.maptool.RenameCommand;
 import fr.moribus.imageonmap.commands.maptool.UpdateCommand;
@@ -51,8 +50,6 @@ import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.moribus.imageonmap.migration.MigratorExecutor;
-import fr.moribus.imageonmap.migration.V3Migrator;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.quartzlib.components.commands.CommandWorkers;
 import fr.zcraft.quartzlib.components.commands.Commands;
@@ -104,7 +101,7 @@ public final class ImageOnMap extends QuartzPlugin {
     public void onEnable() {
         // Creating the images and maps directories if necessary
         try {
-            imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
+            //imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
             checkPluginDirectory(mapsDirectory);
         } catch (final IOException ex) {
             PluginLogger.error("FATAL: " + ex.getMessage());
@@ -136,7 +133,7 @@ public final class ImageOnMap extends QuartzPlugin {
                 GiveCommand.class,
                 GetRemainingCommand.class,
                 ExploreCommand.class,
-                MigrateCommand.class,
+                //MigrateCommand.class,//Removed for now doesn't work nor is useful, maybe useful later on
                 UpdateCommand.class
         );
 
@@ -161,7 +158,7 @@ public final class ImageOnMap extends QuartzPlugin {
     public void onDisable() {
         MapManager.exit();
         MapItemManager.exit();
-        MigratorExecutor.waitForMigration();
+        //MigratorExecutor.waitForMigration();//Removed for now doesn't work nor is useful, maybe useful later on
 
         super.onDisable();
     }
