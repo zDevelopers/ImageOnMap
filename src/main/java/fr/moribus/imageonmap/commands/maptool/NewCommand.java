@@ -41,6 +41,7 @@ import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.ImageUtils;
 import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
@@ -87,7 +88,23 @@ public class NewCommand extends IoMCommand {
         if (args.length < 1) {
             throwInvalidArgument(I.t("You must give an URL to take the image from."));
         }
-
+        //Checking if the map limit and image limit
+        if (!Permissions.BYPASS_IMAGE_LIMIT.grantedTo(player)) {
+            int imageLimit = Permissions.NEW.getLimitPermission(player, Permissions.LimitType.image);
+            int imageCount = MapManager.getPlayerMapStore(player.getUniqueId()).getImagesCount();
+            if (imageLimit <= imageCount) {
+                throwInvalidArgument(
+                        I.t("Your image limit is set to {0} and you currently have {1} ", imageLimit, imageCount));
+            }
+        }
+        if (!Permissions.BYPASS_MAP_LIMIT.grantedTo(player)) {
+            int mapLimit = Permissions.NEW.getLimitPermission(player, Permissions.LimitType.map);
+            int mapCount = MapManager.getPlayerMapStore(player.getUniqueId()).getMapCount();
+            if (mapLimit <= mapCount) {
+                throwInvalidArgument(
+                        I.t("Your map limit is set to {0} and you currently have {1} ", mapLimit, mapCount));
+            }
+        }
         try {
             url = new URL(args[0]);
         } catch (MalformedURLException ex) {

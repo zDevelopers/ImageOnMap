@@ -38,6 +38,8 @@ permissions:
       imageonmap.give: false
       imageonmap.update: true
       imageonmap.updateother: false
+      imageonmap.bypassmaplimit: false
+      imageonmap.bypassimagelimit: false
 
   imageonmap.userender:
     description: "Allows you to use /tomap and related commands (/maptool getremaining). Alias of imageonmap.new."
@@ -109,4 +111,12 @@ permissions:
 
   imageonmap.updateother:
     description: "Allows you to update an existing map of an other player with a new image."
+    default: op
+
+  imageonmap.bypassmaplimit:
+    description: "Allows you to bypass permission node check for the number of used map (by default users have an unlimited amount of maps)."
+    default: op
+
+  imageonmap.bypassimagelimit:
+    description: "Allows you to bypass permission node check for the number of images in the playerMapStore(by default users have an unlimited amount of images)."
     default: op
