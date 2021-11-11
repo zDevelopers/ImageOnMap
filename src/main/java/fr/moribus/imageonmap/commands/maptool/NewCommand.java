@@ -107,6 +107,12 @@ public class NewCommand extends IoMCommand {
         }
         try {
             url = new URL(args[0]);
+            if (!Permissions.IGNOREALLOWLIST.grantedTo(player) && !checkHostingSite(url)) {
+                throwInvalidArgument(I.t("This hosting website is not trusted, if you think that this is an error "
+                        + " contact your server administrator"));
+                return;
+            }
+
         } catch (MalformedURLException ex) {
             throwInvalidArgument(I.t("Invalid URL."));
             return;

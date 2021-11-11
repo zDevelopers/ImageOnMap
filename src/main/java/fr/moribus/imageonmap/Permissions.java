@@ -60,7 +60,8 @@ public enum Permissions {
     BYPASS_SIZE("imageonmap.bypasssize"),
     BYPASS_IMAGE_LIMIT("imageonmap.bypassimagelimit"),
     BYPASS_MAP_LIMIT("imageonmap.bypassmaplimit"),
-    GIVE("imageonmap.give");
+    GIVE("imageonmap.give"),
+    IGNOREALLOWLIST("imageonmap.ignoreallowlist_hostingsite");
 
     private final String permission;
     private final String[] aliases;

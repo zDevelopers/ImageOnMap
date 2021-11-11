@@ -59,4 +59,6 @@ public final class PluginConfiguration extends Configuration {
     public static ConfigurationItem<Integer> LIMIT_SIZE_X = item("limit-map-size-x", 0);
     public static ConfigurationItem<Integer> LIMIT_SIZE_Y = item("limit-map-size-y", 0);
 
+    public static ConfigurationItem<String> ALLOWLIST_HOSTINGSITE = item("allowlist_hostingsite", "");
+
 }

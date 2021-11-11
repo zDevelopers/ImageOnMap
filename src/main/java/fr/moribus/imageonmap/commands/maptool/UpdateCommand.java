@@ -168,6 +168,12 @@ public class UpdateCommand extends IoMCommand {
             URL url1;
             try {
                 url1 = new URL(url);
+                if (!Permissions.IGNOREALLOWLIST.grantedTo(playerSender) && !checkHostingSite(url1)) {
+                    throwInvalidArgument(I.t("This hosting website is not trusted, if you think that this is an error "
+                            + " contact your server administrator"));
+                    return;
+                }
+
                 //TODO replace by a check of the load status.(if not loaded load the mapmanager)
                 MapManager.load(false);//we don't want to spam the console each time we reload the mapManager
 
@@ -211,7 +217,7 @@ public class UpdateCommand extends IoMCommand {
                         ActionBar.removeMessage(playerSender);
                     }
                 }
-            } catch (MalformedURLException ex) {
+            } catch (MalformedURLException | CommandException ex) {
                 warning(sender, I.t("Invalid URL."));
             }
         });

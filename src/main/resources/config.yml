@@ -26,3 +26,6 @@ limit-map-size-y: 0
 # Should the full image be saved when a map is rendered?
 save-full-image: false
 
+# Give the name of trusted image hosting website
+#Example allowlist_hostingsite: https://imgur.com/, https://i.imgur.com/, https://cdn.discordapp.com
+allowlist_hostingsite:

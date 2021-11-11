@@ -38,10 +38,16 @@ package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.MapManager;
+import fr.zcraft.quartzlib.components.events.FutureEventHandler;
+import fr.zcraft.quartzlib.components.events.FutureEvents;
+import fr.zcraft.quartzlib.components.events.WrappedEvent;
 import fr.zcraft.quartzlib.core.QuartzLib;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.reflection.Reflection;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
 import java.io.File;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -53,13 +59,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.world.ChunkEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 
 public class MapInitEvent implements Listener {
+
     public static void init() {
+
         QuartzLib.registerEvents(new MapInitEvent());
+        FutureEvents.registerFutureEvents(new EntitiesLoadListener());
 
         for (World world : Bukkit.getWorlds()) {
             for (ItemFrame frame : world.getEntitiesByClass(ItemFrame.class)) {
@@ -98,7 +108,6 @@ public class MapInitEvent implements Listener {
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
-        //Fix for paper
         RunTask.later(() -> {
             for (Entity entity : event.getChunk().getEntities()) {
                 if (entity instanceof ItemFrame) {
@@ -134,5 +143,42 @@ public class MapInitEvent implements Listener {
             default:
 
         }
+    }
+
+    protected static final class EntitiesLoadListener implements Listener {
+        @FutureEventHandler(event = "world.EntitiesLoadEvent")
+        public void onEntitiesLoad(WrappedEvent event) {
+            //New in 1.17
+            //Used to make sure map are really loaded in 1.17 on Paper (else some won't render or update properly)
+            RunTask.later(() -> {
+                try {
+                    Chunk chunk = (Chunk) Reflection.call(event.getEvent(), "getChunk");
+                    Entity[] entities = chunk.getEntities();
+                    //Not the most efficient method because we go through entity already loaded
+
+                    //The direct method using getEntities of
+                    // https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/world/EntitiesLoadEvent.html
+                    //Return an unmodifiable list of entities.
+                    //Using this make the overall process a bit more efficient but way more complicated and very weak
+                    // to change.
+                    //TODO Investigate if there is a better way to do this.
+                    //Early exit, most are empty entities array
+                    if (entities.length == 0) {
+                        return;
+                    }
+
+                    for (Entity entity : entities) {
+                        if (entity instanceof ItemFrame) {
+                            initMap(((ItemFrame) entity).getItem());
+                        }
+                    }
+                } catch (Exception e) {
+                    PluginLogger.error(e.toString());
+                    return;
+                }
+
+            }, 5L);
+        }
+
     }
 }

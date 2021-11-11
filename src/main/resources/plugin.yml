@@ -40,7 +40,7 @@ permissions:
       imageonmap.updateother: false
       imageonmap.bypassmaplimit: false
       imageonmap.bypassimagelimit: false
-
+      imageonmap.ignoreallowlist_hostingsite: true
   imageonmap.userender:
     description: "Allows you to use /tomap and related commands (/maptool getremaining). Alias of imageonmap.new."
     default: true
@@ -118,5 +118,9 @@ permissions:
     default: op
 
   imageonmap.bypassimagelimit:
-    description: "Allows you to bypass permission node check for the number of images in the playerMapStore(by default users have an unlimited amount of images)."
+    description: "Allows you to bypass permission node check for the number of images in the playerMapStore (by default users have an unlimited amount of images)."
     default: op
+
+  imageonmap.ignoreallowlist_hostingsite:
+    description: "Allows you to ignore the restriction on the allow list for image hosting website."
+    default: true

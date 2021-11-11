@@ -38,6 +38,7 @@ package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.PluginConfiguration;
+import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.i18n.I;
@@ -98,6 +99,7 @@ public class ImageRendererExecutor extends Worker {
             public ImageMap run() throws Throwable {
 
                 BufferedImage image = null;
+
                 //If the link is an imgur one
                 if (url.toString().toLowerCase().startsWith("https://imgur.com/")) {
 
@@ -162,7 +164,6 @@ public class ImageRendererExecutor extends Worker {
         submitQuery(new WorkerRunnable<ImageMap>() {
             @Override
             public ImageMap run() throws Throwable {
-
                 final URLConnection connection = connecting(url);
 
                 final InputStream stream = connection.getInputStream();
