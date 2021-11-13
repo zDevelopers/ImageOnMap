@@ -51,6 +51,7 @@ public enum Permissions {
     GETOTHER("imageonmap.getother"),
     RENAME("imageonmap.rename"),
     PLACE_SPLATTER_MAP("imageonmap.placesplattermap"),
+    PLACE_INVISIBLE_SPLATTER_MAP("imageonmap.placeinvisiblesplattermap"),
     REMOVE_SPLATTER_MAP("imageonmap.removesplattermap"),
     DELETE("imageonmap.delete"),
     DELETEOTHER("imageonmap.deleteother"),

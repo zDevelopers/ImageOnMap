@@ -37,6 +37,7 @@
 package fr.moribus.imageonmap.ui;
 
 import com.google.common.collect.ImmutableMap;
+import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
@@ -53,6 +54,7 @@ import fr.zcraft.quartzlib.tools.runners.RunTask;
 import fr.zcraft.quartzlib.tools.text.MessageSender;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
 import fr.zcraft.quartzlib.tools.world.WorldUtils;
+import java.lang.reflect.Method;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -242,6 +244,7 @@ public abstract class SplatterMapManager {
                 //Rotation management relative to player rotation the default position is North,
                 // when on ceiling we flipped the rotation
                 RunTask.later(() -> {
+                    addPropertiesToFrames(player, frame);
                     frame.setItem(
                             new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
                 }, 5L);
@@ -303,6 +306,7 @@ public abstract class SplatterMapManager {
                 int id = poster.getMapIdAtReverseY(i);
 
                 RunTask.later(() -> {
+                    addPropertiesToFrames(player, frame);
                     frame.setItem(
                             new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
                 }, 5L);
@@ -361,10 +365,31 @@ public abstract class SplatterMapManager {
 
         for (ItemFrame frame : matchingFrames) {
             if (frame != null) {
+                removePropertiesFromFrames(player, frame);
                 frame.setItem(null);
             }
         }
 
         return poster;
+    }
+
+    public static void addPropertiesToFrames(Player player, ItemFrame frame) {
+        if (Permissions.PLACE_INVISIBLE_SPLATTER_MAP.grantedTo(player)) {
+            try {
+                Method setVisible = frame.getClass().getMethod("setVisible", boolean.class);
+                setVisible.invoke(frame, false);
+            } catch (Exception e) {
+                //1.16-
+            }
+        }
+    }
+
+    public static void removePropertiesFromFrames(Player player, ItemFrame frame) {
+        try {
+            Method setVisible = frame.getClass().getMethod("setVisible", boolean.class);
+            setVisible.invoke(frame, true);
+        } catch (Exception e) {
+            //1.16-
+        }
     }
 }
