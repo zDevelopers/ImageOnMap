@@ -236,7 +236,7 @@ public class MapDetailGui extends ExplorerGui<Integer> {
             }, map.getName(), this);
 
         } catch (IllegalStateException e) {
-            PluginLogger.info("error while renaming");
+            PluginLogger.error("Error while renaming map: ", e);
         }
     }
 

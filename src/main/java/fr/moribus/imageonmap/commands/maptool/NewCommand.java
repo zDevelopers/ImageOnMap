@@ -94,7 +94,9 @@ public class NewCommand extends IoMCommand {
             int imageCount = MapManager.getPlayerMapStore(player.getUniqueId()).getImagesCount();
             if (imageLimit <= imageCount) {
                 throwInvalidArgument(
-                        I.t("Your image limit is set to {0} and you currently have {1} ", imageLimit, imageCount));
+                        I.t("Your image limit is set to {0} and you currently have {1} loaded image(s)",
+                                imageLimit,
+                                imageCount));
             }
         }
         if (!Permissions.BYPASS_MAP_LIMIT.grantedTo(player)) {
@@ -102,7 +104,9 @@ public class NewCommand extends IoMCommand {
             int mapCount = MapManager.getPlayerMapStore(player.getUniqueId()).getMapCount();
             if (mapLimit <= mapCount) {
                 throwInvalidArgument(
-                        I.t("Your map limit is set to {0} and you currently have {1} ", mapLimit, mapCount));
+                        I.t("Your map limit is set to {0} and you currently have {1} loaded map(s)",
+                                mapLimit,
+                                mapCount));
             }
         }
         try {

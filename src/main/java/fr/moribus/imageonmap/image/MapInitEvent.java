@@ -203,7 +203,6 @@ public class MapInitEvent implements Listener {
     @EventHandler
     public void onHangingBreakEvent(HangingBreakEvent event) {
         Entity entity = event.getEntity();
-        PluginLogger.info("entity " + entity.toString());
         if (!(entity instanceof ItemFrame)) {
             return;
         }

@@ -57,15 +57,12 @@ public abstract class IoMCommand extends Command {
 
 
     protected boolean checkHostingSite(URL url) {
-        PluginLogger.info("allow list " + PluginConfiguration.ALLOWLIST_HOSTINGSITE.get());
         String urlsString = PluginConfiguration.ALLOWLIST_HOSTINGSITE.get();
-        if (urlsString.trim().equals("")) {
+        if (urlsString.trim().isEmpty()) {
             return true;
         }
         String[] hosts = urlsString.trim().replaceAll("https://","").split(",");
         for (String host : hosts) {
-            PluginLogger.info(host);
-            PluginLogger.info(url.getHost());
             if (url.getHost().equals(host.trim())) {
                 return true;
             }
