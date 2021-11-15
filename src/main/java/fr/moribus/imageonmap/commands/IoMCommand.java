@@ -36,11 +36,14 @@
 
 package fr.moribus.imageonmap.commands;
 
+import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.Command;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -52,6 +55,20 @@ import org.bukkit.entity.Player;
 
 public abstract class IoMCommand extends Command {
 
+
+    protected boolean checkHostingSite(URL url) {
+        String urlsString = PluginConfiguration.ALLOWLIST_HOSTINGSITE.get();
+        if (urlsString.trim().isEmpty()) {
+            return true;
+        }
+        String[] hosts = urlsString.trim().replaceAll("https://","").split(",");
+        for (String host : hosts) {
+            if (url.getHost().equals(host.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     protected void retrieveUUID(String arg, Consumer<UUID> consumer) {
         UUID uuid;

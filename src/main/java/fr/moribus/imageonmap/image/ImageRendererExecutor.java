@@ -98,6 +98,7 @@ public class ImageRendererExecutor extends Worker {
             public ImageMap run() throws Throwable {
 
                 BufferedImage image = null;
+
                 //If the link is an imgur one
                 if (url.toString().toLowerCase().startsWith("https://imgur.com/")) {
 
@@ -162,7 +163,6 @@ public class ImageRendererExecutor extends Worker {
         submitQuery(new WorkerRunnable<ImageMap>() {
             @Override
             public ImageMap run() throws Throwable {
-
                 final URLConnection connection = connecting(url);
 
                 final InputStream stream = connection.getInputStream();

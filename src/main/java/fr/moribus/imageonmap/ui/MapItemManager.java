@@ -37,17 +37,16 @@
 package fr.moribus.imageonmap.ui;
 
 import fr.moribus.imageonmap.Permissions;
-import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.core.QuartzLib;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.items.ItemUtils;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Queue;
@@ -320,7 +319,6 @@ public class MapItemManager implements Listener {
                             || !SplatterMapManager.hasSplatterMap(player, poster)) {
                         poster.give(player);
                     }
-
                     return;
                 }
             }
@@ -329,7 +327,7 @@ public class MapItemManager implements Listener {
         if (!MapManager.managesMap(frame.getItem())) {
             return;
         }
-
+        SplatterMapManager.removePropertiesFromFrames(player, frame);
         frame.setItem(new ItemStackBuilder(item)
                 .title(getMapTitle(item))
                 .hideAllAttributes()

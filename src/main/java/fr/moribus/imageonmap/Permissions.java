@@ -37,7 +37,11 @@
 package fr.moribus.imageonmap;
 
 
+import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import java.util.Set;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public enum Permissions {
     NEW("imageonmap.new", "imageonmap.userender"),
@@ -47,6 +51,7 @@ public enum Permissions {
     GETOTHER("imageonmap.getother"),
     RENAME("imageonmap.rename"),
     PLACE_SPLATTER_MAP("imageonmap.placesplattermap"),
+    PLACE_INVISIBLE_SPLATTER_MAP("imageonmap.placeinvisiblesplattermap"),
     REMOVE_SPLATTER_MAP("imageonmap.removesplattermap"),
     DELETE("imageonmap.delete"),
     DELETEOTHER("imageonmap.deleteother"),
@@ -54,7 +59,10 @@ public enum Permissions {
     UPDATEOTHER("imageonmap.updateother"),
     ADMINISTRATIVE("imageonmap.administrative"),
     BYPASS_SIZE("imageonmap.bypasssize"),
-    GIVE("imageonmap.give");
+    BYPASS_IMAGE_LIMIT("imageonmap.bypassimagelimit"),
+    BYPASS_MAP_LIMIT("imageonmap.bypassmaplimit"),
+    GIVE("imageonmap.give"),
+    IGNOREALLOWLIST("imageonmap.ignoreallowlist_hostingsite");
 
     private final String permission;
     private final String[] aliases;
@@ -82,5 +90,38 @@ public enum Permissions {
         }
 
         return false;
+    }
+
+    /**
+     * Return the limit of map the user is allowed to make
+     *
+     * @param permissible The permissible to check.
+     * @return the limit
+     */
+    public int getLimitPermission(Permissible permissible, LimitType type) {
+        Set<PermissionAttachmentInfo> perms = permissible.getEffectivePermissions();
+        String prefix = String.format("imageonmap.%slimit.", type.name());
+        for (PermissionAttachmentInfo pai : perms) {
+            String permString = pai.getPermission().toLowerCase();
+            if (permString.startsWith(prefix)) {
+                if (pai.getValue()) {
+                    try {
+                        int limit = Integer.parseInt(permString.split(prefix)[1].trim());
+                        return limit;
+                    } catch (Exception e) {
+                        PluginLogger.warning(
+                                I.t("The correct syntax for setting map limit node is: ImageOnMap.mapLimit.X "
+                                        + "where you can replace X with the limit of map a player is allowed to have"));
+                    }
+
+                }
+            }
+        }
+        return 2147483647; //Virtually no limit
+    }
+
+    public enum LimitType {
+        map,
+        image
     }
 }

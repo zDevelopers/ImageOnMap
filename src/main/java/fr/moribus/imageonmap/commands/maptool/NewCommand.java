@@ -41,6 +41,7 @@ import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.ImageUtils;
 import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
@@ -87,9 +88,35 @@ public class NewCommand extends IoMCommand {
         if (args.length < 1) {
             throwInvalidArgument(I.t("You must give an URL to take the image from."));
         }
-
+        //Checking if the map limit and image limit
+        if (!Permissions.BYPASS_IMAGE_LIMIT.grantedTo(player)) {
+            int imageLimit = Permissions.NEW.getLimitPermission(player, Permissions.LimitType.image);
+            int imageCount = MapManager.getPlayerMapStore(player.getUniqueId()).getImagesCount();
+            if (imageLimit <= imageCount) {
+                throwInvalidArgument(
+                        I.t("Your image limit is set to {0} and you currently have {1} loaded image(s)",
+                                imageLimit,
+                                imageCount));
+            }
+        }
+        if (!Permissions.BYPASS_MAP_LIMIT.grantedTo(player)) {
+            int mapLimit = Permissions.NEW.getLimitPermission(player, Permissions.LimitType.map);
+            int mapCount = MapManager.getPlayerMapStore(player.getUniqueId()).getMapCount();
+            if (mapLimit <= mapCount) {
+                throwInvalidArgument(
+                        I.t("Your map limit is set to {0} and you currently have {1} loaded map(s)",
+                                mapLimit,
+                                mapCount));
+            }
+        }
         try {
             url = new URL(args[0]);
+            if (!Permissions.IGNOREALLOWLIST.grantedTo(player) && !checkHostingSite(url)) {
+                throwInvalidArgument(I.t("This hosting website is not trusted, if you think that this is an error "
+                        + " contact your server administrator"));
+                return;
+            }
+
         } catch (MalformedURLException ex) {
             throwInvalidArgument(I.t("Invalid URL."));
             return;
@@ -121,7 +148,7 @@ public class NewCommand extends IoMCommand {
             }
             scaling = resizeMode();
         }
-        if (width == 0 || height == 0) {
+        if (width < 0 || height < 0) {
             throwInvalidArgument(I.t("You need to specify a valid size. e.g. resize 4 5"));
             return;
         }
