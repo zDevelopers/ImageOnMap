@@ -209,6 +209,29 @@ This version fixes some small console spam bugs and improves the performance of 
 - Updates to [QuartzLib 0.0.4](https://github.com/zDevelopers/QuartzLib/blob/master/CHANGELOG.md#quartzlib-004),
   where all these improvements were made.
 
+### 4.2.0 —The permission and cliffhanger part 1 Update
+Permission and cliffhanger Update finally allow a full official support of minecraft 1.17 and java 17. This comes with bugfixes and new features. We are working on the next big update that will be the 5.0. If you want to know more about this checkout our 5.0 milestone.
+
+This version is only compatible with Minecraft 1.15+. We have no clue if this will work with minecraft 1.18 (it should, but we are not sure)
+This was tested on Paper 1.17, 1.16 and spigot 1.17,1.15. If there are any errors on a 1.15+ version of spigot/paper please contact us on our discord or create a ticket on the issues page (better)
+
+- 1.17 support
+- Permissions to limit the number of map/image used/owned is now possible. (permissions imageonmap.mapLimit.XX and imageonmap.imageLimit.XX where XX is an integer and will define the limit allowed for the player)
+
+- Added an allowlist for trusted image hosting website (Add this in config.yml allowlist_hostingsite: , you then have to put the url of trusted websites. There is also a permission to ignore the allow list imageonmap.ignoreallowlist_hostingsite)
+
+- Images are now protected against non player based interaction. (Bye bye sneaky skeleton that used to grief art)
+
+- Now by default when deploying a map the item frame turn invisible and returned to visible hen removing the map from the frame (there is a permission to allow this behaviour imageonmap.placeinvisiblesplattermap)
+
+- Bug fixes & optimizations.
+  - Dropped migrator (no more error when reloading or when sometimes loading the server)
+  - Fixed an issue when resizing with resize 0 0
+  - Fixed a map loading issue. (map did not render at all if they weren't in a player inventory
+  - Added a fix for map loading on paper. (map did not render fully on paper)
+
+### 4.2.1 — The permission and cliffhanger part 1 Update Two
+- Fixed a lag issue caused by the map loading changes of 4.2.0
 ## Data collection
 
 We use metrics to collect [basic information about the usage of this plugin](https://bstats.org/plugin/bukkit/ImageOnMap).
