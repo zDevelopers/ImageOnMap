@@ -11,7 +11,7 @@ lang:
 collect-data: true
 
 
-# Images rendered on maps consume Minecraft maps ID, and there are only 32 767 of them.
+# Images rendered on maps consume Minecraft maps ID, and there are only 2 147 483 647 of them.
 # You can limit the maximum number of maps a player, or the whole server, can use with ImageOnMap.
 # 0 means unlimited.
 map-global-limit: 0
