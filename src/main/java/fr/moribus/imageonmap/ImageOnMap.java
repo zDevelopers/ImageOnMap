@@ -103,6 +103,7 @@ public final class ImageOnMap extends QuartzPlugin {
         try {
             //imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
             checkPluginDirectory(mapsDirectory);
+            checkPluginDirectory(imagesDirectory);
         } catch (final IOException ex) {
             PluginLogger.error("FATAL: " + ex.getMessage());
             this.setEnabled(false);

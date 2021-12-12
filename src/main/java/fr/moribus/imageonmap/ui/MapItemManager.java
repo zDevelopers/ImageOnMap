@@ -43,10 +43,10 @@ import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.core.QuartzLib;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.items.ItemUtils;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
-import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Queue;
@@ -262,6 +262,7 @@ public class MapItemManager implements Listener {
         frame.setItem(new ItemStack(Material.AIR));
         if (SplatterMapManager.hasSplatterAttributes(mapItem)) {
             if (!SplatterMapManager.placeSplatterMap(frame, player, event)) {
+
                 event.setCancelled(true); //In case of an error allow to cancel map placement
                 return;
             }
@@ -274,33 +275,20 @@ public class MapItemManager implements Listener {
             if (frame.getFacing() != BlockFace.UP && frame.getFacing() != BlockFace.DOWN) {
                 frame.setRotation(Rotation.NONE);
             }
-            // If the item has a display name, bot not one from an anvil by the player, we remove it
-            // If it is not displayed on hover on the wall.
-            if (mapItem.hasItemMeta() && mapItem.getItemMeta().hasDisplayName()
-                    && mapItem.getItemMeta().getDisplayName().startsWith("§6")) {
-                //runtask
-                //TODO utiliser run task.later pour essayer de regler le pb d'itemframe bas gauche sans carte
-                final ItemStack frameItem = mapItem.clone();
-                final ItemMeta meta = frameItem.getItemMeta();
 
-                meta.setDisplayName(null);
-                frameItem.setItemMeta(meta);
-                RunTask.later(() -> {
-                    frame.setItem(frameItem);
-                    frame.setRotation(Rotation.NONE);
-                }, 5L);
 
-            } else {
+            final ItemStack frameItem = mapItem.clone();
+            final ItemMeta meta = frameItem.getItemMeta();
+
+            meta.setDisplayName(null);
+            frameItem.setItemMeta(meta);
+            RunTask.later(() -> {
+                frame.setItem(frameItem);
                 frame.setRotation(Rotation.NONE);
-                RunTask.later(() -> {
-                    frame.setItem(mapItem);
-                }, 5L);
-
-            }
+            }, 5L);
 
         }
-
-        ItemUtils.consumeItem(player, mapItem);
+        ItemUtils.consumeItem(player, mapItem); //useless no?
     }
 
     private static void onItemFrameRemove(ItemFrame frame, Player player, EntityDamageByEntityEvent event) {
