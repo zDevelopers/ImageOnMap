@@ -224,10 +224,7 @@ public abstract class SplatterMapManager {
                 // when on ceiling we flipped the rotation
                 RunTask.later(() -> {
                     addPropertiesToFrames(player, frame);
-                    ItemStack mapItem = MapItemManager.createMapItem(id, null,true);
-                    MapMeta meta = (MapMeta) mapItem.getItemMeta();
-                    mapItem.setItemMeta(meta);
-                    frame.setItem(mapItem);
+                    frame.setItem(MapItemManager.createMapItem(id, null,true));
                 }, 5L);
 
                 if (i == 0) {
@@ -288,10 +285,7 @@ public abstract class SplatterMapManager {
 
                 RunTask.later(() -> {
                     addPropertiesToFrames(player, frame);
-                    ItemStack mapItem = MapItemManager.createMapItem(id, null,true);
-                    MapMeta meta = (MapMeta) mapItem.getItemMeta();
-                    mapItem.setItemMeta(meta);
-                    frame.setItem(mapItem);
+                    frame.setItem(MapItemManager.createMapItem(id, null,true));
                 }, 5L);
 
 
