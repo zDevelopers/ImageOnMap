@@ -3,6 +3,7 @@
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
  * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
  * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. <me@foxt.dev> (2021)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -46,7 +47,6 @@ import fr.zcraft.quartzlib.core.QuartzLib;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.items.ItemUtils;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
-import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Queue;
@@ -163,19 +163,18 @@ public class MapItemManager implements Listener {
     }
 
     public static ItemStack createMapItem(int mapID, String text, boolean isMapPart, boolean goldTitle) {
-        ItemStack mapItem;
-        if (goldTitle) {
-            mapItem = new ItemStackBuilder(Material.FILLED_MAP)
-                    .title(ChatColor.GOLD, text)
-                    .hideAllAttributes()
-                    .item();
-        } else {
-            mapItem = new ItemStackBuilder(Material.FILLED_MAP)
-                    .title(text)
-                    .hideAllAttributes()
-                    .item();
-        }
+        ItemStack mapItem = new ItemStackBuilder(Material.FILLED_MAP)
+                .hideAllAttributes()
+                .item();
+
         final MapMeta meta = (MapMeta) mapItem.getItemMeta();
+        if (text != "null") {
+            if (goldTitle) {
+                meta.setDisplayName("§" + ChatColor.GOLD + text);
+            } else {
+                meta.setDisplayName(text);
+            }
+        }
         meta.setMapId(mapID);
         meta.setColor(isMapPart ? Color.LIME : Color.GREEN);
         mapItem.setItemMeta(meta);
@@ -252,7 +251,7 @@ public class MapItemManager implements Listener {
         if (!MapManager.managesMap(mapItem)) {
             return;
         }
-
+        
         if (!Permissions.PLACE_SPLATTER_MAP.grantedTo(player)) {
             player.sendMessage(I.t(ChatColor.RED + "You do not have permission to place splatter maps."));
             event.setCancelled(true);

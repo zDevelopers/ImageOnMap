@@ -101,7 +101,7 @@ public final class ImageOnMap extends QuartzPlugin {
     public void onEnable() {
         // Creating the images and maps directories if necessary
         try {
-            //imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
+            imagesDirectory = checkPluginDirectory(imagesDirectory);
             checkPluginDirectory(mapsDirectory);
         } catch (final IOException ex) {
             PluginLogger.error("FATAL: " + ex.getMessage());
@@ -140,7 +140,7 @@ public final class ImageOnMap extends QuartzPlugin {
         Commands.registerShortcut("maptool", NewCommand.class, "tomap");
         Commands.registerShortcut("maptool", ExploreCommand.class, "maps");
         Commands.registerShortcut("maptool", GiveCommand.class, "givemap");
-
+        /*
         if (PluginConfiguration.CHECK_FOR_UPDATES.get()) {
             UpdateChecker.boot("imageonmap.26585");
         }
@@ -151,7 +151,7 @@ public final class ImageOnMap extends QuartzPlugin {
             metrics.addCustomChart(new Metrics.SingleLineChart("used-minecraft-maps", MapManager::getMapCount));
         } else {
             PluginLogger.warning("Collect data disabled");
-        }
+        }*/
     }
 
     @Override

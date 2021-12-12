@@ -3,6 +3,7 @@
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
  * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
  * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. <me@foxt.dev> (2021)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -36,22 +37,15 @@
 
 package fr.moribus.imageonmap.ui;
 
-import com.google.common.collect.ImmutableMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.components.nbt.NBT;
-import fr.zcraft.quartzlib.components.nbt.NBTCompound;
-import fr.zcraft.quartzlib.components.nbt.NBTList;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.GlowEffect;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
-import fr.zcraft.quartzlib.tools.reflection.NMSException;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
-import fr.zcraft.quartzlib.tools.text.MessageSender;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
 import fr.zcraft.quartzlib.tools.world.WorldUtils;
 import java.lang.reflect.Method;
@@ -140,21 +134,7 @@ public abstract class SplatterMapManager {
      * @return True if the attribute was detected.
      */
     public static boolean hasSplatterAttributes(ItemStack itemStack) {
-
-        try {
-            final NBTCompound nbt = NBT.fromItemStack(itemStack);
-            if (!nbt.containsKey("Enchantments")) {
-                return false;
-            }
-            final Object enchantments = nbt.get("Enchantments");
-            if (!(enchantments instanceof NBTList)) {
-                return false;
-            }
-            return !((NBTList) enchantments).isEmpty();
-        } catch (NMSException e) {
-            PluginLogger.error("Unable to get Splatter Map attribute on item", e);
-            return false;
-        }
+        return GlowEffect.hasGlow(itemStack);
     }
 
     /**
@@ -218,10 +198,9 @@ public abstract class SplatterMapManager {
             surface.loc2 = endLocation;
 
             if (!surface.isValid(player)) {
-                MessageSender.sendActionBarMessage(player,
+                player.sendMessage(
                         I.t("{ce}There is not enough space to place this map ({0} × {1}).",
-                                poster.getColumnCount(),
-                                poster.getRowCount()));
+                                poster.getColumnCount(),  poster.getRowCount()));
 
 
                 return false;
@@ -245,8 +224,10 @@ public abstract class SplatterMapManager {
                 // when on ceiling we flipped the rotation
                 RunTask.later(() -> {
                     addPropertiesToFrames(player, frame);
-                    frame.setItem(
-                            new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+                    ItemStack mapItem = MapItemManager.createMapItem(id, null,true);
+                    MapMeta meta = (MapMeta) mapItem.getItemMeta();
+                    mapItem.setItemMeta(meta);
+                    frame.setItem(mapItem);
                 }, 5L);
 
                 if (i == 0) {
@@ -294,7 +275,7 @@ public abstract class SplatterMapManager {
             wall.loc2 = endLocation;
 
             if (!wall.isValid()) {
-                MessageSender.sendActionBarMessage(player,
+                player.sendMessage(
                         I.t("{ce}There is not enough space to place this map ({0} × {1}).", poster.getColumnCount(),
                                 poster.getRowCount()));
                 return false;
@@ -307,8 +288,10 @@ public abstract class SplatterMapManager {
 
                 RunTask.later(() -> {
                     addPropertiesToFrames(player, frame);
-                    frame.setItem(
-                            new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+                    ItemStack mapItem = MapItemManager.createMapItem(id, null,true);
+                    MapMeta meta = (MapMeta) mapItem.getItemMeta();
+                    mapItem.setItemMeta(meta);
+                    frame.setItem(mapItem);
                 }, 5L);
 
 
