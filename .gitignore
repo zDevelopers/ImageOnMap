@@ -102,3 +102,7 @@ local.properties
 # TeXlipse plugin
 .texlipse
 
+
+# macOS Metadata files
+.DS_STORE
+.icloud
