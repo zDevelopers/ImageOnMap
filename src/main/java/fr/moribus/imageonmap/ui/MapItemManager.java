@@ -288,7 +288,7 @@ public class MapItemManager implements Listener {
             }, 5L);
 
         }
-        ItemUtils.consumeItem(player, mapItem); //useless no?
+        //ItemUtils.consumeItem(player, mapItem); //useless no?
     }
 
     private static void onItemFrameRemove(ItemFrame frame, Player player, EntityDamageByEntityEvent event) {
