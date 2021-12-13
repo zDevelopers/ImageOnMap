@@ -241,6 +241,8 @@ This was tested on Paper 1.17, 1.16 and spigot 1.17, 1.15. If there are any erro
 
 - Fixed an issue in survival where an incorrect amount of map were consumed
 
+- Fixed an issue where image map folder was not created and cause issues
+
 ## Data collection
 
 We use metrics to collect [basic information about the usage of this plugin](https://bstats.org/plugin/bukkit/ImageOnMap).
