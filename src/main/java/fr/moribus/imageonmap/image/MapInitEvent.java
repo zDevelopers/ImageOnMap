@@ -46,8 +46,8 @@ import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.reflection.Reflection;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
 import java.io.File;
+import java.util.List;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -227,21 +227,7 @@ public class MapInitEvent implements Listener {
             //Used to make sure map are really loaded in 1.17 on Paper (else some won't render or update properly)
             RunTask.later(() -> {
                 try {
-                    Chunk chunk = (Chunk) Reflection.call(event.getEvent(), "getChunk");
-                    Entity[] entities = chunk.getEntities();
-                    //Not the most efficient method because we go through entity already loaded
-
-                    //The direct method using getEntities of
-                    // https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/world/EntitiesLoadEvent.html
-                    //Return an unmodifiable list of entities.
-                    //Using this make the overall process a bit more efficient but way more complicated and very weak
-                    // to change.
-                    //TODO Investigate if there is a better way to do this.
-                    //Early exit, most are empty entities array
-                    if (entities.length == 0) {
-                        return;
-                    }
-
+                    List<Entity> entities = (List) Reflection.call(event.getEvent(), "getEntities");
                     for (Entity entity : entities) {
                         if (entity instanceof ItemFrame) {
                             initMap(((ItemFrame) entity).getItem());
