@@ -111,7 +111,7 @@ public class NewCommand extends IoMCommand {
         }
         try {
             url = new URL(args[0]);
-            if (!Permissions.IGNOREALLOWLIST.grantedTo(player) && !checkHostingSite(url)) {
+            if (!Permissions.BYPASS_WHITELIST.grantedTo(player) && !checkHostnameWhitelist(url)) {
                 throwInvalidArgument(I.t("This hosting website is not trusted, if you think that this is an error "
                         + " contact your server administrator"));
                 return;

@@ -36,7 +36,6 @@
 
 package fr.moribus.imageonmap.commands.maptool;
 
-import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
@@ -168,7 +167,7 @@ public class UpdateCommand extends IoMCommand {
             URL url1;
             try {
                 url1 = new URL(url);
-                if (!Permissions.IGNOREALLOWLIST.grantedTo(playerSender) && !checkHostingSite(url1)) {
+                if (!Permissions.BYPASS_WHITELIST.grantedTo(playerSender) && !checkHostnameWhitelist(url1)) {
                     throwInvalidArgument(I.t("This hosting website is not trusted, if you think that this is an error "
                             + " contact your server administrator"));
                     return;
