@@ -219,7 +219,7 @@ This was tested on Paper 1.17, 1.16 and spigot 1.17, 1.15. If there are any erro
   
 - Permissions to limit the number of map/image used/owned is now possible. (permissions imageonmap.mapLimit.XX and imageonmap.imageLimit.XX where XX is an integer and will define the limit allowed for the player)
 
-- Added an allowlist for trusted image hosting website (Add this in config.yml allowlist_hostingsite: , you then have to put the url of trusted websites. There is also a permission to ignore the allow list imageonmap.ignoreallowlist_hostingsite)
+- Added an allowlist for trusted image hosting website (Add this in config.yml allowlist_hostingsite: , you then have to put the url of trusted websites. There is also a permission to ignore the allow list imageonmap.bypasswhitelist)
 
 - Images are now protected against non player based interaction. (Bye bye sneaky skeleton that used to grief art)
 

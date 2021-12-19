@@ -40,7 +40,7 @@ permissions:
       imageonmap.updateother: false
       imageonmap.bypassmaplimit: false
       imageonmap.bypassimagelimit: false
-      imageonmap.ignoreallowlist_hostingsite: true
+      imageonmap.bypasswhitelist: true
       imageonmap.placeinvisiblesplattermap: true
 
   imageonmap.userender:
@@ -123,7 +123,7 @@ permissions:
     description: "Allows you to bypass permission node check for the number of images in the playerMapStore (by default users have an unlimited amount of images)."
     default: op
 
-  imageonmap.ignoreallowlist_hostingsite:
+  imageonmap.bypasswhitelist:
     description: "Allows you to ignore the restriction on the allow list for image hosting website."
     default: true
 
