@@ -55,11 +55,15 @@ import fr.zcraft.quartzlib.tools.text.MessageSender;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
 import fr.zcraft.quartzlib.tools.world.WorldUtils;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Rotation;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -206,6 +210,20 @@ public abstract class SplatterMapManager {
         }
         PosterMap poster = (PosterMap) map;
         PosterWall wall = new PosterWall();
+        int row = poster.getRowCount();
+        int col = poster.getColumnCount();
+
+        PluginLogger.info("row " + row);
+        PluginLogger.info("col " + col);
+        PluginLogger.info("frame " + startFrame.getLocation().toString() + " facing " + startFrame.getFacing().name());
+        PluginLogger.info("Orientation " + WorldUtils.get4thOrientation(player.getLocation()));
+        List<FlatLocation> locs =
+                getLocationList(row, col, startFrame, WorldUtils.get4thOrientation(player.getLocation()));
+
+        for (FlatLocation loc : locs) {
+            PluginLogger.info(loc.toString());
+        }
+
 
         if (startFrame.getFacing().equals(BlockFace.DOWN) || startFrame.getFacing().equals(BlockFace.UP)) {
             // If it is on floor or ceiling
@@ -222,7 +240,6 @@ public abstract class SplatterMapManager {
                         I.t("{ce}There is not enough space to place this map ({0} × {1}).",
                                 poster.getColumnCount(),
                                 poster.getRowCount()));
-
 
                 return false;
             }
@@ -392,4 +409,77 @@ public abstract class SplatterMapManager {
             //1.16-
         }
     }
+
+    private static ItemFrame getFrameAt(FlatLocation location) {
+        Entity[] entities = location.getChunk().getEntities();
+
+        for (Entity entity : entities) {
+            if (!(entity instanceof ItemFrame)) {
+                continue;
+            }
+            PluginLogger.info("itemframe found");
+            if (!WorldUtils.blockEquals(location, entity.getLocation())) {
+                continue;
+            }
+            PluginLogger.info("right location");
+            ItemFrame frame = (ItemFrame) entity;
+            if (frame.getFacing() != location.getFacing()) {
+                continue;
+            }
+            PluginLogger.info("right facing");
+            return frame;
+        }
+
+        return null;
+    }
+
+    private static List<FlatLocation> getLocationList(int row, int col, ItemFrame startFrame, BlockFace orientation) {
+        List<FlatLocation> locations = new ArrayList<>();
+        Location startFrameLoc = startFrame.getLocation();
+        for (int r = 0; r < row; r++) {
+            for (int c = 0; c < col; c++) {
+                FlatLocation frameLoc = new FlatLocation(startFrameLoc, startFrame.getFacing());
+                switch (startFrame.getFacing()) {
+                    case UP:
+                    case DOWN:
+                        frameLoc = frameLoc.addH(r, c, startFrame.getFacing());
+                        break;
+                    case EAST:
+                    case WEST:
+                    case NORTH:
+                    case SOUTH:
+                        frameLoc = frameLoc.add(r, c);
+                        break;
+                    default:
+                }
+
+
+                //TODO tenir compte de l'orientation ici
+                locations.add(frameLoc);
+            }
+        }
+        return locations;
+    }
+
+    private static List<ItemFrame> getFrameList(int row, int col, ItemFrame startFrame, BlockFace orientation) {
+        List<ItemFrame> itemFrames = new ArrayList<>();
+        Location startFrameLoc = startFrame.getLocation();
+        for (int r = 0; r < row; r++) {
+            for (int c = 0; c < col; c++) {
+                FlatLocation frameLoc = new FlatLocation(startFrameLoc, startFrame.getFacing());
+                frameLoc = frameLoc.add(r, c);
+                //TODO tenir compte de l'orientation ici
+                PluginLogger.info(frameLoc.toString());
+                ItemFrame frame = getFrameAt(frameLoc);
+                itemFrames.add(frame);
+            }
+        }
+        for (ItemFrame f : itemFrames) {
+            if (f != null) {
+                PluginLogger.info("f " + f.getLocation().toString());
+            }
+        }
+        return itemFrames;
+    }
+
 }
