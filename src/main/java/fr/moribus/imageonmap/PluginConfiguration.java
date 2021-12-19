@@ -37,9 +37,11 @@
 package fr.moribus.imageonmap;
 
 import static fr.zcraft.quartzlib.components.configuration.ConfigurationItem.item;
+import static fr.zcraft.quartzlib.components.configuration.ConfigurationItem.list;
 
 import fr.zcraft.quartzlib.components.configuration.Configuration;
 import fr.zcraft.quartzlib.components.configuration.ConfigurationItem;
+import fr.zcraft.quartzlib.components.configuration.ConfigurationList;
 import java.util.Locale;
 
 
@@ -59,6 +61,7 @@ public final class PluginConfiguration extends Configuration {
     public static ConfigurationItem<Integer> LIMIT_SIZE_X = item("limit-map-size-x", 0);
     public static ConfigurationItem<Integer> LIMIT_SIZE_Y = item("limit-map-size-y", 0);
 
-    public static ConfigurationItem<String> ALLOWLIST_HOSTINGSITE = item("allowlist_hostingsite", "");
+    public static ConfigurationList<String> IMAGES_HOSTNAMES_WHITELIST =
+            list("images-hostnames-whitelist", String.class);
 
 }

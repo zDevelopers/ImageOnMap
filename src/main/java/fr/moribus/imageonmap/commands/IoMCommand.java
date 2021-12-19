@@ -42,12 +42,12 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.Command;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -55,37 +55,33 @@ import org.bukkit.entity.Player;
 
 public abstract class IoMCommand extends Command {
 
+    protected boolean checkHostnameWhitelist(final URL url) {
+        final List<String> hostnames = PluginConfiguration.IMAGES_HOSTNAMES_WHITELIST.get()
+                .stream()
+                .map(String::trim)
+                .filter(h -> !h.isEmpty())
+                .collect(Collectors.toList());
 
-    protected boolean checkHostingSite(URL url) {
-        String urlsString = PluginConfiguration.ALLOWLIST_HOSTINGSITE.get();
-        if (urlsString.trim().isEmpty()) {
+        if (hostnames.isEmpty()) {
             return true;
         }
-        String[] hosts = urlsString.trim().replaceAll("https://","").split(",");
-        for (String host : hosts) {
-            if (url.getHost().equals(host.trim())) {
-                return true;
-            }
-        }
-        return false;
+
+        return hostnames
+                .stream()
+                .map(h -> h.replaceAll("https://", "").replaceAll("http://", ""))
+                .anyMatch(h -> h.equalsIgnoreCase(url.getHost()));
     }
 
-    protected void retrieveUUID(String arg, Consumer<UUID> consumer) {
-        UUID uuid;
-        OfflinePlayer offlinePlayer;
-
-        offlinePlayer = Bukkit.getOfflinePlayer(arg);//If it is being removed we may have to use mojang services
-        uuid = offlinePlayer.getUniqueId();
-
-        consumer.accept(uuid);
-
+    protected void retrieveUUID(final String arg, final Consumer<UUID> consumer) {
+        // If it is being removed we may have to use Mojang services
+        consumer.accept(Bukkit.getOfflinePlayer(arg).getUniqueId());
     }
 
     protected ImageMap getMapFromArgs() throws CommandException {
         return getMapFromArgs(playerSender(), 0, true);
     }
 
-    protected ImageMap getMapFromArgs(Player player, int index, boolean expand) throws CommandException {
+    protected ImageMap getMapFromArgs(final Player player, final int index, boolean expand) throws CommandException {
         if (args.length <= index) {
             throwInvalidArgument(I.t("You need to give a map name."));
         }
