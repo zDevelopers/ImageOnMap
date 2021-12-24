@@ -10,6 +10,9 @@ lang:
 # The statistics are publicly visible here: http://mcstats.org/plugin/ImageOnMap
 collect-data: true
 
+# Displays a message to administrators (ops and console) when a new version is available.
+check-for-updates: true
+
 
 # Images rendered on maps consume Minecraft maps ID, and there are only 2 147 483 647 of them.
 # You can limit the maximum number of maps a player, or the whole server, can use with ImageOnMap.
