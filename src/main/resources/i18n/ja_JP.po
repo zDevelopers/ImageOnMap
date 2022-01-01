@@ -54,7 +54,7 @@ msgstr "マップのサイズがインベントリに対して大きすぎます
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetCommand.java:39
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/NewCommand.java:71
 msgid "Use '/maptool getremaining' to get the remaining maps."
-msgstr "残りのマップを取得するには '/maptool getremaining' を実行して下さい。"
+msgstr "残りのマップを取得するには '/maptool getremaining' を実行して下さい"
 
 #: src/main/java/fr/moribus/imageonmap/commands/maptool/GetRemainingCommand.java:38
 msgid "You have no remaining map."
@@ -153,7 +153,7 @@ msgstr "{gray}マップの削除に成功しました"
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:54
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:71
 msgid "{green}Map part"
-msgstr "{green}マップ部分"
+msgstr "{green}マップの一部"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:55
 msgid "{gray}Column: {white}{0}"
@@ -197,7 +197,7 @@ msgstr "{red}この写真を削除"
 msgid ""
 "{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"
 msgstr ""
-"{gray}このマップを{white}永久{gray}に削除します。この操作は元に戻せません！"
+"{gray}このマップを{white}永久{gray}に削除します この操作は元に戻せません！"
 
 #: src/main/java/fr/moribus/imageonmap/gui/MapDetailGui.java:144
 msgid "{gray}You will be asked to confirm your choice if you click here."
@@ -552,7 +552,7 @@ msgstr "{0} ({1} 行目, {2} 列目)"
 
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:44
 msgid "Splatter Map"
-msgstr "拡散マップ"
+msgstr "巨大なマップ"
 
 #. Title in a splatter map tooltip
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:48
@@ -574,7 +574,7 @@ msgstr "{0} 行 × {1} 列(合計 {2} 枚)"
 #. Title in a splatter map tooltip
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:53
 msgid "How to use this?"
-msgstr "これをどうやって使いますか？"
+msgstr "使い方"
 
 #: src/main/java/fr/moribus/imageonmap/ui/SplatterMapManager.java:54
 msgid ""
