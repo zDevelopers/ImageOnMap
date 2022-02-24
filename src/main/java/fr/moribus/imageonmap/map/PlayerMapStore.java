@@ -38,6 +38,9 @@ package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.PluginConfiguration;
+import fr.moribus.imageonmap.economy.EconomyComponent;
+import fr.moribus.imageonmap.economy.EconomyNotEnabledException;
+import fr.moribus.imageonmap.economy.InsufficientFundsException;
 import fr.moribus.imageonmap.map.MapManagerException.Reason;
 import fr.zcraft.quartzlib.tools.PluginLogger;
 import java.io.File;
@@ -47,7 +50,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import net.milkbowl.vault.economy.EconomyResponse;
+import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -92,9 +99,42 @@ public class PlayerMapStore implements ConfigurationSerializable {
         return false;
     }
 
-    public synchronized void addMap(ImageMap map) throws MapManagerException {
-        checkMapLimit(map);
-        insertMap(map);
+    public synchronized void addMap(ImageMap map) 
+            throws MapManagerException, EconomyNotEnabledException, InsufficientFundsException {
+        
+        double cost = 0;
+
+        // withdraw money from account if economy is enabled
+        if (PluginConfiguration.ENABLE_ECONOMY.get()) {
+
+            // calculate the cost of the new map(s)
+            cost = PluginConfiguration.COST_PER_MAP.get();
+            if (PluginConfiguration.SCALE_MAP_COST.get()) {
+                cost *= map.getMapCount();
+            }
+
+            EconomyResponse response = EconomyComponent.getEconomy().withdrawPlayer(getPlayer(), cost);
+            if (response.type == ResponseType.FAILURE) {
+                throw new InsufficientFundsException(getPlayer(), cost);
+            }
+
+        }
+
+        try {
+            checkMapLimit(map);
+            insertMap(map);
+        } catch (MapManagerException exception) {
+            // give back the money if player fails to get the map(s)
+            if (PluginConfiguration.ENABLE_ECONOMY.get()) {
+                EconomyComponent.getEconomy().depositPlayer(getPlayer(), cost);
+            }
+            throw exception;
+        }
+         
+    }
+
+    public OfflinePlayer getPlayer() {
+        return Bukkit.getOfflinePlayer(getUUID());
     }
 
     public synchronized void insertMap(ImageMap map) {

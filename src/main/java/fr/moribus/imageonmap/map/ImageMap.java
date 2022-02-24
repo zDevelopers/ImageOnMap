@@ -37,6 +37,8 @@
 package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.economy.EconomyNotEnabledException;
+import fr.moribus.imageonmap.economy.InsufficientFundsException;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.quartzlib.components.i18n.I;
 import java.io.File;
@@ -168,8 +170,20 @@ public abstract class ImageMap implements ConfigurationSerializable {
 
     //
 
-    public boolean give(Player player) {
-        return MapItemManager.give(player, this);
+    public boolean give(Player player, boolean ignoreCost) {
+        try {
+            return MapItemManager.give(player, this, ignoreCost);
+        } catch (EconomyNotEnabledException | InsufficientFundsException exception) {
+            if (ignoreCost) {
+                //TODO it shouldn't get to this state
+                exception.printStackTrace();
+            }
+            return false;
+        }
+    }
+
+    public boolean give(Player player) throws EconomyNotEnabledException, InsufficientFundsException {
+        return give(player, false);
     }
 
     protected abstract void postSerialize(Map<String, Object> map);

@@ -37,13 +37,16 @@
 package fr.moribus.imageonmap.ui;
 
 import fr.moribus.imageonmap.Permissions;
+import fr.moribus.imageonmap.PluginConfiguration;
+import fr.moribus.imageonmap.economy.EconomyComponent;
+import fr.moribus.imageonmap.economy.EconomyNotEnabledException;
+import fr.moribus.imageonmap.economy.InsufficientFundsException;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.core.QuartzLib;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.items.ItemUtils;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
@@ -51,6 +54,8 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Queue;
 import java.util.UUID;
+import net.milkbowl.vault.economy.EconomyResponse;
+import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -86,37 +91,86 @@ public class MapItemManager implements Listener {
         mapItemCache = null;
     }
 
-    public static boolean give(Player player, ImageMap map) {
+    public static boolean give(Player player, ImageMap map, boolean ignoreCost) 
+            throws EconomyNotEnabledException, InsufficientFundsException {
         if (map instanceof PosterMap) {
-            return give(player, (PosterMap) map);
+            return give(player, (PosterMap) map, ignoreCost);
         } else if (map instanceof SingleMap) {
-            return give(player, (SingleMap) map);
+            return give(player, (SingleMap) map, ignoreCost);
         }
         return false;
     }
 
-    public static boolean give(Player player, SingleMap map) {
-        return give(player, createMapItem(map, true));
+    public static boolean give(Player player, ImageMap map) 
+            throws EconomyNotEnabledException, InsufficientFundsException {
+        return give(player, map, false);
     }
 
-    public static boolean give(Player player, PosterMap map) {
+    public static boolean give(Player player, SingleMap map, boolean ignoreCost) 
+            throws EconomyNotEnabledException, InsufficientFundsException {
+        return give(player, createMapItem(map, true), 1, ignoreCost);
+    }
+
+    public static boolean give(Player player, SingleMap map) 
+            throws EconomyNotEnabledException, InsufficientFundsException {
+        return give(player, createMapItem(map, true), 1, false);
+    }
+
+    public static boolean give(Player player, PosterMap map, boolean ignoreCost) 
+            throws EconomyNotEnabledException, InsufficientFundsException {
         if (!map.hasColumnData()) {
             return giveParts(player, map);
         }
-        return give(player, SplatterMapManager.makeSplatterMap(map));
+        return give(player, SplatterMapManager.makeSplatterMap(map), map.getMapCount(), ignoreCost);
     }
 
-    private static boolean give(final Player player, final ItemStack item) {
+    public static boolean give(Player player, PosterMap map) 
+            throws EconomyNotEnabledException, InsufficientFundsException {
+        return give(player, SplatterMapManager.makeSplatterMap(map), map.getMapCount(), false);
+    }
+
+    private static boolean give(final Player player, final ItemStack item, Integer mapCount, boolean ignoreCost) 
+            throws EconomyNotEnabledException, InsufficientFundsException {
+        
+        double cost = 0;
+
+        // withdraw money from account if economy is enabled
+        if (PluginConfiguration.ENABLE_ECONOMY.get() 
+                && !ignoreCost) {
+
+            // calculate the cost of the new map(s)
+            cost = PluginConfiguration.COST_PER_COPY.get();
+            if (PluginConfiguration.SCALE_COPY_COST.get()) {
+                cost *= mapCount;
+            }
+
+            EconomyResponse response = EconomyComponent.getEconomy().withdrawPlayer(player, cost);
+            if (response.type == ResponseType.FAILURE) {
+                throw new InsufficientFundsException(player, cost);
+            }
+
+        }
+        
         boolean given = ItemUtils.give(player, item);
 
         if (given) {
             player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 1, 1);
+        } else if (PluginConfiguration.ENABLE_ECONOMY.get() 
+                && cost > 0) {
+            EconomyComponent.getEconomy().depositPlayer(player, cost);
         }
 
         return !given;
+
     }
 
-    public static boolean giveParts(Player player, PosterMap map) {
+    private static boolean give(final Player player, final ItemStack item) 
+            throws EconomyNotEnabledException, InsufficientFundsException {
+        return give(player, item, 1, false);
+    }
+
+    public static boolean giveParts(Player player, PosterMap map) 
+            throws EconomyNotEnabledException, InsufficientFundsException {
         boolean inventoryFull = false;
 
         ItemStack mapPartItem;
@@ -129,7 +183,7 @@ public class MapItemManager implements Listener {
         return inventoryFull;
     }
 
-    public static int giveCache(Player player) {
+    public static int giveCache(Player player) throws EconomyNotEnabledException, InsufficientFundsException {
         Queue<ItemStack> cache = getCache(player);
         Inventory inventory = player.getInventory();
         int givenItemsCount = 0;
@@ -305,7 +359,7 @@ public class MapItemManager implements Listener {
 
                     if (player.getGameMode() != GameMode.CREATIVE
                             || !SplatterMapManager.hasSplatterMap(player, poster)) {
-                        poster.give(player);
+                        poster.give(player, true);
                     }
                     return;
                 }

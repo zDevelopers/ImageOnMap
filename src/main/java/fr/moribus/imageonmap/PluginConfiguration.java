@@ -64,4 +64,9 @@ public final class PluginConfiguration extends Configuration {
     public static ConfigurationList<String> IMAGES_HOSTNAMES_WHITELIST =
             list("images-hostnames-whitelist", String.class);
 
+    public static ConfigurationItem<Boolean> ENABLE_ECONOMY = item("enable-economy", false);
+    public static ConfigurationItem<Boolean> SCALE_MAP_COST = item("scale-map-cost", true);
+    public static ConfigurationItem<Integer> COST_PER_MAP = item("cost-per-map", 100);
+    public static ConfigurationItem<Boolean> SCALE_COPY_COST = item("scale-copy-cost", false);
+    public static ConfigurationItem<Integer> COST_PER_COPY = item("cost-per-copy", 50);
 }

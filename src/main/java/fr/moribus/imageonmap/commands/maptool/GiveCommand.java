@@ -38,6 +38,8 @@ package fr.moribus.imageonmap.commands.maptool;
 
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
+import fr.moribus.imageonmap.economy.EconomyNotEnabledException;
+import fr.moribus.imageonmap.economy.InsufficientFundsException;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
@@ -111,11 +113,21 @@ public class GiveCommand extends IoMCommand {
             }
 
             retrieveUUID(playerName, uuid2 -> {
-                if (Bukkit.getPlayer((uuid2)) != null && Bukkit.getPlayer((uuid2)).isOnline()
-                        && map.give(Bukkit.getPlayer(uuid2))) {
-                    info(I.t("The requested map was too big to fit in your inventory."));
-                    info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+                
+                try {
+                    if (Bukkit.getPlayer((uuid2)) != null && Bukkit.getPlayer((uuid2)).isOnline()
+                            && map.give(Bukkit.getPlayer(uuid2))) {
+                        info(I.t("The requested map was too big to fit in your inventory."));
+                        info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+                    }
+                } catch (EconomyNotEnabledException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InsufficientFundsException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
+
             });
         });
 

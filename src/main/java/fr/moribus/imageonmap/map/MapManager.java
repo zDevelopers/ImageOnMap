@@ -38,6 +38,8 @@ package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.PluginConfiguration;
+import fr.moribus.imageonmap.economy.EconomyNotEnabledException;
+import fr.moribus.imageonmap.economy.InsufficientFundsException;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.PosterImage;
 import fr.moribus.imageonmap.map.MapManagerException.Reason;
@@ -100,13 +102,15 @@ public abstract class MapManager {
         return false;
     }
 
-    public static ImageMap createMap(UUID playerUUID, int mapID) throws MapManagerException {
+    public static ImageMap createMap(UUID playerUUID, int mapID) 
+            throws MapManagerException, EconomyNotEnabledException, InsufficientFundsException {
         ImageMap newMap = new SingleMap(playerUUID, mapID);
         addMap(newMap);
         return newMap;
     }
 
-    public static ImageMap createMap(PosterImage image, UUID playerUUID, int[] mapsIDs) throws MapManagerException {
+    public static ImageMap createMap(PosterImage image, UUID playerUUID, int[] mapsIDs) 
+            throws MapManagerException, EconomyNotEnabledException, InsufficientFundsException {
         ImageMap newMap;
 
         if (image.getImagesCount() == 1) {
@@ -141,7 +145,8 @@ public abstract class MapManager {
         return ((MapMeta) meta).hasMapId() ? ((MapMeta) meta).getMapId() : 0;
     }
 
-    public static void addMap(ImageMap map) throws MapManagerException {
+    public static void addMap(ImageMap map) 
+            throws MapManagerException, EconomyNotEnabledException, InsufficientFundsException {
         getPlayerMapStore(map.getUserUUID()).addMap(map);
     }
 

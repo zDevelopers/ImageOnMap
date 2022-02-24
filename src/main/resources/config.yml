@@ -40,3 +40,25 @@ save-full-image: false
 #  - cdn.discordapp.com
 images-hostnames-whitelist:
 
+#-------------------------------------------------------------------------------
+# Economy
+
+# Enables Vault-compatible economy plugin (requires Vault and a Vault
+# compatible economy plugin to work) if set to true
+enable-economy: false
+
+# Should the cost to create a splatter map scale with the size of the image?
+# i.e. cost-per-map * width * height
+# If set to false then the cost to create a splatter map is just the
+# cost-per-map no matter what the dimensions of the splatter map are.
+scale-map-cost: true
+
+cost-per-map: 100
+
+# Should the cost to copy a splatter map scale with the size of the image?
+# This is equivalent to scale-map-cost but is applied whenever the player
+# wishes to get a copy of a pre-existing map.
+scale-copy-cost: false
+
+# The cost for each copy of the 
+cost-per-copy: 50

@@ -37,7 +37,10 @@
 package fr.moribus.imageonmap.commands.maptool;
 
 import fr.moribus.imageonmap.Permissions;
+import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.commands.IoMCommand;
+import fr.moribus.imageonmap.economy.EconomyNotEnabledException;
+import fr.moribus.imageonmap.economy.InsufficientFundsException;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.ImageUtils;
 import fr.moribus.imageonmap.map.ImageMap;
@@ -162,11 +165,20 @@ public class NewCommand extends IoMCommand {
                             MessageSender
                                     .sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Rendering finished!"));
 
-                            if (result.give(player)
-                                    && (result instanceof PosterMap && !((PosterMap) result).hasColumnData())) {
-                                info(I.t("The rendered map was too big to fit in your inventory."));
-                                info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+                            try {
+                                if (result.give(player)
+                                        && (result instanceof PosterMap && !((PosterMap) result).hasColumnData())) {
+                                    info(I.t("The rendered map was too big to fit in your inventory."));
+                                    info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+                                }
+                            } catch (EconomyNotEnabledException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            } catch (InsufficientFundsException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
                             }
+                            
                         }
 
                         @Override
