@@ -173,7 +173,7 @@ public class MapDetailGui extends ExplorerGui<Integer> {
         }
 
         if (canDelete) {
-            action("delete", deleteSlot, new ItemStackBuilder(Material.BARRIER)
+            action("delete", deleteSlot, new ItemStackBuilder(Material.REDSTONE)
                     .title(I.t(getPlayerLocale(), "{red}Delete this image"))
                     .longLore(I.t(getPlayerLocale(),
                             "{gray}Deletes this map {white}forever{gray}. This action cannot be undone!"))
@@ -194,7 +194,7 @@ public class MapDetailGui extends ExplorerGui<Integer> {
             backSlot++;
         }
 
-        action("back", backSlot, new ItemStackBuilder(Material.EMERALD)
+        action("back", backSlot, new ItemStackBuilder(Material.GREEN_DYE)
                 .title(I.t(getPlayerLocale(), "{green}« Back"))
                 .lore(I.t(getPlayerLocale(), "{gray}Go back to the list."))
         );
