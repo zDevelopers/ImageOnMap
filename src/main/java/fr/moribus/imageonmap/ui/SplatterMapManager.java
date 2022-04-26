@@ -55,11 +55,13 @@ import fr.zcraft.quartzlib.tools.text.MessageSender;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
 import fr.zcraft.quartzlib.tools.world.WorldUtils;
 import java.lang.reflect.Method;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Rotation;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -307,8 +309,12 @@ public abstract class SplatterMapManager {
 
                 RunTask.later(() -> {
                     addPropertiesToFrames(player, frame);
-                    frame.setItem(
-                            new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+                    ItemStack item = new ItemStack(Material.FILLED_MAP);
+                    net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
+                    net.minecraft.nbt.NBTTagCompound tag = nms.u();
+                    tag.a("map", id);
+                    nms.c(tag);
+                    frame.setItem(CraftItemStack.asBukkitCopy(nms));
                 }, 5L);
 
 
