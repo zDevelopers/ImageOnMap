@@ -46,9 +46,12 @@ import fr.zcraft.quartzlib.components.commands.CommandInfo;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.components.rawtext.RawText;
 import fr.zcraft.quartzlib.components.rawtext.RawTextPart;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.text.RawMessage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -64,43 +67,64 @@ public class ListCommand extends IoMCommand {
         }
 
         String playerName;
+        final boolean isHuman = (sender instanceof Player);
         if (arguments.size() == 1) {
-            if (!Permissions.LISTOTHER.grantedTo(sender)) {
+            if (!Permissions.LISTOTHER.grantedTo(sender) && isHuman) {
                 throwNotAuthorized();
                 return;
             }
 
             playerName = arguments.get(0);
         } else {
-            playerName = playerSender().getName();
-        }
-
-        final Player sender = playerSender();
-
-
-        retrieveUUID(playerName, uuid -> {
-            List<ImageMap> mapList = MapManager.getMapList(uuid);
-            if (mapList.isEmpty()) {
-                info(sender, I.t("No map found."));
+            if (isHuman) {
+                playerName = playerSender().getName();
+            } else {
+                PluginLogger.warning(I.t("You must give a player name"));
                 return;
             }
-            String message = I.tn("{white}{bold}{0} map found.",
-                    "{white}{bold}{0} maps found.",
-                    mapList.size());
-
-            info(sender, I.tn("{white}{bold}{0} map found.", "{white}{bold}{0} maps found.", mapList.size()));
-
-            RawTextPart rawText = new RawText("");
-            rawText = addMap(rawText, mapList.get(0));
-
-            //TODO pagination chat
-            for (int i = 1, c = mapList.size(); i < c; i++) {
-                rawText = rawText.then(", ").color(ChatColor.GRAY);
-                rawText = addMap(rawText, mapList.get(i));
+        }
+        final Player playerSender;
+        if (isHuman) {
+            playerSender = playerSender();
+        } else {
+            playerSender = null;
+        }
+        UUID uuid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        List<ImageMap> mapList = MapManager.getMapList(uuid);
+        if (mapList.isEmpty()) {
+            String msg = I.t("No map found.");
+            if (isHuman) {
+                info(playerSender, msg);
+            } else {
+                PluginLogger.info(msg);
             }
-            RawMessage.send(sender, rawText.build());
+            return;
+        }
+        String msg = I.tn("{white}{bold}{0} map found.",
+                "{white}{bold}{0} maps found.",
+                mapList.size());
+        if (isHuman) {
+            info(playerSender,
+                    msg); //TODO merge those into a common info(isHuman,msg) that print to a sender or the console
+        } else {
+            PluginLogger.info(msg);
+        }
 
-        });
+        RawTextPart rawText = new RawText("");
+        rawText = addMap(rawText, mapList.get(0));
+
+        //TODO pagination chat
+        for (int i = 1, c = mapList.size(); i < c; i++) {
+            rawText = rawText.then(", ").color(ChatColor.GRAY);
+            rawText = addMap(rawText, mapList.get(i));
+        }
+        if (isHuman) {
+            RawMessage.send(playerSender, rawText.build());
+        } else {
+            PluginLogger.info(rawText.build().toPlainText());
+        }
+
+
     }
 
     private RawTextPart<?> addMap(RawTextPart<?> rawText, ImageMap map) {
