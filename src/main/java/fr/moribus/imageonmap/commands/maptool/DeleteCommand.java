@@ -50,9 +50,12 @@ import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.text.RawMessage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
 
 @CommandInfo(name = "delete", usageParameters = "[player name]:<map name> [--confirm]")
 @WithFlags({"confirm"})
@@ -87,45 +90,69 @@ public class DeleteCommand extends IoMCommand {
 
         final String playerName;
         final String mapName;
-        final Player sender = playerSender();
+        final Player sender;
+        Player playerSender;
+        try {
+            playerSender = playerSender();
+        } catch (CommandException ignored) {
+            if (arguments.size() != 2) {
+                throwInvalidArgument(I.t("Player name is required from the console"));
+            }
+            playerSender = null;
+        }
+
+        sender = playerSender;
+        boolean notPlayer = sender == null;
         if (arguments.size() == 2 || arguments.size() == 3) {
             if (!Permissions.DELETEOTHER.grantedTo(sender)) {
                 throwNotAuthorized();
                 return;
             }
-
             playerName = arguments.get(0);
             mapName = arguments.get(1);
         } else {
             playerName = sender.getName();
             mapName = arguments.get(0);
         }
-
-        retrieveUUID(playerName, uuid -> {
-            ImageMap map = MapManager.getMap(uuid, mapName);
-
-            if (map == null) {
-                warning(sender, I.t("This map does not exist."));
-                return;
-            }
-
-            if (!confirm) {
-                RawText msg = deleteMsg(getClass(), playerName, map);
-                RawMessage.send(sender, msg);
+        UUID uuid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        PluginLogger.info("UUID " + uuid.toString());
+        ImageMap map = MapManager.getMap(uuid, mapName);
+        if (map == null) {
+            final String msg = "This map does not exist.";
+            if (notPlayer) {
+                PluginLogger.warning("" + msg);
             } else {
-                if (sender != null && sender.isOnline() && sender.getInventory() != null) {
-                    MapManager.clear(sender.getInventory(), map);
-                }
-
-                try {
-                    MapManager.deleteMap(map);
-                    success(sender, I.t("Map successfully deleted."));
-                } catch (MapManagerException ex) {
-                    PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
-                    warning(sender, I.t("This map does not exist."));
-                }
+                warning(sender, I.t(msg));
             }
-        });
+
+            return;
+        }
+
+        if (!confirm && !notPlayer) {
+            RawText msg = deleteMsg(getClass(), playerName, map);
+
+            if (notPlayer) {
+                PluginLogger.info("" + msg.toFormattedText());
+            } else {
+                RawMessage.send(sender, msg);
+            }
+        } else {
+            if (sender != null && sender.isOnline() && sender.getInventory() != null) {
+                MapManager.clear(sender.getInventory(), map);
+            }
+            try {
+                MapManager.deleteMap(map);
+                String msg = I.t("Map successfully deleted.");
+                if (sender != null) {
+                    success(sender, msg);
+                } else {
+                    PluginLogger.info(msg);
+                }
+            } catch (MapManagerException ex) {
+                PluginLogger.warning(I.t("A non-existent map was requested to be deleted", ex));
+                warning(sender, I.t("This map does not exist."));
+            }
+        }
 
 
     }
