@@ -39,6 +39,8 @@ package fr.moribus.imageonmap.commands.maptool;
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
+import fr.moribus.imageonmap.economy.EconomyNotEnabledException;
+import fr.moribus.imageonmap.economy.InsufficientFundsException;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
@@ -96,10 +98,19 @@ public class GetCommand extends IoMCommand {
                 return;
             }
 
-            if (map.give(sender)) {
-                info(I.t("The requested map was too big to fit in your inventory."));
-                info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+            try {
+                if (map.give(sender)) {
+                    info(I.t("The requested map was too big to fit in your inventory."));
+                    info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+                }
+            } catch (EconomyNotEnabledException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InsufficientFundsException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
+            
         });
     }
 

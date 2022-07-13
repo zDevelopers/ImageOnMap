@@ -38,6 +38,8 @@ package fr.moribus.imageonmap.commands.maptool;
 
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.commands.IoMCommand;
+import fr.moribus.imageonmap.economy.EconomyNotEnabledException;
+import fr.moribus.imageonmap.economy.InsufficientFundsException;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.quartzlib.components.commands.CommandException;
 import fr.zcraft.quartzlib.components.commands.CommandInfo;
@@ -56,14 +58,25 @@ public class GetRemainingCommand extends IoMCommand {
             return;
         }
 
-        int givenMaps = MapItemManager.giveCache(player);
-
-        if (givenMaps == 0) {
-            error(I.t("Your inventory is full! Make some space before requesting the remaining maps."));
-        } else {
-            info(I.tn("There is {0} map remaining.", "There are {0} maps remaining.",
-                    MapItemManager.getCacheSize(player)));
+        try {
+            int givenMaps = MapItemManager.giveCache(player);
+            if (givenMaps == 0) {
+                error(I.t("Your inventory is full! Make some space before requesting the remaining maps."));
+            } else {
+                info(I.tn(
+                        "There is {0} map remaining.", "There are {0} maps remaining.",
+                        MapItemManager.getCacheSize(player)
+                ));
+            }
+        } catch (EconomyNotEnabledException exception) {
+            // TODO Auto-generated catch block
+            exception.printStackTrace();
+        } catch (InsufficientFundsException exception) {
+            // TODO Auto-generated catch block
+            exception.printStackTrace();
         }
+
+        
     }
 
     @Override

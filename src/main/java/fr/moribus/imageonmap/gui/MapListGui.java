@@ -38,6 +38,8 @@ package fr.moribus.imageonmap.gui;
 
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.PluginConfiguration;
+import fr.moribus.imageonmap.economy.EconomyNotEnabledException;
+import fr.moribus.imageonmap.economy.InsufficientFundsException;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
@@ -143,25 +145,37 @@ public class MapListGui extends ExplorerGui<ImageMap> {
 
     @Override
     protected ItemStack getPickedUpItem(ImageMap map) {
-        if (!Permissions.GET.grantedTo(getPlayer())) {
-            return null;
-        }
 
-        if (map instanceof SingleMap) {
-            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName(), false, true);
-        } else if (map instanceof PosterMap) {
-            PosterMap poster = (PosterMap) map;
+        try {
 
-            if (poster.hasColumnData()) {
-                return SplatterMapManager.makeSplatterMap((PosterMap) map);
+            if (!Permissions.GET.grantedTo(getPlayer())) {
+                return null;
             }
 
-            MapItemManager.giveParts(getPlayer(), poster);
-            return null;
-        }
+            if (map instanceof SingleMap) {
+                return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName(), false, true);
+            } else if (map instanceof PosterMap) {
+                PosterMap poster = (PosterMap) map;
 
-        MapItemManager.give(getPlayer(), map);
+                if (poster.hasColumnData()) {
+                    return SplatterMapManager.makeSplatterMap((PosterMap) map);
+                }
+
+                MapItemManager.giveParts(getPlayer(), poster);
+                return null;
+            }
+            
+            MapItemManager.give(getPlayer(), map);
+
+        } catch (EconomyNotEnabledException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InsufficientFundsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return null;
+        
     }
 
     @Override
