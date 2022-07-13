@@ -39,7 +39,6 @@ package fr.moribus.imageonmap.gui;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.PosterMap;
-import fr.moribus.imageonmap.map.SingleMap;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.quartzlib.components.gui.ExplorerGui;
 import fr.zcraft.quartzlib.components.gui.Gui;
@@ -105,9 +104,7 @@ public class MapDetailGui extends ExplorerGui<Integer> {
             return null;
         }
 
-        if (map instanceof SingleMap) {
-            return MapItemManager.createMapItem((SingleMap) map, true);
-        } else if (map instanceof PosterMap) {
+        if (map instanceof PosterMap) {
             return MapItemManager.createMapItem((PosterMap) map, x, y);
         }
 
@@ -124,15 +121,11 @@ public class MapDetailGui extends ExplorerGui<Integer> {
         return MapItemManager.createMapItem(poster, poster.getIndex(mapId));
     }
 
-    @Override
-    protected ItemStack getEmptyViewItem() {
-        if (map instanceof SingleMap) {
-            return getViewItem(0, 0);
-        } else {
+    /*    @Override
+        protected ItemStack getEmptyViewItem() {
             return super.getEmptyViewItem();
         }
-    }
-
+    */
     @Override
     protected void onUpdate() {
         /// Title of the map details GUI

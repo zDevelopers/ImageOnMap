@@ -123,79 +123,74 @@ public class NewCommand extends IoMCommand {
             throwInvalidArgument(I.t("Invalid URL."));
             return;
         }
-
+        boolean isPlayer = sender != null;
         // TODO Add a per-player toggle for the GUI.
-        if (args.length >= 2) {
-            ImageRendererExecutor.renderAndNotify(url, scaling, player.getUniqueId(), width, height);
-        } else {
+        if (args.length < 2 && isPlayer) {
             Gui.open(player, new RenderGui(url));
-        }
-        //I try to test if the gui is run correctly
-        //keep the following as a fallback and for cmd made by console
-
-        /*
-        if (args.length >= 2) {
-            if (args.length >= 3) {
-                try {
-                    if (args.length >= 4) {
-                        width = Integer.parseInt(args[2]);
-                        height = Integer.parseInt(args[3]);
-                    } else {
-                        String[] size;
-                        if (args[2].contains("*") && !args[2].contains("x")) {
-                            size = args[2].split("\\*");
-                            width = Integer.parseInt(size[0]);
-                            height = Integer.parseInt(size[1]);
-                        }
-                        if (!args[2].contains("*") && args[2].contains("x")) {
-                            size = args[2].split("x");
-                            width = Integer.parseInt(size[0]);
-                            height = Integer.parseInt(size[1]);
-                        }
-                    }
-                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                    throwInvalidArgument(I.t("resize dimension as to be in format <n m> or <nxm> or <n*m>."));
-                    return;
-                }
-            }
-            scaling = resizeMode();
-        }
-        if (width < 0 || height < 0) {
-            throwInvalidArgument(I.t("You need to specify a valid size. e.g. resize 4 5"));
-            return;
-        }
-        try {
-            ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));
-            ImageRendererExecutor
-                    .render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>() {
-                        @Override
-                        public void finished(ImageMap result) {
-                            ActionBar.removeMessage(player);
-                            MessageSender
-                                    .sendActionBarMessage(player, ChatColor.DARK_GREEN + I.t("Rendering finished!"));
-
-                            if (result.give(player)
-                                    && (result instanceof PosterMap && !((PosterMap) result).hasColumnData())) {
-                                info(I.t("The rendered map was too big to fit in your inventory."));
-                                info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+        } else {
+            //ImageRendererExecutor.renderAndNotify(url, scaling, player.getUniqueId(), width, height);
+            if (args.length >= 2) {
+                if (args.length >= 3) {
+                    try {
+                        if (args.length >= 4) {
+                            width = Integer.parseInt(args[2]);
+                            height = Integer.parseInt(args[3]);
+                        } else {
+                            String[] size;
+                            if (args[2].contains("*") && !args[2].contains("x")) {
+                                size = args[2].split("\\*");
+                                width = Integer.parseInt(size[0]);
+                                height = Integer.parseInt(size[1]);
+                            }
+                            if (!args[2].contains("*") && args[2].contains("x")) {
+                                size = args[2].split("x");
+                                width = Integer.parseInt(size[0]);
+                                height = Integer.parseInt(size[1]);
                             }
                         }
+                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                        throwInvalidArgument(I.t("resize dimension as to be in format <n m> or <nxm> or <n*m>."));
+                        return;
+                    }
+                }
+                scaling = resizeMode();
+            }
+            if (width < 0 || height < 0) {
+                throwInvalidArgument(I.t("You need to specify a valid size. e.g. resize 4 5"));
+                return;
+            }
+            try {
+                ActionBar.sendPermanentMessage(player, ChatColor.DARK_GREEN + I.t("Rendering..."));
+                ImageRendererExecutor
+                        .render(url, scaling, player.getUniqueId(), width, height, new WorkerCallback<ImageMap>() {
+                            @Override
+                            public void finished(ImageMap result) {
+                                ActionBar.removeMessage(player);
+                                MessageSender
+                                        .sendActionBarMessage(player,
+                                                ChatColor.DARK_GREEN + I.t("Rendering finished!"));
 
-                        @Override
-                        public void errored(Throwable exception) {
-                            player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
+                                if (result.give(player)
+                                        && (result instanceof PosterMap && !((PosterMap) result).hasColumnData())) {
+                                    info(I.t("The rendered map was too big to fit in your inventory."));
+                                    info(I.t("Use '/maptool getremaining' to get the remaining maps."));
+                                }
+                            }
 
-                            PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
-                                    player.getName(),
-                                    exception.getClass().getCanonicalName(),
-                                    exception.getMessage());
-                        }
-                    });
-        } finally {
-            ActionBar.removeMessage(player);
+                            @Override
+                            public void errored(Throwable exception) {
+                                player.sendMessage(I.t("{ce}Map rendering failed: {0}", exception.getMessage()));
+
+                                PluginLogger.warning("Rendering from {0} failed: {1}: {2}",
+                                        player.getName(),
+                                        exception.getClass().getCanonicalName(),
+                                        exception.getMessage());
+                            }
+                        });
+            } finally {
+                ActionBar.removeMessage(player);
+            }
         }
-        */
-
     }
 
     @Override

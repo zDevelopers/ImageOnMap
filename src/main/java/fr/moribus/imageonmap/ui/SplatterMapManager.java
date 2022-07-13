@@ -57,6 +57,7 @@ import org.bukkit.Material;
 import org.bukkit.Rotation;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -66,7 +67,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 
 //TODO rework splatter effect, using ID is far more stable than nbt tags.
-// To update when adding small picture previsualization.
+// To update when adding small picture snapshot.
 public abstract class SplatterMapManager {
     private SplatterMapManager() {
     }
@@ -318,8 +319,9 @@ public abstract class SplatterMapManager {
 
                 RunTask.later(() -> {
                     addPropertiesToFrames(player, frame);
-                    frame.setItem(
-                            new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+
+                    ItemStack item = MapItemManager.createMapItem(id, "", true, false);
+                    frame.setItem(item);
                 }, 5L);
 
 

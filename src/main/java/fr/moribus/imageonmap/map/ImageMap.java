@@ -91,7 +91,7 @@ public abstract class ImageMap implements ConfigurationSerializable {
     }
 
     public static ImageMap fromConfig(Map<String, Object> map, UUID userUUID) throws InvalidConfigurationException {
-        Type mapType;
+        Type mapType;//TODO refactor this
         try {
             mapType = Type.valueOf((String) map.get("type"));
         } catch (ClassCastException ex) {
@@ -100,7 +100,6 @@ public abstract class ImageMap implements ConfigurationSerializable {
 
         switch (mapType) {
             case SINGLE:
-                return new SingleMap(map, userUUID);
             case POSTER:
                 return new PosterMap(map, userUUID);
             default:

@@ -65,7 +65,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 
-
 @WorkerAttributes(name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker {
     public static void renderAndNotify(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID,
@@ -189,14 +188,10 @@ public class ImageRendererExecutor extends Worker {
                 // Limits are in place and the player does NOT have rights to avoid them.
                 checkSizeLimit(playerUUID, image);
                 final BufferedImage resizedImage;
-                if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1) {
-                    resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
-                    image.flush();//Safe to free
-                    return renderSingle(resizedImage, playerUUID);
-                }
-                resizedImage =
-                        scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
+
+                resizedImage = scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
                 image.flush();//Safe to free
+
                 return renderPoster(resizedImage, playerUUID);
             }
         }, callback);
@@ -247,27 +242,6 @@ public class ImageRendererExecutor extends Worker {
                 return null;
             }
         });
-    }
-
-    private static ImageMap renderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable {
-        MapManager.checkMapLimit(1, playerUUID);
-        final Future<Integer> futureMapID = submitToMainThread(new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return MapManager.getNewMapsIds(1)[0];
-            }
-        });
-
-        final int mapID = futureMapID.get();
-        ImageIOExecutor.saveImage(mapID, image);
-        submitToMainThread(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                Renderer.installRenderer(image, mapID);
-                return null;
-            }
-        });
-        return MapManager.createMap(playerUUID, mapID);
     }
 
     private static ImageMap renderPoster(final BufferedImage image, final UUID playerUUID) throws Throwable {

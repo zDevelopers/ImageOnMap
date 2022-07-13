@@ -102,8 +102,10 @@ public abstract class MapManager {
     }
 
     public static ImageMap createMap(UUID playerUUID, int mapID) throws MapManagerException {
-        ImageMap newMap = new SingleMap(playerUUID, mapID);
-        addMap(newMap);
+        //ImageMap newMap = new SingleMap(playerUUID, mapID);
+        int[] ids = new int[] {mapID};
+        ImageMap newMap = new PosterMap(playerUUID, ids, 1, 1);
+        addMap(newMap);//TODO refactor this
         return newMap;
     }
 
@@ -111,7 +113,8 @@ public abstract class MapManager {
         ImageMap newMap;
 
         if (image.getImagesCount() == 1) {
-            newMap = new SingleMap(playerUUID, mapsIDs[0]);
+            newMap = new PosterMap(playerUUID, mapsIDs, 1, 1);//TODO refactor this
+            //newMap = new SingleMap(playerUUID, mapsIDs[0]);
         } else {
             newMap = new PosterMap(playerUUID, mapsIDs, image.getColumns(), image.getLines());
         }

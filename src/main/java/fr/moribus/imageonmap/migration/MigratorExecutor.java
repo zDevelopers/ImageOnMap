@@ -36,7 +36,6 @@
 
 package fr.moribus.imageonmap.migration;
 
-import fr.moribus.imageonmap.ImageOnMap;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.tools.PluginLogger;
 
@@ -49,7 +48,7 @@ public class MigratorExecutor {
             PluginLogger.error(I.t("Migration is already running."));
             return;
         }
-        migratorThread = new Thread(new V3Migrator(ImageOnMap.getPlugin()), "ImageOnMap-Migration");
+        //migratorThread = new Thread(new V3Migrator(ImageOnMap.getPlugin()), "ImageOnMap-Migration");
         migratorThread.start();
     }
 
