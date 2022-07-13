@@ -122,7 +122,6 @@ public final class ImageOnMap extends QuartzPlugin {
     public void onEnable() {
         // Creating the images and maps directories if necessary
         try {
-            //imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
             Map<String, File> directories = checkDirs();
             mapsDirectory = directories.get("mapsDirectory");
             rendersDirectory = directories.get("rendersDirectory");

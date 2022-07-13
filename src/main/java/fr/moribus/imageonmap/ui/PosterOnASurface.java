@@ -48,7 +48,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class PosterOnASurface {
-
     public FlatLocation loc1;
     public FlatLocation loc2;
 
@@ -58,10 +57,8 @@ public class PosterOnASurface {
      * Return the list of map Frames associated with a specific map
      */
     public static ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, int mapId, BlockFace bf) {
-        int mapIndex = map.getIndex(mapId);
-        //int x = map.getColumnAt(mapIndex), y = map.getRowAt(mapIndex);
         int x = 0;
-        int y = 0;
+        int y;
         switch (bf) {
             case EAST:
             case WEST:
@@ -80,19 +77,13 @@ public class PosterOnASurface {
     public static ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, BlockFace bf) {
         ItemFrame[] frames = new ItemFrame[map.getMapCount()];
         FlatLocation loc = location.clone();
-
-
         int x = 0;
         int y = 0;
         switch (bf) {
             case EAST:
             case WEST:
-                //X=map.getRowCount();
-                //Y=map.getColumnCount();
-                //break;
             case NORTH:
             case SOUTH:
-
                 y = map.getRowCount();
                 x = map.getColumnCount();
                 break;
@@ -121,7 +112,6 @@ public class PosterOnASurface {
                     default:
                         throw new IllegalStateException("Unexpected value: " + bf);
                 }
-
 
             }
 

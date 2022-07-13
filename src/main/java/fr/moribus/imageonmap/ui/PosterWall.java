@@ -83,54 +83,11 @@ public class PosterWall {
     }
 
     public static ItemFrame getMapFrameAt(FlatLocation location, PosterMap map) {
-        Entity[] entities = location.getChunk().getEntities();
-
-        for (Entity entity : entities) {
-            if (!(entity instanceof ItemFrame)) {
-                continue;
-            }
-            if (!WorldUtils.blockEquals(location, entity.getLocation())) {
-                continue;
-            }
-            ItemFrame frame = (ItemFrame) entity;
-            if (frame.getFacing() != location.getFacing()) {
-                continue;
-            }
-            ItemStack item = frame.getItem();
-            if (item.getType() != Material.FILLED_MAP) {
-                continue;
-            }
-            if (!map.managesMap(item)) {
-                continue;
-            }
-            return frame;
-        }
-
-        return null;
+        return PosterOnASurface.getMapFrameAt(location, map);
     }
 
     public static ItemFrame getEmptyFrameAt(Location location, BlockFace facing) {
-        Entity[] entities = location.getChunk().getEntities();
-
-        for (Entity entity : entities) {
-            if (!(entity instanceof ItemFrame)) {
-                continue;
-            }
-            if (!WorldUtils.blockEquals(location, entity.getLocation())) {
-                continue;
-            }
-            ItemFrame frame = (ItemFrame) entity;
-            if (frame.getFacing() != facing) {
-                continue;
-            }
-            ItemStack item = frame.getItem();
-            if (item.getType() != Material.AIR) {
-                continue;
-            }
-            return frame;
-        }
-
-        return null;
+        return PosterOnASurface.getEmptyFrameAt(location, facing);
     }
 
     public boolean isValid() {

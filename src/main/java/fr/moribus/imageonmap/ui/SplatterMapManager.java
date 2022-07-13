@@ -36,14 +36,12 @@
 
 package fr.moribus.imageonmap.ui;
 
-import com.google.common.collect.ImmutableMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.GlowEffect;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
@@ -55,9 +53,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Rotation;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -140,21 +136,6 @@ public abstract class SplatterMapManager {
      */
     public static boolean hasSplatterAttributes(ItemStack itemStack) {
         return MapManager.managesMap(itemStack); //TODO only test if bottom left corner
-        /*
-        try {
-            final NBTCompound nbt = NBT.fromItemStack(itemStack);
-            if (!nbt.containsKey("Enchantments")) {
-                return false;
-            }
-            final Object enchantments = nbt.get("Enchantments");
-            if (!(enchantments instanceof NBTList)) {
-                return false;
-            }
-            return !((NBTList) enchantments).isEmpty();
-        } catch (NMSException e) {
-            PluginLogger.error("Unable to get Splatter Map attribute on item", e);
-            return false;
-        }*/
     }
 
     /**
@@ -249,16 +230,9 @@ public abstract class SplatterMapManager {
 
                     ItemStack item = new ItemStack(Material.MAP, 1);
                     ItemMeta meta = item.getItemMeta();
-                    PluginLogger.info(meta.getAttributeModifiers().toString());
-
-                    for (AttributeModifier value : meta.getAttributeModifiers().values()) {
-                        PluginLogger.info("blabla");
-                        PluginLogger.info("" + value);
-                    }
                     item.setItemMeta(meta);
                     frame.setItem(item);
-
-                    //new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+                    //TODO refactor this because it is called multiple time
                 }, 5L);
 
                 if (i == 0) {
