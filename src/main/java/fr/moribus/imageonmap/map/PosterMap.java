@@ -76,6 +76,16 @@ public class PosterMap extends ImageMap {
         return mapsIDs;
     }
 
+    @Override
+    public int getFirstMapID() {
+        int first = -1;
+        for (int id : mapsIDs) {
+            if (first == -1 || first > id) {
+                first = id;
+            }
+        }
+        return first;
+    }
     /* ====== Serialization methods ====== */
 
     @Override
@@ -176,7 +186,6 @@ public class PosterMap extends ImageMap {
         return getMapIdAt(x, rowCount - y - 1);
 
     }
-
 
 
     public boolean hasColumnData() {

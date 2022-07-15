@@ -42,6 +42,7 @@ import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.components.i18n.I;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.GlowEffect;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
@@ -49,11 +50,14 @@ import fr.zcraft.quartzlib.tools.text.MessageSender;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
 import fr.zcraft.quartzlib.tools.world.WorldUtils;
 import java.lang.reflect.Method;
+import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Rotation;
 import org.bukkit.block.BlockFace;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -123,7 +127,8 @@ public abstract class SplatterMapManager {
      * @return The modified item stack. The instance may be different if the passed item stack is not a craft itemstack.
      */
     public static ItemStack addSplatterAttribute(final ItemStack itemStack) {
-        GlowEffect.addGlow(itemStack);
+        itemStack.addUnsafeEnchantment(Enchantment.LURE,1);
+        //TODO check if safe guard for duplication XP still works
         return itemStack;
     }
 
@@ -135,7 +140,7 @@ public abstract class SplatterMapManager {
      * @return True if the attribute was detected.
      */
     public static boolean hasSplatterAttributes(ItemStack itemStack) {
-        return MapManager.managesMap(itemStack); //TODO only test if bottom left corner
+        return MapManager.managesMap(itemStack);
     }
 
     /**
@@ -324,33 +329,14 @@ public abstract class SplatterMapManager {
         if (!poster.hasColumnData()) {
             return null;
         }
-        FlatLocation loc = new FlatLocation(startFrame.getLocation(), startFrame.getFacing());
-        ItemFrame[] matchingFrames = null;
 
-        switch (startFrame.getFacing()) {
-            case UP:
-            case DOWN:
-                matchingFrames = PosterOnASurface.getMatchingMapFrames(poster, loc,
-                        MapManager.getMapIdFromItemStack(startFrame.getItem()),
-                        WorldUtils.get4thOrientation(player.getLocation()));//startFrame.getFacing());
-                break;
+        Map<Location, ItemFrame>
+                itemFrameLocations =
+                PosterOnASurface.getItemFramesLocation(player, startFrame.getLocation(), startFrame.getFacing(),
+                        poster.getRowCount(), poster.getColumnCount());
 
-            case NORTH:
-            case SOUTH:
-            case EAST:
-            case WEST:
-                matchingFrames = PosterWall.getMatchingMapFrames(poster, loc,
-                        MapManager.getMapIdFromItemStack(startFrame.getItem()));
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + startFrame.getFacing());
-        }
-
-        if (matchingFrames == null) {
-            return null;
-        }
-
-        for (ItemFrame frame : matchingFrames) {
+        for (Map.Entry<Location, ItemFrame> entry : itemFrameLocations.entrySet()) {
+            ItemFrame frame = itemFrameLocations.get(entry.getKey());
             if (frame != null) {
                 removePropertiesFromFrames(player, frame);
                 frame.setItem(null);

@@ -148,6 +148,7 @@ public abstract class ImageMap implements ConfigurationSerializable {
 
     public abstract int[] getMapsIDs();
 
+    public abstract int getFirstMapID();
     /* ====== Serialization methods ====== */
 
     public abstract boolean managesMap(int mapID);

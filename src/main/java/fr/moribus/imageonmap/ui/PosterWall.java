@@ -36,15 +36,10 @@
 
 package fr.moribus.imageonmap.ui;
 
-import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
-import fr.zcraft.quartzlib.tools.world.WorldUtils;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
-import org.bukkit.inventory.ItemStack;
 
 public class PosterWall {
 
@@ -52,39 +47,6 @@ public class PosterWall {
     public FlatLocation loc2;
 
     public ItemFrame[] frames;
-
-    public static ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, int mapId) {
-        int mapIndex = map.getIndex(mapId);
-        int x = map.getColumnAt(mapIndex);
-        int y = map.getRowAt(mapIndex);
-
-        return getMatchingMapFrames(map, location.clone().add(-x, y));
-    }
-
-    public static ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location) {
-        ItemFrame[] frames = new ItemFrame[map.getMapCount()];
-        FlatLocation loc = location.clone();
-
-        for (int y = 0; y < map.getRowCount(); ++y) {
-            for (int x = 0; x < map.getColumnCount(); ++x) {
-                int mapIndex = map.getIndexAt(x, y);
-                ItemFrame frame = getMapFrameAt(loc, map);
-                if (frame != null) {
-                    frames[mapIndex] = frame;
-                }
-                loc.add(1, 0);
-            }
-            loc.setX(location.getX());
-            loc.setZ(location.getZ());
-            loc.add(0, -1);
-        }
-
-        return frames;
-    }
-
-    public static ItemFrame getMapFrameAt(FlatLocation location, PosterMap map) {
-        return PosterOnASurface.getMapFrameAt(location, map);
-    }
 
     public static ItemFrame getEmptyFrameAt(Location location, BlockFace facing) {
         return PosterOnASurface.getEmptyFrameAt(location, facing);
@@ -116,7 +78,4 @@ public class PosterWall {
         return true;
     }
 
-    public void expand() {
-
-    }
 }

@@ -37,8 +37,11 @@
 package fr.moribus.imageonmap.ui;
 
 import fr.moribus.imageonmap.map.PosterMap;
+import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
 import fr.zcraft.quartzlib.tools.world.WorldUtils;
+import java.util.HashMap;
+import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -46,6 +49,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 public class PosterOnASurface {
     public FlatLocation loc1;
@@ -53,106 +57,17 @@ public class PosterOnASurface {
 
     public ItemFrame[] frames;
 
-    /**
-     * Return the list of map Frames associated with a specific map
-     */
-    public static ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, int mapId, BlockFace bf) {
-        int x = 0;
-        int y;
-        switch (bf) {
-            case EAST:
-            case WEST:
-                y = map.getColumnCount() - 1;
-                break;
-            case NORTH:
-            case SOUTH:
-                y = map.getRowCount() - 1;
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + bf);
-        }
-        return getMatchingMapFrames(map, location.clone().addH(x, y, bf), bf).clone();
-    }
-
-    public static ItemFrame[] getMatchingMapFrames(PosterMap map, FlatLocation location, BlockFace bf) {
-        ItemFrame[] frames = new ItemFrame[map.getMapCount()];
-        FlatLocation loc = location.clone();
-        int x = 0;
-        int y = 0;
-        switch (bf) {
-            case EAST:
-            case WEST:
-            case NORTH:
-            case SOUTH:
-                y = map.getRowCount();
-                x = map.getColumnCount();
-                break;
-
-            default:
-                throw new IllegalStateException("Unexpected value: " + bf);
-        }
-
-        for (int j = 0; j < y; ++j) {
-            for (int i = 0; i < x; ++i) {
-                int mapIndex = map.getIndexAt(i, j);
-
-                ItemFrame frame = getMapFrameAt(loc, map);
-                if (frame != null) {
-                    frames[mapIndex] = frame;
-                }
-                switch (bf) {
-                    case EAST:
-                    case WEST:
-                        loc.addH(0, -1, bf);
-                        break;
-                    case NORTH:
-                    case SOUTH:
-                        loc.addH(1, 0, bf);
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected value: " + bf);
-                }
-
-            }
-
-            switch (bf) {
-                case EAST:
-                case WEST:
-                    loc.addH(1, map.getColumnCount(), bf);//test
-
-                    break;
-                case NORTH:
-                case SOUTH:
-                    loc.addH(-map.getColumnCount(), -1, bf);
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + bf);
-            }
-
-        }
-
-        return frames;
-    }
-
-    public static ItemFrame getMapFrameAt(FlatLocation location, PosterMap map) {
+    public static ItemFrame getEmptyFrameAt(Location location, BlockFace facing) {
         Entity[] entities = location.getChunk().getEntities();
 
         for (Entity entity : entities) {
-            if (!(entity instanceof ItemFrame)) {
-                continue;
-            }
-            if (!WorldUtils.blockEquals(location, entity.getLocation())) {
+            boolean notItemFrame = !(entity instanceof ItemFrame);
+            if (notItemFrame || !WorldUtils.blockEquals(location, entity.getLocation())) {
                 continue;
             }
             ItemFrame frame = (ItemFrame) entity;
-            if (frame.getFacing() != location.getFacing()) {
-                continue;
-            }
             ItemStack item = frame.getItem();
-            if (item.getType() != Material.FILLED_MAP) {
-                continue;
-            }
-            if (!map.managesMap(item)) {
+            if (frame.getFacing() != facing || item.getType() != Material.AIR) {
                 continue;
             }
             return frame;
@@ -161,22 +76,17 @@ public class PosterOnASurface {
         return null;
     }
 
-    public static ItemFrame getEmptyFrameAt(Location location, BlockFace facing) {
+    public static ItemFrame getFrameAt(Location location, BlockFace facing) {
         Entity[] entities = location.getChunk().getEntities();
 
         for (Entity entity : entities) {
-            if (!(entity instanceof ItemFrame)) {
-                continue;
-            }
-            if (!WorldUtils.blockEquals(location, entity.getLocation())) {
+            boolean notItemFrame = !(entity instanceof ItemFrame);
+            if (notItemFrame || !WorldUtils.blockEquals(location, entity.getLocation())) {
                 continue;
             }
             ItemFrame frame = (ItemFrame) entity;
-            if (frame.getFacing() != facing) {
-                continue;
-            }
             ItemStack item = frame.getItem();
-            if (item.getType() != Material.AIR) {
+            if (frame.getFacing() != facing) {
                 continue;
             }
             return frame;
@@ -241,6 +151,97 @@ public class PosterOnASurface {
             }
         }
         return true;
+    }
+
+    public static Map<Location, ItemFrame> getItemFramesLocation(Player p, Location startingLocation, BlockFace facing,
+                                                                 int rows,
+                                                                 int columns) {
+        Map<Location, ItemFrame> itemFramesLocationMap = new HashMap();
+        BlockFace bf = WorldUtils.get4thOrientation(p.getLocation());
+        boolean isWall =
+                facing.equals(BlockFace.WEST) || facing.equals(BlockFace.EAST) || facing.equals(BlockFace.NORTH)
+                        || facing.equals(BlockFace.SOUTH);
+        boolean isFloor = facing.equals(BlockFace.DOWN);
+        boolean isCeiling = facing.equals(BlockFace.UP);
+        Location loc = startingLocation;
+        int x = 0;
+        int z = 0;
+        PluginLogger.info(loc.toString()); //TODO to delete
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                itemFramesLocationMap.put(loc.clone(), getFrameAt(loc, facing));
+                //do a row
+                if (isWall || isFloor) {
+                    switch (bf) {
+                        case NORTH:
+                            x++;
+                            loc = loc.add(1, 0, 0);
+                            break;
+                        case SOUTH:
+                            x--;
+                            loc = loc.add(-1, 0, 0);
+                            break;
+                        case EAST:
+                            z++;
+                            loc = loc.add(0, 0, 1);
+                            break;
+                        case WEST:
+                            z--;
+                            loc = loc.add(0, 0, -1);
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected value: " + bf);
+
+                    }
+                } else if (isCeiling) {
+                    switch (bf) {
+                        case NORTH:
+                            x--;
+                            loc = loc.add(-1, 0, 0);
+                            break;
+                        case SOUTH:
+                            x++;
+                            loc = loc.add(1, 0, 0);
+                            break;
+                        case EAST:
+                            z--;
+                            loc = loc.add(0, 0, -1);
+                            break;
+                        case WEST:
+                            z++;
+                            loc = loc.add(0, 0, 1);
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected value: " + bf);
+
+                    }
+                }
+
+
+            }
+            itemFramesLocationMap.put(loc.clone(), getFrameAt(loc, facing));
+            if (isWall) {
+                loc = loc.add(-x, 1, -z);
+            } else if (isFloor || isCeiling) {
+                switch (bf) {
+                    case NORTH:
+                    case SOUTH:
+                        loc = loc.add(-x, 0, 1);
+                        break;
+                    case EAST:
+                    case WEST:
+                        loc = loc.add(1, 0, -z);
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + bf);
+
+                }
+                x = 0;
+                z = 0;
+
+            }
+        }
+        return itemFramesLocationMap;
     }
 
     public void expand() {
