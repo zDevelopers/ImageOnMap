@@ -36,7 +36,6 @@
 
 package fr.moribus.imageonmap.ui;
 
-import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
 import fr.zcraft.quartzlib.tools.world.WorldUtils;
@@ -49,7 +48,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 public class PosterOnASurface {
     public FlatLocation loc1;
@@ -164,11 +162,14 @@ public class PosterOnASurface {
         boolean isFloor = facing.equals(BlockFace.DOWN);
         boolean isCeiling = facing.equals(BlockFace.UP);
         Location loc = startingLocation;
+
         int x = 0;
         int z = 0;
-        PluginLogger.info(loc.toString()); //TODO to delete
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
+                PluginLogger.info("column " + c);
+                PluginLogger.info("row " + r);
+
                 itemFramesLocationMap.put(loc.clone(), getFrameAt(loc, facing));
                 //do a row
                 if (isWall || isFloor) {
@@ -219,7 +220,6 @@ public class PosterOnASurface {
 
 
             }
-            itemFramesLocationMap.put(loc.clone(), getFrameAt(loc, facing));
             if (isWall) {
                 loc = loc.add(-x, 1, -z);
             } else if (isFloor || isCeiling) {

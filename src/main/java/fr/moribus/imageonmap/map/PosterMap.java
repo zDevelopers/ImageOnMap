@@ -36,11 +36,20 @@
 
 package fr.moribus.imageonmap.map;
 
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.world.WorldUtils;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import jdk.internal.net.http.common.Pair;
+import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Player;
 
 public class PosterMap extends ImageMap {
     protected final int[] mapsIDs;
@@ -204,6 +213,86 @@ public class PosterMap extends ImageMap {
             }
         }
         throw new IllegalArgumentException("Invalid map ID");
+    }
+
+    public int getSortedIndex(int mapID) {
+        int[] ids = mapsIDs.clone();
+        Arrays.sort(ids);
+        for (int i : ids) {
+            PluginLogger.info("" + i);
+        }
+
+        for (int i = 0; i < mapsIDs.length; i++) {
+            if (ids[i] == mapID) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("Invalid map ID");
+    }
+
+    public MapIndexes getIndexes(int mapID) {
+        int index = getSortedIndex(mapID);
+        PluginLogger.info(rowCount + " " + columnCount + " " + index);
+        return new MapIndexes(index / columnCount, index % columnCount);
+    }
+
+    public Location findLocationFirstFrame(ItemFrame frame, Player player) {
+        final ImageMap map = MapManager.getMap(frame.getItem());
+        if (!(map instanceof PosterMap)) {
+            return null;
+        }
+        PosterMap poster = (PosterMap) map;
+        if (!poster.hasColumnData()) {
+            return null;
+        }
+        int mapID = MapManager.getMapIdFromItemStack(frame.getItem());
+
+        BlockFace bf = WorldUtils.get4thOrientation(player.getLocation());
+
+        MapIndexes mapindexes = getIndexes(mapID);
+        int row = mapindexes.getRowIndex();
+        int column = mapindexes.getColumnIndex();
+        Location loc = frame.getLocation();
+        PluginLogger.info("\n\nlocalization of the initial clicked frame " + loc);
+        PluginLogger.info("row " + row + " col " + column);
+        switch (frame.getFacing().getOppositeFace()) {
+            case UP:
+            case DOWN:
+                switch (bf) {
+                    case NORTH:
+                        loc.add(-row, 0, column);
+                        break;
+                    case SOUTH:
+                        loc.add(row, 0, -column);
+                        break;
+                    case WEST:
+                        loc.add(row, 0, column);
+                        break;
+                    case EAST:
+                        loc.add(-row, 0, -column);
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + bf);
+                }
+                break;
+
+            case EAST:
+                loc.add(0, -row, -column);
+                break;
+            case WEST:
+                loc.add(0, -row, column);
+                break;
+            case NORTH:
+                loc.add(-column, -row, 0);
+                break;
+            case SOUTH:
+                loc.add(column, -row, 0);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + bf);
+        }
+        PluginLogger.info("\n\nlocalization of the first frame " + loc);
+        return loc;
     }
 
 }

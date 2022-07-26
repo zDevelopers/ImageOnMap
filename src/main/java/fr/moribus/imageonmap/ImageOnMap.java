@@ -44,6 +44,7 @@ import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
 import fr.moribus.imageonmap.commands.maptool.GiveCommand;
 import fr.moribus.imageonmap.commands.maptool.ListCommand;
 import fr.moribus.imageonmap.commands.maptool.NewCommand;
+import fr.moribus.imageonmap.commands.maptool.RemotePlacingCommand;
 import fr.moribus.imageonmap.commands.maptool.RenameCommand;
 import fr.moribus.imageonmap.commands.maptool.UpdateCommand;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
@@ -158,12 +159,14 @@ public final class ImageOnMap extends QuartzPlugin {
                 GetRemainingCommand.class,
                 ExploreCommand.class,
                 //MigrateCommand.class,//Removed for now doesn't work nor is useful, maybe useful later on
-                UpdateCommand.class
+                UpdateCommand.class,
+                RemotePlacingCommand.class
         );
 
         Commands.registerShortcut(commandGroupName, NewCommand.class, "tomap");
         Commands.registerShortcut(commandGroupName, ExploreCommand.class, "maps");
         Commands.registerShortcut(commandGroupName, GiveCommand.class, "givemap");
+        Commands.registerShortcut(commandGroupName, RemotePlacingCommand.class, "placemap");
 
         if (PluginConfiguration.CHECK_FOR_UPDATES.get()) {
             UpdateChecker.boot("imageonmap.26585");

@@ -125,6 +125,29 @@ public class ImageUtils {
 
     }
 
+    public static ScalingType scalingTypeFromName(String resize) {
+        switch (resize) {
+            case "stretch":
+            case "stretched":
+            case "resize-stretched":
+                return ScalingType.STRETCHED;
+
+            case "cover":
+            case "covered":
+            case "resize-covered":
+                return ScalingType.COVERED;
+
+            case "contain":
+            case "contained":
+            case "resize-contained":
+            case "resize":
+                return ScalingType.CONTAINED;
+
+            default:
+                return ScalingType.NONE;
+        }
+    }
+
     public enum ScalingType {
         NONE,
         CONTAINED,

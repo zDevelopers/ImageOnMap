@@ -43,7 +43,6 @@ import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.items.GlowEffect;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
 import fr.zcraft.quartzlib.tools.text.MessageSender;
@@ -127,7 +126,7 @@ public abstract class SplatterMapManager {
      * @return The modified item stack. The instance may be different if the passed item stack is not a craft itemstack.
      */
     public static ItemStack addSplatterAttribute(final ItemStack itemStack) {
-        itemStack.addUnsafeEnchantment(Enchantment.LURE,1);
+        itemStack.addUnsafeEnchantment(Enchantment.LURE, 1);
         //TODO check if safe guard for duplication XP still works
         return itemStack;
     }
@@ -330,13 +329,16 @@ public abstract class SplatterMapManager {
             return null;
         }
 
+        Location startingLocation = poster.findLocationFirstFrame(startFrame,player);
+
         Map<Location, ItemFrame>
                 itemFrameLocations =
-                PosterOnASurface.getItemFramesLocation(player, startFrame.getLocation(), startFrame.getFacing(),
+                PosterOnASurface.getItemFramesLocation(player, startingLocation, startFrame.getFacing(),
                         poster.getRowCount(), poster.getColumnCount());
-
+        //TODO check if it is the correct map id and check the why it delete more than it should and out of place
         for (Map.Entry<Location, ItemFrame> entry : itemFrameLocations.entrySet()) {
             ItemFrame frame = itemFrameLocations.get(entry.getKey());
+            PluginLogger.info("Frame to delete " + frame);
             if (frame != null) {
                 removePropertiesFromFrames(player, frame);
                 frame.setItem(null);
