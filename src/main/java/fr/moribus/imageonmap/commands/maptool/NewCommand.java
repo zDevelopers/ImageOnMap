@@ -81,6 +81,7 @@ public class NewCommand extends IoMCommand {
 
     @Override
     protected void run() throws CommandException {
+        //TODO check if not too many args
         final Player player = playerSender();
         ImageUtils.ScalingType scaling = ImageUtils.ScalingType.NONE;
         URL url;

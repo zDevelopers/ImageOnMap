@@ -51,7 +51,6 @@ import fr.zcraft.quartzlib.tools.text.RawMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -61,8 +60,11 @@ public class ListCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
         ArrayList<String> arguments = getArgs();
-        if (arguments.size() > 1) {
-            throwInvalidArgument(I.t("Too many parameters!"));
+
+
+        boolean isTooMany = arguments.size() > 1;
+        boolean isTooFew = false;
+        if (!checkArguments(isTooMany, isTooFew)) {
             return;
         }
 
@@ -89,7 +91,7 @@ public class ListCommand extends IoMCommand {
         } else {
             playerSender = null;
         }
-        UUID uuid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        UUID uuid = getPlayerUUID(playerName);
         List<ImageMap> mapList = MapManager.getMapList(uuid);
         if (mapList.isEmpty()) {
             String msg = I.t("No map found.");

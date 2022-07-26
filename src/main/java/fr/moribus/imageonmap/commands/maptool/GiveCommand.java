@@ -63,14 +63,13 @@ public class GiveCommand extends IoMCommand {
 
         ArrayList<String> arguments = getArgs();
 
-        if (arguments.size() > 3) {
-            throwInvalidArgument(I.t("Too many parameters!"));
+
+        boolean isTooMany = arguments.size() > 3;
+        boolean isTooFew = arguments.isEmpty();
+        if (!checkArguments(isTooMany, isTooFew)) {
             return;
         }
-        if (arguments.isEmpty()) {
-            throwInvalidArgument(I.t("Too few parameters!"));
-            return;
-        }
+        
         final String mapName;
         final String from;
         final String playerName;
@@ -102,8 +101,8 @@ public class GiveCommand extends IoMCommand {
         }
 
         final Player sender = playerSender();
-        UUID uuid = Bukkit.getOfflinePlayer(from).getUniqueId();
-        UUID uuid2 = Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        UUID uuid = getPlayerUUID(from);
+        UUID uuid2 = getPlayerUUID(playerName);
 
         final ImageMap map = MapManager.getMap(uuid, mapName);
 

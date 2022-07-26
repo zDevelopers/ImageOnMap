@@ -51,7 +51,6 @@ import fr.zcraft.quartzlib.tools.text.RawMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -78,12 +77,9 @@ public class DeleteCommand extends IoMCommand {
         ArrayList<String> arguments = getArgs();
         final boolean confirm = hasFlag("confirm");
 
-        if (arguments.size() > 3 || (arguments.size() > 2 && !confirm)) {
-            throwInvalidArgument(I.t("Too many parameters!"));
-            return;
-        }
-        if (arguments.size() < 1) {
-            throwInvalidArgument(I.t("Too few parameters!"));
+        boolean isTooMany = arguments.size() > 3 || (arguments.size() > 2 && !confirm);
+        boolean isTooFew = arguments.isEmpty();
+        if (!checkArguments(isTooMany, isTooFew)) {
             return;
         }
 
@@ -113,8 +109,7 @@ public class DeleteCommand extends IoMCommand {
             playerName = sender.getName();
             mapName = arguments.get(0);
         }
-        UUID uuid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
-        PluginLogger.info("UUID " + uuid.toString());
+        UUID uuid = getPlayerUUID(playerName);
         ImageMap map = MapManager.getMap(uuid, mapName);
         if (map == null) {
             final String msg = "This map does not exist.";
@@ -136,7 +131,7 @@ public class DeleteCommand extends IoMCommand {
                 RawMessage.send(sender, msg);
             }
         } else {
-            if (sender != null && sender.isOnline() && sender.getInventory() != null) {
+            if (sender != null && sender.isOnline()) {
                 MapManager.clear(sender.getInventory(), map);
             }
             try {

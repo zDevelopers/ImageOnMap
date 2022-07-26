@@ -46,24 +46,21 @@ import fr.zcraft.quartzlib.components.i18n.I;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@CommandInfo(name = "get",usageParameters = "[player name]:<map name>")
+@CommandInfo(name = "get", usageParameters = "[player name]:<map name>")
 public class GetCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
         ArrayList<String> arguments = getArgs();
 
-        if (arguments.size() > 2) {
-            throwInvalidArgument(I.t("Too many parameters!"));
+        boolean isTooMany = arguments.size() > 2;
+        boolean isTooFew = arguments.isEmpty();
+        if (!checkArguments(isTooMany, isTooFew)) {
             return;
         }
-        if (arguments.isEmpty()) {
-            throwInvalidArgument(I.t("Too few parameters!"));
-            return;
-        }
+
         final String playerName;
         final String mapName;
         final Player sender = playerSender();
@@ -80,7 +77,7 @@ public class GetCommand extends IoMCommand {
             mapName = arguments.get(1);
         }
 
-        UUID uuid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        UUID uuid = getPlayerUUID(playerName);
         if (!sender.isOnline()) {
             return;
         }

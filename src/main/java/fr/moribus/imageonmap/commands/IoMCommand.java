@@ -37,6 +37,7 @@
 package fr.moribus.imageonmap.commands;
 
 import fr.moribus.imageonmap.PluginConfiguration;
+import fr.moribus.imageonmap.image.ImageUtils;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.Command;
@@ -49,11 +50,32 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 
 public abstract class IoMCommand extends Command {
+    protected UUID getPlayerUUID(String playerName) {
+        return Bukkit.getOfflinePlayer(playerName).getUniqueId();
+    }
+
+    private boolean checkTooArguments(boolean bool, String msg) throws CommandException {
+        if (bool) {
+            throwInvalidArgument(msg);
+        }
+        return bool;
+    }
+
+    protected boolean checkTooManyArguments(boolean bool) throws CommandException {
+        return checkTooArguments(bool, I.t("Too many parameters!"));
+    }
+
+    protected boolean checkTooFewArguments(boolean bool) throws CommandException {
+        return checkTooArguments(bool, I.t("Too few parameters!"));
+    }
+
+    protected boolean checkArguments(boolean bool1, boolean bool2) throws CommandException {
+        return !(checkTooManyArguments(bool1) || checkTooFewArguments(bool2));
+    }
 
     protected boolean checkHostnameWhitelist(final URL url) {
         final List<String> hostnames = PluginConfiguration.IMAGES_HOSTNAMES_WHITELIST.get()
@@ -175,4 +197,5 @@ public abstract class IoMCommand extends Command {
 
         return matches;
     }
+
 }

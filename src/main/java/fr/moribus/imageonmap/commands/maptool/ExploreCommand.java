@@ -56,13 +56,14 @@ public class ExploreCommand extends IoMCommand {
     @Override
     protected void run() throws CommandException {
         ArrayList<String> arguments = getArgs();
-        if (arguments.size() > 1) {
-            throwInvalidArgument(I.t("Too many parameters!"));
+        boolean isTooMany = arguments.size() > 1;
+        boolean isTooFew = false;
+        if (!checkArguments(isTooMany, isTooFew)) {
             return;
         }
         final String playerName;
-
         final Player sender = playerSender();
+
         if (arguments.size() == 1) {
             if (!Permissions.LISTOTHER.grantedTo(sender)) {
                 throwNotAuthorized();

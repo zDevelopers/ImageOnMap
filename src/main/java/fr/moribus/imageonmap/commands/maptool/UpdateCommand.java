@@ -53,7 +53,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.UUID;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -64,17 +63,10 @@ public class UpdateCommand extends IoMCommand {
     protected void run() throws CommandException {
         //TODO fix the issue where to many quick usage of offlineNameFetch will return null
         ArrayList<String> arguments = getArgs();
-        String warningMsg;
-        if (arguments.size() > 4) {
-            warningMsg = "Too many parameters!"
-                    + " Usage: /maptool update [player name]:<map name> <new url> [stretched|covered]";
-            warning(I.t(warningMsg));
-            return;
-        }
-        if (arguments.size() < 2) {
-            warningMsg =
-                    "Too few parameters! Usage: /maptool update [player name]:<map name> <new url> [stretched|covered]";
-            warning(I.t(warningMsg));
+
+        boolean isTooMany = arguments.size() > 4;
+        boolean isTooFew = arguments.size() < 2;
+        if (!checkArguments(isTooMany, isTooFew)) {
             return;
         }
         final String playerName;
@@ -141,22 +133,10 @@ public class UpdateCommand extends IoMCommand {
             }
         }
 
-        final ImageUtils.ScalingType scaling;
+        final ImageUtils.ScalingType scaling = ImageUtils.scalingTypeFromName(resize);//TODO test if nothing broke
+        // because I went from 3 to 4 by adding the none as default instead of the contained one.
 
-        switch (resize) {
-
-            case "stretched":
-                scaling = ImageUtils.ScalingType.STRETCHED;
-                break;
-            case "covered":
-                scaling = ImageUtils.ScalingType.COVERED;
-                break;
-            default:
-                scaling = ImageUtils.ScalingType.CONTAINED;
-        }
-
-
-        UUID uuid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        UUID uuid = getPlayerUUID(playerName);
         ImageMap map = MapManager.getMap(uuid, mapName);
 
         if (map == null) {

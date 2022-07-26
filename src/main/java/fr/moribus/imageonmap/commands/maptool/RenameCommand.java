@@ -70,20 +70,21 @@ public class RenameCommand extends IoMCommand {
 
     @Override
     protected void run() throws CommandException {
+        ArrayList<String> arguments = getArgs();
 
-        ArrayList<String> argList = getArgs();
-
-        if (argList.size() != 2) {
-            warning(I.t("Not enough or too many arguments! Usage: /maptool rename <map name> <new map name>"));
+        boolean isTooMany = arguments.size() > 2;
+        boolean isTooFew = arguments.size() < 2;
+        if (!checkArguments(isTooMany, isTooFew)) {
             return;
         }
-
-        ImageMap map = MapManager.getMap(playerSender().getUniqueId(), argList.get(0));
+        String oldName = arguments.get(0);
+        ImageMap map = MapManager.getMap(playerSender().getUniqueId(), oldName);
         if (map == null) {
             error(I.t("This map does not exist."));
             return;
         }
-        map.rename(argList.get(1));
+        String newName = arguments.get(1);
+        map.rename(newName);
     }
 
     @Override
