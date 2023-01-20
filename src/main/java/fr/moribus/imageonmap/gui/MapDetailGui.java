@@ -237,6 +237,8 @@ public class MapDetailGui extends ExplorerGui<Integer> {
 
         } catch (IllegalStateException e) {
             PluginLogger.error("Error while renaming map: ", e);
+            I.sendT(getPlayer(), "{ce}You are no longer allowed to do that.");
+            close();
         }
     }
 
