@@ -39,7 +39,7 @@ package fr.moribus.imageonmap.migration;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.tools.PluginLogger;
 
-
+//TODO need to support new render folder and write on maps automatically
 public class MigratorExecutor {
     private static Thread migratorThread;
 

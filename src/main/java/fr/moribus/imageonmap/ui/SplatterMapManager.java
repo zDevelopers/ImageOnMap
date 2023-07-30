@@ -229,15 +229,8 @@ public abstract class SplatterMapManager {
                 int id = poster.getMapIdAtReverseZ(i, bf, startFrame.getFacing());
                 //Rotation management relative to player rotation the default position is North,
                 // when on ceiling we flipped the rotation
-                RunTask.later(() -> {
-                    addPropertiesToFrames(player, frame);
 
-                    ItemStack item = new ItemStack(Material.MAP, 1);
-                    ItemMeta meta = item.getItemMeta();
-                    item.setItemMeta(meta);
-                    frame.setItem(item);
-                    //TODO refactor this because it is called multiple time
-                }, 5L);
+                setupMap(player, frame, id);
 
                 if (i == 0) {
                     //First map need to be rotate one time CounterClockwise
@@ -271,7 +264,6 @@ public abstract class SplatterMapManager {
                         throw new IllegalStateException("Unexpected value: " + bf);
                 }
 
-
                 MapInitEvent.initMap(id);
                 i++;
             }
@@ -295,12 +287,8 @@ public abstract class SplatterMapManager {
 
                 int id = poster.getMapIdAtReverseY(i);
 
-                RunTask.later(() -> {
-                    addPropertiesToFrames(player, frame);
 
-                    ItemStack item = MapItemManager.createMapItem(id, "", true, false);
-                    frame.setItem(item);
-                }, 5L);
+                setupMap(player, frame, id);
 
 
                 //Force reset of rotation
@@ -310,6 +298,14 @@ public abstract class SplatterMapManager {
             }
         }
         return true;
+    }
+
+    private static void setupMap(Player player, ItemFrame frame, int id) {
+        RunTask.later(() -> {
+            addPropertiesToFrames(player, frame);
+            ItemStack item = MapItemManager.createMapItem(id, "", true, false);
+            frame.setItem(item);
+        }, 5L);
     }
 
     /**
