@@ -328,12 +328,13 @@ public abstract class SplatterMapManager {
         if (!poster.hasColumnData()) {
             return null;
         }
-
-        Location startingLocation = poster.findLocationFirstFrame(startFrame,player);
+        //We search for the map on the top left corner
+        Location startingLocation = poster.findLocationFirstFrame(startFrame, player);
 
         Map<Location, ItemFrame>
                 itemFrameLocations =
-                PosterOnASurface.getItemFramesLocation(player, startingLocation, startFrame.getFacing(),
+                PosterOnASurface.getItemFramesLocation(player, startingLocation, startFrame.getLocation(),
+                        startFrame.getFacing(),
                         poster.getRowCount(), poster.getColumnCount());
         //TODO check if it is the correct map id and check the why it delete more than it should and out of place
         for (Map.Entry<Location, ItemFrame> entry : itemFrameLocations.entrySet()) {

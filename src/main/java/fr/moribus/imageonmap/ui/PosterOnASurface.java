@@ -36,6 +36,9 @@
 
 package fr.moribus.imageonmap.ui;
 
+import fr.moribus.imageonmap.map.ImageMap;
+import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.map.PlayerMapStore;
 import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
 import fr.zcraft.quartzlib.tools.world.WorldUtils;
@@ -151,7 +154,8 @@ public class PosterOnASurface {
         return true;
     }
 
-    public static Map<Location, ItemFrame> getItemFramesLocation(Player p, Location startingLocation, BlockFace facing,
+    public static Map<Location, ItemFrame> getItemFramesLocation(Player p, Location startingLocation,
+                                                                 Location selectedLocation, BlockFace facing,
                                                                  int rows,
                                                                  int columns) {
         Map<Location, ItemFrame> itemFramesLocationMap = new HashMap();
@@ -163,6 +167,8 @@ public class PosterOnASurface {
         boolean isCeiling = facing.equals(BlockFace.UP);
         Location loc = startingLocation;
 
+        ItemFrame selectedFrame = getFrameAt(selectedLocation, facing);
+
         int x = 0;
         int z = 0;
         for (int r = 0; r < rows; r++) {
@@ -170,7 +176,9 @@ public class PosterOnASurface {
                 PluginLogger.info("column " + c);
                 PluginLogger.info("row " + r);
 
-                itemFramesLocationMap.put(loc.clone(), getFrameAt(loc, facing));
+                if (test(selectedFrame, loc, facing)) {
+                    itemFramesLocationMap.put(loc.clone(), getFrameAt(loc, facing));
+                }
                 //do a row
                 if (isWall || isFloor) {
                     switch (bf) {
@@ -221,7 +229,7 @@ public class PosterOnASurface {
 
             }
             if (isWall) {
-                loc = loc.add(-x, 1, -z);
+                loc = loc.add(-x, -1, -z);
             } else if (isFloor || isCeiling) {
                 switch (bf) {
                     case NORTH:
@@ -234,14 +242,26 @@ public class PosterOnASurface {
                         break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + bf);
-
                 }
                 x = 0;
                 z = 0;
-
             }
         }
         return itemFramesLocationMap;
+    }
+
+    //TODO add descr and move to correct class and rename
+    private static boolean test(ItemFrame selectedFrame, Location loc, BlockFace facing) {
+        ImageMap firstMap = MapManager.getMap(selectedFrame.getItem());
+        MapManager.getMap(getFrameAt(loc, facing).getItem());
+
+        for (int id : firstMap.getMapsIDs()) {
+            if (id == MapManager.getMapIdFromItemStack(getFrameAt(loc, facing).getItem())) {
+                return true;
+            }
+            //TODO refactor with lambda
+        }
+        return false;
     }
 
     public void expand() {

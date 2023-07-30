@@ -274,16 +274,16 @@ public class PosterMap extends ImageMap {
                 break;
 
             case EAST:
-                loc.add(0, -row, -column);
+                loc.add(0, row, -column);
                 break;
             case WEST:
-                loc.add(0, -row, column);
+                loc.add(0, row, column);
                 break;
             case NORTH:
-                loc.add(-column, -row, 0);
+                loc.add(-column, row, 0);
                 break;
             case SOUTH:
-                loc.add(column, -row, 0);
+                loc.add(column, row, 0);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + bf);

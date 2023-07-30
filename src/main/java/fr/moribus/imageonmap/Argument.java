@@ -44,7 +44,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 
 public class Argument {
-    //TODO special case with the --cancel -c type arguments
+    //<TODO special case with the --cancel -c type arguments
     private final String name;
     private final Type type;
     private final Status status;
