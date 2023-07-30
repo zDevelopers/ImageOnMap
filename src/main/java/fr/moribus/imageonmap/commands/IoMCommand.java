@@ -37,7 +37,6 @@
 package fr.moribus.imageonmap.commands;
 
 import fr.moribus.imageonmap.PluginConfiguration;
-import fr.moribus.imageonmap.image.ImageUtils;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.zcraft.quartzlib.components.commands.Command;
@@ -47,7 +46,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

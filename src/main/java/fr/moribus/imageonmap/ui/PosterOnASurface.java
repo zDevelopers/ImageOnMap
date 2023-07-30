@@ -38,7 +38,6 @@ package fr.moribus.imageonmap.ui;
 
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.moribus.imageonmap.map.PlayerMapStore;
 import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
 import fr.zcraft.quartzlib.tools.world.WorldUtils;
