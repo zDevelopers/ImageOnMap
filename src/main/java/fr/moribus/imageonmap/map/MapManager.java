@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <anais.jabre@gmail.com> (2019 – 2023)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -45,6 +45,7 @@ import fr.zcraft.quartzlib.tools.PluginLogger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -101,8 +102,10 @@ public abstract class MapManager {
     }
 
     public static ImageMap createMap(UUID playerUUID, int mapID) throws MapManagerException {
-        ImageMap newMap = new SingleMap(playerUUID, mapID);
-        addMap(newMap);
+        //ImageMap newMap = new SingleMap(playerUUID, mapID);
+        int[] ids = new int[] {mapID};
+        ImageMap newMap = new PosterMap(playerUUID, ids, 1, 1);
+        addMap(newMap);//TODO refactor this
         return newMap;
     }
 
@@ -110,7 +113,8 @@ public abstract class MapManager {
         ImageMap newMap;
 
         if (image.getImagesCount() == 1) {
-            newMap = new SingleMap(playerUUID, mapsIDs[0]);
+            newMap = new PosterMap(playerUUID, mapsIDs, 1, 1);//TODO refactor this
+            //newMap = new SingleMap(playerUUID, mapsIDs[0]);
         } else {
             newMap = new PosterMap(playerUUID, mapsIDs, image.getColumns(), image.getLines());
         }
@@ -157,7 +161,7 @@ public abstract class MapManager {
     public static void notifyModification(UUID playerUUID) {
         getPlayerMapStore(playerUUID).notifyModification();
         if (autosaveTask == null) {
-            Bukkit.getScheduler().runTaskLater(ImageOnMap.getPlugin(), new AutosaveRunnable(), SAVE_DELAY);
+            Bukkit.getScheduler().runTaskLater(ImageOnMap.getPlugin(), new AutoSaveRunnable(), SAVE_DELAY);
         }
     }
 
@@ -268,7 +272,7 @@ public abstract class MapManager {
     //Loading
     public static void load(boolean verbose) {
         int loadedFilesCount = 0;
-        for (File file : ImageOnMap.getPlugin().getMapsDirectory().listFiles()) {
+        for (File file : Objects.requireNonNull(ImageOnMap.getPlugin().getMapsDirectory().listFiles())) {
             UUID uuid = getUUIDFromFile(file);
             if (uuid == null) {
                 continue;
@@ -373,7 +377,7 @@ public abstract class MapManager {
         return null;
     }
 
-    private static class AutosaveRunnable implements Runnable {
+    private static class AutoSaveRunnable implements Runnable {
         @Override
         public void run() {
             synchronized (playerMaps) {

@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <anais.jabre@gmail.com> (2019 – 2023)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -36,39 +36,37 @@
 
 package fr.moribus.imageonmap.ui;
 
-import com.google.common.collect.ImmutableMap;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.components.nbt.NBT;
-import fr.zcraft.quartzlib.components.nbt.NBTCompound;
-import fr.zcraft.quartzlib.components.nbt.NBTList;
 import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.items.GlowEffect;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
-import fr.zcraft.quartzlib.tools.reflection.NMSException;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
 import fr.zcraft.quartzlib.tools.text.MessageSender;
 import fr.zcraft.quartzlib.tools.world.FlatLocation;
 import fr.zcraft.quartzlib.tools.world.WorldUtils;
 import java.lang.reflect.Method;
+import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Rotation;
 import org.bukkit.block.BlockFace;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 
 //TODO rework splatter effect, using ID is far more stable than nbt tags.
-// To update when adding small picture previsualization.
+// To update when adding small picture snapshot.
 public abstract class SplatterMapManager {
     private SplatterMapManager() {
     }
@@ -128,7 +126,8 @@ public abstract class SplatterMapManager {
      * @return The modified item stack. The instance may be different if the passed item stack is not a craft itemstack.
      */
     public static ItemStack addSplatterAttribute(final ItemStack itemStack) {
-        GlowEffect.addGlow(itemStack);
+        itemStack.addUnsafeEnchantment(Enchantment.LURE, 1);
+        //TODO check if safe guard for duplication XP still works
         return itemStack;
     }
 
@@ -140,21 +139,7 @@ public abstract class SplatterMapManager {
      * @return True if the attribute was detected.
      */
     public static boolean hasSplatterAttributes(ItemStack itemStack) {
-
-        try {
-            final NBTCompound nbt = NBT.fromItemStack(itemStack);
-            if (!nbt.containsKey("Enchantments")) {
-                return false;
-            }
-            final Object enchantments = nbt.get("Enchantments");
-            if (!(enchantments instanceof NBTList)) {
-                return false;
-            }
-            return !((NBTList) enchantments).isEmpty();
-        } catch (NMSException e) {
-            PluginLogger.error("Unable to get Splatter Map attribute on item", e);
-            return false;
-        }
+        return MapManager.managesMap(itemStack);
     }
 
     /**
@@ -198,6 +183,7 @@ public abstract class SplatterMapManager {
      * @param player     Player placing map
      * @return true if the map was correctly placed
      */
+    @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     public static boolean placeSplatterMap(ItemFrame startFrame, Player player, PlayerInteractEntityEvent event) {
         ImageMap map = MapManager.getMap(player.getInventory().getItemInMainHand());
 
@@ -229,8 +215,6 @@ public abstract class SplatterMapManager {
 
             int i = 0;
             for (ItemFrame frame : surface.frames) {
-                BlockFace bf = WorldUtils.get4thOrientation(player.getLocation());
-                int id = poster.getMapIdAtReverseZ(i, bf, startFrame.getFacing());
                 Rotation rot = Rotation.NONE;
                 switch (frame.getFacing()) {
                     case UP:
@@ -241,13 +225,12 @@ public abstract class SplatterMapManager {
                     default:
                         //throw new IllegalStateException("Unexpected value: " + frame.getFacing());
                 }
+                BlockFace bf = WorldUtils.get4thOrientation(player.getLocation());
+                int id = poster.getMapIdAtReverseZ(i, bf, startFrame.getFacing());
                 //Rotation management relative to player rotation the default position is North,
                 // when on ceiling we flipped the rotation
-                RunTask.later(() -> {
-                    addPropertiesToFrames(player, frame);
-                    frame.setItem(
-                            new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
-                }, 5L);
+
+                setupMap(player, frame, id);
 
                 if (i == 0) {
                     //First map need to be rotate one time CounterClockwise
@@ -281,7 +264,6 @@ public abstract class SplatterMapManager {
                         throw new IllegalStateException("Unexpected value: " + bf);
                 }
 
-
                 MapInitEvent.initMap(id);
                 i++;
             }
@@ -305,11 +287,8 @@ public abstract class SplatterMapManager {
 
                 int id = poster.getMapIdAtReverseY(i);
 
-                RunTask.later(() -> {
-                    addPropertiesToFrames(player, frame);
-                    frame.setItem(
-                            new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
-                }, 5L);
+
+                setupMap(player, frame, id);
 
 
                 //Force reset of rotation
@@ -319,6 +298,14 @@ public abstract class SplatterMapManager {
             }
         }
         return true;
+    }
+
+    private static void setupMap(Player player, ItemFrame frame, int id) {
+        RunTask.later(() -> {
+            addPropertiesToFrames(player, frame);
+            ItemStack item = MapItemManager.createMapItem(id, "", true, false);
+            frame.setItem(item);
+        }, 5L);
     }
 
     /**
@@ -337,33 +324,18 @@ public abstract class SplatterMapManager {
         if (!poster.hasColumnData()) {
             return null;
         }
-        FlatLocation loc = new FlatLocation(startFrame.getLocation(), startFrame.getFacing());
-        ItemFrame[] matchingFrames = null;
+        //We search for the map on the top left corner
+        Location startingLocation = poster.findLocationFirstFrame(startFrame, player);
 
-        switch (startFrame.getFacing()) {
-            case UP:
-            case DOWN:
-                matchingFrames = PosterOnASurface.getMatchingMapFrames(poster, loc,
-                        MapManager.getMapIdFromItemStack(startFrame.getItem()),
-                        WorldUtils.get4thOrientation(player.getLocation()));//startFrame.getFacing());
-                break;
-
-            case NORTH:
-            case SOUTH:
-            case EAST:
-            case WEST:
-                matchingFrames = PosterWall.getMatchingMapFrames(poster, loc,
-                        MapManager.getMapIdFromItemStack(startFrame.getItem()));
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + startFrame.getFacing());
-        }
-
-        if (matchingFrames == null) {
-            return null;
-        }
-
-        for (ItemFrame frame : matchingFrames) {
+        Map<Location, ItemFrame>
+                itemFrameLocations =
+                PosterOnASurface.getItemFramesLocation(player, startingLocation, startFrame.getLocation(),
+                        startFrame.getFacing(),
+                        poster.getRowCount(), poster.getColumnCount());
+        //TODO check if it is the correct map id and check the why it delete more than it should and out of place
+        for (Map.Entry<Location, ItemFrame> entry : itemFrameLocations.entrySet()) {
+            ItemFrame frame = itemFrameLocations.get(entry.getKey());
+            PluginLogger.info("Frame to delete " + frame);
             if (frame != null) {
                 removePropertiesFromFrames(player, frame);
                 frame.setItem(null);

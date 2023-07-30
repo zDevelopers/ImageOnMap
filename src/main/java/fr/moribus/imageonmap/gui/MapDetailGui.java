@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <anais.jabre@gmail.com> (2019 – 2023)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -39,7 +39,6 @@ package fr.moribus.imageonmap.gui;
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.PosterMap;
-import fr.moribus.imageonmap.map.SingleMap;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.zcraft.quartzlib.components.gui.ExplorerGui;
 import fr.zcraft.quartzlib.components.gui.Gui;
@@ -57,8 +56,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class MapDetailGui extends ExplorerGui<Integer> {
     private final ImageMap map;
-    private OfflinePlayer offplayer;
-    private String name;
+    private final OfflinePlayer offplayer;
+    private final String name;
 
     public MapDetailGui(ImageMap map, OfflinePlayer p, String name) {
         super();
@@ -105,9 +104,7 @@ public class MapDetailGui extends ExplorerGui<Integer> {
             return null;
         }
 
-        if (map instanceof SingleMap) {
-            return MapItemManager.createMapItem((SingleMap) map, true);
-        } else if (map instanceof PosterMap) {
+        if (map instanceof PosterMap) {
             return MapItemManager.createMapItem((PosterMap) map, x, y);
         }
 
@@ -124,15 +121,11 @@ public class MapDetailGui extends ExplorerGui<Integer> {
         return MapItemManager.createMapItem(poster, poster.getIndex(mapId));
     }
 
-    @Override
-    protected ItemStack getEmptyViewItem() {
-        if (map instanceof SingleMap) {
-            return getViewItem(0, 0);
-        } else {
+    /*    @Override
+        protected ItemStack getEmptyViewItem() {
             return super.getEmptyViewItem();
         }
-    }
-
+    */
     @Override
     protected void onUpdate() {
         /// Title of the map details GUI

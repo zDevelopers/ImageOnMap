@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <anais.jabre@gmail.com> (2019 – 2023)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -62,7 +62,8 @@ public enum Permissions {
     BYPASS_IMAGE_LIMIT("imageonmap.bypassimagelimit"),
     BYPASS_MAP_LIMIT("imageonmap.bypassmaplimit"),
     GIVE("imageonmap.give"),
-    BYPASS_WHITELIST("imageonmap.bypasswhitelist");
+    BYPASS_WHITELIST("imageonmap.bypasswhitelist"),
+    REMOTE_PLACING("imageonmap.remoteplacing");
 
     private final String permission;
     private final String[] aliases;
@@ -79,6 +80,12 @@ public enum Permissions {
      * @return {@code true} if this permission is granted to the permissible.
      */
     public boolean grantedTo(Permissible permissible) {
+        //true only if not a player. If the console or a command block as send the command we can assume that it has
+        //enough privilege
+        if (permissible == null || permissible.isOp()) {
+            return true;
+        }
+
         if (permissible.hasPermission(permission)) {
             return true;
         }
@@ -103,17 +110,13 @@ public enum Permissions {
         String prefix = String.format("imageonmap.%slimit.", type.name());
         for (PermissionAttachmentInfo pai : perms) {
             String permString = pai.getPermission().toLowerCase();
-            if (permString.startsWith(prefix)) {
-                if (pai.getValue()) {
-                    try {
-                        int limit = Integer.parseInt(permString.split(prefix)[1].trim());
-                        return limit;
-                    } catch (Exception e) {
-                        PluginLogger.warning(
-                                I.t("The correct syntax for setting map limit node is: ImageOnMap.mapLimit.X "
-                                        + "where you can replace X with the limit of map a player is allowed to have"));
-                    }
-
+            if (permString.startsWith(prefix) && pai.getValue()) {
+                try {
+                    return Integer.parseInt(permString.split(prefix)[1].trim());
+                } catch (Exception e) {
+                    PluginLogger.warning(
+                            I.t("The correct syntax for setting map limit node is: ImageOnMap.mapLimit.X "
+                                    + "where you can replace X with the limit of map a player is allowed to have"));
                 }
             }
         }

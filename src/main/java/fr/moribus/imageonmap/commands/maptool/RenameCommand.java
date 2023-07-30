@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <anais.jabre@gmail.com> (2019 – 2023)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -34,24 +34,6 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-/*
- * Copyright (C) 2013 Moribus
- * Copyright (C) 2015 ProkopyL <prokopylmc@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package fr.moribus.imageonmap.commands.maptool;
 
 import fr.moribus.imageonmap.Permissions;
@@ -70,25 +52,25 @@ public class RenameCommand extends IoMCommand {
 
     @Override
     protected void run() throws CommandException {
+        ArrayList<String> arguments = getArgs();
 
-        ArrayList<String> argList = getArgs();
-
-        if (argList.size() != 2) {
-            warning(I.t("Not enough or too many arguments! Usage: /maptool rename <map name> <new map name>"));
+        boolean isTooMany = arguments.size() > 2;
+        boolean isTooFew = arguments.size() < 2;
+        if (!checkArguments(isTooMany, isTooFew)) {
             return;
         }
-
-        ImageMap map = MapManager.getMap(playerSender().getUniqueId(), argList.get(0));
+        String oldName = arguments.get(0);
+        ImageMap map = MapManager.getMap(playerSender().getUniqueId(), oldName);
         if (map == null) {
             error(I.t("This map does not exist."));
             return;
         }
-        map.rename(argList.get(1));
+        String newName = arguments.get(1);
+        map.rename(newName);
     }
 
     @Override
     protected List<String> complete() throws CommandException {
-
         if (args.length == 1) {
             return getMatchingMapNames(playerSender(), args[0]);
         }

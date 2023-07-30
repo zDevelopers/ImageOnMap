@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <anais.jabre@gmail.com> (2019 – 2023)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -41,7 +41,6 @@ import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
-import fr.moribus.imageonmap.map.SingleMap;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.moribus.imageonmap.ui.SplatterMapManager;
 import fr.zcraft.quartzlib.components.gui.ExplorerGui;
@@ -72,19 +71,14 @@ public class MapListGui extends ExplorerGui<ImageMap> {
     @Override
     protected ItemStack getViewItem(ImageMap map) {
         String mapDescription;
-        if (map instanceof SingleMap) {
-            /// Displayed subtitle description of a single map on the list GUI
-            mapDescription = I.tl(getPlayerLocale(), "{white}Single map");
+        PosterMap poster = (PosterMap) map;
+        if (poster.hasColumnData()) {
+            /// Displayed subtitle description of a poster map on the list GUI (columns × rows in english)
+            mapDescription = I.tl(getPlayerLocale(), "{white}Poster map ({0} × {1})", poster.getColumnCount(),
+                    poster.getRowCount());
         } else {
-            PosterMap poster = (PosterMap) map;
-            if (poster.hasColumnData()) {
-                /// Displayed subtitle description of a poster map on the list GUI (columns × rows in english)
-                mapDescription = I.tl(getPlayerLocale(), "{white}Poster map ({0} × {1})", poster.getColumnCount(),
-                        poster.getRowCount());
-            } else {
-                /// Displayed subtitle description of a poster map without column data on the list GUI
-                mapDescription = I.tl(getPlayerLocale(), "{white}Poster map ({0} parts)", poster.getMapCount());
-            }
+            /// Displayed subtitle description of a poster map without column data on the list GUI
+            mapDescription = I.tl(getPlayerLocale(), "{white}Poster map ({0} parts)", poster.getMapCount());
         }
 
         ItemStackBuilder builder = new ItemStackBuilder(Material.FILLED_MAP)
@@ -147,9 +141,7 @@ public class MapListGui extends ExplorerGui<ImageMap> {
             return null;
         }
 
-        if (map instanceof SingleMap) {
-            return MapItemManager.createMapItem(map.getMapsIDs()[0], map.getName(), false, true);
-        } else if (map instanceof PosterMap) {
+        if (map instanceof PosterMap) {
             PosterMap poster = (PosterMap) map;
 
             if (poster.hasColumnData()) {

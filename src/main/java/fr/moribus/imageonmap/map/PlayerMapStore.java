@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <anais.jabre@gmail.com> (2019 – 2023)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -54,10 +54,11 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerMapStore implements ConfigurationSerializable {
     private final UUID playerUUID;
-    private final ArrayList<ImageMap> mapList = new ArrayList<ImageMap>();
+    private final ArrayList<ImageMap> mapList = new ArrayList<>();
     private boolean modified = false;
     private int mapCount = 0;
     private FileConfiguration mapConfig = null;
@@ -67,6 +68,7 @@ public class PlayerMapStore implements ConfigurationSerializable {
         this.playerUUID = playerUUID;
     }
 
+    //TODO maybe usefull to merge with the other manages map
     public synchronized boolean managesMap(int mapID) {
         for (ImageMap map : mapList) {
             if (map.managesMap(mapID)) {
@@ -83,13 +85,7 @@ public class PlayerMapStore implements ConfigurationSerializable {
         if (item.getType() != Material.FILLED_MAP) {
             return false;
         }
-
-        for (ImageMap map : mapList) {
-            if (map.managesMap(item)) {
-                return true;
-            }
-        }
-        return false;
+        return managesMap(MapManager.getMapIdFromItemStack(item));
     }
 
     public synchronized void addMap(ImageMap map) throws MapManagerException {
@@ -108,33 +104,27 @@ public class PlayerMapStore implements ConfigurationSerializable {
     }
 
     public synchronized void deleteMap(ImageMap map) throws MapManagerException {
-        remove_Map(map);
+        delete_Map(map);
         notifyModification();
     }
 
-    private void remove_Map(ImageMap map) throws MapManagerException {
+    private void delete_Map(ImageMap map) throws MapManagerException {
         if (!mapList.remove(map)) {
             throw new MapManagerException(Reason.IMAGEMAP_DOES_NOT_EXIST);
         }
         mapCount -= map.getMapCount();
     }
 
-    public synchronized boolean mapExists(String id) {
-        for (ImageMap map : mapList) {
-            if (map.getId().equals(id)) {
-                return true;
-            }
-        }
-
-        return false;
+    public synchronized boolean mapExists(String mapId) {
+        return getMap(mapId) != null;
     }
 
     public String getNextAvailableMapID(String mapId) {
+        //TODO check if the value is always greater than the id count
         if (!mapExists(mapId)) {
             return mapId;
         }
         int id = 0;
-
         do {
             id++;
         } while (mapExists(mapId + "-" + id));
@@ -143,11 +133,12 @@ public class PlayerMapStore implements ConfigurationSerializable {
     }
 
     public synchronized List<ImageMap> getMapList() {
-        return new ArrayList(mapList);
+        return new ArrayList<>(mapList);
     }
 
+    //TODO refactor to arraylist instead of an array
     public synchronized ImageMap[] getMaps() {
-        return mapList.toArray(new ImageMap[mapList.size()]);
+        return mapList.toArray(new ImageMap[0]);
     }
 
     public synchronized ImageMap getMap(String mapId) {
@@ -156,7 +147,6 @@ public class PlayerMapStore implements ConfigurationSerializable {
                 return map;
             }
         }
-
         return null;
     }
 
@@ -202,9 +192,9 @@ public class PlayerMapStore implements ConfigurationSerializable {
     /* ****** Configuration Files management ***** */
 
     @Override
-    public Map<String, Object> serialize() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        ArrayList<Map> list = new ArrayList<Map>();
+    public @NotNull Map<String, Object> serialize() {
+        Map<String, Object> map = new HashMap<>();
+        ArrayList<Map> list = new ArrayList<>();
         synchronized (this) {
             for (ImageMap tmpMap : mapList) {
                 list.add(tmpMap.serialize());

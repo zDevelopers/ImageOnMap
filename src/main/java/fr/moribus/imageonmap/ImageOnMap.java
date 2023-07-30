@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <anais.jabre@gmail.com> (2019 – 2023)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -44,6 +44,7 @@ import fr.moribus.imageonmap.commands.maptool.GetRemainingCommand;
 import fr.moribus.imageonmap.commands.maptool.GiveCommand;
 import fr.moribus.imageonmap.commands.maptool.ListCommand;
 import fr.moribus.imageonmap.commands.maptool.NewCommand;
+import fr.moribus.imageonmap.commands.maptool.RemotePlacingCommand;
 import fr.moribus.imageonmap.commands.maptool.RenameCommand;
 import fr.moribus.imageonmap.commands.maptool.UpdateCommand;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
@@ -60,18 +61,24 @@ import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.UpdateChecker;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.bstats.bukkit.Metrics;
 
 public final class ImageOnMap extends QuartzPlugin {
     private static final String IMAGES_DIRECTORY_NAME = "images";
+    private static final String RENDERS_DIRECTORY_NAME = "renders";
     private static final String MAPS_DIRECTORY_NAME = "maps";
     private static ImageOnMap plugin;
-    private final File mapsDirectory;
     private File imagesDirectory;
+
+    private File rendersDirectory;
+    private File mapsDirectory;
     private CommandWorkers commandWorker;
 
     public ImageOnMap() {
         imagesDirectory = new File(this.getDataFolder(), IMAGES_DIRECTORY_NAME);
+        rendersDirectory = new File(this.getDataFolder(), RENDERS_DIRECTORY_NAME);
         mapsDirectory = new File(this.getDataFolder(), MAPS_DIRECTORY_NAME);
         plugin = this;
     }
@@ -84,6 +91,10 @@ public final class ImageOnMap extends QuartzPlugin {
         return imagesDirectory;
     }
 
+    public File getRendersDirectory() {
+        return rendersDirectory;
+    }
+
     public File getMapsDirectory() {
         return mapsDirectory;
     }
@@ -92,20 +103,33 @@ public final class ImageOnMap extends QuartzPlugin {
         return new File(imagesDirectory, "map" + mapID + ".png");
     }
 
+    public File getRenderFile(int mapID) {
+        return new File(rendersDirectory, "render" + mapID + ".png");
+    }
+
     public CommandWorkers getCommandWorker() {
         return commandWorker;
     }
 
-    @SuppressWarnings("unchecked")
+    private Map<String,File> checkDirs() throws IOException {
+        Map<String, File> dirs = new HashMap<>();
+        dirs.put("mapsDirectory", checkPluginDirectory(mapsDirectory));
+        dirs.put("rendersDirectory", checkPluginDirectory(rendersDirectory));
+        dirs.put("imagesDirectory", checkPluginDirectory(imagesDirectory));
+        return dirs;
+    }
+
     @Override
     public void onEnable() {
         // Creating the images and maps directories if necessary
         try {
-            //imagesDirectory = checkPluginDirectory(imagesDirectory, V3Migrator.getOldImagesDirectory(this));
-            checkPluginDirectory(mapsDirectory);
-            checkPluginDirectory(imagesDirectory);
+            Map<String, File> directories = checkDirs();
+            mapsDirectory = directories.get("mapsDirectory");
+            rendersDirectory = directories.get("rendersDirectory");
+            imagesDirectory = directories.get("imagesDirectory");
         } catch (final IOException ex) {
             PluginLogger.error("FATAL: " + ex.getMessage());
+            //disable the plugin
             this.setEnabled(false);
             return;
         }
@@ -123,9 +147,9 @@ public final class ImageOnMap extends QuartzPlugin {
         MapInitEvent.init();
         MapItemManager.init();
 
-
+        String commandGroupName = "maptool";
         Commands.register(
-                "maptool",
+                commandGroupName,
                 NewCommand.class,
                 ListCommand.class,
                 GetCommand.class,
@@ -135,19 +159,21 @@ public final class ImageOnMap extends QuartzPlugin {
                 GetRemainingCommand.class,
                 ExploreCommand.class,
                 //MigrateCommand.class,//Removed for now doesn't work nor is useful, maybe useful later on
-                UpdateCommand.class
+                UpdateCommand.class,
+                RemotePlacingCommand.class
         );
 
-        Commands.registerShortcut("maptool", NewCommand.class, "tomap");
-        Commands.registerShortcut("maptool", ExploreCommand.class, "maps");
-        Commands.registerShortcut("maptool", GiveCommand.class, "givemap");
+        Commands.registerShortcut(commandGroupName, NewCommand.class, "tomap");
+        Commands.registerShortcut(commandGroupName, ExploreCommand.class, "maps");
+        Commands.registerShortcut(commandGroupName, GiveCommand.class, "givemap");
+        Commands.registerShortcut(commandGroupName, RemotePlacingCommand.class, "placemap");
 
         if (PluginConfiguration.CHECK_FOR_UPDATES.get()) {
             UpdateChecker.boot("imageonmap.26585");
         }
 
         if (PluginConfiguration.COLLECT_DATA.get()) {
-            final Metrics metrics = new Metrics(this,5920);
+            final Metrics metrics = new Metrics(this, 5920);
             metrics.addCustomChart(new Metrics.SingleLineChart("rendered-images", MapManager::getImagesCount));
             metrics.addCustomChart(new Metrics.SingleLineChart("used-minecraft-maps", MapManager::getMapCount));
         } else {

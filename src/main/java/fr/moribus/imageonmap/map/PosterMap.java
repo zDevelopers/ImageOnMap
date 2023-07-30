@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <anais.jabre@gmail.com> (2019 – 2023)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -36,11 +36,17 @@
 
 package fr.moribus.imageonmap.map;
 
+import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.zcraft.quartzlib.tools.world.WorldUtils;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Player;
 
 public class PosterMap extends ImageMap {
     protected final int[] mapsIDs;
@@ -76,6 +82,16 @@ public class PosterMap extends ImageMap {
         return mapsIDs;
     }
 
+    @Override
+    public int getFirstMapID() {
+        int first = -1;
+        for (int id : mapsIDs) {
+            if (first == -1 || first > id) {
+                first = id;
+            }
+        }
+        return first;
+    }
     /* ====== Serialization methods ====== */
 
     @Override
@@ -158,6 +174,7 @@ public class PosterMap extends ImageMap {
 
 
     public int getMapIdAtReverseZ(int index, BlockFace orientation, BlockFace bf) {
+        //TODO maybe a bug there why don't use orientation?
         int x = 0;
         int y = 0;
         switch (bf) {
@@ -177,7 +194,6 @@ public class PosterMap extends ImageMap {
     }
 
 
-
     public boolean hasColumnData() {
         return rowCount != 0 && columnCount != 0;
     }
@@ -193,8 +209,87 @@ public class PosterMap extends ImageMap {
                 return i;
             }
         }
-
         throw new IllegalArgumentException("Invalid map ID");
+    }
+
+    public int getSortedIndex(int mapID) {
+        int[] ids = mapsIDs.clone();
+        Arrays.sort(ids);
+        for (int i : ids) {
+            PluginLogger.info("" + i);
+        }
+
+        for (int i = 0; i < mapsIDs.length; i++) {
+            if (ids[i] == mapID) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("Invalid map ID");
+    }
+
+    public MapIndexes getIndexes(int mapID) {
+        int index = getSortedIndex(mapID);
+        PluginLogger.info(rowCount + " " + columnCount + " " + index);
+        return new MapIndexes(index / columnCount, index % columnCount);
+    }
+
+    public Location findLocationFirstFrame(ItemFrame frame, Player player) {
+        final ImageMap map = MapManager.getMap(frame.getItem());
+        if (!(map instanceof PosterMap)) {
+            return null;
+        }
+        PosterMap poster = (PosterMap) map;
+        if (!poster.hasColumnData()) {
+            return null;
+        }
+        int mapID = MapManager.getMapIdFromItemStack(frame.getItem());
+
+        BlockFace bf = WorldUtils.get4thOrientation(player.getLocation());
+
+        MapIndexes mapindexes = getIndexes(mapID);
+        int row = mapindexes.getRowIndex();
+        int column = mapindexes.getColumnIndex();
+        Location loc = frame.getLocation();
+        PluginLogger.info("\n\nlocalization of the initial clicked frame " + loc);
+        PluginLogger.info("row " + row + " col " + column);
+        switch (frame.getFacing().getOppositeFace()) {
+            case UP:
+            case DOWN:
+                switch (bf) {
+                    case NORTH:
+                        loc.add(-row, 0, column);
+                        break;
+                    case SOUTH:
+                        loc.add(row, 0, -column);
+                        break;
+                    case WEST:
+                        loc.add(row, 0, column);
+                        break;
+                    case EAST:
+                        loc.add(-row, 0, -column);
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + bf);
+                }
+                break;
+
+            case EAST:
+                loc.add(0, row, -column);
+                break;
+            case WEST:
+                loc.add(0, row, column);
+                break;
+            case NORTH:
+                loc.add(-column, row, 0);
+                break;
+            case SOUTH:
+                loc.add(column, row, 0);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + bf);
+        }
+        PluginLogger.info("\n\nlocalization of the first frame " + loc);
+        return loc;
     }
 
 }

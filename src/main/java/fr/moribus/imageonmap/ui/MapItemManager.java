@@ -1,8 +1,8 @@
 /*
  * Copyright or © or Copr. Moribus (2013)
  * Copyright or © or Copr. ProkopyL <prokopylmc@gmail.com> (2015)
- * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2021)
- * Copyright or © or Copr. Vlammar <valentin.jabre@gmail.com> (2019 – 2021)
+ * Copyright or © or Copr. Amaury Carrade <amaury@carrade.eu> (2016 – 2022)
+ * Copyright or © or Copr. Vlammar <anais.jabre@gmail.com> (2019 – 2023)
  *
  * This software is a computer program whose purpose is to allow insertion of
  * custom images in a Minecraft world.
@@ -40,10 +40,8 @@ import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
-import fr.moribus.imageonmap.map.SingleMap;
 import fr.zcraft.quartzlib.components.i18n.I;
 import fr.zcraft.quartzlib.core.QuartzLib;
-import fr.zcraft.quartzlib.tools.PluginLogger;
 import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
 import fr.zcraft.quartzlib.tools.items.ItemUtils;
 import fr.zcraft.quartzlib.tools.runners.RunTask;
@@ -89,15 +87,10 @@ public class MapItemManager implements Listener {
     public static boolean give(Player player, ImageMap map) {
         if (map instanceof PosterMap) {
             return give(player, (PosterMap) map);
-        } else if (map instanceof SingleMap) {
-            return give(player, (SingleMap) map);
         }
         return false;
     }
 
-    public static boolean give(Player player, SingleMap map) {
-        return give(player, createMapItem(map, true));
-    }
 
     public static boolean give(Player player, PosterMap map) {
         if (!map.hasColumnData()) {
@@ -142,14 +135,6 @@ public class MapItemManager implements Listener {
         return givenItemsCount;
     }
 
-    public static ItemStack createMapItem(SingleMap map) {
-        return createMapItem(map.getMapsIDs()[0], map.getName(), false);
-    }
-
-    public static ItemStack createMapItem(SingleMap map, boolean goldTitle) {
-        return createMapItem(map.getMapsIDs()[0], map.getName(), false, goldTitle);
-    }
-
     public static ItemStack createMapItem(PosterMap map, int index) {
         return createMapItem(map.getMapIdAt(index), getMapTitle(map, index), true);
     }
@@ -164,17 +149,24 @@ public class MapItemManager implements Listener {
 
     public static ItemStack createMapItem(int mapID, String text, boolean isMapPart, boolean goldTitle) {
         ItemStack mapItem;
-        if (goldTitle) {
+        if (text == "") {
             mapItem = new ItemStackBuilder(Material.FILLED_MAP)
-                    .title(ChatColor.GOLD, text)
                     .hideAllAttributes()
                     .item();
         } else {
-            mapItem = new ItemStackBuilder(Material.FILLED_MAP)
-                    .title(text)
-                    .hideAllAttributes()
-                    .item();
+            if (goldTitle) {
+                mapItem = new ItemStackBuilder(Material.FILLED_MAP)
+                        .title(ChatColor.GOLD, text)
+                        .hideAllAttributes()
+                        .item();
+            } else {
+                mapItem = new ItemStackBuilder(Material.FILLED_MAP)
+                        .title(text)
+                        .hideAllAttributes()
+                        .item();
+            }
         }
+
         final MapMeta meta = (MapMeta) mapItem.getItemMeta();
         meta.setMapId(mapID);
         meta.setColor(isMapPart ? Color.LIME : Color.GREEN);
@@ -194,17 +186,14 @@ public class MapItemManager implements Listener {
 
     private static String getMapTitle(ItemStack item) {
         ImageMap map = MapManager.getMap(item);
-        if (map instanceof SingleMap) {
-            return map.getName();
-        } else {
-            PosterMap poster = (PosterMap) map;
-            int index = poster.getIndex(MapManager.getMapIdFromItemStack(item));
-            if (poster.hasColumnData()) {
-                return getMapTitle(poster, poster.getRowAt(index), poster.getColumnAt(index));
-            }
-
-            return getMapTitle(poster, index);
+        PosterMap poster = (PosterMap) map;
+        int index = poster.getIndex(MapManager.getMapIdFromItemStack(item));
+        if (poster.hasColumnData()) {
+            return getMapTitle(poster, poster.getRowAt(index), poster.getColumnAt(index));
         }
+
+        return getMapTitle(poster, index);
+        //}
     }
 
     //
@@ -297,19 +286,19 @@ public class MapItemManager implements Listener {
             return;
         }
 
-        if (Permissions.REMOVE_SPLATTER_MAP.grantedTo(player)) {
-            if (player.isSneaking()) {
-                PosterMap poster = SplatterMapManager.removeSplatterMap(frame, player);
-                if (poster != null) {
-                    event.setCancelled(true);
+        if (Permissions.REMOVE_SPLATTER_MAP.grantedTo(player) && player.isSneaking()) {
 
-                    if (player.getGameMode() != GameMode.CREATIVE
-                            || !SplatterMapManager.hasSplatterMap(player, poster)) {
-                        poster.give(player);
-                    }
-                    return;
+            PosterMap poster = SplatterMapManager.removeSplatterMap(frame, player);
+            if (poster != null) {
+                event.setCancelled(true);
+
+                if (player.getGameMode() != GameMode.CREATIVE
+                        || !SplatterMapManager.hasSplatterMap(player, poster)) {
+                    poster.give(player);
                 }
+                return;
             }
+
         }
 
         if (!MapManager.managesMap(frame.getItem())) {
