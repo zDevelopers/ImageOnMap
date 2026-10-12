@@ -37,17 +37,17 @@
 package fr.moribus.imageonmap.gui;
 
 import fr.moribus.imageonmap.Permissions;
+import fr.moribus.imageonmap.gui.framework.ActionGui;
+import fr.moribus.imageonmap.gui.framework.Gui;
+import fr.moribus.imageonmap.gui.framework.GuiAction;
+import fr.moribus.imageonmap.i18n.I;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.MapManagerException;
-import fr.zcraft.quartzlib.components.gui.ActionGui;
-import fr.zcraft.quartzlib.components.gui.Gui;
-import fr.zcraft.quartzlib.components.gui.GuiAction;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
+import fr.moribus.imageonmap.tools.ChatColor;
+import fr.moribus.imageonmap.tools.ItemStackBuilder;
+import fr.moribus.imageonmap.tools.PluginLogger;
 import java.util.Random;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

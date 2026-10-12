@@ -37,27 +37,28 @@
 package fr.moribus.imageonmap.commands.maptool;
 
 import fr.moribus.imageonmap.Permissions;
+import fr.moribus.imageonmap.commands.CommandException;
+import fr.moribus.imageonmap.commands.CommandInfo;
 import fr.moribus.imageonmap.commands.IoMCommand;
+import fr.moribus.imageonmap.i18n.I;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.ImageUtils;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.zcraft.quartzlib.components.commands.CommandException;
-import fr.zcraft.quartzlib.components.commands.CommandInfo;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.components.worker.WorkerCallback;
-import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.text.ActionBar;
-import fr.zcraft.quartzlib.tools.text.MessageSender;
+import fr.moribus.imageonmap.tools.ActionBar;
+import fr.moribus.imageonmap.tools.ChatColor;
+import fr.moribus.imageonmap.tools.PluginLogger;
+import fr.moribus.imageonmap.worker.WorkerCallback;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @CommandInfo(name = "update", usageParameters = "[player name]:<map name> <new url> [stretched|covered] ")
 public class UpdateCommand extends IoMCommand {
+    // URLs are parsed with the lenient java.net.URL parser on purpose, so that any link that worked before still works.
+    @SuppressWarnings("deprecation")
     @Override
     protected void run() throws CommandException {
         //TODO fix the issue where to many quick usage of offlineNameFetch will return null
@@ -193,7 +194,7 @@ public class UpdateCommand extends IoMCommand {
                                 public void finished(ImageMap result) {
                                     if (playerSender != null) {
                                         ActionBar.removeMessage(playerSender);
-                                        MessageSender.sendActionBarMessage(playerSender,
+                                        ActionBar.sendMessage(playerSender,
                                                 ChatColor.DARK_GREEN + I.t("The map was updated using the new image!"));
                                     }
                                 }

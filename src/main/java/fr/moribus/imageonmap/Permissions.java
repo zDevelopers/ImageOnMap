@@ -37,8 +37,8 @@
 package fr.moribus.imageonmap;
 
 
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.moribus.imageonmap.i18n.I;
+import fr.moribus.imageonmap.tools.PluginLogger;
 import java.util.Set;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.PermissionAttachmentInfo;

@@ -39,7 +39,7 @@ package fr.moribus.imageonmap.map;
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.PluginConfiguration;
 import fr.moribus.imageonmap.map.MapManagerException.Reason;
-import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.moribus.imageonmap.tools.PluginLogger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

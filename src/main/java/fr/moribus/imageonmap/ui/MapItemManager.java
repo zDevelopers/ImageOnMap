@@ -36,23 +36,23 @@
 
 package fr.moribus.imageonmap.ui;
 
+import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.Permissions;
+import fr.moribus.imageonmap.i18n.I;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.core.QuartzLib;
-import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
-import fr.zcraft.quartzlib.tools.items.ItemUtils;
-import fr.zcraft.quartzlib.tools.runners.RunTask;
+import fr.moribus.imageonmap.tools.ChatColor;
+import fr.moribus.imageonmap.tools.ItemStackBuilder;
+import fr.moribus.imageonmap.tools.ItemUtils;
+import fr.moribus.imageonmap.tools.PluginLogger;
+import fr.moribus.imageonmap.tools.RunTask;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Queue;
 import java.util.UUID;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Rotation;
@@ -70,13 +70,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.map.MapView;
 
 public class MapItemManager implements Listener {
     private static HashMap<UUID, Queue<ItemStack>> mapItemCache;
 
     public static void init() {
         mapItemCache = new HashMap<>();
-        QuartzLib.registerEvents(new MapItemManager());
+        Bukkit.getPluginManager().registerEvents(new MapItemManager(), ImageOnMap.getPlugin());
     }
 
     public static void exit() {
@@ -176,10 +177,26 @@ public class MapItemManager implements Listener {
                     .item();
         }
         final MapMeta meta = (MapMeta) mapItem.getItemMeta();
-        meta.setMapId(mapID);
-        meta.setColor(isMapPart ? Color.LIME : Color.GREEN);
+        setMapId(meta, mapID);
         mapItem.setItemMeta(meta);
         return mapItem;
+    }
+
+    /**
+     * Sets the Minecraft map displayed by a map item.
+     *
+     * @param meta  The meta of the map item.
+     * @param mapID The ID of the Minecraft map.
+     */
+    @SuppressWarnings("deprecation")
+    public static void setMapId(MapMeta meta, int mapID) {
+        final MapView mapView = Bukkit.getMap(mapID);
+        if (mapView != null) {
+            meta.setMapView(mapView);
+        } else {
+            // Keeps the ID even if the map does not exist (yet) on this server.
+            meta.setMapId(mapID);
+        }
     }
 
     public static String getMapTitle(PosterMap map, int row, int column) {
@@ -280,7 +297,7 @@ public class MapItemManager implements Listener {
             final ItemStack frameItem = mapItem.clone();
             final ItemMeta meta = frameItem.getItemMeta();
 
-            meta.setDisplayName(null);
+            meta.displayName(null);
             frameItem.setItemMeta(meta);
             RunTask.later(() -> {
                 frame.setItem(frameItem);

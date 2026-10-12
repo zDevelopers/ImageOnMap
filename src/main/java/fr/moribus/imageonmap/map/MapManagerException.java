@@ -36,7 +36,7 @@
 
 package fr.moribus.imageonmap.map;
 
-import fr.zcraft.quartzlib.components.i18n.I;
+import fr.moribus.imageonmap.i18n.I;
 import java.text.MessageFormat;
 
 public class MapManagerException extends Exception {

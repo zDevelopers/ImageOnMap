@@ -38,13 +38,11 @@ package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.PluginConfiguration;
+import fr.moribus.imageonmap.i18n.I;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.components.worker.Worker;
-import fr.zcraft.quartzlib.components.worker.WorkerAttributes;
-import fr.zcraft.quartzlib.components.worker.WorkerCallback;
-import fr.zcraft.quartzlib.components.worker.WorkerRunnable;
+import fr.moribus.imageonmap.worker.Worker;
+import fr.moribus.imageonmap.worker.WorkerCallback;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,15 +50,27 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import javax.imageio.ImageIO;
 import org.bukkit.Bukkit;
 
-@WorkerAttributes(name = "Image Renderer", queriesMainThread = true)
 public class ImageRendererExecutor extends Worker {
+    public ImageRendererExecutor() {
+        super("Image Renderer");
+    }
+
+    // Links copied from the Discord client point to its media proxy with format=webp, and ImageIO cannot decode WebP.
+    // The proxy can convert to any format, so ask it for PNG instead.
+    @SuppressWarnings("deprecation")
+    private static URL requestDecodableFormat(URL url) throws IOException {
+        if (!"media.discordapp.net".equalsIgnoreCase(url.getHost())) {
+            return url;
+        }
+        return new URL(url.toString().replaceAll("(?i)([?&]format=)[^&#]*", "$1png"));
+    }
+
     private static URLConnection connecting(URL url) throws IOException {
-        final URLConnection connection = url.openConnection();
+        final URLConnection connection = requestDecodableFormat(url).openConnection();
         connection.addRequestProperty("User-Agent",
                 "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
         connection.connect();
@@ -91,95 +101,91 @@ public class ImageRendererExecutor extends Worker {
         }
     }
 
+    // URLs are parsed with the lenient java.net.URL parser on purpose, so that any link that worked before still works.
+    @SuppressWarnings("deprecation")
     public static void render(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID,
                               final int width, final int height, WorkerCallback<ImageMap> callback) {
-        submitQuery(new WorkerRunnable<ImageMap>() {
-            @Override
-            public ImageMap run() throws Throwable {
+        submitQuery(ImageRendererExecutor.class, () -> {
 
-                BufferedImage image = null;
+            BufferedImage image = null;
 
-                //If the link is an imgur one
-                if (url.toString().toLowerCase().startsWith("https://imgur.com/")) {
+            //If the link is an imgur one
+            if (url.toString().toLowerCase().startsWith("https://imgur.com/")) {
 
-                    //Not handled, can't with the hash only access the image in i.imgur.com/<hash>.<extension>
+                //Not handled, can't with the hash only access the image in i.imgur.com/<hash>.<extension>
 
-                    if (url.toString().contains("gallery/")) {
-                        throw new IOException(
-                                "We do not support imgur gallery yet, please use direct link to image instead."
-                                        + " Right click on the picture you want "
-                                        + "to use then select copy picture link:) ");
-                    }
+                if (url.toString().contains("gallery/")) {
+                    throw new IOException(
+                            "We do not support imgur gallery yet, please use direct link to image instead."
+                                    + " Right click on the picture you want "
+                                    + "to use then select copy picture link:) ");
+                }
 
-                    for (Extension ext : Extension.values()) {
-                        String newLink = "https://i.imgur.com/" + url.toString().split("https://imgur.com/")[1]
-                                + "."
-                                + ext.toString();
-                        URL url2 = new URL(newLink);
+                for (Extension ext : Extension.values()) {
+                    String newLink = "https://i.imgur.com/" + url.toString().split("https://imgur.com/")[1]
+                            + "."
+                            + ext.toString();
+                    URL url2 = new URL(newLink);
 
-                        //Try connecting
-                        URLConnection connection = connecting(url2);
-
-                        final InputStream stream = connection.getInputStream();
-
-                        image = ImageIO.read(stream);
-
-                        //valid image
-                        if (image != null) {
-                            break;
-                        }
-
-                    }
-
-                } else {
                     //Try connecting
-                    URLConnection connection = connecting(url);
+                    URLConnection connection = connecting(url2);
 
                     final InputStream stream = connection.getInputStream();
 
                     image = ImageIO.read(stream);
+
+                    //valid image
+                    if (image != null) {
+                        break;
+                    }
+
                 }
-                if (image == null) {
-                    throw new IOException(I.t("The given URL is not a valid image"));
-                }
-                // Limits are in place and the player does NOT have rights to avoid them.
-                checkSizeLimit(playerUUID, image);
-                if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1) {
-                    ImageMap ret = renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
-                    image.flush();//Safe to free
-                    return ret;
-                }
-                final BufferedImage resizedImage =
-                        scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
-                image.flush();//Safe to free
-                return renderPoster(resizedImage, playerUUID);
+
+            } else {
+                //Try connecting
+                URLConnection connection = connecting(url);
+
+                final InputStream stream = connection.getInputStream();
+
+                image = ImageIO.read(stream);
             }
+            if (image == null) {
+                throw new IOException(I.t("The given URL is not a valid image"));
+            }
+            // Limits are in place and the player does NOT have rights to avoid them.
+            checkSizeLimit(playerUUID, image);
+            if (scaling != ImageUtils.ScalingType.NONE && height <= 1 && width <= 1) {
+                ImageMap ret = renderSingle(scaling.resize(image, ImageMap.WIDTH, ImageMap.HEIGHT), playerUUID);
+                image.flush();//Safe to free
+                return ret;
+            }
+            final BufferedImage resizedImage =
+                    scaling.resize(image, ImageMap.WIDTH * width, ImageMap.HEIGHT * height);
+            image.flush();//Safe to free
+            return renderPoster(resizedImage, playerUUID);
         }, callback);
     }
 
     public static void update(final URL url, final ImageUtils.ScalingType scaling, final UUID playerUUID,
                               final ImageMap map, final int width, final int height,
                               WorkerCallback<ImageMap> callback) {
-        submitQuery(new WorkerRunnable<ImageMap>() {
-            @Override
-            public ImageMap run() throws Throwable {
-                final URLConnection connection = connecting(url);
+        submitQuery(ImageRendererExecutor.class, () -> {
+            final URLConnection connection = connecting(url);
 
-                final InputStream stream = connection.getInputStream();
-                final BufferedImage image = ImageIO.read(stream);
-                stream.close();
+            final InputStream stream = connection.getInputStream();
+            final BufferedImage image = ImageIO.read(stream);
+            stream.close();
 
-                if (image == null) {
-                    throw new IOException(I.t("The given URL is not a valid image"));
-                }
-
-                // Limits are in place and the player does NOT have rights to avoid them.
-                checkSizeLimit(playerUUID, image);
-
-                updateMap(scaling.resize(image, width * 128, height * 128), playerUUID, map.getMapsIDs());
-                return map;
-
+            if (image == null) {
+                throw new IOException(I.t("The given URL is not a valid image"));
             }
+
+            // Limits are in place and the player does NOT have rights to avoid them.
+            checkSizeLimit(playerUUID, image);
+
+            updateMap(scaling.resize(image, width * 128, height * 128), playerUUID, map.getMapsIDs());
+            return map;
+
         }, callback);
 
     }
@@ -195,32 +201,21 @@ public class ImageRendererExecutor extends Worker {
             ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
         }
 
-        submitToMainThread(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                Renderer.installRenderer(poster, mapsIDs);
-                return null;
-            }
+        submitToMainThread(() -> {
+            Renderer.installRenderer(poster, mapsIDs);
+            return null;
         });
     }
 
     private static ImageMap renderSingle(final BufferedImage image, final UUID playerUUID) throws Throwable {
         MapManager.checkMapLimit(1, playerUUID);
-        final Future<Integer> futureMapID = submitToMainThread(new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return MapManager.getNewMapsIds(1)[0];
-            }
-        });
+        final Future<Integer> futureMapID = submitToMainThread(() -> MapManager.getNewMapsIds(1)[0]);
 
         final int mapID = futureMapID.get();
         ImageIOExecutor.saveImage(mapID, image);
-        submitToMainThread(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                Renderer.installRenderer(image, mapID);
-                return null;
-            }
+        submitToMainThread(() -> {
+            Renderer.installRenderer(image, mapID);
+            return null;
         });
         return MapManager.createMap(playerUUID, mapID);
     }
@@ -229,12 +224,7 @@ public class ImageRendererExecutor extends Worker {
         final PosterImage poster = new PosterImage(image);
         final int mapCount = poster.getImagesCount();
         MapManager.checkMapLimit(mapCount, playerUUID);
-        final Future<int[]> futureMapsIds = submitToMainThread(new Callable<int[]>() {
-            @Override
-            public int[] call() throws Exception {
-                return MapManager.getNewMapsIds(mapCount);
-            }
-        });
+        final Future<int[]> futureMapsIds = submitToMainThread(() -> MapManager.getNewMapsIds(mapCount));
         poster.splitImages();
         final int[] mapsIDs = futureMapsIds.get();
         ImageIOExecutor.saveImage(mapsIDs, poster);
@@ -245,13 +235,9 @@ public class ImageRendererExecutor extends Worker {
             ImageIOExecutor.saveImage(ImageMap.getFullImageFile(mapsIDs[0], mapsIDs[mapsIDs.length - 1]), image);
         }
 
-        submitToMainThread(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                Renderer.installRenderer(poster, mapsIDs);
-                return null;
-            }
-
+        submitToMainThread(() -> {
+            Renderer.installRenderer(poster, mapsIDs);
+            return null;
         });
         poster.getImage().flush();//Safe to free
         return MapManager.createMap(poster, playerUUID, mapsIDs);

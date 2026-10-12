@@ -36,7 +36,7 @@
 
 package fr.moribus.imageonmap.image;
 
-import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.moribus.imageonmap.tools.PluginLogger;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 

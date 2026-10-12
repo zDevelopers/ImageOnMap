@@ -38,37 +38,31 @@ package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.ImageMap;
-import fr.zcraft.quartzlib.components.worker.Worker;
-import fr.zcraft.quartzlib.components.worker.WorkerAttributes;
-import fr.zcraft.quartzlib.components.worker.WorkerRunnable;
+import fr.moribus.imageonmap.worker.Worker;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Files;
 import javax.imageio.ImageIO;
 
 
-@WorkerAttributes(name = "Image IO")
 public class ImageIOExecutor extends Worker {
-    public static void loadImage(final File file, final Renderer mapRenderer) {
+    public ImageIOExecutor() {
+        super("Image IO");
+    }
 
-        submitQuery(new WorkerRunnable<Void>() {
-            @Override
-            public Void run() throws Exception {
-                BufferedImage image = ImageIO.read(file);
-                mapRenderer.setImage(image);
-                image.flush();//Safe to free
-                return null;
-            }
+    public static void loadImage(final File file, final Renderer mapRenderer) {
+        submitQuery(ImageIOExecutor.class, () -> {
+            BufferedImage image = ImageIO.read(file);
+            mapRenderer.setImage(image);
+            image.flush();//Safe to free
+            return null;
         });
     }
 
     public static void saveImage(final File file, final BufferedImage image) {
-        submitQuery(new WorkerRunnable<Void>() {
-            @Override
-            public Void run() throws Throwable {
-                ImageIO.write(image, "png", file);
-                return null;
-            }
+        submitQuery(ImageIOExecutor.class, () -> {
+            ImageIO.write(image, "png", file);
+            return null;
         });
     }
 
@@ -92,12 +86,9 @@ public class ImageIOExecutor extends Worker {
     }
 
     public static void deleteImage(final File file) {
-        submitQuery(new WorkerRunnable<Void>() {
-            @Override
-            public Void run() throws Throwable {
-                Files.delete(file.toPath());
-                return null;
-            }
+        submitQuery(ImageIOExecutor.class, () -> {
+            Files.delete(file.toPath());
+            return null;
         });
     }
 }

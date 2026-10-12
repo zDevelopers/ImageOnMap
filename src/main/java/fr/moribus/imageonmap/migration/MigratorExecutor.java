@@ -37,8 +37,8 @@
 package fr.moribus.imageonmap.migration;
 
 import fr.moribus.imageonmap.ImageOnMap;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
+import fr.moribus.imageonmap.i18n.I;
+import fr.moribus.imageonmap.tools.PluginLogger;
 
 
 public class MigratorExecutor {

@@ -1,20 +1,8 @@
 name: ImageOnMap
 main: fr.moribus.imageonmap.ImageOnMap
 version: "4.2.2"
-api-version: "1.13"
+api-version: "26.3"
 
-
-commands:
-  tomap:
-    description: render an image in a map
-    usage: /<command> [URL]
-  maptool:
-    description: Manage maps
-  maps:
-    description: Manage maps through a GUI
-  givemap:
-    description: give a map to a player from a player map store, by default take from the player that make the command
-    usage: /<command> [player_from] player_to map_name
 
 permissions:
   imageonmap.*:

@@ -37,19 +37,23 @@
 package fr.moribus.imageonmap.commands.maptool;
 
 import fr.moribus.imageonmap.Permissions;
+import fr.moribus.imageonmap.commands.CommandException;
+import fr.moribus.imageonmap.commands.CommandInfo;
+import fr.moribus.imageonmap.commands.Commands;
 import fr.moribus.imageonmap.commands.IoMCommand;
+import fr.moribus.imageonmap.i18n.I;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
-import fr.zcraft.quartzlib.components.commands.CommandException;
-import fr.zcraft.quartzlib.components.commands.CommandInfo;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.components.rawtext.RawText;
-import fr.zcraft.quartzlib.components.rawtext.RawTextPart;
-import fr.zcraft.quartzlib.tools.text.RawMessage;
+import fr.moribus.imageonmap.tools.Text;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -90,32 +94,32 @@ public class ListCommand extends IoMCommand {
 
             info(sender, I.tn("{white}{bold}{0} map found.", "{white}{bold}{0} maps found.", mapList.size()));
 
-            RawTextPart rawText = new RawText("");
-            rawText = addMap(rawText, mapList.get(0));
+            final TextComponent.Builder rawText = Component.text();
+            addMap(rawText, mapList.get(0));
 
             //TODO pagination chat
             for (int i = 1, c = mapList.size(); i < c; i++) {
-                rawText = rawText.then(", ").color(ChatColor.GRAY);
-                rawText = addMap(rawText, mapList.get(i));
+                rawText.append(Component.text(", ", NamedTextColor.GRAY));
+                addMap(rawText, mapList.get(i));
             }
-            RawMessage.send(sender, rawText.build());
+            sender.sendMessage(rawText.build());
 
         });
     }
 
-    private RawTextPart<?> addMap(RawTextPart<?> rawText, ImageMap map) {
+    private void addMap(TextComponent.Builder rawText, ImageMap map) {
         final String size = map.getType() == ImageMap.Type.SINGLE ? "1 × 1" :
                 ((PosterMap) map).getColumnCount() + " × " + ((PosterMap) map).getRowCount();
 
-        return rawText
-                .then(map.getId())
-                .color(ChatColor.WHITE)
-                .command(GetCommand.class, map.getId())
-                .hover(new RawText()
-                        .then(map.getName()).style(ChatColor.BOLD, ChatColor.GREEN).then("\n")
-                        .then(map.getId() + ", " + size).color(ChatColor.GRAY).then("\n\n")
-                        .then(I.t("{white}Click{gray} to get this map"))
-                );
+        rawText.append(Component.text(map.getId(), NamedTextColor.WHITE)
+                .clickEvent(ClickEvent.runCommand(Commands.getCommandInfo(GetCommand.class).build(map.getId())))
+                .hoverEvent(HoverEvent.showText(Component.text()
+                        .append(Component.text(map.getName(), NamedTextColor.GREEN, TextDecoration.BOLD))
+                        .append(Component.text("\n"))
+                        .append(Component.text(map.getId() + ", " + size, NamedTextColor.GRAY))
+                        .append(Component.text("\n\n"))
+                        .append(Text.legacy(I.t("{white}Click{gray} to get this map")))
+                        .build())));
     }
 
     @Override

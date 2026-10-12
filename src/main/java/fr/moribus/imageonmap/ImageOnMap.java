@@ -37,6 +37,7 @@
 package fr.moribus.imageonmap;
 
 
+import fr.moribus.imageonmap.commands.Commands;
 import fr.moribus.imageonmap.commands.maptool.DeleteCommand;
 import fr.moribus.imageonmap.commands.maptool.ExploreCommand;
 import fr.moribus.imageonmap.commands.maptool.GetCommand;
@@ -46,29 +47,36 @@ import fr.moribus.imageonmap.commands.maptool.ListCommand;
 import fr.moribus.imageonmap.commands.maptool.NewCommand;
 import fr.moribus.imageonmap.commands.maptool.RenameCommand;
 import fr.moribus.imageonmap.commands.maptool.UpdateCommand;
+import fr.moribus.imageonmap.gui.framework.Gui;
+import fr.moribus.imageonmap.i18n.I18n;
 import fr.moribus.imageonmap.image.ImageIOExecutor;
 import fr.moribus.imageonmap.image.ImageRendererExecutor;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.MapManager;
+import fr.moribus.imageonmap.tools.ActionBar;
+import fr.moribus.imageonmap.tools.PluginLogger;
+import fr.moribus.imageonmap.tools.UpdateChecker;
 import fr.moribus.imageonmap.ui.MapItemManager;
-import fr.zcraft.quartzlib.components.commands.CommandWorkers;
-import fr.zcraft.quartzlib.components.commands.Commands;
-import fr.zcraft.quartzlib.components.gui.Gui;
-import fr.zcraft.quartzlib.components.i18n.I18n;
-import fr.zcraft.quartzlib.core.QuartzPlugin;
-import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.UpdateChecker;
+import fr.moribus.imageonmap.ui.SplatterMapManager;
+import fr.moribus.imageonmap.worker.Worker;
 import java.io.File;
 import java.io.IOException;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SingleLineChart;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public final class ImageOnMap extends QuartzPlugin {
+public final class ImageOnMap extends JavaPlugin {
     private static final String IMAGES_DIRECTORY_NAME = "images";
     private static final String MAPS_DIRECTORY_NAME = "maps";
+
+    /**
+     * How long to wait, when the plugin is disabled, for the queued images to be written to disk.
+     */
+    private static final long IMAGE_IO_SHUTDOWN_TIMEOUT_MS = 10_000;
+
     private static ImageOnMap plugin;
     private final File mapsDirectory;
     private File imagesDirectory;
-    private CommandWorkers commandWorker;
 
     public ImageOnMap() {
         imagesDirectory = new File(this.getDataFolder(), IMAGES_DIRECTORY_NAME);
@@ -92,11 +100,6 @@ public final class ImageOnMap extends QuartzPlugin {
         return new File(imagesDirectory, "map" + mapID + ".png");
     }
 
-    public CommandWorkers getCommandWorker() {
-        return commandWorker;
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
     public void onEnable() {
         // Creating the images and maps directories if necessary
@@ -112,9 +115,10 @@ public final class ImageOnMap extends QuartzPlugin {
 
 
         saveDefaultConfig();
-        commandWorker = loadComponent(CommandWorkers.class);
-        loadComponents(I18n.class, Gui.class, Commands.class, PluginConfiguration.class, ImageIOExecutor.class,
-                ImageRendererExecutor.class);
+        I18n.init(this, getFile());
+        Gui.init(this);
+        Worker.start(ImageIOExecutor.class);
+        Worker.start(ImageRendererExecutor.class);
 
         //Init all the things !
         I18n.setPrimaryLocale(PluginConfiguration.LANG.get());
@@ -122,6 +126,7 @@ public final class ImageOnMap extends QuartzPlugin {
         MapManager.init();
         MapInitEvent.init();
         MapItemManager.init();
+        SplatterMapManager.init(this);
 
 
         Commands.register(
@@ -142,14 +147,16 @@ public final class ImageOnMap extends QuartzPlugin {
         Commands.registerShortcut("maptool", ExploreCommand.class, "maps");
         Commands.registerShortcut("maptool", GiveCommand.class, "givemap");
 
+        Commands.registerToServer(this);
+
         if (PluginConfiguration.CHECK_FOR_UPDATES.get()) {
             UpdateChecker.boot("imageonmap.26585");
         }
 
         if (PluginConfiguration.COLLECT_DATA.get()) {
-            final Metrics metrics = new Metrics(this,5920);
-            metrics.addCustomChart(new Metrics.SingleLineChart("rendered-images", MapManager::getImagesCount));
-            metrics.addCustomChart(new Metrics.SingleLineChart("used-minecraft-maps", MapManager::getMapCount));
+            final Metrics metrics = new Metrics(this, 5920);
+            metrics.addCustomChart(new SingleLineChart("rendered-images", MapManager::getImagesCount));
+            metrics.addCustomChart(new SingleLineChart("used-minecraft-maps", MapManager::getMapCount));
         } else {
             PluginLogger.warning("Collect data disabled");
         }
@@ -161,7 +168,12 @@ public final class ImageOnMap extends QuartzPlugin {
         MapItemManager.exit();
         //MigratorExecutor.waitForMigration();//Removed for now doesn't work nor is useful, maybe useful later on
 
-        super.onDisable();
+        Gui.exit();
+        ActionBar.clear();
+        Worker.stop(ImageRendererExecutor.class, 0);
+        Worker.stop(ImageIOExecutor.class, IMAGE_IO_SHUTDOWN_TIMEOUT_MS);
+        Commands.clear();
+        I18n.exit();
     }
 
     private File checkPluginDirectory(File primaryFile, File... alternateFiles) throws IOException {

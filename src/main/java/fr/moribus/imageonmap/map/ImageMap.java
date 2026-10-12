@@ -37,8 +37,8 @@
 package fr.moribus.imageonmap.map;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.i18n.I;
 import fr.moribus.imageonmap.ui.MapItemManager;
-import fr.zcraft.quartzlib.components.i18n.I;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;

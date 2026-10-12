@@ -38,21 +38,19 @@ package fr.moribus.imageonmap.gui;
 
 import fr.moribus.imageonmap.Permissions;
 import fr.moribus.imageonmap.PluginConfiguration;
+import fr.moribus.imageonmap.gui.framework.ExplorerGui;
+import fr.moribus.imageonmap.gui.framework.Gui;
+import fr.moribus.imageonmap.i18n.I;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
+import fr.moribus.imageonmap.tools.ItemStackBuilder;
 import fr.moribus.imageonmap.ui.MapItemManager;
 import fr.moribus.imageonmap.ui.SplatterMapManager;
-import fr.zcraft.quartzlib.components.gui.ExplorerGui;
-import fr.zcraft.quartzlib.components.gui.Gui;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.MapMeta;
 
 
 public class MapListGui extends ExplorerGui<ImageMap> {
@@ -103,13 +101,7 @@ public class MapListGui extends ExplorerGui<ImageMap> {
 
         builder.lore(I.tl(getPlayerLocale(), "{gray}» {white}Right-click{gray} for details and options"));
 
-        final ItemStack mapItem = builder.item();
-
-        final MapMeta meta = (MapMeta) mapItem.getItemMeta();
-        meta.setColor(Color.GREEN);
-        mapItem.setItemMeta(meta);
-
-        return mapItem;
+        return builder.item();
     }
 
     @Override

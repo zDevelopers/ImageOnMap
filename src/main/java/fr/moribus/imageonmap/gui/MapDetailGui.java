@@ -37,19 +37,19 @@
 package fr.moribus.imageonmap.gui;
 
 import fr.moribus.imageonmap.Permissions;
+import fr.moribus.imageonmap.gui.framework.ExplorerGui;
+import fr.moribus.imageonmap.gui.framework.Gui;
+import fr.moribus.imageonmap.gui.framework.GuiAction;
+import fr.moribus.imageonmap.gui.framework.PromptGui;
+import fr.moribus.imageonmap.i18n.I;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.PosterMap;
 import fr.moribus.imageonmap.map.SingleMap;
+import fr.moribus.imageonmap.tools.ItemStackBuilder;
+import fr.moribus.imageonmap.tools.PluginLogger;
+import fr.moribus.imageonmap.tools.RunTask;
 import fr.moribus.imageonmap.ui.MapItemManager;
-import fr.zcraft.quartzlib.components.gui.ExplorerGui;
-import fr.zcraft.quartzlib.components.gui.Gui;
-import fr.zcraft.quartzlib.components.gui.GuiAction;
-import fr.zcraft.quartzlib.components.gui.PromptGui;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
-import fr.zcraft.quartzlib.tools.runners.RunTask;
-import org.apache.commons.lang.ArrayUtils;
+import java.util.Arrays;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
@@ -148,7 +148,7 @@ public class MapDetailGui extends ExplorerGui<Integer> {
             if (poster.hasColumnData()) {
                 setDataShape(poster.getColumnCount(), poster.getRowCount());
             } else {
-                setData(ArrayUtils.toObject(poster.getMapsIDs()));
+                setData(Arrays.stream(poster.getMapsIDs()).boxed().toArray(Integer[]::new));
             }
         } else {
             setDataShape(1, 1);

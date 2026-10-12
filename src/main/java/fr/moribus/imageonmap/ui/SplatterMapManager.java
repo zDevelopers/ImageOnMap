@@ -36,28 +36,20 @@
 
 package fr.moribus.imageonmap.ui;
 
-import com.google.common.collect.ImmutableMap;
 import fr.moribus.imageonmap.Permissions;
+import fr.moribus.imageonmap.i18n.I;
 import fr.moribus.imageonmap.image.MapInitEvent;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
 import fr.moribus.imageonmap.map.PosterMap;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.components.nbt.NBT;
-import fr.zcraft.quartzlib.components.nbt.NBTCompound;
-import fr.zcraft.quartzlib.components.nbt.NBTList;
-import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.items.GlowEffect;
-import fr.zcraft.quartzlib.tools.items.ItemStackBuilder;
-import fr.zcraft.quartzlib.tools.reflection.NMSException;
-import fr.zcraft.quartzlib.tools.runners.RunTask;
-import fr.zcraft.quartzlib.tools.text.MessageSender;
-import fr.zcraft.quartzlib.tools.world.FlatLocation;
-import fr.zcraft.quartzlib.tools.world.WorldUtils;
-import java.lang.reflect.Method;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
+import fr.moribus.imageonmap.tools.ActionBar;
+import fr.moribus.imageonmap.tools.ChatColor;
+import fr.moribus.imageonmap.tools.FlatLocation;
+import fr.moribus.imageonmap.tools.ItemStackBuilder;
+import fr.moribus.imageonmap.tools.RunTask;
+import fr.moribus.imageonmap.tools.WorldUtils;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Rotation;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
@@ -65,12 +57,24 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin;
 
 //TODO rework splatter effect, using ID is far more stable than nbt tags.
 // To update when adding small picture previsualization.
 public abstract class SplatterMapManager {
+    /**
+     * The key of the persistent data marking an item as a splatter map.
+     */
+    private static NamespacedKey splatterKey = null;
+
     private SplatterMapManager() {
+    }
+
+    public static void init(Plugin plugin) {
+        splatterKey = new NamespacedKey(plugin, "splatter_map");
     }
 
     public static ItemStack makeSplatterMap(PosterMap map) {
@@ -100,61 +104,46 @@ public abstract class SplatterMapManager {
                 .longLore(ChatColor.GRAY
                         + I.t("Shift-click one of the placed maps to remove the whole poster in one shot."), 40)
                 .hideAllAttributes()
-                .craftItem();
+                .item();
 
         final MapMeta meta = (MapMeta) splatter.getItemMeta();
-        meta.setMapId(map.getMapIdAt(0));
-        meta.setColor(Color.GREEN);
+        MapItemManager.setMapId(meta, map.getMapIdAt(0));
         splatter.setItemMeta(meta);
 
         return addSplatterAttribute(splatter);
     }
 
     /**
-     * To identify image on maps for the auto-splattering to work, we mark the
-     * items using an enchantment maps are not supposed to have (Mending).
-     *
-     * <p>
-     * Then we check if the map is enchanted at all to know if it's a splatter
-     * map. This ensure compatibility with old splatter maps from 3.x, where
-     * zLib's glow effect was used.
-     * </p>
-     * An AttributeModifier (using zLib's attributes system) is not used,
-     * because Minecraft (or Spigot) removes them from maps in 1.14+, so that
-     * wasn't stable enough (and the glowing effect of enchantments is
-     * prettier).
+     * To identify image on maps for the auto-splattering to work, we mark the items with a persistent data tag, and
+     * make them glow like enchanted items.
      *
      * @param itemStack The item stack to mark as a splatter map.
-     * @return The modified item stack. The instance may be different if the passed item stack is not a craft itemstack.
+     * @return The modified item stack.
      */
     public static ItemStack addSplatterAttribute(final ItemStack itemStack) {
-        GlowEffect.addGlow(itemStack);
+        final ItemMeta meta = itemStack.getItemMeta();
+        meta.getPersistentDataContainer().set(splatterKey, PersistentDataType.BOOLEAN, true);
+        meta.setEnchantmentGlintOverride(true);
+        itemStack.setItemMeta(meta);
         return itemStack;
     }
 
     /**
-     * Checks if an item have the splatter attribute set (i.e. if the item is
-     * enchanted in any way).
+     * Checks if an item have the splatter attribute set.
+     *
+     * <p>Splatter maps created by older versions of ImageOnMap were marked with an enchantment, so enchanted maps
+     * are also considered as splatter maps.</p>
      *
      * @param itemStack The item to check.
      * @return True if the attribute was detected.
      */
     public static boolean hasSplatterAttributes(ItemStack itemStack) {
-
-        try {
-            final NBTCompound nbt = NBT.fromItemStack(itemStack);
-            if (!nbt.containsKey("Enchantments")) {
-                return false;
-            }
-            final Object enchantments = nbt.get("Enchantments");
-            if (!(enchantments instanceof NBTList)) {
-                return false;
-            }
-            return !((NBTList) enchantments).isEmpty();
-        } catch (NMSException e) {
-            PluginLogger.error("Unable to get Splatter Map attribute on item", e);
+        if (itemStack == null || !itemStack.hasItemMeta()) {
             return false;
         }
+
+        final ItemMeta meta = itemStack.getItemMeta();
+        return meta.getPersistentDataContainer().has(splatterKey, PersistentDataType.BOOLEAN) || meta.hasEnchants();
     }
 
     /**
@@ -218,7 +207,7 @@ public abstract class SplatterMapManager {
             surface.loc2 = endLocation;
 
             if (!surface.isValid(player)) {
-                MessageSender.sendActionBarMessage(player,
+                ActionBar.sendMessage(player,
                         I.t("{ce}There is not enough space to place this map ({0} × {1}).",
                                 poster.getColumnCount(),
                                 poster.getRowCount()));
@@ -246,7 +235,7 @@ public abstract class SplatterMapManager {
                 RunTask.later(() -> {
                     addPropertiesToFrames(player, frame);
                     frame.setItem(
-                            new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+                            createFrameMapItem(id));
                 }, 5L);
 
                 if (i == 0) {
@@ -294,7 +283,7 @@ public abstract class SplatterMapManager {
             wall.loc2 = endLocation;
 
             if (!wall.isValid()) {
-                MessageSender.sendActionBarMessage(player,
+                ActionBar.sendMessage(player,
                         I.t("{ce}There is not enough space to place this map ({0} × {1}).", poster.getColumnCount(),
                                 poster.getRowCount()));
                 return false;
@@ -308,7 +297,7 @@ public abstract class SplatterMapManager {
                 RunTask.later(() -> {
                     addPropertiesToFrames(player, frame);
                     frame.setItem(
-                            new ItemStackBuilder(Material.FILLED_MAP).nbt(ImmutableMap.of("map", id)).craftItem());
+                            createFrameMapItem(id));
                 }, 5L);
 
 
@@ -375,21 +364,19 @@ public abstract class SplatterMapManager {
 
     public static void addPropertiesToFrames(Player player, ItemFrame frame) {
         if (Permissions.PLACE_INVISIBLE_SPLATTER_MAP.grantedTo(player)) {
-            try {
-                Method setVisible = frame.getClass().getMethod("setVisible", boolean.class);
-                setVisible.invoke(frame, false);
-            } catch (Exception e) {
-                //1.16-
-            }
+            frame.setVisible(false);
         }
     }
 
     public static void removePropertiesFromFrames(Player player, ItemFrame frame) {
-        try {
-            Method setVisible = frame.getClass().getMethod("setVisible", boolean.class);
-            setVisible.invoke(frame, true);
-        } catch (Exception e) {
-            //1.16-
-        }
+        frame.setVisible(true);
+    }
+
+    private static ItemStack createFrameMapItem(int mapId) {
+        final ItemStack item = new ItemStack(Material.FILLED_MAP);
+        final MapMeta meta = (MapMeta) item.getItemMeta();
+        MapItemManager.setMapId(meta, mapId);
+        item.setItemMeta(meta);
+        return item;
     }
 }

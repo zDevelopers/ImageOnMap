@@ -37,11 +37,9 @@
 package fr.moribus.imageonmap.commands;
 
 import fr.moribus.imageonmap.PluginConfiguration;
+import fr.moribus.imageonmap.i18n.I;
 import fr.moribus.imageonmap.map.ImageMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.zcraft.quartzlib.components.commands.Command;
-import fr.zcraft.quartzlib.components.commands.CommandException;
-import fr.zcraft.quartzlib.components.i18n.I;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +70,7 @@ public abstract class IoMCommand extends Command {
                 .anyMatch(h -> h.equalsIgnoreCase(url.getHost()));
     }
 
+    @SuppressWarnings("deprecation")
     protected void retrieveUUID(final String arg, final Consumer<UUID> consumer) {
         // If it is being removed we may have to use Mojang services
         consumer.accept(Bukkit.getOfflinePlayer(arg).getUniqueId());

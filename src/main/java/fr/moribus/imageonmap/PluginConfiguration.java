@@ -36,32 +36,144 @@
 
 package fr.moribus.imageonmap;
 
-import static fr.zcraft.quartzlib.components.configuration.ConfigurationItem.item;
-import static fr.zcraft.quartzlib.components.configuration.ConfigurationItem.list;
-
-import fr.zcraft.quartzlib.components.configuration.Configuration;
-import fr.zcraft.quartzlib.components.configuration.ConfigurationItem;
-import fr.zcraft.quartzlib.components.configuration.ConfigurationList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IllformedLocaleException;
+import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
+import org.bukkit.configuration.file.FileConfiguration;
 
 
-public final class PluginConfiguration extends Configuration {
-    public static ConfigurationItem<Locale> LANG = item("lang", Locale.class);
+public final class PluginConfiguration {
+    public static final ConfigurationItem<Locale> LANG = item("lang", null, PluginConfiguration::toLocale);
 
-    public static ConfigurationItem<Boolean> COLLECT_DATA = item("collect-data", true);
+    public static final ConfigurationItem<Boolean> COLLECT_DATA = item("collect-data", true);
 
-    public static ConfigurationItem<Boolean> CHECK_FOR_UPDATES = item("check-for-updates", true);
+    public static final ConfigurationItem<Boolean> CHECK_FOR_UPDATES = item("check-for-updates", true);
 
-    public static ConfigurationItem<Integer> MAP_GLOBAL_LIMIT = item("map-global-limit", 0, "Limit-map-by-server");
-    public static ConfigurationItem<Integer> MAP_PLAYER_LIMIT = item("map-player-limit", 0, "Limit-map-by-player");
+    public static final ConfigurationItem<Integer> MAP_GLOBAL_LIMIT =
+            item("map-global-limit", 0, "Limit-map-by-server");
+    public static final ConfigurationItem<Integer> MAP_PLAYER_LIMIT =
+            item("map-player-limit", 0, "Limit-map-by-player");
 
-    public static ConfigurationItem<Boolean> SAVE_FULL_IMAGE = item("save-full-image", true);
+    public static final ConfigurationItem<Boolean> SAVE_FULL_IMAGE = item("save-full-image", true);
 
 
-    public static ConfigurationItem<Integer> LIMIT_SIZE_X = item("limit-map-size-x", 0);
-    public static ConfigurationItem<Integer> LIMIT_SIZE_Y = item("limit-map-size-y", 0);
+    public static final ConfigurationItem<Integer> LIMIT_SIZE_X = item("limit-map-size-x", 0);
+    public static final ConfigurationItem<Integer> LIMIT_SIZE_Y = item("limit-map-size-y", 0);
 
-    public static ConfigurationList<String> IMAGES_HOSTNAMES_WHITELIST =
-            list("images-hostnames-whitelist", String.class);
+    public static final ConfigurationItem<List<String>> IMAGES_HOSTNAMES_WHITELIST =
+            item("images-hostnames-whitelist", Collections.emptyList(), PluginConfiguration::toStringList);
 
+    private PluginConfiguration() {
+    }
+
+    private static ConfigurationItem<Boolean> item(String path, boolean defaultValue) {
+        return item(path, defaultValue, PluginConfiguration::toBoolean);
+    }
+
+    private static ConfigurationItem<Integer> item(String path, int defaultValue, String... deprecatedPaths) {
+        return item(path, defaultValue, PluginConfiguration::toInteger, deprecatedPaths);
+    }
+
+    private static <T> ConfigurationItem<T> item(String path, T defaultValue, Function<Object, T> parser,
+                                                 String... deprecatedPaths) {
+        return new ConfigurationItem<>(path, defaultValue, parser, deprecatedPaths);
+    }
+
+    private static Locale toLocale(Object value) {
+        if (value.toString().isEmpty()) {
+            return null;
+        }
+        try {
+            return new Locale.Builder().setLanguageTag(value.toString()).build();
+        } catch (IllformedLocaleException ex) {
+            return null;
+        }
+    }
+
+    private static Boolean toBoolean(Object value) {
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        switch (value.toString().trim().toLowerCase()) {
+            case "true":
+            case "yes":
+            case "on":
+            case "1":
+                return true;
+            case "false":
+            case "no":
+            case "off":
+            case "0":
+                return false;
+            default:
+                return null;
+        }
+    }
+
+    private static Integer toInteger(Object value) {
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        try {
+            return Integer.parseInt(value.toString().trim());
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    private static List<String> toStringList(Object value) {
+        if (!(value instanceof List)) {
+            return null;
+        }
+        final List<String> list = new ArrayList<>();
+        for (Object element : (List<?>) value) {
+            if (element != null) {
+                list.add(element.toString());
+            }
+        }
+        return list;
+    }
+
+    /**
+     * A value of the configuration file. The value is read from the configuration every time it is requested.
+     *
+     * @param <T> The type of the value.
+     */
+    public static final class ConfigurationItem<T> {
+        private final String path;
+        private final T defaultValue;
+        private final Function<Object, T> parser;
+        private final String[] deprecatedPaths;
+
+        private ConfigurationItem(String path, T defaultValue, Function<Object, T> parser, String[] deprecatedPaths) {
+            this.path = path;
+            this.defaultValue = defaultValue;
+            this.parser = parser;
+            this.deprecatedPaths = deprecatedPaths;
+        }
+
+        /**
+         * Returns the value of this item.
+         *
+         * @return The configured value, or the default value if the configured one is missing or invalid.
+         */
+        public T get() {
+            final FileConfiguration config = ImageOnMap.getPlugin().getConfig();
+
+            Object rawValue = config.get(path);
+            for (int i = 0; rawValue == null && i < deprecatedPaths.length; i++) {
+                rawValue = config.get(deprecatedPaths[i]);
+            }
+
+            if (rawValue == null) {
+                return defaultValue;
+            }
+
+            final T value = parser.apply(rawValue);
+            return value != null ? value : defaultValue;
+        }
+    }
 }

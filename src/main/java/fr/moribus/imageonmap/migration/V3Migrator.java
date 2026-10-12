@@ -37,10 +37,10 @@
 package fr.moribus.imageonmap.migration;
 
 import fr.moribus.imageonmap.ImageOnMap;
+import fr.moribus.imageonmap.i18n.I;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.zcraft.quartzlib.components.i18n.I;
-import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.mojang.UUIDFetcher;
+import fr.moribus.imageonmap.tools.PluginLogger;
+import fr.moribus.imageonmap.tools.UUIDFetcher;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -52,13 +52,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -528,8 +525,9 @@ public class V3Migrator implements Runnable {
             if (playerUUID == null) {
                 remainingPosters.add(poster);
             } else if (!poster.isMapValid()) {
-                missingMapIds.addAll(Arrays.stream(ArrayUtils.toObject(poster.getMapsIds())).map(id -> (int) id)
-                        .collect(Collectors.toList()));
+                for (short mapId : poster.getMapsIds()) {
+                    missingMapIds.add((int) mapId);
+                }
             } else {
                 MapManager.insertMap(poster.toImageMap(playerUUID));
             }
@@ -543,7 +541,7 @@ public class V3Migrator implements Runnable {
                     I.t("These maps will not be migrated,"
                             + " but this could mean the save has been altered or corrupted."));
             PluginLogger.warning(I.t("The following maps are missing : {0} ",
-                    StringUtils.join(missingMapIds, ',')));
+                    missingMapIds.stream().map(String::valueOf).collect(Collectors.joining(","))));
         }
     }
 

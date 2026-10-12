@@ -38,13 +38,7 @@ package fr.moribus.imageonmap.image;
 
 import fr.moribus.imageonmap.ImageOnMap;
 import fr.moribus.imageonmap.map.MapManager;
-import fr.zcraft.quartzlib.components.events.FutureEventHandler;
-import fr.zcraft.quartzlib.components.events.FutureEvents;
-import fr.zcraft.quartzlib.components.events.WrappedEvent;
-import fr.zcraft.quartzlib.core.QuartzLib;
-import fr.zcraft.quartzlib.tools.PluginLogger;
-import fr.zcraft.quartzlib.tools.reflection.Reflection;
-import fr.zcraft.quartzlib.tools.runners.RunTask;
+import fr.moribus.imageonmap.tools.RunTask;
 import java.io.File;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -63,6 +57,7 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 
@@ -70,8 +65,7 @@ public class MapInitEvent implements Listener {
 
     public static void init() {
 
-        QuartzLib.registerEvents(new MapInitEvent());
-        FutureEvents.registerFutureEvents(new EntitiesLoadListener());
+        Bukkit.getPluginManager().registerEvents(new MapInitEvent(), ImageOnMap.getPlugin());
 
         for (World world : Bukkit.getWorlds()) {
             for (ItemFrame frame : world.getEntitiesByClass(ItemFrame.class)) {
@@ -220,26 +214,16 @@ public class MapInitEvent implements Listener {
     }
 
 
-    protected static final class EntitiesLoadListener implements Listener {
-        @FutureEventHandler(event = "world.EntitiesLoadEvent")
-        public void onEntitiesLoad(WrappedEvent event) {
-            //New in 1.17
-            //Used to make sure map are really loaded in 1.17 on Paper (else some won't render or update properly)
-            RunTask.later(() -> {
-                try {
-                    List<Entity> entities = (List) Reflection.call(event.getEvent(), "getEntities");
-                    for (Entity entity : entities) {
-                        if (entity instanceof ItemFrame) {
-                            initMap(((ItemFrame) entity).getItem());
-                        }
-                    }
-                } catch (Exception e) {
-                    PluginLogger.error(e.toString());
-                    return;
+    @EventHandler
+    public void onEntitiesLoad(EntitiesLoadEvent event) {
+        //Used to make sure map are really loaded (else some won't render or update properly)
+        final List<Entity> entities = event.getEntities();
+        RunTask.later(() -> {
+            for (Entity entity : entities) {
+                if (entity instanceof ItemFrame) {
+                    initMap(((ItemFrame) entity).getItem());
                 }
-
-            }, 5L);
-        }
-
+            }
+        }, 5L);
     }
 }
